@@ -1,10 +1,24 @@
 # EPUB to Audiobook Converter [![Discord](https://img.shields.io/discord/1177631634724491385?label=Discord&logo=discord&logoColor=white)](https://discord.com/invite/pgp2G8zhS7) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/p0n1/epub_to_audiobook)
 
-*Join our [Discord](https://discord.com/invite/pgp2G8zhS7) server for any questions or discussions. You can also ask questions about this project on [DeepWiki](https://deepwiki.com/p0n1/epub_to_audiobook).*
+调试：
+git clone https://github.com/p0n1/epub_to_audiobook.git
+cd epub_to_audiobook
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+export OPENAI_API_KEY=‘’
+运行：
+cd epub_to_audiobook
+python3 -m venv venv
+source venv/bin/activate
+python3 main_ui.py
+python3 main_ui.py --host 0.0.0.0 --port 8080
+python3 main.py <input_file> <output_folder> [options]
+python3 main_ui.py --host 0.0.0.0 --port 8080
+不间断运行：nohup python3 main_ui.py --host 0.0.0.0 --port 8080 > output.log 2>&1 &
+查看进程日志：tail -f output.log
+关闭进程：1.找到进程号 ps -ef | grep main_ui.py
 
-This project provides a command-line tool to convert EPUB ebooks into audiobooks. It now supports both the [Microsoft Azure Text-to-Speech API](https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/rest-text-to-speech) (alternativly [EdgeTTS](https://github.com/rany2/edge-tts)) and the [OpenAI Text-to-Speech API](https://platform.openai.com/docs/guides/text-to-speech) to generate the audio for each chapter in the ebook. The output audio files are optimized for use with [Audiobookshelf](https://github.com/advplyr/audiobookshelf).
-
-<!-- *This project was developed with the help of ChatGPT.* -->
 
 ## Recent Updates
 

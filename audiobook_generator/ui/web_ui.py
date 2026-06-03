@@ -34,7 +34,9 @@ def on_tab_change(evt: gr.SelectData):
 
 
 def get_azure_voices_by_language(language):
-    voices_list = [voice for voice in get_azure_supported_voices() if voice.startswith(language)]
+    voices_list = get_azure_supported_voices()
+    if not voices_list:
+        voices_list = ["Vivian"]
     return gr.Dropdown(voices_list, value=voices_list[0], label="Voice", interactive=True, info="Select the voice")
 
 
