@@ -3,6 +3,7 @@ import logging
 import math
 import tempfile
 import os
+import base64
 from pydub import AudioSegment
 
 from openai import OpenAI
@@ -12,62 +13,59 @@ from audiobook_generator.config.general_config import GeneralConfig
 from audiobook_generator.utils.utils import split_text, set_audio_tags, merge_audio_segments
 from audiobook_generator.tts_providers.base_tts_provider import BaseTTSProvider
 
-
 logger = logging.getLogger(__name__)
 
 
 def get_openai_supported_output_formats():
     return ["mp3", "aac", "flac", "opus", "wav"]
 
+
 def get_openai_supported_voices():
-    return ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse"]
+    # 彻底替换为小米 MiMo 支持的合法音色列表
+    return ["mimo_default", "冰糖", "茉莉", "苏打", "白桦", "Mia", "Chloe", "Milo", "Dean"]
+
 
 def get_openai_supported_models():
-    return ["gpt-4o-mini-tts", "tts-1", "tts-1-hd"]
+    return ["mimo-v2.5-tts"]
+
 
 def get_openai_instructions_example():
-    return """Voice Affect: Calm, composed, and reassuring. Competent and in control, instilling trust.
-Tone: Sincere, empathetic, with genuine concern for the customer and understanding of the situation.
-Pacing: Slower during the apology to allow for clarity and processing. Faster when offering solutions to signal action and resolution.
-Emotions: Calm reassurance, empathy, and gratitude.
-Pronunciation: Clear, precise: Ensures clarity, especially with key details. Focus on key words like 'refund' and 'patience.' 
-Pauses: Before and after the apology to give space for processing the apology."""
+    return """Voice Affect: Calm, composed, and reassuring. Competent and in control, instilling trust."""
+
 
 def get_price(model):
-    # https://platform.openai.com/docs/pricing#transcription-and-speech-generation
-    if model == "tts-1": # $15 per 1 mil chars
-        return 0.015
-    elif model == "tts-1-hd": # $30 per 1 mil chars
-        return 0.03
-    elif model == "gpt-4o-mini-tts": # $12 per 1 mil tokens (not chars, as 1 token is ~4 chars)
-        return 0.003 # TODO: this could be very wrong for Chinese. Not sure how openai calculates the audio token count.
-    else:
-        logger.warning(f"OpenAI: Unsupported model name: {model}, unable to retrieve the price")
-        return 0.0
+    return 0.0
 
 
 class OpenAITTSProvider(BaseTTSProvider):
     def __init__(self, config: GeneralConfig):
-        config.model_name = config.model_name or "gpt-4o-mini-tts" # default to this model as it's the cheapest
-        config.voice_name = config.voice_name or "alloy"
+        # 1. 强制设定或纠正默认参数，防止其回退到官方的 alloy
+        config.model_name = config.model_name or "mimo-v2.5-tts"
+
+        # 如果音色为空，或者传入了不属于 MiMo 的音色（例如系统默认带入的 alloy），强制纠正为 mimo_default
+        if not config.voice_name or config.voice_name not in get_openai_supported_voices():
+            logger.warning(f"Voice '{config.voice_name}' is not supported by MiMo. Falling back to 'mimo_default'.")
+            config.voice_name = "mimo_default"
+
         config.speed = config.speed or 1.0
         config.instructions = config.instructions or None
-        config.output_format = config.output_format or "mp3"
+        config.output_format = config.output_format or "wav"
 
         self.price = get_price(config.model_name)
         super().__init__(config)
 
-        self.client = OpenAI(max_retries=4)  # User should set OPENAI_API_KEY environment variable
+        # 2. 更新为文档提供的最新 Base URL 链接
+        base_url = os.environ.get("OPENAI_BASE_URL", "https://token-plan-cn.xiaomimimo.com/v1")
+        self.client = OpenAI(
+            base_url=base_url,
+            max_retries=4
+        )
 
     def __str__(self) -> str:
         return super().__str__()
 
     def text_to_speech(self, text: str, output_file: str, audio_tags: AudioTags):
-        # Reason: The max num of input tokens is 2000 for gpt-4o-mini-tts https://platform.openai.com/docs/models/gpt-4o-mini-tts. One token is ~4 chars in English but ~1 word/char in Chinese.
-        # So we reduce the max num of chars from 4000 to 1800 to avoid the input tokens limit.
-        # TODO: detect the language and set the max num of chars accordingly.
         max_chars = 1800
-
         text_chunks = split_text(text, max_chars, self.config.language)
 
         audio_segments = []
@@ -75,34 +73,54 @@ class OpenAITTSProvider(BaseTTSProvider):
 
         for i, chunk in enumerate(text_chunks, 1):
             chunk_id = f"chapter-{audio_tags.idx}_{audio_tags.title}_chunk_{i}_of_{len(text_chunks)}"
-            logger.info(
-                f"Processing {chunk_id}, length={len(chunk)}"
-            )
-            logger.debug(
-                f"Processing {chunk_id}, length={len(chunk)}, text=[{chunk}]"
-            )
+            logger.info(f"Processing {chunk_id}, length={len(chunk)}")
 
-            # NO retry for OpenAI TTS because SDK has built-in retry logic
-            response = self.client.audio.speech.create(
-                model=self.config.model_name,
-                voice=self.config.voice_name,
-                speed=self.config.speed,
-                instructions=self.config.instructions,
-                input=chunk,
-                response_format=self.config.output_format,
-            )
+            if self.config.model_name == "mimo-v2.5-tts":
+                messages = []
+                if self.config.instructions:
+                    messages.append({
+                        "role": "user",
+                        "content": self.config.instructions
+                    })
+                else:
+                    messages.append({
+                        "role": "user",
+                        "content": "Read the text in a natural and clear audiobook voice."
+                    })
 
-            # Log response details
-            logger.debug(f"Remote server response: status_code={response.response.status_code}, "
-                         f"size={len(response.content)} bytes, "
-                         f"content={response.content[:128]}...")
+                messages.append({
+                    "role": "assistant",
+                    "content": chunk
+                })
 
-            audio_segments.append(io.BytesIO(response.content))
+                completion = self.client.chat.completions.create(
+                    model=self.config.model_name,
+                    messages=messages,
+                    audio={
+                        "format": self.config.output_format,
+                        "voice": self.config.voice_name
+                    }
+                )
+
+                message = completion.choices[0].message
+                audio_content = base64.b64decode(message.audio.data)
+
+            else:
+                response = self.client.audio.speech.create(
+                    model=self.config.model_name,
+                    voice=self.config.voice_name,
+                    speed=self.config.speed,
+                    input=chunk,
+                    response_format=self.config.output_format,
+                )
+                audio_content = response.content
+
+            logger.debug(f"Remote server response: size={len(audio_content)} bytes")
+            audio_segments.append(io.BytesIO(audio_content))
             chunk_ids.append(chunk_id)
 
-        # Use utility function to merge audio segments
-        merge_audio_segments(audio_segments, output_file, self.config.output_format, chunk_ids, self.config.use_pydub_merge)
-
+        merge_audio_segments(audio_segments, output_file, self.config.output_format, chunk_ids,
+                             self.config.use_pydub_merge)
         set_audio_tags(output_file, audio_tags)
 
     def get_break_string(self):
@@ -116,8 +134,9 @@ class OpenAITTSProvider(BaseTTSProvider):
             raise ValueError(f"OpenAI: Unsupported output format: {self.config.output_format}")
         if self.config.speed < 0.25 or self.config.speed > 4.0:
             raise ValueError(f"OpenAI: Unsupported speed: {self.config.speed}")
-        if self.config.instructions and len(self.config.instructions) > 0 and self.config.model_name != "gpt-4o-mini-tts":
-            raise ValueError(f"OpenAI: Instructions are only supported for 'gpt-4o-mini-tts' model")
+        if self.config.voice_name not in get_openai_supported_voices():
+            raise ValueError(
+                f"OpenAI: Unsupported voice: {self.config.voice_name}. Available: {get_openai_supported_voices()}")
 
     def estimate_cost(self, total_chars):
         return math.ceil(total_chars / 1000) * self.price

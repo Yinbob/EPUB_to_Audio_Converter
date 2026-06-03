@@ -7,7 +7,11 @@ from audiobook_generator.tts_providers.base_tts_provider import (
     get_supported_tts_providers,
 )
 from audiobook_generator.utils.log_handler import setup_logging, generate_unique_log_path
+from pydub import AudioSegment
 
+# 手动指定路径（Mac 通用）
+AudioSegment.converter = "/opt/homebrew/bin/ffmpeg"
+AudioSegment.ffprobe = "/opt/homebrew/bin/ffprobe"
 
 def handle_args():
     parser = argparse.ArgumentParser(description="Convert text book to audiobook")
