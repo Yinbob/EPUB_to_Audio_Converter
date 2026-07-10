@@ -6,12 +6,15 @@ import os
 import base64
 from pydub import AudioSegment
 
+import numpy as np
+import soundfile as sf
 from openai import OpenAI
 
 from audiobook_generator.core.audio_tags import AudioTags
 from audiobook_generator.config.general_config import GeneralConfig
 from audiobook_generator.utils.utils import split_text, set_audio_tags, merge_audio_segments
 from audiobook_generator.tts_providers.base_tts_provider import BaseTTSProvider
+from audiobook_generator.utils.mimo_config import get_mimo_credentials
 
 logger = logging.getLogger(__name__)
 
@@ -54,8 +57,16 @@ class OpenAITTSProvider(BaseTTSProvider):
         self.price = get_price(config.model_name)
         super().__init__(config)
 
-        # 2. 更新为文档提供的最新 Base URL 链接
-        base_url = os.environ.get("OPENAI_BASE_URL", "https://token-plan-cn.xiaomimimo.com/v1")
+        # 2. 从本地配置文件 / 环境变量 / 交互式输入获取凭证
+        api_key, base_url = get_mimo_credentials()
+
+        # 安全处理：自动去除 API Key 中可能误带的非 ASCII 字符（如弯引号）
+        cleaned_key = api_key.encode("ascii", "ignore").decode("ascii").strip()
+        if cleaned_key != api_key:
+            logger.warning("OPENAI_API_KEY contains non-ASCII characters (e.g. smart quotes). Automatically cleaned.")
+            api_key = cleaned_key
+            os.environ["OPENAI_API_KEY"] = cleaned_key
+
         self.client = OpenAI(
             base_url=base_url,
             max_retries=4
@@ -93,17 +104,53 @@ class OpenAITTSProvider(BaseTTSProvider):
                     "content": chunk
                 })
 
-                completion = self.client.chat.completions.create(
-                    model=self.config.model_name,
-                    messages=messages,
-                    audio={
-                        "format": self.config.output_format,
-                        "voice": self.config.voice_name
-                    }
-                )
+                if self.config.stream:
+                    # ── 流式调用：收集 PCM16 分片后合成 WAV ──
+                    logger.info(f"Streaming mode enabled for chunk {chunk_id}")
+                    completion = self.client.chat.completions.create(
+                        model=self.config.model_name,
+                        messages=messages,
+                        audio={
+                            "format": "pcm16",
+                            "voice": self.config.voice_name
+                        },
+                        stream=True
+                    )
 
-                message = completion.choices[0].message
-                audio_content = base64.b64decode(message.audio.data)
+                    collected_pcm = np.array([], dtype=np.float32)
+                    for stream_chunk in completion:
+                        if not stream_chunk.choices:
+                            continue
+                        delta = stream_chunk.choices[0].delta
+                        audio = getattr(delta, "audio", None)
+                        if audio is not None and isinstance(audio, dict) and "data" in audio:
+                            pcm_bytes = base64.b64decode(audio["data"])
+                            np_pcm = np.frombuffer(pcm_bytes, dtype=np.int16).astype(np.float32) / 32768.0
+                            collected_pcm = np.concatenate((collected_pcm, np_pcm))
+
+                    if len(collected_pcm) == 0:
+                        logger.warning(f"No audio data received for {chunk_id}")
+                        continue
+
+                    # 将 PCM float32 写入 WAV 格式的 BytesIO
+                    wav_buffer = io.BytesIO()
+                    sf.write(wav_buffer, collected_pcm, samplerate=24000, format="WAV")
+                    wav_buffer.seek(0)
+                    audio_content = wav_buffer.read()
+                    logger.info(f"Stream collected {len(collected_pcm)} samples ({len(audio_content)} bytes WAV)")
+                else:
+                    # ── 非流式调用（原有逻辑） ──
+                    completion = self.client.chat.completions.create(
+                        model=self.config.model_name,
+                        messages=messages,
+                        audio={
+                            "format": self.config.output_format,
+                            "voice": self.config.voice_name
+                        }
+                    )
+
+                    message = completion.choices[0].message
+                    audio_content = base64.b64decode(message.audio.data)
 
             else:
                 response = self.client.audio.speech.create(

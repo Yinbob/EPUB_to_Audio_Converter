@@ -28,6 +28,9 @@ Thumbs.db
 # audio files
 audiobook_output/
 
+# API config (contains secrets)
+mimo_config.json
+
 private_examples/
 
 # custom

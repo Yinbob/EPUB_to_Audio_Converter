@@ -5,7 +5,7 @@ from audiobook_generator.ui.web_ui import host_ui
 
 
 def handle_args():
-    parser = argparse.ArgumentParser(description="WebUI for Epub to Audiobook convertor")
+    parser = argparse.ArgumentParser(description="WebUI for Book to Audiobook converter (supports EPUB, DOC, DOCX)")
     parser.add_argument("--host", default="127.0.0.1", help="Host address")
     parser.add_argument("--port", default=7860, type=int, help="Port number")
 

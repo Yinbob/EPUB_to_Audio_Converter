@@ -10,3 +10,7 @@ gradio==5.50.0
 docker==7.1.0
 sentencex==0.6.1
 gradio_log==0.0.8
+python-docx==1.1.2
+websockets>=11.0
+numpy>=1.24.0
+soundfile>=0.12.0

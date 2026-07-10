@@ -1,6 +1,8 @@
 from multiprocessing import Process
 from typing import Optional
+from pathlib import Path
 import os
+import json
 import urllib.parse
 import zipfile
 import tempfile
@@ -10,19 +12,53 @@ from datetime import datetime
 import gradio as gr
 from gradio_log import Log
 
+# ── WebUI 持久化设置 ──────────────────────────────────────────────
+_SETTINGS_PATH = os.path.join(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")),
+    ".webui_settings.json",
+)
+
+_DEFAULT_SETTINGS = {
+    "output_text": False,
+    "preview": False,
+    "remove_endnotes": False,
+    "remove_reference_numbers": False,
+    "show_voice_instructions": False,
+}
+
+
+def _load_settings() -> dict:
+    """从磁盘读取已保存的设置，缺失项用默认值补全。"""
+    merged = dict(_DEFAULT_SETTINGS)
+    if os.path.exists(_SETTINGS_PATH):
+        try:
+            with open(_SETTINGS_PATH, "r", encoding="utf-8") as f:
+                merged.update(json.load(f))
+        except Exception:
+            pass
+    return merged
+
+
+def _save_checkbox(key: str, value: bool):
+    """将单个开关的最新状态写回磁盘。"""
+    settings = _load_settings()
+    settings[key] = value
+    with open(_SETTINGS_PATH, "w", encoding="utf-8") as f:
+        json.dump(settings, f, indent=2, ensure_ascii=False)
+
 from audiobook_generator.config.general_config import GeneralConfig
-from audiobook_generator.tts_providers.azure_tts_provider import get_azure_supported_languages, \
-    get_azure_supported_voices, get_azure_supported_output_formats
 from audiobook_generator.tts_providers.edge_tts_provider import get_edge_tts_supported_voices, \
     get_edge_tts_supported_language, get_edge_tts_supported_output_formats
 from audiobook_generator.tts_providers.openai_tts_provider import get_openai_supported_models, \
     get_openai_supported_voices, get_openai_instructions_example, get_openai_supported_output_formats
 from audiobook_generator.tts_providers.piper_tts_provider import get_piper_supported_languages, \
     get_piper_supported_voices, get_piper_supported_qualities, get_piper_supported_speakers
+from audiobook_generator.tts_providers.minimax_tts_provider import get_minimax_supported_models, \
+    get_minimax_supported_output_formats, get_minimax_voice_choices, get_minimax_voice_id_from_choice
 from audiobook_generator.utils.log_handler import generate_unique_log_path
 from main import main
 
-selected_tts = "OpenAI"  # 默认选中优化后的 OpenAI 标签页
+selected_tts = "Mimo"  # 默认选中优化后的 Mimo 标签页
 running_process: Optional[Process] = None
 webui_log_file = None
 
@@ -33,11 +69,26 @@ def on_tab_change(evt: gr.SelectData):
     selected_tts = evt.value
 
 
-def get_azure_voices_by_language(language):
-    voices_list = get_azure_supported_voices()
-    if not voices_list:
-        voices_list = ["Vivian"]
-    return gr.Dropdown(voices_list, value=voices_list[0], label="Voice", interactive=True, info="Select the voice")
+def update_output_dir_from_file(file_objs):
+    """根据上传的 EPUB 文件名自动生成输出目录（支持多文件）"""
+    if not file_objs:
+        return gr.update()
+    # 兼容单文件（单个对象）和多文件（列表）两种情况
+    if not isinstance(file_objs, list):
+        file_objs = [file_objs]
+    if len(file_objs) == 0:
+        return gr.update()
+    # 取第一个文件的书名作为输出目录
+    first = file_objs[0]
+    file_path = first.name if hasattr(first, "name") else first
+    if not file_path:
+        return gr.update()
+    book_name = Path(file_path).stem  # 去掉 .epub 后缀
+    safe_name = "".join(c if c.isalnum() or c in "._-" else "_" for c in book_name)
+    if len(file_objs) > 1:
+        safe_name += f" 等{len(file_objs)}本书"
+    output_path = os.path.join("audiobook_output", safe_name)
+    return gr.update(value=output_path)
 
 
 def get_edge_voices_by_language(language):
@@ -65,78 +116,118 @@ def get_piper_supported_speakers_gui(language, voice, quality):
 def process_ui_form(input_file, output_dir, worker_count, log_level, output_text, preview,
                     search_and_replace_file, title_mode, new_line_mode, chapter_start, chapter_end, remove_endnotes,
                     remove_reference_numbers,
-                    model, voices, speed, openai_output_format, instructions,
-                    azure_language, azure_voice, azure_output_format, azure_break_duration,
+                    model, voices, speed, openai_output_format, instructions, enable_stream,
+                    minimax_model, minimax_voice, minimax_output_format,
                     edge_language, edge_voice, edge_output_format, proxy, edge_voice_rate, edge_volume, edge_pitch,
                     edge_break_duration,
                     piper_executable_path, piper_docker_image, piper_language, piper_voice, piper_quality,
                     piper_speaker,
                     piper_noise_scale, piper_noise_w_scale, piper_length_scale, piper_sentence_silence):
-    config = GeneralConfig(None)
-    config.input_file = input_file.name if hasattr(input_file, 'name') else input_file
-    config.output_folder = output_dir
-    config.preview = preview
-    config.output_text = output_text
-    config.log = log_level
-    config.worker_count = worker_count
-    config.no_prompt = True
 
-    config.title_mode = title_mode
-    config.newline_mode = new_line_mode
-    config.chapter_start = chapter_start
-    config.chapter_end = chapter_end
-    config.remove_endnotes = remove_endnotes
-    config.remove_reference_numbers = remove_reference_numbers
-    config.search_and_replace_file = search_and_replace_file.name if hasattr(search_and_replace_file,
-                                                                             'name') else search_and_replace_file
+    # --- 兼容多文件：统一为列表 ---
+    if not input_file:
+        print("❌ 请先选择至少一个 EPUB 文件")
+        return
+    if not isinstance(input_file, list):
+        input_file = [input_file]
 
     global selected_tts
-    if "OpenAI" in selected_tts:
-        config.tts = "openai"
-        config.output_format = openai_output_format
-        config.voice_name = voices
-        config.model_name = model
-        config.instructions = instructions
-        config.speed = speed
-    elif selected_tts == "Azure":
-        config.tts = "azure"
-        config.language = azure_language
-        config.voice_name = azure_voice
-        config.output_format = azure_output_format
-        config.break_duration = azure_break_duration
-    elif selected_tts == "Edge":
-        config.tts = "edge"
-        config.language = edge_language
-        config.voice_name = edge_voice
-        config.output_format = edge_output_format
-        config.proxy = proxy
-        config.voice_rate = f"{edge_voice_rate:+}%"
-        config.voice_volume = f"{edge_volume:+}%"
-        config.voice_pitch = f"{edge_pitch:+}Hz"
-        config.break_duration = edge_break_duration
-    elif selected_tts == "Piper":
-        config.tts = "piper"
-        config.piper_path = piper_executable_path
-        config.piper_docker_image = piper_docker_image
-        config.model_name = f"{piper_language}-{piper_voice}-{piper_quality}"
-        config.piper_speaker = piper_speaker
-        config.piper_noise_scale = piper_noise_scale
-        config.piper_noise_w_scale = piper_noise_w_scale
-        config.piper_length_scale = piper_length_scale
-        config.piper_sentence_silence = piper_sentence_silence
-    else:
-        raise ValueError("Unsupported TTS provider selected")
 
-    launch_audiobook_generator(config)
+    # --- 为每个文件生成独立的 config ---
+    configs = []
+    for idx, single_file in enumerate(input_file):
+        config = GeneralConfig(None)
+        file_path = single_file.name if hasattr(single_file, 'name') else single_file
+        config.input_file = file_path
+
+        # 多文件时，每个文件生成以书名为名的子文件夹
+        if len(input_file) > 1:
+            book_name = Path(file_path).stem
+            safe_name = "".join(c if c.isalnum() or c in "._-" else "_" for c in book_name)
+            config.output_folder = os.path.join(output_dir, safe_name)
+        else:
+            config.output_folder = output_dir
+
+        config.preview = preview
+        config.output_text = output_text
+        config.log = log_level
+        config.worker_count = worker_count
+        config.no_prompt = True
+
+        config.title_mode = title_mode
+        config.newline_mode = new_line_mode
+        config.chapter_start = chapter_start
+        config.chapter_end = chapter_end
+        config.remove_endnotes = remove_endnotes
+        config.remove_reference_numbers = remove_reference_numbers
+        config.search_and_replace_file = search_and_replace_file.name if hasattr(search_and_replace_file,
+                                                                                 'name') else search_and_replace_file
+
+        if "Mimo" in selected_tts or "OpenAI" in selected_tts:
+            config.tts = "openai"
+            config.output_format = openai_output_format
+            config.voice_name = voices
+            config.model_name = model
+            config.instructions = instructions
+            config.speed = speed
+            config.stream = enable_stream
+        elif selected_tts == "MiniMax":
+            config.tts = "minimax"
+            config.model_name = minimax_model
+            config.voice_name = get_minimax_voice_id_from_choice(minimax_voice)
+            config.output_format = minimax_output_format
+        elif selected_tts == "Edge":
+            config.tts = "edge"
+            config.language = edge_language
+            config.voice_name = edge_voice
+            config.output_format = edge_output_format
+            config.proxy = proxy
+            config.voice_rate = f"{edge_voice_rate:+}%"
+            config.voice_volume = f"{edge_volume:+}%"
+            config.voice_pitch = f"{edge_pitch:+}Hz"
+            config.break_duration = edge_break_duration
+        elif selected_tts == "Piper":
+            config.tts = "piper"
+            config.piper_path = piper_executable_path
+            config.piper_docker_image = piper_docker_image
+            config.model_name = f"{piper_language}-{piper_voice}-{piper_quality}"
+            config.piper_speaker = piper_speaker
+            config.piper_noise_scale = piper_noise_scale
+            config.piper_noise_w_scale = piper_noise_w_scale
+            config.piper_length_scale = piper_length_scale
+            config.piper_sentence_silence = piper_sentence_silence
+        else:
+            raise ValueError("Unsupported TTS provider selected")
+
+        configs.append(config)
+
+    launch_audiobook_generator_batch(configs)
 
 
-def launch_audiobook_generator(config):
+def _batch_worker(config_list, log_file_path):
+    """子进程中逐个处理每个 EPUB（必须在模块顶层，spawn 模式下才能被 pickle）"""
+    total = len(config_list)
+    for idx, cfg in enumerate(config_list):
+        book_name = Path(cfg.input_file).stem
+        print(f"\n{'='*60}")
+        print(f"📚 [{idx + 1}/{total}] 开始转换: {book_name}")
+        print(f"{'='*60}")
+        try:
+            main(cfg, log_file_path)
+            print(f"✅ [{idx + 1}/{total}] 完成: {book_name}")
+        except Exception as e:
+            print(f"❌ [{idx + 1}/{total}] 失败: {book_name} — {e}")
+    print(f"\n🎉 全部处理完毕！共 {total} 本书")
+
+
+def launch_audiobook_generator_batch(configs):
+    """批量启动有声书生成：逐个处理多个 EPUB 文件"""
     global running_process
     if running_process and running_process.is_alive():
         print("Audiobook generator already running")
         return
 
-    running_process = Process(target=main, args=(config, str(webui_log_file.absolute())))
+    running_process = Process(target=_batch_worker, args=(configs, str(webui_log_file.absolute())))
     running_process.start()
 
 
@@ -355,6 +446,7 @@ def generate_download_link(folder_name, selected_files, auto_delete):
 def host_ui(config):
     default_output_dir = os.path.join("audiobook_output", datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
     output_absolute_path = get_output_dir()
+    saved = _load_settings()          # 读取持久化设置
 
     custom_css = """
     body { background-color: #fcfcfd; color: #111827; margin: 0; padding: 0; }
@@ -383,14 +475,14 @@ def host_ui(config):
     .file-selector-group label:hover { border-color: #7dd3fc !important; background: #f0f9ff !important; }
     .file-selector-group label:has(input:checked) { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important; color: white !important; border-color: #0284c7 !important; box-shadow: 0 4px 8px -2px rgba(2, 132, 199, 0.4) !important; }
 
-    .auto-delete-toggle { background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 8px !important; padding: 6px 14px !important; margin-bottom: 8px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;}
-    .auto-delete-toggle .checkbox { display: none !important; }
-    .auto-delete-toggle label { position: relative; display: flex !important; align-items: center !important; cursor: pointer !important; font-weight: 600 !important; color: #475569 !important; transition: all 0.3s ease; }
-    .auto-delete-toggle label::before { content: ''; display: block; width: 44px; height: 24px; background-color: #cbd5e1; border-radius: 24px; margin-right: 12px; transition: background-color 0.3s ease; flex-shrink: 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
-    .auto-delete-toggle label::after { content: ''; position: absolute; left: 3px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; background-color: #ffffff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .auto-delete-toggle label:has(input:checked)::before { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%) !important; }
-    .auto-delete-toggle label:has(input:checked)::after { transform: translate(20px, -50%); }
-    .auto-delete-toggle label:has(input:checked) { color: #e11d48 !important; }
+    .toggle-switch { background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 8px !important; padding: 6px 14px !important; margin-bottom: 8px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;}
+    .toggle-switch .checkbox { display: none !important; }
+    .toggle-switch label { position: relative; display: flex !important; align-items: center !important; cursor: pointer !important; font-weight: 600 !important; color: #64748b !important; transition: all 0.3s ease; }
+    .toggle-switch label::before { content: ''; display: block; width: 40px; height: 22px; background-color: #e2e8f0; border-radius: 22px; margin-right: 12px; transition: background-color 0.3s ease; flex-shrink: 0; box-shadow: inset 0 1px 2px rgba(0,0,0,0.06); }
+    .toggle-switch label::after { content: ''; position: absolute; left: 3px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; background-color: #ffffff; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.15); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .toggle-switch label:has(input:checked)::before { background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%) !important; }
+    .toggle-switch label:has(input:checked)::after { transform: translate(18px, -50%); }
+    .toggle-switch label:has(input:checked) { color: #0284c7 !important; }
 
     .custom-download-zone .file-preview-item, .custom-download-zone tbody tr { position: relative !important; cursor: pointer !important; transition: background-color 0.2s ease !important; }
     .custom-download-zone .file-preview-item:hover, .custom-download-zone tbody tr:hover { background-color: #f0f9ff !important; }
@@ -406,19 +498,20 @@ def host_ui(config):
         button_large_radius="8px"
     )
 
-    with gr.Blocks(theme=theme, css=custom_css, analytics_enabled=False, title="Epub to Audiobook Converter") as ui:
+    with gr.Blocks(theme=theme, css=custom_css, analytics_enabled=False, title="Book to Audiobook Converter") as ui:
         with gr.Row():
             with gr.Column():
                 gr.Markdown(
-                    "# 🎧 Epub to Audiobook Converter\n<p style='color: #475467; font-size: 1.05em; margin-top: -6px;'>EPUB音频生成工作台</p>")
+                    "# 🎧 Book to Audiobook Converter\n<p style='color: #475467; font-size: 1.05em; margin-top: -6px;'>EPUB/DOC/DOCX 音频生成工作台</p>")
 
         with gr.Row():
             with gr.Column(scale=3):
                 gr.Markdown("### 📂 核心文件与输出设置")
-                input_file = gr.File(label="选择待处理的 EPUB 书籍", file_types=[".epub"], file_count="single",
+                input_file = gr.File(label="选择待处理的书籍文件（支持 EPUB/DOC/DOCX，多选）", file_types=[".epub", ".doc", ".docx"], file_count="multiple",
                                      interactive=True)
                 output_dir = gr.Textbox(label="输出目录设置", value=default_output_dir, interactive=True,
-                                        info="存储路径已自动按当前生成时间对齐")
+                                        info="多文件时每本书自动生成以书名为名的子文件夹")
+                input_file.change(fn=update_output_dir_from_file, inputs=input_file, outputs=output_dir)
 
                 with gr.Accordion("📂 自定义文本替换规则文件 (可选)", open=False):
                     search_and_replace_file = gr.File(label="选择替换规则文件 (.txt)", file_types=[".txt"],
@@ -432,11 +525,16 @@ def host_ui(config):
                                          info="多线程并行可加速处理，请依配置微调")
 
                 with gr.Group():
-                    output_text = gr.Checkbox(label="同步导出各章节纯文本 (.txt)", value=False)
-                    preview = gr.Checkbox(label="开启预解析模式 (不消耗生成额度)", value=False,
-                                          info="勾选此项仅拆分章节并预估成本，不实际合成音频")
-                    remove_endnotes = gr.Checkbox(label="自动剔除书末尾注 (Endnotes)", value=False)
-                    remove_reference_numbers = gr.Checkbox(label="智能清理文本中的数字文献引用标签", value=False)
+                    output_text = gr.Checkbox(label="同步导出各章节纯文本 (.txt)", value=saved["output_text"],
+                                              elem_classes="toggle-switch")
+                    preview = gr.Checkbox(label="开启预解析模式 (不消耗生成额度)", value=saved["preview"],
+                                          info="勾选此项仅拆分章节并预估成本，不实际合成音频",
+                                          elem_classes="toggle-switch")
+                    remove_endnotes = gr.Checkbox(label="自动剔除书末尾注 (Endnotes)", value=saved["remove_endnotes"],
+                                                  elem_classes="toggle-switch")
+                    remove_reference_numbers = gr.Checkbox(label="智能清理文本中的数字文献引用标签",
+                                                            value=saved["remove_reference_numbers"],
+                                                            elem_classes="toggle-switch")
 
         gr.Markdown("<br>")
 
@@ -455,7 +553,7 @@ def host_ui(config):
         gr.Markdown("### 🎙️ TTS 语音合成驱动配置")
 
         with gr.Tabs(selected="openai_tab_id"):
-            with gr.Tab("OpenAI (Mimo)", id="openai_tab_id") as open_ai_tab:
+            with gr.Tab("Mimo", id="openai_tab_id") as open_ai_tab:
                 gr.Markdown(
                     "<p style='color: #0284c7; font-size: 0.95em; margin-bottom: 12px; font-weight: 500;'>✨ 预设就绪：当前已默认选择自定义情绪控制模型 <code>mimo-v2.5-tts</code>。</p>")
                 with gr.Row():
@@ -468,23 +566,38 @@ def host_ui(config):
                     openai_output_format = gr.Dropdown(get_openai_supported_output_formats(), label="音频输出格式",
                                                        interactive=True)
                 with gr.Row():
+                    enable_stream = gr.Checkbox(
+                        label="启用流式调用模式 (Streaming)",
+                        value=False,
+                        info="使用 PCM16 流式传输，实时收集音频片段并合成为 WAV",
+                        elem_classes="toggle-switch",
+                    )
+                show_voice_instructions = gr.Checkbox(
+                    label="展开高级语音情绪/语气控制面板",
+                    value=saved["show_voice_instructions"],
+                    elem_classes="toggle-switch",
+                )
+                with gr.Row(visible=saved["show_voice_instructions"]) as voice_instructions_row:
                     instructions = gr.TextArea(label="高级语音情绪/语气控制指令 (Voice Instructions)", interactive=True,
                                                lines=3, value=get_openai_instructions_example())
+                show_voice_instructions.change(
+                    fn=lambda x: gr.update(visible=x),
+                    inputs=show_voice_instructions,
+                    outputs=voice_instructions_row,
+                )
                 open_ai_tab.select(on_tab_change, inputs=None, outputs=None)
 
-            with gr.Tab("Azure", id="azure_tab_id") as azure_tab:
+            with gr.Tab("MiniMax", id="minimax_tab_id") as minimax_tab:
                 gr.Markdown(
-                    "It is expected that user configured: `MS_TTS_KEY` and `MS_TTS_REGION` in the environment variables.")
+                    "<p style='color: #0284c7; font-size: 0.95em; margin-bottom: 12px; font-weight: 500;'>✨ 使用 MiniMax TTS API，请先设置环境变量 <code>MINIMAX_API_KEY</code>。</p>")
                 with gr.Row(equal_height=True):
-                    azure_language = gr.Dropdown(get_azure_supported_languages(), value="en-US", label="Language",
-                                                 interactive=True)
-                    azure_voice = get_azure_voices_by_language(azure_language.value)
-                    azure_output_format = gr.Dropdown(get_azure_supported_output_formats(), label="Output Format",
-                                                      interactive=True, value="audio-24khz-48kbitrate-mono-mp3")
-                    azure_break_duration = gr.Slider(minimum=0, maximum=5000, step=1, label="Break Duration",
-                                                     value=1250)
-                    azure_language.change(fn=get_azure_voices_by_language, inputs=azure_language, outputs=azure_voice)
-                azure_tab.select(on_tab_change, inputs=None, outputs=None)
+                    minimax_model = gr.Dropdown(get_minimax_supported_models(), value="speech-2.8-hd", label="模型 (Model)",
+                                               interactive=True, allow_custom_value=True)
+                    minimax_voice = gr.Dropdown(get_minimax_voice_choices(), value=get_minimax_voice_choices()[0],
+                                               label="音色 (Voice)", interactive=True, allow_custom_value=True)
+                    minimax_output_format = gr.Dropdown(get_minimax_supported_output_formats(), value="mp3",
+                                                        label="输出格式 (Output Format)", interactive=True)
+                minimax_tab.select(on_tab_change, inputs=None, outputs=None)
 
             with gr.Tab("Edge", id="edge_tab_id") as edge_tab:
                 with gr.Row(equal_height=True):
@@ -564,8 +677,8 @@ def host_ui(config):
                         input_file, output_dir, worker_count, log_level, output_text, preview,
                         search_and_replace_file, title_mode, new_line_mode, chapter_start, chapter_end, remove_endnotes,
                         remove_reference_numbers,
-                        model, voices, speed, openai_output_format, instructions,
-                        azure_language, azure_voice, azure_output_format, azure_break_duration,
+                        model, voices, speed, openai_output_format, instructions, enable_stream,
+                        minimax_model, minimax_voice, minimax_output_format,
                         edge_language, edge_voice, edge_output_format, proxy, edge_voice_rate, edge_volume, edge_pitch,
                         edge_break_duration,
                         piper_executable_path, piper_docker_image, piper_language, piper_voice, piper_quality,
@@ -603,7 +716,7 @@ def host_ui(config):
 
                 with gr.Group():
                     auto_delete_cb = gr.Checkbox(label="自动删除 (打包后物理删除源文件)", value=False,
-                                                 elem_classes="auto-delete-toggle")
+                                                 elem_classes="toggle-switch")
                     generate_btn = gr.Button("⚡ 确认打包并生成下载通道", elem_classes="btn-primary-custom")
 
                 download_card = gr.HTML(get_empty_html())
@@ -658,6 +771,15 @@ def host_ui(config):
             inputs=[folder_dropdown, file_selector, auto_delete_cb],
             outputs=[folder_dropdown, file_selector, download_card, real_download_file]
         )
+
+        # ── 持久化开关状态：每次变动立即写入磁盘 ──
+        output_text.change(fn=lambda v: _save_checkbox("output_text", v), inputs=output_text, outputs=None)
+        preview.change(fn=lambda v: _save_checkbox("preview", v), inputs=preview, outputs=None)
+        remove_endnotes.change(fn=lambda v: _save_checkbox("remove_endnotes", v), inputs=remove_endnotes, outputs=None)
+        remove_reference_numbers.change(fn=lambda v: _save_checkbox("remove_reference_numbers", v),
+                                        inputs=remove_reference_numbers, outputs=None)
+        show_voice_instructions.change(fn=lambda v: _save_checkbox("show_voice_instructions", v),
+                                       inputs=show_voice_instructions, outputs=None)
 
         with gr.Row():
             global webui_log_file

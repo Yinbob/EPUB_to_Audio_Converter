@@ -15,7 +15,7 @@ AudioSegment.ffprobe = "/opt/homebrew/bin/ffprobe"
 
 def handle_args():
     parser = argparse.ArgumentParser(description="Convert text book to audiobook")
-    parser.add_argument("input_file", help="Path to the EPUB file")
+    parser.add_argument("input_file", help="Path to the book file (supports EPUB, DOC, DOCX)")
     parser.add_argument("output_folder", help="Path to the output folder")
     parser.add_argument(
         "--tts",
@@ -141,6 +141,12 @@ def handle_args():
     openai_tts_group.add_argument(
         "--instructions",
         help="Instructions for the TTS model. Only supported for 'gpt-4o-mini-tts' model.",
+    )
+
+    openai_tts_group.add_argument(
+        "--stream",
+        action="store_true",
+        help="Enable streaming mode for MiMo TTS. Uses PCM16 stream for real-time audio chunk collection.",
     )
 
     edge_tts_group = parser.add_argument_group(title="edge specific")

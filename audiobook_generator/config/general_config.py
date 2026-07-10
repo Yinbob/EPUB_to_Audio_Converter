@@ -30,6 +30,7 @@ class GeneralConfig:
         # OpenAI specific arguments
         self.instructions = getattr(args, 'instructions', None)
         self.speed = getattr(args, 'speed', None)
+        self.stream = getattr(args, 'stream', None)
 
         # TTS provider: Azure & Edge TTS specific arguments
         self.break_duration = getattr(args, 'break_duration', None)
