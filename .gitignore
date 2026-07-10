@@ -26,7 +26,11 @@ Thumbs.db
 .history
 
 # audio files
-audiobook_output/
+audiobook_output/*
+!audiobook_output/.gitkeep
+audiobook_output.zip
+test_output.mp3
+*.mp3
 
 # API config (contains secrets)
 mimo_config.json
