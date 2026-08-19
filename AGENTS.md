@@ -5,7 +5,7 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
 ## Entry points (all at repo root)
 - `python3 main.py <input.epub|.doc|.docx> <output_dir> [--tts ...]` — CLI converter.
 - `python3 main_ui.py [--host 127.0.0.1 --port 7860]` — Gradio WebUI (`audiobook_generator/ui/web_ui.py`).
-- `main_ui_v2.py` — WIP alternate UI (port 7861) → `audiobook_generator/ui/web_ui_v3.py`. `web_ui_v2.py`/`web_ui_v3.py` are untracked WIP.
+- `python3 main_ui_apple.py [--host 127.0.0.1 --port 7861]` — Apple-style WebUI (`audiobook_generator/ui/web_ui_apple.py`).
 - TTS providers registered in `audiobook_generator/tts_providers/base_tts_provider.py:get_supported_tts_providers()`.
 
 ## Environment & credentials
