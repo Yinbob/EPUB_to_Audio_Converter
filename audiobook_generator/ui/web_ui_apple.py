@@ -183,23 +183,6 @@ def get_piper_speakers_gui(language, voice, quality):
     return gr.Dropdown(s, value=s[0] if s else None, label="说话人 Speaker", interactive=True)
 
 
-# ── 引擎选择 / 弹窗控制 ───────────────────────────────────────────
-def select_and_open(provider):
-    """点击引擎卡片：选定引擎 + 打开对应配置弹窗 + 关闭其他弹窗。"""
-    return (
-        provider,                       # provider_state
-        _badge_html(provider),          # badge
-        gr.update(visible=True),        # mimo modal
-        gr.update(visible=(provider == "MiniMax")),
-        gr.update(visible=(provider == "Edge")),
-        gr.update(visible=(provider == "Piper")),
-    )
-
-
-def close_all_modals():
-    return (gr.update(visible=False),) * 4
-
-
 # ── 转换核心 ──────────────────────────────────────────────────────
 def process_form(provider,
                  input_file, output_dir, worker_count, log_level, output_text, preview,
@@ -592,24 +575,35 @@ label { color: var(--apple-text-2) !important; font-weight: 500 !important; font
 /* ── 滑块 ── */
 input[type=range] { accent-color: var(--apple-blue) !important; }
 
-/* ── 引擎卡片 ── */
-.engine-grid { display: grid !important; grid-template-columns: 1fr;
-  gap: 12px !important; }
-@media (min-width: 560px) { .engine-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 14px !important; } }
-.engine-card {
-  text-align: left !important; cursor: pointer; padding: 20px 20px !important;
-  background: var(--apple-surface) !important;
-  border: 1.5px solid var(--apple-border-soft) !important;
-  border-radius: 16px !important; transition: all 0.25s cubic-bezier(0.4,0,0.2,1) !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important; height: 100% !important;
-  white-space: pre-line !important; line-height: 1.4 !important;
-  font-size: 0.9rem !important; font-weight: 600 !important; color: var(--apple-text) !important;
-  display: flex !important; flex-direction: column !important; justify-content: center !important;
-  min-height: 96px !important;
+/* ── 引擎分段选择器（原生 Tabs） ── */
+.engine-tabs { gap: 0 !important; }
+.engine-tabs > .tab-nav {
+  display: grid !important; grid-template-columns: repeat(4, 1fr) !important;
+  gap: 0 !important; padding: 4px !important; margin: 0 0 16px !important;
+  background: #f0f0f4 !important; border-radius: 12px !important;
+  border: 1px solid var(--apple-border-soft) !important;
 }
-.engine-card:hover { transform: translateY(-3px); border-color: var(--apple-blue) !important;
-  box-shadow: 0 10px 24px rgba(0,113,227,0.14) !important; color: var(--apple-blue) !important; }
-.engine-card:active { transform: scale(0.985); }
+@media (max-width: 560px) {
+  .engine-tabs > .tab-nav { grid-template-columns: repeat(2, 1fr) !important; }
+}
+.engine-tabs > .tab-nav button {
+  border: none !important; background: transparent !important;
+  font-weight: 600 !important; color: var(--apple-text-2) !important;
+  font-size: 0.86rem !important; padding: 10px 6px !important;
+  border-radius: 9px !important; margin: 0 !important; text-align: center !important;
+  transition: all 0.2s ease !important; box-shadow: none !important;
+}
+.engine-tabs > .tab-nav button:hover { color: var(--apple-text) !important; background: rgba(255,255,255,0.6) !important; }
+.engine-tabs > .tab-nav button.selected {
+  color: var(--apple-blue) !important; background: #fff !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+}
+
+/* ── 手风琴（高级设置） ── */
+.gr-accordion { border: 1px solid var(--apple-border-soft) !important;
+  border-radius: 14px !important; background: #fafafd !important; overflow: hidden; }
+.gr-accordion > .label-wrap { padding: 14px 18px !important; font-weight: 600 !important;
+  color: var(--apple-text) !important; font-size: 0.92rem !important; }
 
 .engine-badge {
   display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
@@ -622,43 +616,6 @@ input[type=range] { accent-color: var(--apple-blue) !important; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 .engine-badge-label { font-size: 0.74rem; color: var(--apple-text-3); }
 .engine-badge-name { font-size: 0.86rem; font-weight: 600; color: var(--apple-text); }
-
-/* ── 弹窗 Modal ── */
-.modal-wrap {
-  position: fixed !important; inset: 0 !important; z-index: 9998 !important;
-  background: rgba(29,29,31,0.42) !important;
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  display: flex !important; align-items: center !important; justify-content: center !important;
-  padding: clamp(0px, 0px, 28px) !important;
-  padding-top: max(env(safe-area-inset-top), 12px) !important;
-  padding-bottom: max(env(safe-area-inset-bottom), 12px) !important;
-  padding-left: max(env(safe-area-inset-left), 12px) !important;
-  padding-right: max(env(safe-area-inset-right), 12px) !important;
-  animation: fadeIn 0.25s ease both;
-  overflow-y: auto !important;
-}
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.modal-card {
-  background: var(--apple-surface) !important; border-radius: clamp(16px, 3vw, 22px) !important;
-  max-width: 720px !important; width: 100% !important; max-height: 90vh !important;
-  overflow-y: auto !important; box-shadow: var(--apple-shadow-lg) !important;
-  padding: clamp(18px, 4vw, 28px) !important; border: none !important;
-  animation: modalIn 0.32s cubic-bezier(0.16,1,0.3,1) both !important;
-}
-@keyframes modalIn { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: none; } }
-.modal-head { display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 6px; }
-.modal-title { font-size: 1.12rem; font-weight: 600; color: var(--apple-text); letter-spacing: -0.01em; }
-.modal-sub { font-size: 0.8rem; color: var(--apple-text-3); margin-bottom: 18px; }
-.modal-close {
-  width: 30px !important; height: 30px !important; min-width: 30px !important;
-  border-radius: 50% !important; background: #f5f5f7 !important; border: none !important;
-  color: var(--apple-text-2) !important; font-size: 1rem !important; padding: 0 !important;
-  transition: all 0.2s ease !important; cursor: pointer !important;
-}
-.modal-close:hover { background: #ebebed !important; color: var(--apple-text) !important; transform: rotate(90deg); }
-.modal-foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 16px;
-  border-top: 1px solid var(--apple-border-soft); }
 
 /* ── 按钮 ── */
 .btn-primary {
@@ -834,7 +791,6 @@ def host_ui(config):
                     <div class="app-sub">EPUB · DOC · DOCX → 高品质语音</div>
                 </div>
             </div>
-            <div class="app-tag">Apple Style · 全新界面</div>
         </div>''')
 
         with gr.Tabs(selected="tab_convert") as main_tabs:
@@ -859,13 +815,72 @@ def host_ui(config):
                 # —— Step 2 引擎 ——
                 with gr.Group(elem_classes="app-card"):
                     gr.HTML('<p class="card-title"><span class="card-num">2</span>选择语音引擎</p>')
-                    gr.HTML('<p class="card-desc">点击任一引擎卡片以选定，并弹出参数配置面板。</p>')
+                    gr.HTML('<p class="card-desc">点击下方标签切换引擎，所选引擎的参数随即显示。</p>')
                     engine_badge = gr.HTML(_badge_html("Mimo"))
-                    with gr.Group(elem_classes="engine-grid"):
-                        mimo_card = gr.Button("✨  MiMo 情绪语音\n情绪/语气控制 · 流式合成", elem_classes="engine-card")
-                        minimax_card = gr.Button("🎙️  MiniMax 高清语音\n海量音色 · 高清合成", elem_classes="engine-card")
-                        edge_card = gr.Button("🌐  Edge 在线语音\n多语种 · 语速音调可调", elem_classes="engine-card")
-                        piper_card = gr.Button("💻  Piper 离线语音\n本地/Docker · 隐私优先", elem_classes="engine-card")
+                    with gr.Tabs(selected="Mimo", elem_classes="engine-tabs") as engine_tabs:
+                        # ── MiMo ──
+                        with gr.Tab("✨ MiMo", id="Mimo") as mimo_tab:
+                            with gr.Row():
+                                model = gr.Dropdown(get_openai_supported_models(), value="mimo-v2.5-tts", label="模型", interactive=True, allow_custom_value=True)
+                                voices = gr.Dropdown(get_openai_supported_voices(), label="音色风格", interactive=True, allow_custom_value=True)
+                            with gr.Row():
+                                speed = gr.Slider(minimum=0.25, maximum=4.0, step=0.1, label="生成语速", value=1.0, info="1.0 为自然语速")
+                                openai_output_format = gr.Dropdown(get_openai_supported_output_formats(), label="音频输出格式", interactive=True)
+                            enable_stream = gr.Checkbox(label="启用流式调用（PCM16 实时合成 WAV）", value=False, elem_classes="toggle")
+                            show_voice_instructions = gr.Checkbox(label="展开高级情绪/语气控制", value=saved["show_voice_instructions"], elem_classes="toggle")
+                            with gr.Accordion("情绪/语气控制指令", open=saved["show_voice_instructions"]) as voice_instructions_row:
+                                instructions = gr.TextArea(label="情绪/语气控制指令", interactive=True, lines=3,
+                                                           value=get_openai_instructions_example())
+                            show_voice_instructions.change(fn=lambda v: _save_checkbox("show_voice_instructions", v),
+                                                           inputs=show_voice_instructions, outputs=None)
+                        # ── MiniMax ──
+                        with gr.Tab("🎙️ MiniMax", id="MiniMax") as minimax_tab:
+                            with gr.Row():
+                                minimax_model = gr.Dropdown(get_minimax_supported_models(), value="speech-2.8-hd", label="模型", interactive=True, allow_custom_value=True)
+                                minimax_voice = gr.Dropdown(get_minimax_voice_choices(), value=get_minimax_voice_choices()[0], label="音色", interactive=True, allow_custom_value=True)
+                            minimax_output_format = gr.Dropdown(get_minimax_supported_output_formats(), value="mp3", label="输出格式", interactive=True)
+                            gr.HTML('<p class="card-desc">使用 MiniMax TTS API，请先设置环境变量 MINIMAX_API_KEY</p>')
+                        # ── Edge ──
+                        with gr.Tab("🌐 Edge", id="Edge") as edge_tab:
+                            with gr.Row():
+                                edge_language = gr.Dropdown(get_edge_tts_supported_language(), value="en-US", label="语言", interactive=True)
+                                edge_voice = get_edge_voices_by_language("en-US")
+                                edge_output_format = gr.Dropdown(get_edge_tts_supported_output_formats(), label="输出格式", interactive=True)
+                            proxy = gr.Textbox(label="代理 Proxy", value="", interactive=True)
+                            with gr.Row():
+                                edge_voice_rate = gr.Slider(minimum=-50, maximum=100, step=1, label="语速", value=0)
+                                edge_volume = gr.Slider(minimum=-100, maximum=100, step=1, label="音量", value=0)
+                            with gr.Row():
+                                edge_pitch = gr.Slider(minimum=-100, maximum=100, step=1, label="音调", value=0)
+                                edge_break_duration = gr.Slider(minimum=0, maximum=5000, step=1, label="段落停顿 (ms)", value=1250)
+                            edge_language.change(fn=get_edge_voices_by_language, inputs=edge_language, outputs=edge_voice)
+                        # ── Piper ──
+                        with gr.Tab("💻 Piper", id="Piper") as piper_tab:
+                            piper_deployment = gr.Dropdown(["Docker", "Local"], label="部署方式", value="Docker", interactive=True)
+                            with gr.Group(visible=True) as docker_group:
+                                piper_docker_image = gr.Textbox(label="Piper Docker 镜像", value="lscr.io/linuxserver/piper:latest", interactive=True)
+                            with gr.Group(visible=False) as local_group:
+                                piper_executable_path = gr.Textbox(label="Piper 可执行文件路径", interactive=True)
+                                piper_file_upload = gr.File(label="上传 Piper 可执行文件", file_count="single", interactive=True)
+                                piper_file_upload.change(fn=lambda x: x.name if x else "", inputs=piper_file_upload, outputs=piper_executable_path)
+                            piper_deployment.change(
+                                fn=lambda x: (gr.update(visible=x == "Local"), gr.update(visible=x == "Docker")),
+                                inputs=piper_deployment, outputs=[local_group, docker_group])
+                            with gr.Row():
+                                piper_language = gr.Dropdown(get_piper_supported_languages(), label="语言", value="en_US", interactive=True)
+                                piper_voice = gr.Dropdown(get_piper_supported_voices("en_US"), label="音色", interactive=True)
+                            with gr.Row():
+                                piper_quality = gr.Dropdown(get_piper_supported_qualities("en_US", get_piper_supported_voices("en_US")[0]), label="质量", interactive=True)
+                                piper_speaker = gr.Dropdown(get_piper_supported_speakers("en_US", get_piper_supported_voices("en_US")[0], get_piper_supported_qualities("en_US", get_piper_supported_voices("en_US")[0])[0]), label="说话人", interactive=True)
+                            piper_language.change(fn=get_piper_voices_gui, inputs=piper_language, outputs=piper_voice)
+                            piper_voice.change(fn=get_piper_qualities_gui, inputs=[piper_language, piper_voice], outputs=piper_quality)
+                            piper_quality.change(fn=get_piper_speakers_gui, inputs=[piper_language, piper_voice, piper_quality], outputs=piper_speaker)
+                            with gr.Row():
+                                piper_noise_scale = gr.Slider(minimum=0.0, maximum=2.0, step=0.01, label="噪声尺度", value=0.667)
+                                piper_noise_w_scale = gr.Slider(minimum=0.0, maximum=2.0, step=0.1, label="宽度噪声", value=0.8)
+                            with gr.Row():
+                                piper_length_scale = gr.Slider(minimum=0.0, maximum=5.0, step=0.1, label="语速长度", value=1.0)
+                                piper_sentence_silence = gr.Slider(minimum=0.0, maximum=2.0, step=0.1, label="句间静音", value=0.2)
 
                 # —— Step 3 生成选项 ——
                 with gr.Group(elem_classes="app-card"):
@@ -880,11 +895,18 @@ def host_ui(config):
                         worker_count = gr.Slider(minimum=1, maximum=8, step=1, label="并行线程数", value=1, info="多线程加速，依配置微调")
                         log_level = gr.Dropdown(["INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"], label="日志级别", value="INFO")
 
-                # —— Step 4 高级（弹窗入口） ——
+                # —— Step 4 高级（手风琴展开） ——
                 with gr.Group(elem_classes="app-card"):
                     gr.HTML('<p class="card-title"><span class="card-num">4</span>高级解析设置</p>')
-                    gr.HTML('<p class="card-desc">章节匹配、段落换行、文本替换规则等进阶选项。</p>')
-                    advanced_open_btn = gr.Button("打开高级设置", elem_classes="btn-ghost")
+                    gr.HTML('<p class="card-desc">章节匹配、段落换行、文本替换规则等进阶选项，点击展开。</p>')
+                    with gr.Accordion("展开高级解析设置", open=False):
+                        with gr.Row():
+                            title_mode = gr.Dropdown(["auto", "tag_text", "first_few"], label="章节标题匹配模式", value="auto", interactive=True)
+                            new_line_mode = gr.Dropdown(["single", "double", "none"], label="段落换行检测模式", value="double", interactive=True)
+                        with gr.Row():
+                            chapter_start = gr.Slider(minimum=1, maximum=100, step=1, label="起始章节页码", value=1, interactive=True)
+                            chapter_end = gr.Slider(minimum=-1, maximum=100, step=1, label="结束章节页码", value=-1, info="-1 代表处理至最后一章", interactive=True)
+                        search_and_replace_file = gr.File(label="文本替换规则文件 (.txt，可选)", file_types=[".txt"], file_count="single", interactive=True)
 
                 # —— CTA ——
                 with gr.Row(elem_classes="row-cta"):
@@ -927,142 +949,12 @@ def host_ui(config):
                     webui_log_file.touch()
                     Log(str(webui_log_file.absolute()), dark=False, xterm_font_size=12)
 
-        # ════════════ 弹窗：高级设置 ════════════
-        with gr.Column(visible=False, elem_classes="modal-wrap") as advanced_modal:
-            with gr.Group(elem_classes="modal-card"):
-                gr.HTML('''
-                <div class="modal-head">
-                    <div><div class="modal-title">高级解析设置</div>
-                    <div class="modal-sub">章节匹配与换行解析微调</div></div>
-                </div>''')
-                with gr.Row():
-                    title_mode = gr.Dropdown(["auto", "tag_text", "first_few"], label="章节标题匹配模式", value="auto", interactive=True)
-                    new_line_mode = gr.Dropdown(["single", "double", "none"], label="段落换行检测模式", value="double", interactive=True)
-                with gr.Row():
-                    chapter_start = gr.Slider(minimum=1, maximum=100, step=1, label="起始章节页码", value=1, interactive=True)
-                    chapter_end = gr.Slider(minimum=-1, maximum=100, step=1, label="结束章节页码", value=-1, info="-1 代表处理至最后一章", interactive=True)
-                gr.HTML('<div style="height:6px"></div>')
-                search_and_replace_file = gr.File(label="文本替换规则文件 (.txt，可选)", file_types=[".txt"], file_count="single", interactive=True)
-                gr.HTML('<div class="modal-foot">')
-                advanced_close_btn = gr.Button("完成", elem_classes="btn-primary")
-                gr.HTML('</div>')
-
-        # ════════════ 弹窗：Mimo ════════════
-        with gr.Column(visible=False, elem_classes="modal-wrap") as mimo_modal:
-            with gr.Group(elem_classes="modal-card"):
-                gr.HTML('''
-                <div class="modal-head">
-                    <div><div class="modal-title">✨ MiMo 情绪语音</div>
-                    <div class="modal-sub">已预设 mimo-v2.5-tts 模型，支持情绪/语气控制与流式合成</div></div>
-                </div>''')
-                with gr.Row():
-                    model = gr.Dropdown(get_openai_supported_models(), value="mimo-v2.5-tts", label="模型", interactive=True, allow_custom_value=True)
-                    voices = gr.Dropdown(get_openai_supported_voices(), label="音色风格", interactive=True, allow_custom_value=True)
-                with gr.Row():
-                    speed = gr.Slider(minimum=0.25, maximum=4.0, step=0.1, label="生成语速", value=1.0, info="1.0 为自然语速")
-                    openai_output_format = gr.Dropdown(get_openai_supported_output_formats(), label="音频输出格式", interactive=True)
-                enable_stream = gr.Checkbox(label="启用流式调用（PCM16 实时合成 WAV）", value=False, elem_classes="toggle")
-                show_voice_instructions = gr.Checkbox(label="展开高级情绪/语气控制", value=saved["show_voice_instructions"], elem_classes="toggle")
-                with gr.Row(visible=saved["show_voice_instructions"]) as voice_instructions_row:
-                    instructions = gr.TextArea(label="情绪/语气控制指令", interactive=True, lines=3,
-                                               value=get_openai_instructions_example())
-                show_voice_instructions.change(fn=lambda x: gr.update(visible=x), inputs=show_voice_instructions, outputs=voice_instructions_row)
-                gr.HTML('<div class="modal-foot">')
-                mimo_close_btn = gr.Button("完成", elem_classes="btn-primary")
-                gr.HTML('</div>')
-
-        # ════════════ 弹窗：MiniMax ════════════
-        with gr.Column(visible=False, elem_classes="modal-wrap") as minimax_modal:
-            with gr.Group(elem_classes="modal-card"):
-                gr.HTML('''
-                <div class="modal-head">
-                    <div><div class="modal-title">🎙️ MiniMax 高清语音</div>
-                    <div class="modal-sub">使用 MiniMax TTS API，请先设置环境变量 MINIMAX_API_KEY</div></div>
-                </div>''')
-                with gr.Row():
-                    minimax_model = gr.Dropdown(get_minimax_supported_models(), value="speech-2.8-hd", label="模型", interactive=True, allow_custom_value=True)
-                    minimax_voice = gr.Dropdown(get_minimax_voice_choices(), value=get_minimax_voice_choices()[0], label="音色", interactive=True, allow_custom_value=True)
-                minimax_output_format = gr.Dropdown(get_minimax_supported_output_formats(), value="mp3", label="输出格式", interactive=True)
-                gr.HTML('<div class="modal-foot">')
-                minimax_close_btn = gr.Button("完成", elem_classes="btn-primary")
-                gr.HTML('</div>')
-
-        # ════════════ 弹窗：Edge ════════════
-        with gr.Column(visible=False, elem_classes="modal-wrap") as edge_modal:
-            with gr.Group(elem_classes="modal-card"):
-                gr.HTML('''
-                <div class="modal-head">
-                    <div><div class="modal-title">🌐 Edge 在线语音</div>
-                    <div class="modal-sub">微软 Edge TTS，多语种、语速音调可调</div></div>
-                </div>''')
-                with gr.Row():
-                    edge_language = gr.Dropdown(get_edge_tts_supported_language(), value="en-US", label="语言", interactive=True)
-                    edge_voice = get_edge_voices_by_language("en-US")
-                    edge_output_format = gr.Dropdown(get_edge_tts_supported_output_formats(), label="输出格式", interactive=True)
-                proxy = gr.Textbox(label="代理 Proxy", value="", interactive=True)
-                with gr.Row():
-                    edge_voice_rate = gr.Slider(minimum=-50, maximum=100, step=1, label="语速", value=0)
-                    edge_volume = gr.Slider(minimum=-100, maximum=100, step=1, label="音量", value=0)
-                with gr.Row():
-                    edge_pitch = gr.Slider(minimum=-100, maximum=100, step=1, label="音调", value=0)
-                    edge_break_duration = gr.Slider(minimum=0, maximum=5000, step=1, label="段落停顿 (ms)", value=1250)
-                edge_language.change(fn=get_edge_voices_by_language, inputs=edge_language, outputs=edge_voice)
-                gr.HTML('<div class="modal-foot">')
-                edge_close_btn = gr.Button("完成", elem_classes="btn-primary")
-                gr.HTML('</div>')
-
-        # ════════════ 弹窗：Piper ════════════
-        with gr.Column(visible=False, elem_classes="modal-wrap") as piper_modal:
-            with gr.Group(elem_classes="modal-card"):
-                gr.HTML('''
-                <div class="modal-head">
-                    <div><div class="modal-title">💻 Piper 离线语音</div>
-                    <div class="modal-sub">本地或 Docker 部署，完全离线、隐私优先</div></div>
-                </div>''')
-                piper_deployment = gr.Dropdown(["Docker", "Local"], label="部署方式", value="Docker", interactive=True)
-                with gr.Group(visible=True) as docker_group:
-                    piper_docker_image = gr.Textbox(label="Piper Docker 镜像", value="lscr.io/linuxserver/piper:latest", interactive=True)
-                with gr.Group(visible=False) as local_group:
-                    piper_executable_path = gr.Textbox(label="Piper 可执行文件路径", interactive=True)
-                    piper_file_upload = gr.File(label="上传 Piper 可执行文件", file_count="single", interactive=True)
-                    piper_file_upload.change(fn=lambda x: x.name if x else "", inputs=piper_file_upload, outputs=piper_executable_path)
-                piper_deployment.change(
-                    fn=lambda x: (gr.update(visible=x == "Local"), gr.update(visible=x == "Docker")),
-                    inputs=piper_deployment, outputs=[local_group, docker_group])
-                with gr.Row():
-                    piper_language = gr.Dropdown(get_piper_supported_languages(), label="语言", value="en_US", interactive=True)
-                    piper_voice = gr.Dropdown(get_piper_supported_voices("en_US"), label="音色", interactive=True)
-                with gr.Row():
-                    piper_quality = gr.Dropdown(get_piper_supported_qualities("en_US", get_piper_supported_voices("en_US")[0]), label="质量", interactive=True)
-                    piper_speaker = gr.Dropdown(get_piper_supported_speakers("en_US", get_piper_supported_voices("en_US")[0], get_piper_supported_qualities("en_US", get_piper_supported_voices("en_US")[0])[0]), label="说话人", interactive=True)
-                piper_language.change(fn=get_piper_voices_gui, inputs=piper_language, outputs=piper_voice)
-                piper_voice.change(fn=get_piper_qualities_gui, inputs=[piper_language, piper_voice], outputs=piper_quality)
-                piper_quality.change(fn=get_piper_speakers_gui, inputs=[piper_language, piper_voice, piper_quality], outputs=piper_speaker)
-                with gr.Row():
-                    piper_noise_scale = gr.Slider(minimum=0.0, maximum=2.0, step=0.01, label="噪声尺度", value=0.667)
-                    piper_noise_w_scale = gr.Slider(minimum=0.0, maximum=2.0, step=0.1, label="宽度噪声", value=0.8)
-                with gr.Row():
-                    piper_length_scale = gr.Slider(minimum=0.0, maximum=5.0, step=0.1, label="语速长度", value=1.0)
-                    piper_sentence_silence = gr.Slider(minimum=0.0, maximum=2.0, step=0.1, label="句间静音", value=0.2)
-                gr.HTML('<div class="modal-foot">')
-                piper_close_btn = gr.Button("完成", elem_classes="btn-primary")
-                gr.HTML('</div>')
-
         # ════════════ 事件绑定 ════════════
-        modal_outputs = [mimo_modal, minimax_modal, edge_modal, piper_modal]
-
-        # 引擎卡片 → 选定 + 打开弹窗
-        for card, name in [(mimo_card, "Mimo"), (minimax_card, "MiniMax"),
-                           (edge_card, "Edge"), (piper_card, "Piper")]:
-            card.click(fn=lambda n=name: select_and_open(n),
-                       inputs=None, outputs=[provider_state, engine_badge] + modal_outputs)
-
-        # 关闭弹窗
-        advanced_open_btn.click(fn=lambda: gr.update(visible=True), inputs=None, outputs=advanced_modal)
-        for close_btn, modal in [(advanced_close_btn, advanced_modal), (mimo_close_btn, mimo_modal),
-                                 (minimax_close_btn, minimax_modal), (edge_close_btn, edge_modal),
-                                 (piper_close_btn, piper_modal)]:
-            close_btn.click(fn=lambda: gr.update(visible=False), inputs=None, outputs=modal)
+        # 引擎标签切换 → 同步当前引擎状态 + 徽标（标签内容切换为原生客户端行为，即时显示）
+        for _tab, _name in [(mimo_tab, "Mimo"), (minimax_tab, "MiniMax"),
+                            (edge_tab, "Edge"), (piper_tab, "Piper")]:
+            _tab.select(fn=lambda n=_name: (n, _badge_html(n)),
+                        inputs=None, outputs=[provider_state, engine_badge])
 
         # 开始 / 停止
         start_btn.click(
