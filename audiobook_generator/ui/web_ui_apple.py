@@ -457,8 +457,9 @@ def load_files_for_folder(folder_name):
 # ── 样式 ──────────────────────────────────────────────────────────
 CUSTOM_CSS = """
 :root {
-  --apple-bg: #fbfbfd;
+  --apple-bg: #f5f5f7;
   --apple-surface: #ffffff;
+  --apple-surface-2: #fbfbfd;
   --apple-text: #1d1d1f;
   --apple-text-2: #6e6e73;
   --apple-text-3: #86868b;
@@ -467,11 +468,14 @@ CUSTOM_CSS = """
   --apple-blue: #0071e3;
   --apple-blue-hover: #0077ed;
   --apple-blue-soft: #e8f1fd;
+  --apple-indigo: #5e5ce6;
   --apple-green: #34c759;
   --apple-red: #ff3b30;
-  --apple-shadow: 0 4px 24px rgba(0,0,0,0.06);
-  --apple-shadow-lg: 0 18px 48px rgba(0,0,0,0.16);
-  --radius: 18px;
+  --apple-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04);
+  --apple-shadow-lg: 0 24px 60px rgba(0,0,0,0.14);
+  --apple-shadow-blue: 0 8px 20px rgba(0,113,227,0.28);
+  --radius: 20px;
+  --radius-sm: 14px;
 }
 * { box-sizing: border-box; }
 body, .gradio-container {
@@ -537,16 +541,28 @@ body, .gradio-container {
   box-shadow: var(--apple-shadow) !important;
   padding: clamp(16px, 3.5vw, 24px) !important;
   margin-bottom: 18px !important;
-  animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+  animation: fadeUp 0.55s cubic-bezier(0.16,1,0.3,1) both;
+  transition: box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1) !important;
 }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.app-card:hover { box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 16px 40px rgba(0,0,0,0.07) !important; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
-.card-title { font-size: 1.02rem; font-weight: 600; color: var(--apple-text);
-  margin: 0 0 4px; letter-spacing: -0.01em; }
+.card-title { font-size: 1.05rem; font-weight: 600; color: var(--apple-text);
+  margin: 0 0 4px; letter-spacing: -0.012em; display: flex; align-items: center; }
 .card-desc { font-size: 0.84rem; color: var(--apple-text-3); margin: 0 0 16px; }
-.card-num { display: inline-flex; width: 22px; height: 22px; border-radius: 50%;
-  background: var(--apple-blue-soft); color: var(--apple-blue); font-size: 0.74rem;
-  font-weight: 700; align-items: center; justify-content: center; margin-right: 9px; }
+.card-num {
+  display: inline-flex; width: 24px; height: 24px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--apple-blue) 0%, var(--apple-indigo) 100%);
+  color: #fff !important; font-size: 0.76rem;
+  font-weight: 700; align-items: center; justify-content: center; margin-right: 10px;
+  box-shadow: 0 4px 10px rgba(94,92,230,0.3);
+}
+
+/* ── 卡片内分隔与小标题 ── */
+.section-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--apple-border-soft) 20%, var(--apple-border-soft) 80%, transparent);
+  margin: 18px 0 14px; border: none; }
+.card-sub-title { font-size: 0.78rem; font-weight: 600; color: var(--apple-text-2);
+  margin: 0 0 12px; letter-spacing: 0.02em; text-transform: uppercase; }
 
 /* ── 英雄区 ── */
 .hero { text-align: center; padding: clamp(18px, 4vw, 30px) 8px 24px; animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
@@ -562,13 +578,14 @@ body, .gradio-container {
 
 /* ── 输入控件统一 ── */
 input, textarea, select {
-  border-radius: 12px !important; background: #f5f5f7 !important;
+  border-radius: var(--radius-sm) !important; background: var(--apple-surface-2) !important;
   border: 1px solid var(--apple-border-soft) !important; color: var(--apple-text) !important;
-  font-size: 0.92em !important; transition: all 0.2s ease !important;
+  font-size: 0.92em !important; transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
 }
+input:hover, textarea:hover, select:hover { border-color: var(--apple-border) !important; }
 input:focus, textarea:focus, select:focus {
   border-color: var(--apple-blue) !important; background: #fff !important;
-  box-shadow: 0 0 0 4px rgba(0,113,227,0.12) !important;
+  box-shadow: 0 0 0 4px rgba(0,113,227,0.14) !important;
 }
 label { color: var(--apple-text-2) !important; font-weight: 500 !important; font-size: 0.85rem !important; }
 
@@ -579,8 +596,8 @@ input[type=range] { accent-color: var(--apple-blue) !important; }
 .engine-tabs { gap: 0 !important; }
 .engine-tabs > .tab-nav {
   display: grid !important; grid-template-columns: repeat(4, 1fr) !important;
-  gap: 0 !important; padding: 4px !important; margin: 0 0 16px !important;
-  background: #f0f0f4 !important; border-radius: 12px !important;
+  gap: 4px !important; padding: 4px !important; margin: 0 0 16px !important;
+  background: var(--apple-surface-2) !important; border-radius: var(--radius-sm) !important;
   border: 1px solid var(--apple-border-soft) !important;
 }
 @media (max-width: 560px) {
@@ -590,19 +607,21 @@ input[type=range] { accent-color: var(--apple-blue) !important; }
   border: none !important; background: transparent !important;
   font-weight: 600 !important; color: var(--apple-text-2) !important;
   font-size: 0.86rem !important; padding: 10px 6px !important;
-  border-radius: 9px !important; margin: 0 !important; text-align: center !important;
-  transition: all 0.2s ease !important; box-shadow: none !important;
+  border-radius: 10px !important; margin: 0 !important; text-align: center !important;
+  transition: color 0.2s ease, background 0.2s ease, box-shadow 0.25s ease !important; box-shadow: none !important;
 }
-.engine-tabs > .tab-nav button:hover { color: var(--apple-text) !important; background: rgba(255,255,255,0.6) !important; }
+.engine-tabs > .tab-nav button:hover { color: var(--apple-text) !important; background: rgba(255,255,255,0.7) !important; }
 .engine-tabs > .tab-nav button.selected {
-  color: var(--apple-blue) !important; background: #fff !important;
+  color: var(--apple-blue) !important; background: var(--apple-surface) !important;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
 }
 
 /* ── 手风琴（高级设置） ── */
 .gr-accordion { border: 1px solid var(--apple-border-soft) !important;
-  border-radius: 14px !important; background: #fafafd !important; overflow: hidden; }
-.gr-accordion > .label-wrap { padding: 14px 18px !important; font-weight: 600 !important;
+  border-radius: var(--radius-sm) !important; background: var(--apple-surface-2) !important;
+  overflow: hidden; transition: box-shadow 0.3s ease !important; }
+.gr-accordion:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.05) !important; }
+.gr-accordion > .label-wrap { padding: 15px 18px !important; font-weight: 600 !important;
   color: var(--apple-text) !important; font-size: 0.92rem !important; }
 
 .engine-badge {
@@ -624,32 +643,35 @@ input[type=range] { accent-color: var(--apple-blue) !important; }
 
 /* ── 按钮 ── */
 .btn-primary {
-  background: var(--apple-blue) !important; color: #fff !important; border: none !important;
+  background: linear-gradient(135deg, var(--apple-blue) 0%, var(--apple-indigo) 100%) !important;
+  color: #fff !important; border: none !important;
   border-radius: 980px !important; font-weight: 600 !important; font-size: 0.95rem !important;
-  padding: 12px 26px !important; transition: all 0.2s ease !important; cursor: pointer !important;
-  box-shadow: 0 6px 16px rgba(0,113,227,0.28) !important;
+  padding: 13px 28px !important; transition: transform 0.25s cubic-bezier(0.16,1,0.3,1), box-shadow 0.25s ease !important;
+  cursor: pointer !important; box-shadow: var(--apple-shadow-blue) !important;
 }
-.btn-primary:hover { background: var(--apple-blue-hover) !important; transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(0,113,227,0.36) !important; }
+.btn-primary:hover { transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(0,113,227,0.42) !important; }
 .btn-primary:active { transform: translateY(0) scale(0.98); }
-.btn-primary.pulse { animation: ctaPulse 2.4s ease-in-out infinite; }
-@keyframes ctaPulse { 0%,100% { box-shadow: 0 6px 16px rgba(0,113,227,0.28); }
-  50% { box-shadow: 0 6px 28px rgba(0,113,227,0.5); } }
+.btn-primary.pulse { animation: ctaPulse 2.8s ease-in-out infinite; }
+@keyframes ctaPulse {
+  0%,100% { box-shadow: 0 8px 20px rgba(0,113,227,0.28); }
+  50% { box-shadow: 0 8px 32px rgba(0,113,227,0.52); }
+}
 
 .btn-ghost {
-  background: #fff !important; color: var(--apple-text) !important;
+  background: var(--apple-surface) !important; color: var(--apple-text) !important;
   border: 1px solid var(--apple-border) !important; border-radius: 980px !important;
-  font-weight: 500 !important; font-size: 0.92rem !important; padding: 11px 22px !important;
-  transition: all 0.2s ease !important; cursor: pointer !important;
+  font-weight: 500 !important; font-size: 0.92rem !important; padding: 12px 24px !important;
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease !important; cursor: pointer !important;
 }
-.btn-ghost:hover { background: #f5f5f7 !important; }
+.btn-ghost:hover { background: var(--apple-surface-2) !important; border-color: var(--apple-border-soft) !important; }
 .btn-ghost:active { transform: scale(0.98); }
 
 .btn-danger {
-  background: #fff !important; color: var(--apple-red) !important;
+  background: var(--apple-surface) !important; color: var(--apple-red) !important;
   border: 1px solid #ffd1ce !important; border-radius: 980px !important;
-  font-weight: 500 !important; font-size: 0.85rem !important; padding: 8px 16px !important;
-  transition: all 0.2s ease !important; cursor: pointer !important;
+  font-weight: 500 !important; font-size: 0.85rem !important; padding: 9px 18px !important;
+  transition: background 0.2s ease, border-color 0.2s ease !important; cursor: pointer !important;
 }
 .btn-danger:hover { background: #fff0ef !important; border-color: var(--apple-red) !important; }
 
@@ -807,7 +829,7 @@ def host_ui(config):
                     <p>上传书籍，选择语音引擎，一键生成属于你的有声书。多引擎、多格式、批量处理，尽在掌控。</p>
                 </div>''')
 
-                # —— Step 1 文件 ——
+                # —— Step 1 文件 + 章节范围 ——
                 with gr.Group(elem_classes="app-card"):
                     gr.HTML('<p class="card-title"><span class="card-num">1</span>上传书籍文件</p>')
                     gr.HTML('<p class="card-desc">支持 EPUB / DOC / DOCX，可多选。输出目录将根据书名自动生成。</p>')
@@ -816,6 +838,11 @@ def host_ui(config):
                     output_dir = gr.Textbox(label="输出目录", value=default_output_dir, interactive=True,
                                             info="多文件时每本书自动生成以书名为名的子文件夹")
                     input_file.change(fn=update_output_dir_from_file, inputs=input_file, outputs=output_dir, show_progress="hidden")
+                    gr.HTML('<div class="section-divider"></div>')
+                    gr.HTML('<p class="card-sub-title">章节范围</p>')
+                    with gr.Row():
+                        chapter_start = gr.Slider(minimum=1, maximum=100, step=1, label="起始章节页码", value=1, interactive=True)
+                        chapter_end = gr.Slider(minimum=-1, maximum=100, step=1, label="结束章节页码", value=-1, info="-1 代表处理至最后一章", interactive=True)
 
                 # —— Step 2 引擎 ——
                 with gr.Group(elem_classes="app-card"):
@@ -887,30 +914,25 @@ def host_ui(config):
                                 piper_length_scale = gr.Slider(minimum=0.0, maximum=5.0, step=0.1, label="语速长度", value=1.0)
                                 piper_sentence_silence = gr.Slider(minimum=0.0, maximum=2.0, step=0.1, label="句间静音", value=0.2)
 
-                # —— Step 3 生成选项 ——
+                # —— Step 3 高级（生成选项 + 解析设置，手风琴展开） ——
                 with gr.Group(elem_classes="app-card"):
-                    gr.HTML('<p class="card-title"><span class="card-num">3</span>生成选项</p>')
-                    gr.HTML('<p class="card-desc">常用开关已持久化保存，下次打开自动恢复。</p>')
-                    with gr.Group(elem_classes="toggle-grid"):
-                        output_text = gr.Checkbox(label="同步导出章节纯文本", value=saved["output_text"], elem_classes="toggle")
-                        preview = gr.Checkbox(label="预解析模式（不消耗额度）", value=saved["preview"], elem_classes="toggle")
-                        remove_endnotes = gr.Checkbox(label="剔除书末尾注", value=saved["remove_endnotes"], elem_classes="toggle")
-                        remove_reference_numbers = gr.Checkbox(label="清理数字文献引用", value=saved["remove_reference_numbers"], elem_classes="toggle")
-                    with gr.Row():
-                        worker_count = gr.Slider(minimum=1, maximum=8, step=1, label="并行线程数", value=1, info="多线程加速，依配置微调")
-                        log_level = gr.Dropdown(["INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"], label="日志级别", value="INFO")
-
-                # —— Step 4 高级（手风琴展开） ——
-                with gr.Group(elem_classes="app-card"):
-                    gr.HTML('<p class="card-title"><span class="card-num">4</span>高级解析设置</p>')
-                    gr.HTML('<p class="card-desc">章节匹配、段落换行、文本替换规则等进阶选项，点击展开。</p>')
-                    with gr.Accordion("展开高级解析设置", open=False):
+                    gr.HTML('<p class="card-title"><span class="card-num">3</span>高级设置</p>')
+                    gr.HTML('<p class="card-desc">生成开关、解析模式、文本替换等进阶选项，点击展开。</p>')
+                    with gr.Accordion("展开高级设置", open=False):
+                        gr.HTML('<p class="card-sub-title">生成选项</p>')
+                        with gr.Group(elem_classes="toggle-grid"):
+                            output_text = gr.Checkbox(label="同步导出章节纯文本", value=saved["output_text"], elem_classes="toggle")
+                            preview = gr.Checkbox(label="预解析模式（不消耗额度）", value=saved["preview"], elem_classes="toggle")
+                            remove_endnotes = gr.Checkbox(label="剔除书末尾注", value=saved["remove_endnotes"], elem_classes="toggle")
+                            remove_reference_numbers = gr.Checkbox(label="清理数字文献引用", value=saved["remove_reference_numbers"], elem_classes="toggle")
+                        with gr.Row():
+                            worker_count = gr.Slider(minimum=1, maximum=8, step=1, label="并行线程数", value=1, info="多线程加速，依配置微调")
+                            log_level = gr.Dropdown(["INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"], label="日志级别", value="INFO")
+                        gr.HTML('<div class="section-divider"></div>')
+                        gr.HTML('<p class="card-sub-title">解析设置</p>')
                         with gr.Row():
                             title_mode = gr.Dropdown(["auto", "tag_text", "first_few"], label="章节标题匹配模式", value="auto", interactive=True)
                             new_line_mode = gr.Dropdown(["single", "double", "none"], label="段落换行检测模式", value="double", interactive=True)
-                        with gr.Row():
-                            chapter_start = gr.Slider(minimum=1, maximum=100, step=1, label="起始章节页码", value=1, interactive=True)
-                            chapter_end = gr.Slider(minimum=-1, maximum=100, step=1, label="结束章节页码", value=-1, info="-1 代表处理至最后一章", interactive=True)
                         search_and_replace_file = gr.File(label="文本替换规则文件 (.txt，可选)", file_types=[".txt"], file_count="single", interactive=True)
 
                 # —— CTA ——
