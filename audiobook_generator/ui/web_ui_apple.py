@@ -854,22 +854,26 @@ body.modal-open { overflow: hidden !important; }
 /* backdrop-filter 只模糊背后的内容，不影响弹窗子元素 */
 #advanced_modal.show { display: flex !important;
   backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; }
-/* Gradio 内层 wrapper 全部透明，不继承遮罩色 */
+/* Gradio 内层 wrapper 全部透明，不继承遮罩色；禁止内部滚动条 */
 #advanced_modal .styler, #advanced_modal .gr-group,
-#advanced_modal .form, #advanced_modal .block, #advanced_modal .group {
+#advanced_modal .form, #advanced_modal .block, #advanced_modal .group,
+#advanced_modal .toggle-grid, #advanced_modal .wrap,
+#advanced_modal .component-wrapper, #advanced_modal .contain {
   background: transparent !important; border: none !important; box-shadow: none !important;
-}
+  overflow: hidden !important; }
 #advanced_modal .styler { display: flex !important; align-items: center !important;
-  justify-content: center !important; width: 100% !important; }
+  justify-content: center !important; width: 100% !important; overflow: visible !important; }
 #advanced_modal .modal-box, #advanced_modal .modal-box .styler {
   background: #fff !important; border: none !important;
-  box-shadow: 0 16px 56px rgba(0,0,0,0.22) !important;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 24px 80px rgba(0,0,0,0.28) !important;
   border-radius: 22px !important; padding: clamp(16px,3vw,28px) !important;
-  width: min(620px, 94vw) !important; max-width: 94vw !important;
+  width: min(760px, 94vw) !important; max-width: 94vw !important;
   max-height: 82vh !important; overflow-y: auto !important;
   overscroll-behavior: contain !important;
 }
-#advanced_modal .modal-box .styler { box-shadow: none !important; background: transparent !important; }
+/* modal-box 内层 wrapper 不滚动，滚动统一在 modal-box 自身 */
+#advanced_modal .modal-box .styler { box-shadow: none !important; background: transparent !important;
+  overflow: visible !important; max-height: none !important; }
 #advanced_modal .modal-box { background: #fff !important; animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1); }
 @keyframes modalIn { from { opacity:0; transform: translateY(14px) scale(0.97); } to { opacity:1; transform:none; } }
 #advanced_modal .modal-header { display:flex !important; align-items:center !important; justify-content:space-between !important; margin-bottom:4px; }
