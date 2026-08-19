@@ -700,14 +700,16 @@ div[data-testid="file"] .file-preview > div {
 .engine-tabs .tabitem { animation: tabFadeIn 0.3s cubic-bezier(0.16,1,0.3,1) both; }
 @keyframes tabFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+/* 标题行：标题左 + 徽标右 */
+.card-title-row { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 12px; flex-wrap: wrap; }
+.card-title-row .card-title { margin: 0 !important; }
+
 .engine-badge {
   display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
   background: linear-gradient(135deg, #e8f1fd 0%, #f0eefe 100%);
-  border: 1px solid #cfe3fc; border-radius: 980px; margin-bottom: 14px;
-  /* 徽标自身缩放弹出（徽标不是 Dropdown 的祖先，transform 安全） */
-  animation: badgePop 0.35s cubic-bezier(0.16,1,0.3,1) both;
+  border: 1px solid #cfe3fc; border-radius: 980px; margin-bottom: 0;
+  /* 徽标本身无动效，切换时文字直接更新 */
 }
-@keyframes badgePop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 /* 防止 gr.HTML 进入 loading 态时把徽标变灰/变透明（服务端 queue 卡住的兜底） */
 .block:has(.engine-badge),
 .block:has(.engine-badge) .wrap,
@@ -1006,12 +1008,19 @@ def host_ui(config):
 
                 # —— Step 2 引擎 ——
                 with gr.Group(elem_classes="app-card"):
-                    gr.HTML('<p class="card-title"><span class="card-num">2</span>选择语音引擎</p>')
+                    gr.HTML('''
+                    <div class="card-title-row">
+                        <p class="card-title"><span class="card-num">2</span>选择语音引擎</p>
+                        <div class="engine-badge" id="engine_badge_static">
+                            <span class="engine-badge-dot"></span>
+                            <span class="engine-badge-label">当前语音引擎</span>
+                            <span class="engine-badge-name" id="engine_badge_name">MiMo</span>
+                        </div>
+                    </div>''')
                     gr.HTML('<p class="card-desc">点击下方标签切换引擎，所选引擎的参数随即显示。</p>')
                     with gr.Tabs(selected="Mimo", elem_classes="engine-tabs") as engine_tabs:
                         # ── MiMo ──
                         with gr.Tab("✨ MiMo", id="Mimo") as mimo_tab:
-                            gr.HTML(_badge_html("Mimo"))
                             with gr.Row():
                                 model = gr.Dropdown(get_openai_supported_models(), value="mimo-v2.5-tts", label="模型", interactive=True, allow_custom_value=True)
                                 voices = gr.Dropdown(get_openai_supported_voices(), label="音色风格", interactive=True, allow_custom_value=True)
@@ -1027,7 +1036,6 @@ def host_ui(config):
                                                            inputs=show_voice_instructions, outputs=None, show_progress="hidden")
                         # ── MiniMax ──
                         with gr.Tab("🎙️ MiniMax", id="MiniMax") as minimax_tab:
-                            gr.HTML(_badge_html("MiniMax"))
                             with gr.Row():
                                 minimax_model = gr.Dropdown(get_minimax_supported_models(), value="speech-2.8-hd", label="模型", interactive=True, allow_custom_value=True)
                                 minimax_voice = gr.Dropdown(get_minimax_voice_choices(), value=get_minimax_voice_choices()[0], label="音色", interactive=True, allow_custom_value=True)
@@ -1035,7 +1043,6 @@ def host_ui(config):
                             gr.HTML('<p class="card-desc">使用 MiniMax TTS API，请先设置环境变量 MINIMAX_API_KEY</p>')
                         # ── Edge ──
                         with gr.Tab("🌐 Edge", id="Edge") as edge_tab:
-                            gr.HTML(_badge_html("Edge"))
                             with gr.Row():
                                 edge_language = gr.Dropdown(get_edge_tts_supported_language(), value="en-US", label="语言", interactive=True)
                                 edge_voice = get_edge_voices_by_language("en-US")
@@ -1050,7 +1057,6 @@ def host_ui(config):
                             edge_language.change(fn=get_edge_voices_by_language, inputs=edge_language, outputs=edge_voice, show_progress="hidden")
                         # ── Piper ──
                         with gr.Tab("💻 Piper", id="Piper") as piper_tab:
-                            gr.HTML(_badge_html("Piper"))
                             piper_deployment = gr.Dropdown(["Docker", "Local"], label="部署方式", value="Docker", interactive=True)
                             with gr.Group(visible=True) as docker_group:
                                 piper_docker_image = gr.Textbox(label="Piper Docker 镜像", value="lscr.io/linuxserver/piper:latest", interactive=True)
@@ -1141,14 +1147,16 @@ def host_ui(config):
                     Log(str(webui_log_file.absolute()), dark=False, xterm_font_size=12)
 
         # ════════════ 事件绑定 ════════════
-        # 引擎标签切换 → 仅同步 provider_state（用于后续开始合成的参数）
-        # 徽标已内嵌到 4 个 TabItem 各自内部（纯静态 HTML），由 Svelte 原生
-        # Tabs 切换直接显示/隐藏，不经过服务端 queue，因此不会有"徽标变灰"
-        # 的 loading 态，切换即显示对应引擎中文标签。
-        for _tab, _name in [(mimo_tab, "Mimo"), (minimax_tab, "MiniMax"),
+        # 引擎标签切换 → 同步 provider_state（服务端）+ 更新徽标文字（客户端 js）
+        # js 在 Tab 被选中时立即执行，不经过服务端 queue，零延迟更新徽标
+        _PROVIDER_IDS = {"MiMo": "Mimo", "MiniMax": "MiniMax", "Edge": "Edge", "Piper": "Piper"}
+        for _tab, _display in [(mimo_tab, "MiMo"), (minimax_tab, "MiniMax"),
                             (edge_tab, "Edge"), (piper_tab, "Piper")]:
-            _tab.select(fn=lambda n=_name: n,
-                        inputs=None, outputs=provider_state, show_progress="hidden")
+            _id = _PROVIDER_IDS[_display]
+            _js = f"() => {{ const el = document.getElementById('engine_badge_name'); if (el) el.textContent = '{_display}'; }}"
+            _tab.select(fn=lambda n=_id: n,
+                        inputs=None, outputs=provider_state, show_progress="hidden",
+                        js=_js)
 
         # 开始 / 停止
         start_btn.click(
