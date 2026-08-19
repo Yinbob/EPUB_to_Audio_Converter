@@ -840,25 +840,40 @@ hr { border: none !important; border-top: 1px solid var(--apple-border-soft) !im
   .hero h1 { -webkit-text-fill-color: var(--apple-text) !important; }
 }
 
+/* ── 高级设置弹窗（背景模糊 + 居中卡片） ── */
+.modal-overlay, .modal-overlay .styler, .modal-overlay .gr-group, .modal-overlay .form {
+  background: rgba(0,0,0,0.22) !important;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: none !important; box-shadow: none !important;
+}
+.modal-overlay { position: fixed !important; top:0; left:0; right:0; bottom:0;
+  z-index: 1000; display: flex !important; align-items: center !important;
+  justify-content: center !important; padding: clamp(16px,4vw,40px); }
+.modal-overlay .styler { display: flex !important; align-items: center !important;
+  justify-content: center !important; width: 100% !important; }
+.modal-box, .modal-box .styler {
+  background: #fff !important; border: none !important; box-shadow: none !important;
+  border-radius: 22px !important; padding: clamp(20px,3vw,32px) !important;
+  max-width: 620px; width: 100%; max-height: 86vh; overflow-y: auto;
+}
+.modal-box { animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1); }
+@keyframes modalIn { from { opacity:0; transform: translateY(14px) scale(0.97); } to { opacity:1; transform:none; } }
+.modal-header { display:flex !important; align-items:center !important; justify-content:space-between !important; margin-bottom:4px; }
+.modal-title { font-size:1.25rem; font-weight:700; margin:0; color: var(--apple-text); }
+.modal-desc { color: var(--apple-text-2); font-size:0.9rem; margin:0 0 14px; }
+.modal-close-btn { width:34px !important; height:34px !important; min-width:34px !important;
+  border-radius:50% !important; padding:0 !important; font-size:1.1rem;
+  background: var(--apple-surface-2) !important; border:none !important; color: var(--apple-text) !important; }
+.modal-done { width:100%; margin-top:14px; }
+.modal-trigger { width:100%; }
+
 /* 大屏：放宽内容列宽，避免超宽屏拉伸 */
 @media (min-width: 1200px) {
   .gradio-container { max-width: 1280px !important; }
 }
-/* 超宽屏：两栏横向排版，左栏放上传+引擎，右栏放高级设置+CTA */
+/* 超宽屏：放宽容器，居中留白 */
 @media (min-width: 1440px) {
-  .gradio-container { max-width: 1440px !important; }
-  /* 将转换页的卡片区域排成两栏：前两张卡一栏，第三张+CTA 一栏 */
-  #tab_convert > div:not(.hero):not(.app-header) {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 18px !important;
-    align-items: start !important;
-  }
-  /* 左栏：Step1 + Step2 自然堆叠；右栏：Step3 + CTA。
-     第三张卡（高级设置，index 2）跨入右栏顶部 */
-  #tab_convert > .app-card:nth-child(3) { grid-column: 2 !important; grid-row: 1 !important; }
-  /* CTA 行跟随高级设置卡进入右栏 */
-  #tab_convert > .row-cta { grid-column: 2 !important; grid-row: 2 !important; }
+  .gradio-container { max-width: 1320px !important; }
 }
 """
 
@@ -913,6 +928,8 @@ def host_ui(config):
                     with gr.Row():
                         chapter_start = gr.Slider(minimum=1, maximum=100, step=1, label="起始章节页码", value=1, interactive=True)
                         chapter_end = gr.Slider(minimum=-1, maximum=100, step=1, label="结束章节页码", value=-1, info="-1 代表处理至最后一章", interactive=True)
+                    gr.HTML('<div class="section-divider"></div>')
+                    advanced_btn = gr.Button("⚙  高级设置", elem_classes="btn-ghost modal-trigger")
 
                 # —— Step 2 引擎 ——
                 with gr.Group(elem_classes="app-card"):
@@ -984,11 +1001,13 @@ def host_ui(config):
                                 piper_length_scale = gr.Slider(minimum=0.0, maximum=5.0, step=0.1, label="语速长度", value=1.0)
                                 piper_sentence_silence = gr.Slider(minimum=0.0, maximum=2.0, step=0.1, label="句间静音", value=0.2)
 
-                # —— Step 3 高级（生成选项 + 解析设置，手风琴展开） ——
-                with gr.Group(elem_classes="app-card"):
-                    gr.HTML('<p class="card-title"><span class="card-num">3</span>高级设置</p>')
-                    gr.HTML('<p class="card-desc">生成开关、解析模式、文本替换等进阶选项，点击展开。</p>')
-                    with gr.Accordion("展开高级设置", open=False):
+                # —— 高级设置弹窗（默认隐藏；点按 Step 1 内「高级设置」按钮唤起，背景模糊） ——
+                with gr.Group(visible=False, elem_classes="modal-overlay") as advanced_modal:
+                    with gr.Column(elem_classes="modal-box"):
+                        with gr.Row(elem_classes="modal-header"):
+                            gr.HTML('<p class="modal-title">高级设置</p>')
+                            modal_close_btn = gr.Button("✕", elem_classes="modal-close-btn")
+                        gr.HTML('<p class="modal-desc">生成开关、解析模式、文本替换等进阶选项。</p>')
                         gr.HTML('<p class="card-sub-title">生成选项</p>')
                         with gr.Group(elem_classes="toggle-grid"):
                             output_text = gr.Checkbox(label="同步导出章节纯文本", value=saved["output_text"], elem_classes="toggle")
@@ -1004,6 +1023,7 @@ def host_ui(config):
                             title_mode = gr.Dropdown(["auto", "tag_text", "first_few"], label="章节标题匹配模式", value="auto", interactive=True)
                             new_line_mode = gr.Dropdown(["single", "double", "none"], label="段落换行检测模式", value="double", interactive=True)
                         search_and_replace_file = gr.File(label="文本替换规则文件 (.txt，可选)", file_types=[".txt"], file_count="single", interactive=True)
+                        advanced_done_btn = gr.Button("完成", elem_classes="btn-primary modal-done")
 
                 # —— CTA ——
                 with gr.Row(elem_classes="row-cta"):
@@ -1089,6 +1109,11 @@ def host_ui(config):
                                         inputs=remove_reference_numbers, outputs=None, show_progress="hidden")
         show_voice_instructions.change(fn=lambda v: _save_checkbox("show_voice_instructions", v),
                                        inputs=show_voice_instructions, outputs=None, show_progress="hidden")
+
+        # 高级设置弹窗：按钮唤起 / ✕ 与「完成」关闭（均无 queue 指示器）
+        advanced_btn.click(fn=lambda: gr.update(visible=True), inputs=None, outputs=advanced_modal, show_progress="hidden")
+        modal_close_btn.click(fn=lambda: gr.update(visible=False), inputs=None, outputs=advanced_modal, show_progress="hidden")
+        advanced_done_btn.click(fn=lambda: gr.update(visible=False), inputs=None, outputs=advanced_modal, show_progress="hidden")
 
     temp_dir = os.path.join(get_output_dir(), ".temp_downloads")
     ui.launch(
