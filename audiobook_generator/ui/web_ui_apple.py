@@ -90,10 +90,10 @@ running_process: Optional[Process] = None
 webui_log_file = None
 
 _PROVIDER_LABEL = {
-    "Mimo": "MiMo 情绪语音",
-    "MiniMax": "MiniMax 高清语音",
-    "Edge": "Edge 在线语音",
-    "Piper": "Piper 离线语音",
+    "Mimo": "MiMo",
+    "MiniMax": "MiniMax",
+    "Edge": "Edge",
+    "Piper": "Piper",
 }
 
 
@@ -770,7 +770,13 @@ div[data-testid="file"] .file-preview > div {
   border-radius: 14px !important; padding: 12px 16px !important; transition: all 0.25s ease !important;
 }
 .toggle:hover { border-color: var(--apple-border) !important; }
-.toggle .checkbox { display: none !important; }
+/* 隐藏 Gradio 原生 checkbox 及任何额外渲染的开关圆点（仅保留伪元素做的苹果风 toggle） */
+.toggle .checkbox,
+.toggle input[type="checkbox"],
+.toggle input,
+.toggle .checkbox-wrap,
+.toggle .cf-switch,
+.toggle .switch { display: none !important; -webkit-appearance: none !important; appearance: none !important; }
 .toggle label { position: relative; display: flex !important; align-items: center !important;
   cursor: pointer !important; font-weight: 500 !important; color: var(--apple-text) !important;
   font-size: 0.88rem !important; padding-left: 0 !important; }
