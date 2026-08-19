@@ -544,6 +544,12 @@ body, .gradio-container {
   animation: fadeUp 0.55s cubic-bezier(0.16,1,0.3,1) both;
   transition: box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1) !important;
 }
+/* 清除 Gradio group 内部 styler 默认灰色直角底（让卡片白底直接透出） */
+.app-card .styler,
+.app-card.styler,
+.app-card .block.hide-container,
+.app-card .gr-group { background: transparent !important; border-radius: 0 !important;
+  border: none !important; box-shadow: none !important; }
 .app-card:hover { box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 16px 40px rgba(0,0,0,0.07) !important; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
