@@ -550,7 +550,10 @@ html, body, #root, .gradio-container, .main, footer,
 .app-card .gr-group { background: transparent !important; border-radius: 0 !important;
   border: none !important; box-shadow: none !important; }
 .app-card:hover { box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 16px 40px rgba(0,0,0,0.07) !important; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+/* 注意：fadeUp 不能用 transform（translateY），否则 CSS 规范里 transform 会让
+   卡片内 Dropdown 的 portal 选项面板（position:fixed）把卡片当作 containing block
+   → 坐标全错 → 选项出现在很远的顶部。改为纯 opacity 淡入动画。 */
+@keyframes fadeUp { from { opacity: 0; } to { opacity: 1; } }
 
 .card-title { font-size: 1.05rem; font-weight: 600; color: var(--apple-text);
   margin: 0 0 4px; letter-spacing: -0.012em; display: flex; align-items: center; }
@@ -856,18 +859,27 @@ hr { border: none !important; border-top: 1px solid var(--apple-border-soft) !im
 
 /* ── 高级设置弹窗（居中卡片，背景模糊） ── */
 /* 纯客户端控制：默认 display:none，JS 切换 .show → display:flex */
-/* 打开时 JS 给 body 加 .modal-open → 锁定背景滚动 */
+/* ⚠️  不能在 #advanced_modal.show 自身上用 backdrop-filter / transform / filter / contain:layout
+   否则 CSS 规范会让所有 position:fixed 的子元素把该元素当作 containing block（不再是 viewport）
+   → Gradio Dropdown 的选项面板（portal, fixed）坐标计算全错 → 选项出现在很远的顶部。
+   解决方案：把模糊层改成 body::before（弹窗的外部兄弟），由它承担 backdrop-filter，不影响 fixed 定位。 */
 body.modal-open { overflow: hidden !important; }
-/* 用 ID 选择器覆盖 Gradio 主题的 .gr-group 背景色 */
+body.modal-open::before {
+  content: "" !important;
+  position: fixed !important; inset: 0 !important; z-index: 999 !important;
+  background: rgba(0,0,0,0.08) !important;
+  backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;
+  pointer-events: none !important;
+  display: block !important;
+}
+/* 遮罩层用 ID 选择器覆盖 Gradio 主题的 .gr-group 背景色 —— 不再有 backdrop-filter */
 #advanced_modal { position: fixed !important; top:0; left:0; right:0; bottom:0;
   z-index: 1000; display: none !important; align-items: center !important;
   justify-content: center !important; padding: clamp(12px,3vw,32px);
   background: transparent !important; background-color: transparent !important;
   --block-background-fill: transparent !important;
   --group-background-fill: transparent !important; }
-/* backdrop-filter 只模糊背后的内容，不影响弹窗子元素 */
-#advanced_modal.show { display: flex !important;
-  backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; }
+#advanced_modal.show { display: flex !important; }
 /* Gradio 内层 wrapper 全部透明，不继承遮罩色；禁止内部滚动条 */
 #advanced_modal .styler, #advanced_modal .gr-group,
 #advanced_modal .form, #advanced_modal .block, #advanced_modal .group,
