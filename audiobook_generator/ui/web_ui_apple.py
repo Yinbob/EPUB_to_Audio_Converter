@@ -478,15 +478,14 @@ CUSTOM_CSS = """
   --radius-sm: 14px;
 }
 * { box-sizing: border-box; }
-body, .gradio-container {
-  background: var(--apple-bg) !important;
+html, body, #root, .gradio-container, .main, footer,
+.gradio-container > .main { background: var(--apple-bg) !important;
   color: var(--apple-text) !important;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
                "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif !important;
-  -webkit-font-smoothing: antialiased;
-}
-.gradio-container { max-width: 1080px !important; margin: 0 auto !important;
-  padding: 0 clamp(14px, 4vw, 32px) 64px !important; width: 100% !important; }
+  -webkit-font-smoothing: antialiased; }
+.gradio-container { margin: 0 auto !important;
+  padding: 0 clamp(14px, 4vw, 48px) 64px !important; width: 100% !important; }
 
 /* ── 顶部品牌栏 ── */
 .app-header {
@@ -841,9 +840,25 @@ hr { border: none !important; border-top: 1px solid var(--apple-border-soft) !im
   .hero h1 { -webkit-text-fill-color: var(--apple-text) !important; }
 }
 
-/* 大屏：限制内容列宽，避免超宽屏拉伸 */
+/* 大屏：放宽内容列宽，避免超宽屏拉伸 */
 @media (min-width: 1200px) {
-  .gradio-container { max-width: 1120px !important; }
+  .gradio-container { max-width: 1280px !important; }
+}
+/* 超宽屏：两栏横向排版，左栏放上传+引擎，右栏放高级设置+CTA */
+@media (min-width: 1440px) {
+  .gradio-container { max-width: 1440px !important; }
+  /* 将转换页的卡片区域排成两栏：前两张卡一栏，第三张+CTA 一栏 */
+  #tab_convert > div:not(.hero):not(.app-header) {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 18px !important;
+    align-items: start !important;
+  }
+  /* 左栏：Step1 + Step2 自然堆叠；右栏：Step3 + CTA。
+     第三张卡（高级设置，index 2）跨入右栏顶部 */
+  #tab_convert > .app-card:nth-child(3) { grid-column: 2 !important; grid-row: 1 !important; }
+  /* CTA 行跟随高级设置卡进入右栏 */
+  #tab_convert > .row-cta { grid-column: 2 !important; grid-row: 2 !important; }
 }
 """
 
