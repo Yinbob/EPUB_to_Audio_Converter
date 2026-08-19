@@ -600,7 +600,8 @@ input[type=range] { accent-color: var(--apple-blue) !important; }
 
 /* ── 文件上传拖拽区（替代 Gradio 默认深色方块） ── */
 /* 隐藏左上角浮动标签「书籍文件」与 Gradio 默认灰色上传 SVG */
-div[data-testid="file"] > label.float.svelte-j0zqjt { display: none !important; }
+[data-testid="file-upload-button"] label.float,
+[data-testid="block-label"].float { display: none !important; }
 button.center.boundedheight.flex > .wrap { display: none !important; }
 
 button.center.boundedheight.flex,
@@ -620,10 +621,10 @@ div[data-testid="file"] button.center.boundedheight.flex {
 /* 蓝色上传图标（居中显示，替代被隐藏的灰色 SVG） */
 button.center.boundedheight.flex::before {
   content: "" !important; display: block !important;
-  width: 44px !important; height: 44px !important; border-radius: 50% !important;
+  width: 56px !important; height: 56px !important; border-radius: 50% !important;
   background: linear-gradient(135deg, var(--apple-blue-soft) 0%, #f0eefe 100%) !important;
   border: 1px solid #d8e7fc !important;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%230071e3' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='17 8 12 3 7 8'/><line x1='12' y1='3' x2='12' y2='15'/></svg>") !important;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 24 24' fill='none' stroke='%230071e3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='17 8 12 3 7 8'/><line x1='12' y1='3' x2='12' y2='15'/></svg>") !important;
   background-repeat: no-repeat !important; background-position: center !important;
   transition: transform 0.3s cubic-bezier(0.16,1,0.3,1) !important;
 }
