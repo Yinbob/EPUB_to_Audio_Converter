@@ -617,6 +617,11 @@ input[type=range] { accent-color: var(--apple-blue) !important; }
 .engine-badge-label { font-size: 0.74rem; color: var(--apple-text-3); }
 .engine-badge-name { font-size: 0.86rem; font-weight: 600; color: var(--apple-text); }
 
+/* ── 隐藏 Gradio 队列/进度指示器（queue: N/N | Xs 文本 + 半透明遮罩 + spinner） ── */
+.wrap.translucent,
+.progress-text.meta-text-center,
+#progress-bar { display: none !important; }
+
 /* ── 按钮 ── */
 .btn-primary {
   background: var(--apple-blue) !important; color: #fff !important; border: none !important;
@@ -810,7 +815,7 @@ def host_ui(config):
                                          file_count="multiple", interactive=True)
                     output_dir = gr.Textbox(label="输出目录", value=default_output_dir, interactive=True,
                                             info="多文件时每本书自动生成以书名为名的子文件夹")
-                    input_file.change(fn=update_output_dir_from_file, inputs=input_file, outputs=output_dir)
+                    input_file.change(fn=update_output_dir_from_file, inputs=input_file, outputs=output_dir, show_progress="hidden")
 
                 # —— Step 2 引擎 ——
                 with gr.Group(elem_classes="app-card"):
@@ -832,7 +837,7 @@ def host_ui(config):
                                 instructions = gr.TextArea(label="情绪/语气控制指令", interactive=True, lines=3,
                                                            value=get_openai_instructions_example())
                             show_voice_instructions.change(fn=lambda v: _save_checkbox("show_voice_instructions", v),
-                                                           inputs=show_voice_instructions, outputs=None)
+                                                           inputs=show_voice_instructions, outputs=None, show_progress="hidden")
                         # ── MiniMax ──
                         with gr.Tab("🎙️ MiniMax", id="MiniMax") as minimax_tab:
                             with gr.Row():
@@ -853,7 +858,7 @@ def host_ui(config):
                             with gr.Row():
                                 edge_pitch = gr.Slider(minimum=-100, maximum=100, step=1, label="音调", value=0)
                                 edge_break_duration = gr.Slider(minimum=0, maximum=5000, step=1, label="段落停顿 (ms)", value=1250)
-                            edge_language.change(fn=get_edge_voices_by_language, inputs=edge_language, outputs=edge_voice)
+                            edge_language.change(fn=get_edge_voices_by_language, inputs=edge_language, outputs=edge_voice, show_progress="hidden")
                         # ── Piper ──
                         with gr.Tab("💻 Piper", id="Piper") as piper_tab:
                             piper_deployment = gr.Dropdown(["Docker", "Local"], label="部署方式", value="Docker", interactive=True)
@@ -862,19 +867,19 @@ def host_ui(config):
                             with gr.Group(visible=False) as local_group:
                                 piper_executable_path = gr.Textbox(label="Piper 可执行文件路径", interactive=True)
                                 piper_file_upload = gr.File(label="上传 Piper 可执行文件", file_count="single", interactive=True)
-                                piper_file_upload.change(fn=lambda x: x.name if x else "", inputs=piper_file_upload, outputs=piper_executable_path)
+                                piper_file_upload.change(fn=lambda x: x.name if x else "", inputs=piper_file_upload, outputs=piper_executable_path, show_progress="hidden")
                             piper_deployment.change(
                                 fn=lambda x: (gr.update(visible=x == "Local"), gr.update(visible=x == "Docker")),
-                                inputs=piper_deployment, outputs=[local_group, docker_group])
+                                inputs=piper_deployment, outputs=[local_group, docker_group], show_progress="hidden")
                             with gr.Row():
                                 piper_language = gr.Dropdown(get_piper_supported_languages(), label="语言", value="en_US", interactive=True)
                                 piper_voice = gr.Dropdown(get_piper_supported_voices("en_US"), label="音色", interactive=True)
                             with gr.Row():
                                 piper_quality = gr.Dropdown(get_piper_supported_qualities("en_US", get_piper_supported_voices("en_US")[0]), label="质量", interactive=True)
                                 piper_speaker = gr.Dropdown(get_piper_supported_speakers("en_US", get_piper_supported_voices("en_US")[0], get_piper_supported_qualities("en_US", get_piper_supported_voices("en_US")[0])[0]), label="说话人", interactive=True)
-                            piper_language.change(fn=get_piper_voices_gui, inputs=piper_language, outputs=piper_voice)
-                            piper_voice.change(fn=get_piper_qualities_gui, inputs=[piper_language, piper_voice], outputs=piper_quality)
-                            piper_quality.change(fn=get_piper_speakers_gui, inputs=[piper_language, piper_voice, piper_quality], outputs=piper_speaker)
+                            piper_language.change(fn=get_piper_voices_gui, inputs=piper_language, outputs=piper_voice, show_progress="hidden")
+                            piper_voice.change(fn=get_piper_qualities_gui, inputs=[piper_language, piper_voice], outputs=piper_quality, show_progress="hidden")
+                            piper_quality.change(fn=get_piper_speakers_gui, inputs=[piper_language, piper_voice, piper_quality], outputs=piper_speaker, show_progress="hidden")
                             with gr.Row():
                                 piper_noise_scale = gr.Slider(minimum=0.0, maximum=2.0, step=0.01, label="噪声尺度", value=0.667)
                                 piper_noise_w_scale = gr.Slider(minimum=0.0, maximum=2.0, step=0.1, label="宽度噪声", value=0.8)
@@ -954,7 +959,7 @@ def host_ui(config):
         for _tab, _name in [(mimo_tab, "Mimo"), (minimax_tab, "MiniMax"),
                             (edge_tab, "Edge"), (piper_tab, "Piper")]:
             _tab.select(fn=lambda n=_name: (n, _badge_html(n)),
-                        inputs=None, outputs=[provider_state, engine_badge])
+                        inputs=None, outputs=[provider_state, engine_badge], show_progress="hidden")
 
         # 开始 / 停止
         start_btn.click(
@@ -973,10 +978,10 @@ def host_ui(config):
         stop_btn.click(fn=terminate_generator, inputs=None, outputs=None)
 
         # 资源库
-        refresh_btn.click(fn=refresh_batches, inputs=None, outputs=[folder_dropdown, file_selector])
-        folder_dropdown.change(fn=load_files_for_folder, inputs=folder_dropdown, outputs=file_selector)
-        select_all_btn.click(fn=lambda f: gr.update(value=get_files_in_folder(f)), inputs=folder_dropdown, outputs=file_selector)
-        deselect_all_btn.click(fn=lambda: gr.update(value=[]), inputs=None, outputs=file_selector)
+        refresh_btn.click(fn=refresh_batches, inputs=None, outputs=[folder_dropdown, file_selector], show_progress="hidden")
+        folder_dropdown.change(fn=load_files_for_folder, inputs=folder_dropdown, outputs=file_selector, show_progress="hidden")
+        select_all_btn.click(fn=lambda f: gr.update(value=get_files_in_folder(f)), inputs=folder_dropdown, outputs=file_selector, show_progress="hidden")
+        deselect_all_btn.click(fn=lambda: gr.update(value=[]), inputs=None, outputs=file_selector, show_progress="hidden")
         delete_btn.click(fn=delete_selected_files, inputs=[folder_dropdown, file_selector],
                          outputs=[folder_dropdown, file_selector, download_card, real_download_file])
         delete_folder_btn.click(fn=delete_entire_folder, inputs=folder_dropdown,
@@ -985,13 +990,13 @@ def host_ui(config):
                            outputs=[folder_dropdown, file_selector, download_card, real_download_file])
 
         # 持久化开关
-        output_text.change(fn=lambda v: _save_checkbox("output_text", v), inputs=output_text, outputs=None)
-        preview.change(fn=lambda v: _save_checkbox("preview", v), inputs=preview, outputs=None)
-        remove_endnotes.change(fn=lambda v: _save_checkbox("remove_endnotes", v), inputs=remove_endnotes, outputs=None)
+        output_text.change(fn=lambda v: _save_checkbox("output_text", v), inputs=output_text, outputs=None, show_progress="hidden")
+        preview.change(fn=lambda v: _save_checkbox("preview", v), inputs=preview, outputs=None, show_progress="hidden")
+        remove_endnotes.change(fn=lambda v: _save_checkbox("remove_endnotes", v), inputs=remove_endnotes, outputs=None, show_progress="hidden")
         remove_reference_numbers.change(fn=lambda v: _save_checkbox("remove_reference_numbers", v),
-                                        inputs=remove_reference_numbers, outputs=None)
+                                        inputs=remove_reference_numbers, outputs=None, show_progress="hidden")
         show_voice_instructions.change(fn=lambda v: _save_checkbox("show_voice_instructions", v),
-                                       inputs=show_voice_instructions, outputs=None)
+                                       inputs=show_voice_instructions, outputs=None, show_progress="hidden")
 
     temp_dir = os.path.join(get_output_dir(), ".temp_downloads")
     ui.launch(
