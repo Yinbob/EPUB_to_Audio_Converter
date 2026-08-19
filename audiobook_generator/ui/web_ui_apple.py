@@ -699,7 +699,6 @@ div[data-testid="file"] .file-preview > div {
   display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
   background: linear-gradient(135deg, #e8f1fd 0%, #f0eefe 100%);
   border: 1px solid #cfe3fc; border-radius: 980px; margin-bottom: 14px;
-  animation: fadeUp 0.4s ease both;
 }
 /* 防止 gr.HTML 进入 loading 态时把徽标变灰/变透明（服务端 queue 卡住的兜底） */
 .block:has(.engine-badge),
