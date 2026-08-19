@@ -695,11 +695,19 @@ div[data-testid="file"] .file-preview > div {
 .gr-accordion > .label-wrap { padding: 15px 18px !important; font-weight: 600 !important;
   color: var(--apple-text) !important; font-size: 0.92rem !important; }
 
+/* ── 引擎切换动效 ── */
+/* Tab 内容淡入（仅 opacity，不用 transform——tabitem 是 Dropdown 祖先，transform 会破坏 fixed 定位） */
+.engine-tabs .tabitem { animation: tabFadeIn 0.3s cubic-bezier(0.16,1,0.3,1) both; }
+@keyframes tabFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
 .engine-badge {
   display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
   background: linear-gradient(135deg, #e8f1fd 0%, #f0eefe 100%);
   border: 1px solid #cfe3fc; border-radius: 980px; margin-bottom: 14px;
+  /* 徽标自身缩放弹出（徽标不是 Dropdown 的祖先，transform 安全） */
+  animation: badgePop 0.35s cubic-bezier(0.16,1,0.3,1) both;
 }
+@keyframes badgePop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 /* 防止 gr.HTML 进入 loading 态时把徽标变灰/变透明（服务端 queue 卡住的兜底） */
 .block:has(.engine-badge),
 .block:has(.engine-badge) .wrap,
