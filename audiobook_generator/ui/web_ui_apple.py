@@ -608,7 +608,7 @@ button.center.boundedheight.flex,
 div[data-testid="file"] button.center.boundedheight.flex {
   display: flex !important; flex-direction: column !important;
   align-items: center !important; justify-content: center !important; gap: 8px !important;
-  width: 100% !important; min-height: 200px !important; padding: 28px !important;
+  width: 100% !important; min-height: 300px !important; padding: 28px !important;
   background: var(--apple-surface-2) !important;
   border: 1.5px dashed var(--apple-border) !important;
   border-radius: var(--radius) !important;
