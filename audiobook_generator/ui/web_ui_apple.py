@@ -840,12 +840,15 @@ hr { border: none !important; border-top: 1px solid var(--apple-border-soft) !im
   .hero h1 { -webkit-text-fill-color: var(--apple-text) !important; }
 }
 
-/* ── 高级设置弹窗（居中卡片，无灰色遮罩） ── */
+/* ── 高级设置弹窗（居中卡片，背景模糊） ── */
 /* 纯客户端控制：默认 display:none，JS 切换 .show → display:flex */
+/* 打开时 JS 给 body 加 .modal-open → 锁定背景滚动 + 背景模糊 */
+body.modal-open { overflow: hidden !important; }
+body.modal-open .gradio-container { filter: blur(6px); pointer-events: none; transition: filter 0.2s ease; }
 /* 用 ID 选择器覆盖 Gradio 主题的 .gr-group 背景色 */
 #advanced_modal { position: fixed !important; top:0; left:0; right:0; bottom:0;
   z-index: 1000; display: none !important; align-items: center !important;
-  justify-content: center !important; padding: clamp(16px,4vw,40px);
+  justify-content: center !important; padding: clamp(12px,3vw,32px);
   background: transparent !important; background-color: transparent !important;
   --block-background-fill: transparent !important;
   --group-background-fill: transparent !important; }
@@ -859,15 +862,17 @@ hr { border: none !important; border-top: 1px solid var(--apple-border-soft) !im
   justify-content: center !important; width: 100% !important; }
 #advanced_modal .modal-box, #advanced_modal .modal-box .styler {
   background: #fff !important; border: none !important;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.18) !important;
-  border-radius: 22px !important; padding: clamp(20px,3vw,32px) !important;
-  max-width: 620px; width: 100%; max-height: 86vh; overflow-y: auto;
+  box-shadow: 0 16px 56px rgba(0,0,0,0.22) !important;
+  border-radius: 22px !important; padding: clamp(16px,3vw,28px) !important;
+  width: min(620px, 94vw) !important; max-width: 94vw !important;
+  max-height: 82vh !important; overflow-y: auto !important;
+  overscroll-behavior: contain !important;
 }
 #advanced_modal .modal-box .styler { box-shadow: none !important; background: transparent !important; }
 #advanced_modal .modal-box { background: #fff !important; animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1); }
 @keyframes modalIn { from { opacity:0; transform: translateY(14px) scale(0.97); } to { opacity:1; transform:none; } }
 #advanced_modal .modal-header { display:flex !important; align-items:center !important; justify-content:space-between !important; margin-bottom:4px; }
-#advanced_modal .modal-title { font-size:1.25rem; font-weight:700; margin:0; color: var(--apple-text); }
+#advanced_modal .modal-title { font-size: clamp(1.05rem, 3vw, 1.25rem); font-weight:700; margin:0; color: var(--apple-text); }
 #advanced_modal .modal-desc { color: var(--apple-text-2); font-size:0.9rem; margin:0 0 14px; }
 #advanced_modal .modal-close-btn { width:34px !important; height:34px !important; min-width:34px !important;
   border-radius:50% !important; padding:0 !important; font-size:1.1rem;
@@ -937,7 +942,7 @@ def host_ui(config):
                         chapter_start = gr.Slider(minimum=1, maximum=100, step=1, label="起始章节页码", value=1, interactive=True)
                         chapter_end = gr.Slider(minimum=-1, maximum=100, step=1, label="结束章节页码", value=-1, info="-1 代表处理至最后一章", interactive=True)
                     gr.HTML('<div class="section-divider"></div>')
-                    gr.HTML('<button class="btn-ghost modal-trigger" onclick="var m=document.querySelector(\'#advanced_modal\');m.classList.add(\'show\');m.style.setProperty(\'background-color\',\'transparent\',\'important\');m.style.setProperty(\'--block-background-fill\',\'transparent\',\'important\');m.style.setProperty(\'--group-background-fill\',\'transparent\',\'important\')" style="width:100%;padding:12px;border-radius:14px;font-size:1rem;cursor:pointer;">⚙\u00a0\u00a0高级设置</button>')
+                    gr.HTML('<button class="btn-ghost modal-trigger" onclick="var m=document.querySelector(\'#advanced_modal\');m.classList.add(\'show\');m.style.setProperty(\'background-color\',\'transparent\',\'important\');m.style.setProperty(\'--block-background-fill\',\'transparent\',\'important\');m.style.setProperty(\'--group-background-fill\',\'transparent\',\'important\');document.body.classList.add(\'modal-open\')" style="width:100%;padding:12px;border-radius:14px;font-size:1rem;cursor:pointer;">⚙\u00a0\u00a0高级设置</button>')
 
                 # —— Step 2 引擎 ——
                 with gr.Group(elem_classes="app-card"):
@@ -1012,7 +1017,7 @@ def host_ui(config):
                 # —— 高级设置弹窗（纯客户端控制；默认 display:none，JS 切换 .show） ——
                 with gr.Group(elem_classes="modal-overlay", elem_id="advanced_modal") as advanced_modal:
                     with gr.Column(elem_classes="modal-box"):
-                        gr.HTML('<div class="modal-header"><p class="modal-title">高级设置</p><button class="modal-close-btn" onclick="document.querySelector(\'#advanced_modal\').classList.remove(\'show\')">✕</button></div>')
+                        gr.HTML('<div class="modal-header"><p class="modal-title">高级设置</p><button class="modal-close-btn" onclick="document.querySelector(\'#advanced_modal\').classList.remove(\'show\');document.body.classList.remove(\'modal-open\')">✕</button></div>')
                         gr.HTML('<p class="modal-desc">生成开关、解析模式、文本替换等进阶选项。</p>')
                         gr.HTML('<p class="card-sub-title">生成选项</p>')
                         with gr.Group(elem_classes="toggle-grid"):
@@ -1029,7 +1034,7 @@ def host_ui(config):
                             title_mode = gr.Dropdown(["auto", "tag_text", "first_few"], label="章节标题匹配模式", value="auto", interactive=True)
                             new_line_mode = gr.Dropdown(["single", "double", "none"], label="段落换行检测模式", value="double", interactive=True)
                         search_and_replace_file = gr.File(label="文本替换规则文件 (.txt，可选)", file_types=[".txt"], file_count="single", interactive=True)
-                        gr.HTML('<button class="btn-primary modal-done" onclick="document.querySelector(\'#advanced_modal\').classList.remove(\'show\')" style="width:100%;margin-top:14px;padding:12px;border-radius:14px;font-size:1rem;cursor:pointer;">完成</button>')
+                        gr.HTML('<button class="btn-primary modal-done" onclick="document.querySelector(\'#advanced_modal\').classList.remove(\'show\');document.body.classList.remove(\'modal-open\')" style="width:100%;margin-top:14px;padding:12px;border-radius:14px;font-size:1rem;cursor:pointer;">完成</button>')
 
                 # —— CTA ——
                 with gr.Row(elem_classes="row-cta"):
