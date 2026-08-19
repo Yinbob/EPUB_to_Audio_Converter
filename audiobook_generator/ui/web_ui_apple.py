@@ -842,9 +842,8 @@ hr { border: none !important; border-top: 1px solid var(--apple-border-soft) !im
 
 /* ── 高级设置弹窗（居中卡片，背景模糊） ── */
 /* 纯客户端控制：默认 display:none，JS 切换 .show → display:flex */
-/* 打开时 JS 给 body 加 .modal-open → 锁定背景滚动 + 背景模糊 */
+/* 打开时 JS 给 body 加 .modal-open → 锁定背景滚动 */
 body.modal-open { overflow: hidden !important; }
-body.modal-open .gradio-container { filter: blur(6px); pointer-events: none; transition: filter 0.2s ease; }
 /* 用 ID 选择器覆盖 Gradio 主题的 .gr-group 背景色 */
 #advanced_modal { position: fixed !important; top:0; left:0; right:0; bottom:0;
   z-index: 1000; display: none !important; align-items: center !important;
@@ -852,7 +851,9 @@ body.modal-open .gradio-container { filter: blur(6px); pointer-events: none; tra
   background: transparent !important; background-color: transparent !important;
   --block-background-fill: transparent !important;
   --group-background-fill: transparent !important; }
-#advanced_modal.show { display: flex !important; }
+/* backdrop-filter 只模糊背后的内容，不影响弹窗子元素 */
+#advanced_modal.show { display: flex !important;
+  backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; }
 /* Gradio 内层 wrapper 全部透明，不继承遮罩色 */
 #advanced_modal .styler, #advanced_modal .gr-group,
 #advanced_modal .form, #advanced_modal .block, #advanced_modal .group {
