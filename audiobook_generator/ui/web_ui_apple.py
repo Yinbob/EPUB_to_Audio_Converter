@@ -499,13 +499,14 @@ body, .gradio-container {
   -webkit-font-smoothing: antialiased;
 }
 .gradio-container { max-width: 1080px !important; margin: 0 auto !important;
-  padding: 0 24px 64px !important; width: 100% !important; }
+  padding: 0 clamp(14px, 4vw, 32px) 64px !important; width: 100% !important; }
 
 /* ── 顶部品牌栏 ── */
 .app-header {
   position: sticky; top: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 4px; margin-bottom: 8px;
+  gap: 10px; padding: 14px 4px; margin-bottom: 8px;
+  padding-top: max(14px, env(safe-area-inset-top));
   background: rgba(251,251,253,0.72);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -526,7 +527,9 @@ body, .gradio-container {
 /* ── 胶囊导航 Tabs ── */
 .tabs { gap: 0 !important; border: none !important; background: transparent !important; }
 .tab-nav { border: none !important; justify-content: flex-start !important;
-  padding: 4px 0 18px !important; }
+  padding: 4px 0 18px !important; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; flex-wrap: nowrap !important; }
+.tab-nav::-webkit-scrollbar { display: none; }
 .tab-nav button {
   border: none !important; background: transparent !important;
   font-weight: 500 !important; color: var(--apple-text-3) !important;
@@ -549,7 +552,7 @@ body, .gradio-container {
   border: 1px solid var(--apple-border-soft) !important;
   border-radius: var(--radius) !important;
   box-shadow: var(--apple-shadow) !important;
-  padding: 22px 24px !important;
+  padding: clamp(16px, 3.5vw, 24px) !important;
   margin-bottom: 18px !important;
   animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
 }
@@ -563,16 +566,16 @@ body, .gradio-container {
   font-weight: 700; align-items: center; justify-content: center; margin-right: 9px; }
 
 /* ── 英雄区 ── */
-.hero { text-align: center; padding: 30px 8px 24px; animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+.hero { text-align: center; padding: clamp(18px, 4vw, 30px) 8px 24px; animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
 .hero h1 {
-  font-size: 2.1rem !important; font-weight: 700 !important; letter-spacing: -0.03em;
+  font-size: clamp(1.6rem, 5.5vw, 2.3rem) !important; font-weight: 700 !important; letter-spacing: -0.03em;
   background: linear-gradient(120deg, #1d1d1f 0%, #0071e3 55%, #5e5ce6 100%);
   background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent; margin: 0 0 10px !important;
   animation: shimmer 6s ease-in-out infinite;
 }
 @keyframes shimmer { 0%,100% { background-position: 0% center; } 50% { background-position: 100% center; } }
-.hero p { color: var(--apple-text-2); font-size: 1.02rem; margin: 0 auto; max-width: 560px; line-height: 1.5; }
+.hero p { color: var(--apple-text-2); font-size: clamp(0.92rem, 2.6vw, 1.05rem); margin: 0 auto; max-width: 560px; line-height: 1.5; }
 
 /* ── 输入控件统一 ── */
 input, textarea, select {
@@ -590,8 +593,9 @@ label { color: var(--apple-text-2) !important; font-weight: 500 !important; font
 input[type=range] { accent-color: var(--apple-blue) !important; }
 
 /* ── 引擎卡片 ── */
-.engine-grid { display: grid !important; grid-template-columns: repeat(2, 1fr);
-  gap: 14px !important; }
+.engine-grid { display: grid !important; grid-template-columns: 1fr;
+  gap: 12px !important; }
+@media (min-width: 560px) { .engine-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 14px !important; } }
 .engine-card {
   text-align: left !important; cursor: pointer; padding: 20px 20px !important;
   background: var(--apple-surface) !important;
@@ -625,14 +629,20 @@ input[type=range] { accent-color: var(--apple-blue) !important; }
   background: rgba(29,29,31,0.42) !important;
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   display: flex !important; align-items: center !important; justify-content: center !important;
-  padding: 28px !important; animation: fadeIn 0.25s ease both;
+  padding: clamp(0px, 0px, 28px) !important;
+  padding-top: max(env(safe-area-inset-top), 12px) !important;
+  padding-bottom: max(env(safe-area-inset-bottom), 12px) !important;
+  padding-left: max(env(safe-area-inset-left), 12px) !important;
+  padding-right: max(env(safe-area-inset-right), 12px) !important;
+  animation: fadeIn 0.25s ease both;
+  overflow-y: auto !important;
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .modal-card {
-  background: var(--apple-surface) !important; border-radius: 22px !important;
-  max-width: 720px !important; width: 100% !important; max-height: 84vh !important;
+  background: var(--apple-surface) !important; border-radius: clamp(16px, 3vw, 22px) !important;
+  max-width: 720px !important; width: 100% !important; max-height: 90vh !important;
   overflow-y: auto !important; box-shadow: var(--apple-shadow-lg) !important;
-  padding: 26px 28px !important; border: none !important;
+  padding: clamp(18px, 4vw, 28px) !important; border: none !important;
   animation: modalIn 0.32s cubic-bezier(0.16,1,0.3,1) both !important;
 }
 @keyframes modalIn { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: none; } }
@@ -689,7 +699,8 @@ input[type=range] { accent-color: var(--apple-blue) !important; }
 .btn-mini:hover { background: #ebebed !important; color: var(--apple-text) !important; }
 
 /* ── 开关组（苹果风 toggle） ── */
-.toggle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.toggle-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 560px) { .toggle-grid { grid-template-columns: 1fr 1fr; } }
 .toggle {
   background: var(--apple-surface) !important; border: 1px solid var(--apple-border-soft) !important;
   border-radius: 14px !important; padding: 12px 16px !important; transition: all 0.25s ease !important;
@@ -738,6 +749,63 @@ input[type=range] { accent-color: var(--apple-blue) !important; }
 h1, h2, h3 { color: var(--apple-text) !important; }
 hr { border: none !important; border-top: 1px solid var(--apple-border-soft) !important; margin: 16px 0; }
 .gradio-container .form { background: transparent !important; border: none !important; }
+
+/* ═══ 响应式自适应 ═══ */
+/* 小屏：隐藏品牌副标签，避免顶栏拥挤 */
+@media (max-width: 480px) {
+  .app-tag { display: none !important; }
+  .app-sub { display: none !important; }
+  .tab-nav button { padding: 8px 14px !important; font-size: 0.9rem !important; }
+  .hero { padding-top: 12px !important; }
+}
+
+/* 小屏：资源库主行（批次列表 / 下载区）纵向堆叠 */
+@media (max-width: 720px) {
+  .row-stack { flex-direction: column !important; }
+  .row-stack > * { width: 100% !important; }
+}
+
+/* 小屏：CTA 行按钮等宽撑满 */
+@media (max-width: 520px) {
+  .row-cta { flex-direction: column !important; gap: 10px !important; }
+  .row-cta button { width: 100% !important; }
+  .btn-primary, .btn-ghost { padding: 14px 22px !important; font-size: 1rem !important; }
+}
+
+/* 触屏：放大可点击区域，避免误触 */
+@media (pointer: coarse) {
+  .btn-mini { padding: 11px 18px !important; font-size: 0.88rem !important; }
+  .btn-danger { padding: 11px 18px !important; }
+  .engine-card { min-height: 72px !important; padding: 18px !important; }
+  .file-checks label { padding: 14px 16px !important; margin-bottom: 8px !important; }
+  .toggle { padding: 14px 16px !important; }
+  input, textarea, select { font-size: 1em !important; }
+  .tab-nav button { padding: 11px 18px !important; }
+}
+
+/* 触屏：禁用依赖悬停的视觉态，避免 sticky hover */
+@media (hover: none) {
+  .engine-card:hover, .btn-primary:hover, .btn-ghost:hover, .btn-danger:hover,
+  .btn-mini:hover, .toggle:hover, .file-checks label:hover, .modal-close:hover {
+    transform: none !important; background: revert !important; color: revert !important;
+    box-shadow: revert !important; border-color: revert !important;
+  }
+  .engine-card:active { transform: scale(0.985); }
+}
+
+/* 无障碍：尊重「减少动态」系统偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+  }
+  .hero h1 { -webkit-text-fill-color: var(--apple-text) !important; }
+}
+
+/* 大屏：限制内容列宽，避免超宽屏拉伸 */
+@media (min-width: 1200px) {
+  .gradio-container { max-width: 1120px !important; }
+}
 """
 
 # ── 主装配 ────────────────────────────────────────────────────────
@@ -819,14 +887,14 @@ def host_ui(config):
                     advanced_open_btn = gr.Button("打开高级设置", elem_classes="btn-ghost")
 
                 # —— CTA ——
-                with gr.Row():
+                with gr.Row(elem_classes="row-cta"):
                     stop_btn = gr.Button("停止转换", elem_classes="btn-ghost")
                     start_btn = gr.Button("🚀 开始生成有声书", elem_classes="btn-primary pulse", variant="primary")
 
             # ════════════ 资源库页 ════════════
             with gr.Tab("资源库", id="tab_library"):
                 gr.HTML('<div class="hero"><h1>资源库</h1><p>管理已生成的音频文件：批量下载、打包导出、一键清理。</p></div>')
-                with gr.Row():
+                with gr.Row(elem_classes="row-stack"):
                     with gr.Column(scale=3):
                         with gr.Group(elem_classes="app-card"):
                             gr.HTML('<p class="card-title">选择导出批次</p>')
