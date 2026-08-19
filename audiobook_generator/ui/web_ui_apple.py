@@ -646,6 +646,20 @@ div[data-testid="file"] .file-preview > div {
   background: var(--apple-surface) !important; padding: 8px 12px !important;
 }
 
+/* ── 弹窗内规则文件上传：紧凑版拖放区 + 图标 + 说明文字 ── */
+#advanced_modal .rules-file-upload button.center.boundedheight.flex {
+  min-height: 132px !important; padding: 16px 20px !important;
+  margin-top: 2px !important;
+}
+#advanced_modal .rules-file-upload button.center.boundedheight.flex::before {
+  width: 44px !important; height: 44px !important;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%230071e3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='17 8 12 3 7 8'/><line x1='12' y1='3' x2='12' y2='15'/></svg>") !important;
+}
+#advanced_modal .rules-file-upload button.center.boundedheight.flex::after {
+  content: "拖放 .txt 规则文件到此处，或点击选择" !important;
+  font-size: 0.82rem !important;
+}
+
 /* ── 引擎分段选择器（原生 Tabs） ── */
 .engine-tabs { gap: 0 !important; }
 .engine-tabs > .tab-nav {
@@ -862,19 +876,25 @@ body.modal-open { overflow: hidden !important; }
   background: transparent !important; border: none !important; box-shadow: none !important;
   overflow: hidden !important; }
 #advanced_modal .styler { display: flex !important; align-items: center !important;
-  justify-content: center !important; width: 100% !important; overflow: visible !important; }
+  justify-content: center !important; width: 100% !important; overflow: visible !important;
+  max-height: 100% !important; min-height: 0 !important; }
 #advanced_modal .modal-box, #advanced_modal .modal-box .styler {
   background: #fff !important; border: none !important;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 24px 80px rgba(0,0,0,0.28) !important;
-  border-radius: 22px !important; padding: clamp(16px,3vw,28px) !important;
+  border-radius: 22px !important; padding: 24px !important;
   width: min(760px, 94vw) !important; max-width: 94vw !important;
-  max-height: 82vh !important; overflow-y: auto !important;
+  max-height: 80vh !important; overflow-y: auto !important;
+  overflow-x: hidden !important;
   overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
 }
-/* modal-box 内层 wrapper 不滚动，滚动统一在 modal-box 自身 */
+/* modal-box 内层 wrapper：使用充足的底部 padding 避免最后一个元素被滚动视口裁切 */
 #advanced_modal .modal-box .styler { box-shadow: none !important; background: transparent !important;
-  overflow: visible !important; max-height: none !important; }
-#advanced_modal .modal-box { background: #fff !important; animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1); }
+  overflow: visible !important; max-height: none !important; min-height: 0 !important;
+  padding: 4px 0 36px 0 !important; display: flex !important; flex-direction: column !important;
+  align-items: stretch !important; width: 100% !important; gap: 0 !important; }
+#advanced_modal .modal-box { background: #fff !important; animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1);
+  display: block !important; }
 @keyframes modalIn { from { opacity:0; transform: translateY(14px) scale(0.97); } to { opacity:1; transform:none; } }
 #advanced_modal .modal-header { display:flex !important; align-items:center !important; justify-content:space-between !important; margin-bottom:4px; }
 #advanced_modal .modal-title { font-size: clamp(1.05rem, 3vw, 1.25rem); font-weight:700; margin:0; color: var(--apple-text); }
@@ -882,7 +902,8 @@ body.modal-open { overflow: hidden !important; }
 #advanced_modal .modal-close-btn { width:34px !important; height:34px !important; min-width:34px !important;
   border-radius:50% !important; padding:0 !important; font-size:1.1rem;
   background: var(--apple-surface-2) !important; border:none !important; color: var(--apple-text) !important; }
-#advanced_modal .modal-done { width:100%; margin-top:14px; }
+/* 完成按钮底部预留安全边距，避免被视口下沿裁切 */
+#advanced_modal .modal-done { width: 100%; margin-top: 14px; margin-bottom: 8px; }
 #advanced_modal .modal-trigger { width:100%; }
 
 /* 大屏：放宽内容列宽，避免超宽屏拉伸 */
@@ -1038,7 +1059,7 @@ def host_ui(config):
                         with gr.Row():
                             title_mode = gr.Dropdown(["auto", "tag_text", "first_few"], label="章节标题匹配模式", value="auto", interactive=True)
                             new_line_mode = gr.Dropdown(["single", "double", "none"], label="段落换行检测模式", value="double", interactive=True)
-                        search_and_replace_file = gr.File(label="文本替换规则文件 (.txt，可选)", file_types=[".txt"], file_count="single", interactive=True)
+                        search_and_replace_file = gr.File(label="文本替换规则文件 (.txt，可选)", file_types=[".txt"], file_count="single", interactive=True, elem_classes="rules-file-upload")
                         gr.HTML('<button class="btn-primary modal-done" onclick="document.querySelector(\'#advanced_modal\').classList.remove(\'show\');document.body.classList.remove(\'modal-open\')" style="width:100%;margin-top:14px;padding:12px;border-radius:14px;font-size:1rem;cursor:pointer;">完成</button>')
 
                 # —— CTA ——
