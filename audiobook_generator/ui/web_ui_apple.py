@@ -599,10 +599,14 @@ label { color: var(--apple-text-2) !important; font-weight: 500 !important; font
 input[type=range] { accent-color: var(--apple-blue) !important; }
 
 /* ── 文件上传拖拽区（替代 Gradio 默认深色方块） ── */
+/* 隐藏左上角浮动标签「书籍文件」与 Gradio 默认灰色上传 SVG */
+div[data-testid="file"] > label.float.svelte-j0zqjt { display: none !important; }
+button.center.boundedheight.flex > .wrap { display: none !important; }
+
 button.center.boundedheight.flex,
 div[data-testid="file"] button.center.boundedheight.flex {
   display: flex !important; flex-direction: column !important;
-  align-items: center !important; justify-content: center !important; gap: 6px !important;
+  align-items: center !important; justify-content: center !important; gap: 8px !important;
   width: 100% !important; min-height: 130px !important; padding: 22px !important;
   background: var(--apple-surface-2) !important;
   border: 1.5px dashed var(--apple-border) !important;
@@ -613,24 +617,26 @@ div[data-testid="file"] button.center.boundedheight.flex {
   transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s cubic-bezier(0.16,1,0.3,1) !important;
   position: relative !important;
 }
-/* 上传图标（用伪元素画一个柔和的圆形上传符号） */
+/* 蓝色上传图标（居中显示，替代被隐藏的灰色 SVG） */
 button.center.boundedheight.flex::before {
   content: "" !important; display: block !important;
-  width: 42px !important; height: 42px !important; border-radius: 50% !important;
+  width: 44px !important; height: 44px !important; border-radius: 50% !important;
   background: linear-gradient(135deg, var(--apple-blue-soft) 0%, #f0eefe 100%) !important;
   border: 1px solid #d8e7fc !important;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%230071e3' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='17 8 12 3 7 8'/><line x1='12' y1='3' x2='12' y2='15'/></svg>") !important;
   background-repeat: no-repeat !important; background-position: center !important;
-  margin-bottom: 2px !important;
   transition: transform 0.3s cubic-bezier(0.16,1,0.3,1) !important;
+}
+/* 提示文案（灰 SVG 隐藏后用伪元素补回） */
+button.center.boundedheight.flex::after {
+  content: "拖放文件到此处，或点击选择" !important;
+  color: var(--apple-text-3) !important; font-size: 0.84rem !important; font-weight: 500 !important;
 }
 button.center.boundedheight.flex:hover {
   border-color: var(--apple-blue) !important; background: var(--apple-blue-soft) !important;
 }
 button.center.boundedheight.flex:hover::before { transform: translateY(-3px); }
 button.center.boundedheight.flex:active { transform: scale(0.99) !important; }
-/* 拖拽区内的提示文字更柔和 */
-button.center.boundedheight.flex > div { color: var(--apple-text-3) !important; opacity: 0.85 !important; }
 
 /* 已上传文件列表（gr.File 展示的文件名条）保持简洁圆角 */
 div[data-testid="file"] .file-preview,
