@@ -841,14 +841,16 @@ hr { border: none !important; border-top: 1px solid var(--apple-border-soft) !im
 }
 
 /* ── 高级设置弹窗（背景模糊 + 居中卡片） ── */
+/* 纯客户端控制：默认 display:none，JS 切换 .show → display:flex */
 .modal-overlay, .modal-overlay .styler, .modal-overlay .gr-group, .modal-overlay .form {
   background: rgba(0,0,0,0.22) !important;
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   border: none !important; box-shadow: none !important;
 }
 .modal-overlay { position: fixed !important; top:0; left:0; right:0; bottom:0;
-  z-index: 1000; display: flex !important; align-items: center !important;
+  z-index: 1000; display: none !important; align-items: center !important;
   justify-content: center !important; padding: clamp(16px,4vw,40px); }
+.modal-overlay.show { display: flex !important; }
 .modal-overlay .styler { display: flex !important; align-items: center !important;
   justify-content: center !important; width: 100% !important; }
 .modal-box, .modal-box .styler {
@@ -929,7 +931,7 @@ def host_ui(config):
                         chapter_start = gr.Slider(minimum=1, maximum=100, step=1, label="起始章节页码", value=1, interactive=True)
                         chapter_end = gr.Slider(minimum=-1, maximum=100, step=1, label="结束章节页码", value=-1, info="-1 代表处理至最后一章", interactive=True)
                     gr.HTML('<div class="section-divider"></div>')
-                    advanced_btn = gr.Button("⚙  高级设置", elem_classes="btn-ghost modal-trigger")
+                    gr.HTML('<button class="btn-ghost modal-trigger" onclick="document.querySelector(\'.modal-overlay\').classList.add(\'show\')" style="width:100%;padding:12px;border-radius:14px;font-size:1rem;cursor:pointer;">⚙\u00a0\u00a0高级设置</button>')
 
                 # —— Step 2 引擎 ——
                 with gr.Group(elem_classes="app-card"):
@@ -1001,12 +1003,10 @@ def host_ui(config):
                                 piper_length_scale = gr.Slider(minimum=0.0, maximum=5.0, step=0.1, label="语速长度", value=1.0)
                                 piper_sentence_silence = gr.Slider(minimum=0.0, maximum=2.0, step=0.1, label="句间静音", value=0.2)
 
-                # —— 高级设置弹窗（默认隐藏；点按 Step 1 内「高级设置」按钮唤起，背景模糊） ——
-                with gr.Group(visible=False, elem_classes="modal-overlay") as advanced_modal:
+                # —— 高级设置弹窗（纯客户端控制；默认 display:none，JS 切换 .show） ——
+                with gr.Group(elem_classes="modal-overlay") as advanced_modal:
                     with gr.Column(elem_classes="modal-box"):
-                        with gr.Row(elem_classes="modal-header"):
-                            gr.HTML('<p class="modal-title">高级设置</p>')
-                            modal_close_btn = gr.Button("✕", elem_classes="modal-close-btn")
+                        gr.HTML('<div class="modal-header"><p class="modal-title">高级设置</p><button class="modal-close-btn" onclick="document.querySelector(\'.modal-overlay\').classList.remove(\'show\')">✕</button></div>')
                         gr.HTML('<p class="modal-desc">生成开关、解析模式、文本替换等进阶选项。</p>')
                         gr.HTML('<p class="card-sub-title">生成选项</p>')
                         with gr.Group(elem_classes="toggle-grid"):
@@ -1023,7 +1023,7 @@ def host_ui(config):
                             title_mode = gr.Dropdown(["auto", "tag_text", "first_few"], label="章节标题匹配模式", value="auto", interactive=True)
                             new_line_mode = gr.Dropdown(["single", "double", "none"], label="段落换行检测模式", value="double", interactive=True)
                         search_and_replace_file = gr.File(label="文本替换规则文件 (.txt，可选)", file_types=[".txt"], file_count="single", interactive=True)
-                        advanced_done_btn = gr.Button("完成", elem_classes="btn-primary modal-done")
+                        gr.HTML('<button class="btn-primary modal-done" onclick="document.querySelector(\'.modal-overlay\').classList.remove(\'show\')" style="width:100%;margin-top:14px;padding:12px;border-radius:14px;font-size:1rem;cursor:pointer;">完成</button>')
 
                 # —— CTA ——
                 with gr.Row(elem_classes="row-cta"):
@@ -1109,11 +1109,6 @@ def host_ui(config):
                                         inputs=remove_reference_numbers, outputs=None, show_progress="hidden")
         show_voice_instructions.change(fn=lambda v: _save_checkbox("show_voice_instructions", v),
                                        inputs=show_voice_instructions, outputs=None, show_progress="hidden")
-
-        # 高级设置弹窗：按钮唤起 / ✕ 与「完成」关闭（均无 queue 指示器）
-        advanced_btn.click(fn=lambda: gr.update(visible=True), inputs=None, outputs=advanced_modal, show_progress="hidden")
-        modal_close_btn.click(fn=lambda: gr.update(visible=False), inputs=None, outputs=advanced_modal, show_progress="hidden")
-        advanced_done_btn.click(fn=lambda: gr.update(visible=False), inputs=None, outputs=advanced_modal, show_progress="hidden")
 
     temp_dir = os.path.join(get_output_dir(), ".temp_downloads")
     ui.launch(
