@@ -2,11 +2,12 @@ from typing import List
 
 from audiobook_generator.config.general_config import GeneralConfig
 
-TTS_AZURE = "azure"
+TTS_QWEN = "qwen"
 TTS_OPENAI = "openai"
 TTS_EDGE = "edge"
 TTS_PIPER = "piper"
 TTS_MINIMAX = "minimax"
+TTS_CHATTERBOX = "chatterbox"
 
 
 class BaseTTSProvider:  # Base interface for TTS providers
@@ -36,16 +37,16 @@ class BaseTTSProvider:  # Base interface for TTS providers
 
 # Common support methods for all TTS providers
 def get_supported_tts_providers() -> List[str]:
-    return [TTS_AZURE, TTS_OPENAI, TTS_EDGE, TTS_PIPER, TTS_MINIMAX]
+    return [TTS_QWEN, TTS_OPENAI, TTS_EDGE, TTS_PIPER, TTS_MINIMAX, TTS_CHATTERBOX]
 
 
 def get_tts_provider(config) -> BaseTTSProvider:
-    if config.tts == TTS_AZURE:
-        from audiobook_generator.tts_providers.azure_tts_provider import (
-            AzureTTSProvider,
+    if config.tts == TTS_QWEN:
+        from audiobook_generator.tts_providers.qwen_tts_provider import (
+            QwenTTSProvider,
         )
 
-        return AzureTTSProvider(config)
+        return QwenTTSProvider(config)
     elif config.tts == TTS_OPENAI:
         from audiobook_generator.tts_providers.openai_tts_provider import (
             OpenAITTSProvider,
@@ -64,5 +65,9 @@ def get_tts_provider(config) -> BaseTTSProvider:
         from audiobook_generator.tts_providers.minimax_tts_provider import MiniMaxTTSProvider
 
         return MiniMaxTTSProvider(config)
+    elif config.tts == TTS_CHATTERBOX:
+        from audiobook_generator.tts_providers.chatterbox_tts_provider import ChatterboxTTSProvider
+
+        return ChatterboxTTSProvider(config)
     else:
         raise ValueError(f"Invalid TTS provider: {config.tts}")

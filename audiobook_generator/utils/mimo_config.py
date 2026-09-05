@@ -52,22 +52,29 @@ def get_mimo_credentials() -> tuple[str, str]:
     """
     获取 MiMo API 凭证（api_key, base_url）。
     优先级：
-    1. 环境变量 OPENAI_API_KEY / OPENAI_BASE_URL
-    2. 本地配置文件 mimo_config.json
+    1. 本地配置文件 mimo_config.json（WebUI配置，覆盖环境变量）
+    2. 环境变量 OPENAI_API_KEY / OPENAI_BASE_URL
     3. 交互式提示用户输入（并询问是否保存）
     """
-    # 1. 优先从环境变量读取
+    # 1. 优先从本地配置文件读取（WebUI配置）
+    file_config = load_mimo_config()
+    api_key = file_config.get("api_key")
+    base_url = file_config.get("base_url", DEFAULT_BASE_URL)
+
+    if api_key:
+        logger.info("使用本地配置文件中的 MiMo API Key")
+        # 同步到环境变量，供 OpenAI SDK 使用
+        os.environ["OPENAI_API_KEY"] = api_key
+        os.environ["OPENAI_BASE_URL"] = base_url
+        return api_key, base_url
+
+    # 2. 从环境变量读取
     env_api_key = os.environ.get("OPENAI_API_KEY")
     env_base_url = os.environ.get("OPENAI_BASE_URL")
 
     if env_api_key:
         logger.info("使用环境变量中的 OPENAI_API_KEY")
         return env_api_key, env_base_url or DEFAULT_BASE_URL
-
-    # 2. 从本地配置文件读取
-    file_config = load_mimo_config()
-    api_key = file_config.get("api_key")
-    base_url = file_config.get("base_url", DEFAULT_BASE_URL)
 
     if api_key:
         logger.info("使用本地配置文件中的 MiMo API Key")
@@ -109,3 +116,33 @@ def get_mimo_credentials() -> tuple[str, str]:
     os.environ["OPENAI_BASE_URL"] = base_url
 
     return api_key, base_url
+
+
+def mask_api_key(api_key: str) -> str:
+    """
+    遮挡 API Key，只显示后4位。
+    """
+    if not api_key or len(api_key) <= 4:
+        return "••••••••"
+    return "•" * (len(api_key) - 4) + api_key[-4:]
+
+
+def test_mimo_connection(api_key: str, base_url: str) -> tuple[bool, str]:
+    """
+    测试 MiMo API 连接。
+    返回 (success, message)。
+    """
+    import requests
+    try:
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        # 使用一个简单的 GET 请求来测试连接
+        response = requests.get(f"{base_url}/models", headers=headers, timeout=10)
+        if response.status_code == 200:
+            return True, "连接成功"
+        else:
+            return False, f"连接失败: HTTP {response.status_code}"
+    except Exception as e:
+        return False, f"连接失败: {str(e)}"

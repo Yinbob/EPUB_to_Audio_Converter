@@ -32,7 +32,7 @@ class GeneralConfig:
         self.speed = getattr(args, 'speed', None)
         self.stream = getattr(args, 'stream', None)
 
-        # TTS provider: Azure & Edge TTS specific arguments
+        # TTS provider: Qwen & Edge TTS specific arguments
         self.break_duration = getattr(args, 'break_duration', None)
 
         # TTS provider: Edge specific arguments
@@ -49,6 +49,12 @@ class GeneralConfig:
         self.piper_noise_w_scale = getattr(args, 'piper_noise_w_scale', None)
         self.piper_length_scale = getattr(args, 'piper_length_scale', None)
         self.piper_sentence_silence = getattr(args, 'piper_sentence_silence', None)
+
+        # TTS provider: Chatterbox specific arguments
+        self.chatterbox_device = getattr(args, 'chatterbox_device', None)
+        self.chatterbox_reference_audio = getattr(args, 'chatterbox_reference_audio', None)
+        self.chatterbox_exaggeration = getattr(args, 'chatterbox_exaggeration', None)
+        self.chatterbox_cfg_weight = getattr(args, 'chatterbox_cfg_weight', None)
 
     def __str__(self):
         return ",\n".join(f"{key}={value}" for key, value in self.__dict__.items())

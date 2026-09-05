@@ -14,3 +14,6 @@ python-docx==1.1.2
 websockets>=11.0
 numpy>=1.24.0
 soundfile>=0.12.0
+
+# Chatterbox TTS (optional - local TTS with voice cloning)
+# chatterbox-tts  # 取消注释以启用 Chatterbox TTS

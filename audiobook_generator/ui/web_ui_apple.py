@@ -35,11 +35,10 @@ from audiobook_generator.tts_providers.openai_tts_provider import (
     get_openai_instructions_example,
     get_openai_supported_output_formats,
 )
-from audiobook_generator.tts_providers.piper_tts_provider import (
-    get_piper_supported_languages,
-    get_piper_supported_voices,
-    get_piper_supported_qualities,
-    get_piper_supported_speakers,
+from audiobook_generator.tts_providers.qwen_tts_provider import (
+    get_qwen_supported_languages,
+    get_qwen_supported_voices,
+    get_qwen_supported_output_formats,
 )
 from audiobook_generator.tts_providers.minimax_tts_provider import (
     get_minimax_supported_models,
@@ -48,6 +47,15 @@ from audiobook_generator.tts_providers.minimax_tts_provider import (
     get_minimax_voice_id_from_choice,
 )
 from audiobook_generator.utils.log_handler import generate_unique_log_path
+from audiobook_generator.utils.mimo_config import (
+    load_mimo_config, save_mimo_config, mask_api_key as mimo_mask_api_key, test_mimo_connection
+)
+from audiobook_generator.utils.minimax_config import (
+    load_minimax_config, save_minimax_config, mask_api_key as minimax_mask_api_key, test_minimax_connection
+)
+from audiobook_generator.utils.qwen_config import (
+    load_qwen_config, save_qwen_config, mask_api_key as qwen_mask_api_key, test_qwen_connection
+)
 from main import main
 
 # ── 设置持久化（与旧版共用 .webui_settings.json） ─────────────────
@@ -85,6 +93,123 @@ def _save_checkbox(key: str, value: bool):
         pass
 
 
+def _save_setting(key: str, value):
+    """保存任意类型的设置（字符串、数字等）"""
+    settings = _load_settings()
+    settings[key] = value
+    try:
+        with open(_SETTINGS_PATH, "w", encoding="utf-8") as f:
+            json.dump(settings, f, indent=2, ensure_ascii=False)
+    except Exception:
+        pass
+
+
+# ── 管理员密码验证 ─────────────────────────────────────────────────
+import hashlib
+
+def _hash_password(password: str) -> str:
+    """对密码进行 SHA256 哈希"""
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+
+def _get_admin_password_hash() -> str:
+    """获取存储的管理员密码哈希，若未设置则返回默认密码 'admin' 的哈希"""
+    settings = _load_settings()
+    return settings.get("admin_password_hash", _hash_password("admin"))
+
+
+def _verify_admin_password(password: str) -> bool:
+    """验证管理员密码"""
+    return _hash_password(password) == _get_admin_password_hash()
+
+
+def _change_admin_password(old_password: str, new_password: str) -> tuple[bool, str]:
+    """修改管理员密码，返回 (success, message)"""
+    if not _verify_admin_password(old_password):
+        return False, "原密码错误"
+    if len(new_password) < 4:
+        return False, "新密码长度不能少于4位"
+    _save_setting("admin_password_hash", _hash_password(new_password))
+    return True, "密码修改成功"
+
+
+# ── API 配置管理 ─────────────────────────────────────────────────
+def _load_api_configs() -> dict:
+    """加载所有 API 配置"""
+    configs = {}
+    
+    # MiMo 配置
+    mimo_config = load_mimo_config()
+    mimo_api_key = mimo_config.get("api_key", "")
+    configs["mimo_api_key"] = mimo_api_key
+    configs["mimo_api_key_masked"] = mimo_mask_api_key(mimo_api_key) if mimo_api_key else ""
+    configs["mimo_base_url"] = mimo_config.get("base_url", "https://token-plan-cn.xiaomimimo.com/v1")
+    
+    # MiniMax 配置
+    minimax_config = load_minimax_config()
+    minimax_api_key = minimax_config.get("api_key", "")
+    configs["minimax_api_key"] = minimax_api_key
+    configs["minimax_api_key_masked"] = minimax_mask_api_key(minimax_api_key) if minimax_api_key else ""
+    
+    # Qwen 配置
+    qwen_config = load_qwen_config()
+    qwen_api_key = qwen_config.get("api_key", "")
+    configs["qwen_api_key"] = qwen_api_key
+    configs["qwen_api_key_masked"] = qwen_mask_api_key(qwen_api_key) if qwen_api_key else ""
+    configs["qwen_base_url"] = qwen_config.get("base_url", "https://gpu.ncut.edu.cn/v1")
+    configs["qwen_model"] = qwen_config.get("model", "qwen3-tts-12hz-1.7b-voicedesign")
+    
+    return configs
+
+
+def _save_mimo_api_config(api_key: str, base_url: str) -> str:
+    """保存 MiMo API 配置，返回保存结果消息"""
+    if not api_key.strip():
+        return "❌ API Key 不能为空"
+    save_mimo_config(api_key.strip(), base_url.strip())
+    return "✅ MiMo 配置已保存"
+
+
+def _save_minimax_api_config(api_key: str) -> str:
+    """保存 MiniMax API 配置，返回保存结果消息"""
+    if not api_key.strip():
+        return "❌ API Key 不能为空"
+    save_minimax_config(api_key.strip())
+    return "✅ MiniMax 配置已保存"
+
+
+def _save_qwen_api_config(api_key: str, base_url: str, model: str) -> str:
+    """保存 Qwen API 配置，返回保存结果消息"""
+    if not api_key.strip():
+        return "❌ API Key 不能为空"
+    save_qwen_config(api_key.strip(), base_url.strip(), model.strip())
+    return "✅ Qwen 配置已保存"
+
+
+def _test_mimo_api(api_key: str, base_url: str) -> str:
+    """测试 MiMo API 连接，返回测试结果消息"""
+    if not api_key.strip():
+        return "❌ 请先输入 API Key"
+    success, msg = test_mimo_connection(api_key.strip(), base_url.strip())
+    return "✅ " + msg if success else "❌ " + msg
+
+
+def _test_minimax_api(api_key: str) -> str:
+    """测试 MiniMax API 连接，返回测试结果消息"""
+    if not api_key.strip():
+        return "❌ 请先输入 API Key"
+    success, msg = test_minimax_connection(api_key.strip())
+    return "✅ " + msg if success else "❌ " + msg
+
+
+def _test_qwen_api(api_key: str, base_url: str, model: str) -> str:
+    """测试 Qwen API 连接，返回测试结果消息"""
+    if not api_key.strip():
+        return "❌ 请先输入 API Key"
+    success, msg = test_qwen_connection(api_key.strip(), base_url.strip(), model.strip())
+    return "✅ " + msg if success else "❌ " + msg
+
+
 # ── 运行态 ────────────────────────────────────────────────────────
 running_process: Optional[Process] = None
 webui_log_file = None
@@ -93,7 +218,7 @@ _PROVIDER_LABEL = {
     "Mimo": "MiMo",
     "MiniMax": "MiniMax",
     "Edge": "Edge",
-    "Piper": "Piper",
+    "Qwen": "Qwen TTS",
 }
 
 
@@ -167,20 +292,15 @@ def get_edge_voices_by_language(language):
                        label="音色 Voice", interactive=True)
 
 
-def get_piper_voices_gui(language):
-    voices_list = get_piper_supported_voices(language)
+def get_qwen_voices_gui():
+    voices_list = get_qwen_supported_voices()
     return gr.Dropdown(voices_list, value=voices_list[0] if voices_list else None,
                        label="音色 Voice", interactive=True)
 
 
-def get_piper_qualities_gui(language, voice):
-    q = get_piper_supported_qualities(language, voice)
-    return gr.Dropdown(q, value=q[0] if q else None, label="质量 Quality", interactive=True)
-
-
-def get_piper_speakers_gui(language, voice, quality):
-    s = get_piper_supported_speakers(language, voice, quality)
-    return gr.Dropdown(s, value=s[0] if s else None, label="说话人 Speaker", interactive=True)
+def get_qwen_languages_gui():
+    languages_list = get_qwen_supported_languages()
+    return gr.Dropdown(languages_list, value="Auto", label="语言 Language", interactive=True)
 
 
 # ── 转换核心 ──────────────────────────────────────────────────────
@@ -192,12 +312,11 @@ def process_form(provider,
                  minimax_model, minimax_voice, minimax_output_format,
                  edge_language, edge_voice, edge_output_format, proxy, edge_voice_rate,
                  edge_volume, edge_pitch, edge_break_duration,
-                 piper_executable_path, piper_docker_image, piper_language, piper_voice,
-                 piper_quality, piper_speaker, piper_noise_scale, piper_noise_w_scale,
-                 piper_length_scale, piper_sentence_silence):
+                 qwen_language, qwen_voice):
     if not input_file:
-        print("❌ 请先选择至少一个书籍文件")
-        return
+        gr.Warning("请先选择至少一个书籍文件")
+        return gr.Timer(active=False)
+    gr.Info("🚀 有声书生成已开始！请在日志页查看实时进度。")
     if not isinstance(input_file, list):
         input_file = [input_file]
 
@@ -252,22 +371,17 @@ def process_form(provider,
             config.voice_volume = f"{edge_volume:+}%"
             config.voice_pitch = f"{edge_pitch:+}Hz"
             config.break_duration = edge_break_duration
-        elif provider == "Piper":
-            config.tts = "piper"
-            config.piper_path = piper_executable_path
-            config.piper_docker_image = piper_docker_image
-            config.model_name = f"{piper_language}-{piper_voice}-{piper_quality}"
-            config.piper_speaker = piper_speaker
-            config.piper_noise_scale = piper_noise_scale
-            config.piper_noise_w_scale = piper_noise_w_scale
-            config.piper_length_scale = piper_length_scale
-            config.piper_sentence_silence = piper_sentence_silence
+        elif provider == "Qwen":
+            config.tts = "qwen"
+            config.language = qwen_language
+            config.voice_name = qwen_voice
         else:
             raise ValueError("Unsupported TTS provider selected")
 
         configs.append(config)
 
     launch_batch(configs)
+    return gr.Timer(active=True)
 
 
 def _batch_worker(config_list, log_file_path):
@@ -295,12 +409,83 @@ def launch_batch(configs):
     running_process.start()
 
 
+
+def get_progress_info():
+    """解析日志文件获取生成进度，同时控制定时器开关"""
+    global webui_log_file
+    if not webui_log_file or not webui_log_file.exists():
+        return _progress_html(0, "等待开始", "", 0, 0), gr.Timer(active=False)
+
+    try:
+        log_content = webui_log_file.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return _progress_html(0, "等待开始", "", 0, 0), gr.Timer(active=True)
+
+    import re
+
+    # 解析当前书名: [idx/total] 开始转换: book_name
+    book_match = re.findall(r"\[\d+/\d+\] 开始转换: (.+)$", log_content, re.MULTILINE)
+    current_book = book_match[-1] if book_match else ""
+
+    # 解析总章节数: Chapters count: X
+    chapters_count_match = re.findall(r"Chapters count: (\d+)", log_content, re.MULTILINE)
+    total_chapters = int(chapters_count_match[-1]) if chapters_count_match else 0
+
+    # 解析章节范围: Converting chapters from X to Y
+    range_match = re.findall(r"Converting chapters from (\d+) to (\d+)", log_content, re.MULTILINE)
+    if range_match:
+        chapter_start, chapter_end = int(range_match[-1][0]), int(range_match[-1][1])
+        total_chapters = chapter_end - chapter_start + 1
+
+    # 解析已完成章节: ✅ Converted chapter X
+    completed_match = re.findall(r"✅ Converted chapter (\d+)", log_content, re.MULTILINE)
+    completed = len(completed_match)
+
+    # 检查是否全部完成
+    is_done = "全部处理完毕" in log_content
+
+    if is_done and total_chapters > 0:
+        return _progress_html(100, "✅ 全部完成", current_book, total_chapters, total_chapters), gr.Timer(active=False)
+
+    if total_chapters > 0:
+        pct = min(100, int(completed / total_chapters * 100))
+        return _progress_html(pct, f"正在生成...", current_book, total_chapters, completed), gr.Timer(active=True)
+
+    if current_book:
+        return _progress_html(5, "正在初始化...", current_book, 0, 0), gr.Timer(active=True)
+
+    return _progress_html(0, "等待开始", "", 0, 0), gr.Timer(active=True)
+
+
+def _progress_html(pct, status, book_name, total, done):
+    """生成进度条 HTML"""
+    if pct == 0 and not book_name:
+        return """<div class="progress-container idle">
+            <div class="progress-status">等待开始生成...</div>
+        </div>"""
+    
+    book_display = f'<span class="progress-book">📖 {book_name}</span>' if book_name else ""
+    detail = f"章节 {done}/{total}" if total > 0 else ""
+    
+    return f"""<div class="progress-container active">
+        <div class="progress-header">
+            <span class="progress-status">{status}</span>
+            <span class="progress-detail">{detail}</span>
+            <span class="progress-pct">{pct}%</span>
+        </div>
+        {book_display}
+        <div class="progress-track">
+            <div class="progress-fill" style="width: {pct}%"></div>
+        </div>
+    </div>"""
+
 def terminate_generator():
     global running_process
     if running_process and running_process.is_alive():
         running_process.terminate()
         running_process = None
         print("Audiobook generator terminated manually")
+    return gr.Timer(active=False)
 
 
 # ── 资源库管理 ────────────────────────────────────────────────────
@@ -577,11 +762,9 @@ html, body, #root, .gradio-container, .main, footer,
 .hero h1 {
   font-size: clamp(1.6rem, 5.5vw, 2.3rem) !important; font-weight: 700 !important; letter-spacing: -0.03em;
   background: linear-gradient(120deg, #1d1d1f 0%, #0071e3 55%, #5e5ce6 100%);
-  background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
+  -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent; margin: 0 0 10px !important;
-  animation: shimmer 6s ease-in-out infinite;
 }
-@keyframes shimmer { 0%,100% { background-position: 0% center; } 50% { background-position: 100% center; } }
 .hero p { color: var(--apple-text-2); font-size: clamp(0.92rem, 2.6vw, 1.05rem); margin: 0 auto; max-width: 560px; line-height: 1.5; }
 
 /* ── 输入控件统一 ── */
@@ -604,10 +787,10 @@ input[type=range] { accent-color: var(--apple-blue) !important; }
 /* 隐藏左上角浮动标签「书籍文件」与 Gradio 默认灰色上传 SVG */
 [data-testid="file-upload-button"] label.float,
 [data-testid="block-label"].float { display: none !important; }
-button.center.boundedheight.flex > .wrap { display: none !important; }
+.book-file-upload button.center.boundedheight.flex > .wrap { display: none !important; }
 
-button.center.boundedheight.flex,
-div[data-testid="file"] button.center.boundedheight.flex {
+.book-file-upload button.center.boundedheight.flex,
+.book-file-upload div[data-testid="file"] button.center.boundedheight.flex {
   display: flex !important; flex-direction: column !important;
   align-items: center !important; justify-content: center !important; gap: 8px !important;
   width: 100% !important; min-height: 300px !important; padding: 28px !important;
@@ -621,7 +804,7 @@ div[data-testid="file"] button.center.boundedheight.flex {
   position: relative !important;
 }
 /* 蓝色上传图标（居中显示，替代被隐藏的灰色 SVG） */
-button.center.boundedheight.flex::before {
+.book-file-upload button.center.boundedheight.flex::before {
   content: "" !important; display: block !important;
   width: 56px !important; height: 56px !important; border-radius: 50% !important;
   background: linear-gradient(135deg, var(--apple-blue-soft) 0%, #f0eefe 100%) !important;
@@ -631,15 +814,21 @@ button.center.boundedheight.flex::before {
   transition: transform 0.3s cubic-bezier(0.16,1,0.3,1) !important;
 }
 /* 提示文案（灰 SVG 隐藏后用伪元素补回） */
-button.center.boundedheight.flex::after {
+.book-file-upload button.center.boundedheight.flex::after {
   content: "拖放文件到此处，或点击选择" !important;
   color: var(--apple-text-3) !important; font-size: 0.84rem !important; font-weight: 500 !important;
 }
-button.center.boundedheight.flex:hover {
+.book-file-upload button.center.boundedheight.flex:hover {
   border-color: var(--apple-blue) !important; background: var(--apple-blue-soft) !important;
 }
-button.center.boundedheight.flex:hover::before { transform: translateY(-3px); }
-button.center.boundedheight.flex:active { transform: scale(0.99) !important; }
+.book-file-upload button.center.boundedheight.flex:hover::before { transform: translateY(-3px); }
+.book-file-upload button.center.boundedheight.flex:active { transform: scale(0.99) !important; }
+
+/* 书籍文件上传后，隐藏整个上传区域（包括伪元素） */
+.book-file-upload:has(.file-preview) button.center.boundedheight.flex,
+.book-file-upload:has(.thumbnails) button.center.boundedheight.flex {
+  display: none !important;
+}
 
 /* 已上传文件列表（gr.File 展示的文件名条）保持简洁圆角 */
 div[data-testid="file"] .file-preview,
@@ -648,6 +837,7 @@ div[data-testid="file"] .file-preview > div {
   border-radius: 12px !important; border: 1px solid var(--apple-border-soft) !important;
   background: var(--apple-surface) !important; padding: 8px 12px !important;
 }
+/* 上传文件后，通过 JS 隐藏上传按钮（由 page_load_js 执行） */
 
 /* ── 弹窗内规则文件上传：紧凑版拖放区 + 图标 + 说明文字 ── */
 #advanced_modal .rules-file-upload button.center.boundedheight.flex {
@@ -662,6 +852,66 @@ div[data-testid="file"] .file-preview > div {
   content: "拖放 .txt 规则文件到此处，或点击选择" !important;
   font-size: 0.82rem !important;
 }
+
+/* ── 生成进度条 ── */
+.progress-container {
+  margin: 0 0 16px; padding: 16px 20px;
+  background: var(--apple-surface); border-radius: var(--radius);
+  border: 1px solid var(--apple-border-soft);
+  transition: all 0.3s ease;
+}
+.progress-container.idle { opacity: 0.5; }
+.progress-container.active {
+  background: linear-gradient(135deg, rgba(0,113,227,0.04), rgba(94,92,230,0.04));
+  border-color: rgba(0,113,227,0.15);
+}
+.progress-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 8px;
+}
+.progress-status {
+  font-weight: 600; font-size: 0.92rem; color: var(--apple-text);
+}
+.progress-detail {
+  color: var(--apple-text-2); font-size: 0.85rem;
+}
+.progress-pct {
+  margin-left: auto; font-weight: 700; font-size: 1.1rem;
+  color: var(--apple-blue); font-variant-numeric: tabular-nums;
+}
+.progress-book {
+  display: inline-block; margin-bottom: 10px;
+  font-size: 0.85rem; color: var(--apple-text-2);
+  background: var(--apple-surface-2); padding: 4px 12px;
+  border-radius: 8px;
+}
+.progress-track {
+  height: 8px; background: var(--apple-surface-2);
+  border-radius: 4px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--apple-blue), #5e5ce6);
+  transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+}
+.progress-fill::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* 隐藏 Gradio Timer 组件本身的可见元素（拖拽横条等） */
+.progress-bar-wrap + .gr-timer,
+.progress-bar-wrap ~ [data-testid="timer"],
+.gradio-timer { display: none !important; height: 0 !important; overflow: hidden !important; }
+/* 隐藏所有 Timer 渲染出的分隔/拖拽条 */
+div:has(> .progress-bar-wrap) ~ .gr-group:empty,
+div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
 
 /* ── 引擎分段选择器（原生 Tabs） ── */
 .engine-tabs { gap: 0 !important; }
@@ -986,15 +1236,60 @@ def host_ui(config):
                 gr.HTML('''
                 <div class="hero">
                     <h1>让文字化作声音</h1>
-                    <p>上传书籍，选择语音引擎，一键生成属于你的有声书。多引擎、多格式、批量处理，尽在掌控。</p>
+                    <p>上传书籍，选择语音引擎，一键生成有声书。多引擎、多格式、批量处理。</p>
                 </div>''')
+                # 进度条
+                progress_bar = gr.HTML(_progress_html(0, "等待开始", "", 0, 0), elem_classes="progress-bar-wrap")
+                with gr.Group(visible=False, elem_classes="timer-hidden"):
+                    progress_timer = gr.Timer(2, active=False)
+                # 上传按钮隐藏脚本（运行在浏览器端）
+                gr.HTML('''
+                <script>
+                (function() {
+                    function hideUploadWhenFilesExist() {
+                        // 遍历所有书籍文件上传组件
+                        document.querySelectorAll('.book-file-upload').forEach(function(fileComp) {
+                            // 检查是否已有文件（thumbnails 容器有子元素）
+                            var thumbs = fileComp.querySelector('[data-testid="container_el"], .thumbnails, .file-preview');
+                            if (!thumbs || thumbs.offsetHeight === 0 || thumbs.children.length === 0) return;
+                            
+                            // 隐藏上传按钮/拖拽区
+                            var uploaders = fileComp.querySelectorAll(
+                                '.upload-container, [data-testid="file-upload"], .source-selection, button.center'
+                            );
+                            uploaders.forEach(function(el) {
+                                el.style.setProperty('display', 'none', 'important');
+                            });
+                            
+                            // 也隐藏可能的 "添加更多" 按钮
+                            var addBtns = fileComp.querySelectorAll('button:not(.delete-button):not(.thumbnail-item)');
+                            addBtns.forEach(function(btn) {
+                                if (btn.querySelector('svg') || btn.textContent.includes('上传') || btn.textContent.includes('拖放')) {
+                                    btn.style.setProperty('display', 'none', 'important');
+                                }
+                            });
+                        });
+                    }
+                    
+                    // MutationObserver 监听 DOM 变化
+                    var observer = new MutationObserver(hideUploadWhenFilesExist);
+                    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+                    
+                    // 定时检查（备用方案）
+                    setInterval(hideUploadWhenFilesExist, 1000);
+                    
+                    // 初始执行
+                    hideUploadWhenFilesExist();
+                })();
+                </script>
+                ''', visible=False)
 
                 # —— Step 1 文件 + 章节范围 ——
                 with gr.Group(elem_classes="app-card"):
                     gr.HTML('<p class="card-title"><span class="card-num">1</span>上传书籍文件</p>')
                     gr.HTML('<p class="card-desc">支持 EPUB / DOC / DOCX，可多选。输出目录将根据书名自动生成。</p>')
                     input_file = gr.File(label="书籍文件", file_types=[".epub", ".doc", ".docx"],
-                                         file_count="multiple", interactive=True)
+                                         file_count="multiple", interactive=True, elem_classes="book-file-upload")
                     output_dir = gr.Textbox(label="输出目录", value=default_output_dir, interactive=True,
                                             info="多文件时每本书自动生成以书名为名的子文件夹")
                     input_file.change(fn=update_output_dir_from_file, inputs=input_file, outputs=output_dir, show_progress="hidden")
@@ -1055,33 +1350,12 @@ def host_ui(config):
                                 edge_pitch = gr.Slider(minimum=-100, maximum=100, step=1, label="音调", value=0)
                                 edge_break_duration = gr.Slider(minimum=0, maximum=5000, step=1, label="段落停顿 (ms)", value=1250)
                             edge_language.change(fn=get_edge_voices_by_language, inputs=edge_language, outputs=edge_voice, show_progress="hidden")
-                        # ── Piper ──
-                        with gr.Tab("💻 Piper", id="Piper") as piper_tab:
-                            piper_deployment = gr.Dropdown(["Docker", "Local"], label="部署方式", value="Docker", interactive=True)
-                            with gr.Group(visible=True) as docker_group:
-                                piper_docker_image = gr.Textbox(label="Piper Docker 镜像", value="lscr.io/linuxserver/piper:latest", interactive=True)
-                            with gr.Group(visible=False) as local_group:
-                                piper_executable_path = gr.Textbox(label="Piper 可执行文件路径", interactive=True)
-                                piper_file_upload = gr.File(label="上传 Piper 可执行文件", file_count="single", interactive=True)
-                                piper_file_upload.change(fn=lambda x: x.name if x else "", inputs=piper_file_upload, outputs=piper_executable_path, show_progress="hidden")
-                            piper_deployment.change(
-                                fn=lambda x: (gr.update(visible=x == "Local"), gr.update(visible=x == "Docker")),
-                                inputs=piper_deployment, outputs=[local_group, docker_group], show_progress="hidden")
+                        # ── Qwen TTS ──
+                        with gr.Tab("🤖 Qwen TTS", id="Qwen") as qwen_tab:
+                            gr.HTML('<p class="card-desc">Qwen TTS API（私有化/本地部署），需在「⚙️ 设置」页面配置 API</p>')
                             with gr.Row():
-                                piper_language = gr.Dropdown(get_piper_supported_languages(), label="语言", value="en_US", interactive=True)
-                                piper_voice = gr.Dropdown(get_piper_supported_voices("en_US"), label="音色", interactive=True)
-                            with gr.Row():
-                                piper_quality = gr.Dropdown(get_piper_supported_qualities("en_US", get_piper_supported_voices("en_US")[0]), label="质量", interactive=True)
-                                piper_speaker = gr.Dropdown(get_piper_supported_speakers("en_US", get_piper_supported_voices("en_US")[0], get_piper_supported_qualities("en_US", get_piper_supported_voices("en_US")[0])[0]), label="说话人", interactive=True)
-                            piper_language.change(fn=get_piper_voices_gui, inputs=piper_language, outputs=piper_voice, show_progress="hidden")
-                            piper_voice.change(fn=get_piper_qualities_gui, inputs=[piper_language, piper_voice], outputs=piper_quality, show_progress="hidden")
-                            piper_quality.change(fn=get_piper_speakers_gui, inputs=[piper_language, piper_voice, piper_quality], outputs=piper_speaker, show_progress="hidden")
-                            with gr.Row():
-                                piper_noise_scale = gr.Slider(minimum=0.0, maximum=2.0, step=0.01, label="噪声尺度", value=0.667)
-                                piper_noise_w_scale = gr.Slider(minimum=0.0, maximum=2.0, step=0.1, label="宽度噪声", value=0.8)
-                            with gr.Row():
-                                piper_length_scale = gr.Slider(minimum=0.0, maximum=5.0, step=0.1, label="语速长度", value=1.0)
-                                piper_sentence_silence = gr.Slider(minimum=0.0, maximum=2.0, step=0.1, label="句间静音", value=0.2)
+                                qwen_language = gr.Dropdown(get_qwen_supported_languages(), label="语言", value="Auto", interactive=True)
+                                qwen_voice = gr.Dropdown(get_qwen_supported_voices(), label="音色", value="Vivian", interactive=True)
 
                 # —— 高级设置弹窗（纯客户端控制；默认 display:none，JS 切换 .show） ——
                 with gr.Group(elem_classes="modal-overlay", elem_id="advanced_modal") as advanced_modal:
@@ -1146,12 +1420,78 @@ def host_ui(config):
                     webui_log_file.touch()
                     Log(str(webui_log_file.absolute()), dark=False, xterm_font_size=12)
 
+            # ════════════ 设置页 ════════════
+            with gr.Tab("⚙️ 设置", id="tab_settings"):
+                gr.HTML('<div class="hero"><h1>设置</h1><p>配置 TTS 模型 API 和系统参数。</p></div>')
+                
+                # 登录状态
+                login_state = gr.State(False)
+                
+                # 登录表单
+                with gr.Group(elem_classes="app-card") as login_card:
+                    gr.HTML('<p class="card-title"><span class="card-num">🔐</span>管理员登录</p>')
+                    gr.HTML('<p class="card-desc">请输入管理员密码以访问设置页面。</p>')
+                    admin_password = gr.Textbox(label="管理员密码", type="password", placeholder="请输入密码")
+                    login_btn = gr.Button("登录", elem_classes="btn-primary")
+                    login_msg = gr.HTML("")
+                
+                # 设置内容（登录后显示）
+                with gr.Group(visible=False, elem_classes="app-card") as settings_card:
+                    gr.HTML('<p class="card-title"><span class="card-num">🔑</span>TTS API 配置</p>')
+                    gr.HTML('<p class="card-desc">配置各 TTS 引擎的 API Key 和相关参数。配置文件优先级高于环境变量。</p>')
+                    
+                    with gr.Tabs(elem_classes="engine-tabs") as api_tabs:
+                        # MiMo 配置
+                        with gr.Tab("✨ MiMo", id="api_mimo"):
+                            gr.HTML('<p class="card-desc">MiMo TTS API 配置（基于 OpenAI 兼容接口）</p>')
+                            mimo_api_key = gr.Textbox(label="API Key", placeholder="请输入 MiMo API Key", type="password")
+                            mimo_api_key_display = gr.HTML("")
+                            mimo_show_key = gr.Checkbox(label="显示 API Key", value=False, elem_classes="toggle")
+                            mimo_base_url = gr.Textbox(label="Base URL", value="https://token-plan-cn.xiaomimimo.com/v1", placeholder="请输入 Base URL")
+                            with gr.Row():
+                                mimo_test_btn = gr.Button("🔍 测试连接", elem_classes="btn-ghost")
+                                mimo_save_btn = gr.Button("💾 保存配置", elem_classes="btn-primary")
+                            mimo_msg = gr.HTML("")
+                        
+                        # MiniMax 配置
+                        with gr.Tab("🎙️ MiniMax", id="api_minimax"):
+                            gr.HTML('<p class="card-desc">MiniMax TTS API 配置</p>')
+                            minimax_api_key = gr.Textbox(label="API Key", placeholder="请输入 MiniMax API Key", type="password")
+                            minimax_api_key_display = gr.HTML("")
+                            minimax_show_key = gr.Checkbox(label="显示 API Key", value=False, elem_classes="toggle")
+                            with gr.Row():
+                                minimax_test_btn = gr.Button("🔍 测试连接", elem_classes="btn-ghost")
+                                minimax_save_btn = gr.Button("💾 保存配置", elem_classes="btn-primary")
+                            minimax_msg = gr.HTML("")
+                        
+                        # Qwen 配置
+                        with gr.Tab("🤖 Qwen TTS", id="api_qwen"):
+                            gr.HTML('<p class="card-desc">Qwen TTS API 配置</p>')
+                            qwen_api_key = gr.Textbox(label="API Key", placeholder="请输入 Qwen API Key", type="password")
+                            qwen_api_key_display = gr.HTML("")
+                            qwen_show_key = gr.Checkbox(label="显示 API Key", value=False, elem_classes="toggle")
+                            qwen_base_url = gr.Textbox(label="Base URL", value="https://gpu.ncut.edu.cn/v1", placeholder="请输入 Base URL")
+                            qwen_model = gr.Textbox(label="Model", value="qwen3-tts-12hz-1.7b-voicedesign", placeholder="请输入模型名称")
+                            with gr.Row():
+                                qwen_test_btn = gr.Button("🔍 测试连接", elem_classes="btn-ghost")
+                                qwen_save_btn = gr.Button("💾 保存配置", elem_classes="btn-primary")
+                            qwen_msg = gr.HTML("")
+                
+                # 修改密码区域
+                with gr.Group(visible=False, elem_classes="app-card") as password_card:
+                    gr.HTML('<p class="card-title"><span class="card-num">🔒</span>修改密码</p>')
+                    old_password = gr.Textbox(label="原密码", type="password", placeholder="请输入原密码")
+                    new_password = gr.Textbox(label="新密码", type="password", placeholder="请输入新密码（至少4位）")
+                    confirm_password = gr.Textbox(label="确认新密码", type="password", placeholder="请再次输入新密码")
+                    change_pwd_btn = gr.Button("修改密码", elem_classes="btn-ghost")
+                    change_pwd_msg = gr.HTML("")
+
         # ════════════ 事件绑定 ════════════
         # 引擎标签切换 → 同步 provider_state（服务端）+ 更新徽标文字（客户端 js）
         # js 在 Tab 被选中时立即执行，不经过服务端 queue，零延迟更新徽标
-        _PROVIDER_IDS = {"MiMo": "Mimo", "MiniMax": "MiniMax", "Edge": "Edge", "Piper": "Piper"}
+        _PROVIDER_IDS = {"MiMo": "Mimo", "MiniMax": "MiniMax", "Edge": "Edge", "Qwen": "Qwen"}
         for _tab, _display in [(mimo_tab, "MiMo"), (minimax_tab, "MiniMax"),
-                            (edge_tab, "Edge"), (piper_tab, "Piper")]:
+                            (edge_tab, "Edge"), (qwen_tab, "Qwen")]:
             _id = _PROVIDER_IDS[_display]
             _js = f"() => {{ const el = document.getElementById('engine_badge_name'); if (el) el.textContent = '{_display}'; }}"
             _tab.select(fn=lambda n=_id: n,
@@ -1168,11 +1508,12 @@ def host_ui(config):
                     minimax_model, minimax_voice, minimax_output_format,
                     edge_language, edge_voice, edge_output_format, proxy, edge_voice_rate,
                     edge_volume, edge_pitch, edge_break_duration,
-                    piper_executable_path, piper_docker_image, piper_language, piper_voice,
-                    piper_quality, piper_speaker, piper_noise_scale, piper_noise_w_scale,
-                    piper_length_scale, piper_sentence_silence],
-            outputs=None)
-        stop_btn.click(fn=terminate_generator, inputs=None, outputs=None)
+                    qwen_language, qwen_voice],
+            outputs=progress_timer)
+        stop_btn.click(fn=terminate_generator, inputs=None, outputs=progress_timer)
+
+        # 进度条定时更新
+        progress_timer.tick(fn=get_progress_info, inputs=None, outputs=[progress_bar, progress_timer], show_progress="hidden")
 
         # 资源库
         refresh_btn.click(fn=refresh_batches, inputs=None, outputs=[folder_dropdown, file_selector], show_progress="hidden")
@@ -1193,7 +1534,165 @@ def host_ui(config):
         remove_reference_numbers.change(fn=lambda v: _save_checkbox("remove_reference_numbers", v),
                                         inputs=remove_reference_numbers, outputs=None, show_progress="hidden")
         show_voice_instructions.change(fn=lambda v: _save_checkbox("show_voice_instructions", v),
-                                       inputs=show_voice_instructions, outputs=None, show_progress="hidden")
+                                        inputs=show_voice_instructions, outputs=None, show_progress="hidden")
+
+        # ════════════ 设置页事件绑定 ════════════
+        
+        # 登录验证
+        def handle_login(password, current_state):
+            try:
+                if current_state:
+                    return current_state, "", gr.update(visible=True), gr.update(visible=True)
+                if _verify_admin_password(password):
+                    return (
+                        True,
+                        '<div style="color: var(--apple-green); font-weight: 600;">✅ 登录成功</div>',
+                        gr.update(visible=True),
+                        gr.update(visible=True),
+                    )
+                else:
+                    return False, '<div style="color: var(--apple-red); font-weight: 600;">❌ 密码错误</div>', gr.update(visible=False), gr.update(visible=False)
+            except Exception as e:
+                return False, f'<div style="color: var(--apple-red); font-weight: 600;">❌ 登录出错: {e}</div>', gr.update(visible=False), gr.update(visible=False)
+        
+        login_btn.click(
+            fn=handle_login,
+            inputs=[admin_password, login_state],
+            outputs=[login_state, login_msg, settings_card, password_card],
+            show_progress="hidden"
+        )
+        
+        # MiMo API Key 显示/隐藏
+        def toggle_mimo_key(show, api_key):
+            if show:
+                return api_key, ""
+            else:
+                return "", mimo_mask_api_key(api_key) if api_key else ""
+        
+        mimo_show_key.change(
+            fn=toggle_mimo_key,
+            inputs=[mimo_show_key, mimo_api_key],
+            outputs=[mimo_api_key, mimo_api_key_display],
+            show_progress="hidden"
+        )
+        
+        # MiMo 保存
+        mimo_save_btn.click(
+            fn=_save_mimo_api_config,
+            inputs=[mimo_api_key, mimo_base_url],
+            outputs=mimo_msg,
+            show_progress="hidden"
+        )
+        
+        # MiMo 测试连接
+        mimo_test_btn.click(
+            fn=_test_mimo_api,
+            inputs=[mimo_api_key, mimo_base_url],
+            outputs=mimo_msg,
+            show_progress="hidden"
+        )
+        
+        # MiniMax API Key 显示/隐藏
+        def toggle_minimax_key(show, api_key):
+            if show:
+                return api_key, ""
+            else:
+                return "", minimax_mask_api_key(api_key) if api_key else ""
+        
+        minimax_show_key.change(
+            fn=toggle_minimax_key,
+            inputs=[minimax_show_key, minimax_api_key],
+            outputs=[minimax_api_key, minimax_api_key_display],
+            show_progress="hidden"
+        )
+        
+        # MiniMax 保存
+        minimax_save_btn.click(
+            fn=_save_minimax_api_config,
+            inputs=[minimax_api_key],
+            outputs=minimax_msg,
+            show_progress="hidden"
+        )
+        
+        # MiniMax 测试连接
+        minimax_test_btn.click(
+            fn=_test_minimax_api,
+            inputs=[minimax_api_key],
+            outputs=minimax_msg,
+            show_progress="hidden"
+        )
+        
+        # Qwen API Key 显示/隐藏
+        def toggle_qwen_key(show, api_key):
+            if show:
+                return api_key, ""
+            else:
+                return "", qwen_mask_api_key(api_key) if api_key else ""
+        
+        qwen_show_key.change(
+            fn=toggle_qwen_key,
+            inputs=[qwen_show_key, qwen_api_key],
+            outputs=[qwen_api_key, qwen_api_key_display],
+            show_progress="hidden"
+        )
+        
+        # Qwen 保存
+        qwen_save_btn.click(
+            fn=_save_qwen_api_config,
+            inputs=[qwen_api_key, qwen_base_url, qwen_model],
+            outputs=qwen_msg,
+            show_progress="hidden"
+        )
+        
+        # Qwen 测试连接
+        qwen_test_btn.click(
+            fn=_test_qwen_api,
+            inputs=[qwen_api_key, qwen_base_url, qwen_model],
+            outputs=qwen_msg,
+            show_progress="hidden"
+        )
+        
+        # 修改密码
+        def handle_change_password(old_pwd, new_pwd, confirm_pwd):
+            if new_pwd != confirm_pwd:
+                return '<div style="color: var(--apple-red); font-weight: 600;">❌ 两次输入的新密码不一致</div>'
+            success, msg = _change_admin_password(old_pwd, new_pwd)
+            if success:
+                return f'<div style="color: var(--apple-green); font-weight: 600;">✅ {msg}</div>'
+            else:
+                return f'<div style="color: var(--apple-red); font-weight: 600;">❌ {msg}</div>'
+        
+        change_pwd_btn.click(
+            fn=handle_change_password,
+            inputs=[old_password, new_password, confirm_password],
+            outputs=change_pwd_msg,
+            show_progress="hidden"
+        )
+        
+        # 页面加载时初始化 API 配置
+        def init_api_configs():
+            configs = _load_api_configs()
+            return (
+                configs["mimo_api_key"],
+                configs["mimo_api_key_masked"],
+                configs["mimo_base_url"],
+                configs["minimax_api_key"],
+                configs["minimax_api_key_masked"],
+                configs["qwen_api_key"],
+                configs["qwen_api_key_masked"],
+                configs["qwen_base_url"],
+                configs["qwen_model"],
+            )
+        
+        # 初始化配置（隐藏 API Key）
+        ui.load(
+            fn=init_api_configs,
+            inputs=None,
+            outputs=[mimo_api_key, mimo_api_key_display, mimo_base_url,
+                    minimax_api_key, minimax_api_key_display,
+                    qwen_api_key, qwen_api_key_display, qwen_base_url, qwen_model],
+            show_progress="hidden"
+        )
 
     temp_dir = os.path.join(get_output_dir(), ".temp_downloads")
     ui.launch(

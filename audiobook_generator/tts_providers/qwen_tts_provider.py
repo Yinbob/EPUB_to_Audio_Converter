@@ -3,20 +3,19 @@ import os
 import requests
 from audiobook_generator.config.general_config import GeneralConfig
 from audiobook_generator.tts_providers.base_tts_provider import BaseTTSProvider
+from audiobook_generator.utils.qwen_config import get_qwen_credentials
 
 logger = logging.getLogger(__name__)
 
 
-class AzureTTSProvider(BaseTTSProvider):
+class QwenTTSProvider(BaseTTSProvider):
     def __init__(self, config: GeneralConfig):
         super().__init__(config)
         
-        # Qwen TTS API 配置
-        self.base_url = os.getenv("QWEN_TTS_BASE_URL", "https://gpu.ncut.edu.cn/v1")
-        self.api_key = os.getenv("QWEN_TTS_API_KEY", "gpustack_0e90c3f81d68e162_eb14154831b67d3253a02d7445f4f3b4")
-        self.model = os.getenv("QWEN_TTS_MODEL", "qwen3-tts-12hz-1.7b-voicedesign")
+        # Qwen TTS API 配置 - 优先从配置文件读取，覆盖环境变量
+        self.api_key, self.base_url, self.model = get_qwen_credentials()
         
-        # 将原 Azure 的 voice_name 映射为 Qwen 的 speaker (voice)
+        # 设置 speaker (voice)
         self.speaker = self.config.voice_name if self.config.voice_name else "Vivian"
         
         # 获取配置中的语言设置，若无则默认 "Auto"
@@ -72,8 +71,8 @@ class AzureTTSProvider(BaseTTSProvider):
 
     def validate_config(self):
         """验证配置参数"""
-        if self.config.voice_name and self.config.voice_name not in get_azure_supported_voices():
-            raise ValueError(f"AzureTTS: Unsupported voice name: {self.config.voice_name}")
+        if self.config.voice_name and self.config.voice_name not in get_qwen_supported_voices():
+            raise ValueError(f"QwenTTS: Unsupported voice name: {self.config.voice_name}")
 
     def estimate_cost(self, text: str) -> float:
         """
@@ -82,16 +81,16 @@ class AzureTTSProvider(BaseTTSProvider):
         return 0.0
 
 
-def get_azure_supported_output_formats():
+def get_qwen_supported_output_formats():
     """返回支持的输出格式"""
     return ["mp3"]
 
 
-def get_azure_supported_languages():
+def get_qwen_supported_languages():
     """返回支持的语言"""
     return ["Auto", "English", "Chinese", "Japanese", "Korean", "French", "German", "Spanish", "Portuguese", "Russian"]
 
 
-def get_azure_supported_voices():
+def get_qwen_supported_voices():
     """返回支持的音色"""
     return ["Vivian", "Aiden", "Alloy", "Echo", "Fable", "Onyx", "Nova", "Shimmer"]

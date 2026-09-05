@@ -55,6 +55,9 @@ from audiobook_generator.tts_providers.piper_tts_provider import get_piper_suppo
     get_piper_supported_voices, get_piper_supported_qualities, get_piper_supported_speakers
 from audiobook_generator.tts_providers.minimax_tts_provider import get_minimax_supported_models, \
     get_minimax_supported_output_formats, get_minimax_voice_choices, get_minimax_voice_id_from_choice
+from audiobook_generator.tts_providers.chatterbox_tts_provider import get_chatterbox_supported_devices, \
+    get_chatterbox_supported_output_formats, get_chatterbox_reference_audio_info, \
+    get_chatterbox_supported_models, get_chatterbox_model_info
 from audiobook_generator.utils.log_handler import generate_unique_log_path
 from main import main
 
@@ -122,7 +125,9 @@ def process_ui_form(input_file, output_dir, worker_count, log_level, output_text
                     edge_break_duration,
                     piper_executable_path, piper_docker_image, piper_language, piper_voice, piper_quality,
                     piper_speaker,
-                    piper_noise_scale, piper_noise_w_scale, piper_length_scale, piper_sentence_silence):
+                    piper_noise_scale, piper_noise_w_scale, piper_length_scale, piper_sentence_silence,
+                    chatterbox_model, chatterbox_device, chatterbox_output_format, chatterbox_reference_audio,
+                    chatterbox_exaggeration, chatterbox_cfg_weight):
 
     # --- 兼容多文件：统一为列表 ---
     if not input_file:
@@ -196,6 +201,14 @@ def process_ui_form(input_file, output_dir, worker_count, log_level, output_text
             config.piper_noise_w_scale = piper_noise_w_scale
             config.piper_length_scale = piper_length_scale
             config.piper_sentence_silence = piper_sentence_silence
+        elif selected_tts == "Chatterbox":
+            config.tts = "chatterbox"
+            config.model_name = chatterbox_model
+            config.output_format = chatterbox_output_format
+            config.chatterbox_device = chatterbox_device
+            config.chatterbox_reference_audio = chatterbox_reference_audio.name if hasattr(chatterbox_reference_audio, 'name') else chatterbox_reference_audio
+            config.chatterbox_exaggeration = chatterbox_exaggeration
+            config.chatterbox_cfg_weight = chatterbox_cfg_weight
         else:
             raise ValueError("Unsupported TTS provider selected")
 
@@ -664,6 +677,52 @@ def host_ui(config):
                             piper_sentence_silence = gr.Slider(minimum=0.0, maximum=2.0, step=0.1,
                                                                label="Sentence Silence", value=0.2)
 
+            with gr.Tab("Chatterbox", id="chatterbox_tab_id") as chatterbox_tab:
+                gr.Markdown(
+                    "<p style='color: #0284c7; font-size: 0.95em; margin-bottom: 12px; font-weight: 500;'>🎯 轻量级本地 TTS 模型，支持语音克隆，完全离线运行。首次使用需安装 <code>pip install chatterbox-tts</code>。</p>")
+                with gr.Row(equal_height=True):
+                    chatterbox_model = gr.Dropdown(
+                        get_chatterbox_supported_models(),
+                        value="chatterbox-multilingual-v3",
+                        label="模型版本 (Model)",
+                        interactive=True,
+                        info="multilingual-v3 支持中文，v0.5 仅支持英文"
+                    )
+                    chatterbox_device = gr.Dropdown(
+                        get_chatterbox_supported_devices(),
+                        value="auto" if "auto" in get_chatterbox_supported_devices() else get_chatterbox_supported_devices()[0],
+                        label="运行设备 (Device)",
+                        interactive=True,
+                        info="auto 会自动选择最佳设备 (CUDA/MPS/CPU)"
+                    )
+                    chatterbox_output_format = gr.Dropdown(
+                        get_chatterbox_supported_output_formats(),
+                        value="wav",
+                        label="输出格式 (Output Format)",
+                        interactive=True
+                    )
+                with gr.Row():
+                    chatterbox_reference_audio = gr.File(
+                        label="参考音频 (Reference Audio) - 可选",
+                        file_count="single",
+                        file_types=["audio"],
+                        info="上传音频文件用于语音克隆，留空使用默认声音"
+                    )
+                with gr.Row(equal_height=True):
+                    chatterbox_exaggeration = gr.Slider(
+                        minimum=0.0, maximum=1.0, step=0.05,
+                        label="表现力 (Exaggeration)",
+                        value=0.5,
+                        info="控制语音的情感表现力，0=平淡, 1=夸张"
+                    )
+                    chatterbox_cfg_weight = gr.Slider(
+                        minimum=0.0, maximum=1.0, step=0.05,
+                        label="稳定性 (CFG Weight)",
+                        value=0.5,
+                        info="控制生成的稳定性，越高越稳定但可能略显单调"
+                    )
+                chatterbox_tab.select(on_tab_change, inputs=None, outputs=None)
+
         gr.Markdown("<br>")
 
         with gr.Row():
@@ -683,7 +742,9 @@ def host_ui(config):
                         edge_break_duration,
                         piper_executable_path, piper_docker_image, piper_language, piper_voice, piper_quality,
                         piper_speaker,
-                        piper_noise_scale, piper_noise_w_scale, piper_length_scale, piper_sentence_silence
+                        piper_noise_scale, piper_noise_w_scale, piper_length_scale, piper_sentence_silence,
+                        chatterbox_model, chatterbox_device, chatterbox_output_format, chatterbox_reference_audio,
+                        chatterbox_exaggeration, chatterbox_cfg_weight
                     ],
                     outputs=None)
 

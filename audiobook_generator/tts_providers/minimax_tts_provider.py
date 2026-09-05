@@ -6,6 +6,7 @@ import ssl
 import websockets
 from audiobook_generator.config.general_config import GeneralConfig
 from audiobook_generator.tts_providers.base_tts_provider import BaseTTSProvider
+from audiobook_generator.utils.minimax_config import get_minimax_credentials
 
 logger = logging.getLogger(__name__)
 
@@ -14,10 +15,11 @@ class MiniMaxTTSProvider(BaseTTSProvider):
     def __init__(self, config: GeneralConfig):
         super().__init__(config)
         
-        # MiniMax API 配置
-        self.api_key = os.getenv("MINIMAX_API_KEY")
-        if not self.api_key:
-            raise ValueError("MiniMaxTTS: 环境变量 MINIMAX_API_KEY 未设置")
+        # MiniMax API 配置 - 优先从配置文件读取，覆盖环境变量
+        try:
+            self.api_key = get_minimax_credentials()
+        except RuntimeError as e:
+            raise ValueError(f"MiniMaxTTS: {e}")
         
         self.model = getattr(config, 'model_name', None) or "speech-2.8-hd"
         self.voice_id = self.config.voice_name if self.config.voice_name else "male-qn-qingse"
@@ -136,8 +138,8 @@ class MiniMaxTTSProvider(BaseTTSProvider):
 
     def validate_config(self):
         """验证配置参数"""
-        if not os.getenv("MINIMAX_API_KEY"):
-            raise ValueError("MiniMaxTTS: 环境变量 MINIMAX_API_KEY 未设置")
+        # API Key 已在 __init__ 中通过 get_minimax_credentials() 验证
+        # 这里只需要验证音色配置
         
         # 验证音色 ID 是否在支持列表中
         supported_voices = get_minimax_supported_voices()

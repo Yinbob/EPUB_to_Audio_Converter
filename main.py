@@ -21,7 +21,7 @@ def handle_args():
         "--tts",
         choices=get_supported_tts_providers(),
         default=get_supported_tts_providers()[0],
-        help="Choose TTS provider (default: azure). azure: Azure Cognitive Services, openai: OpenAI TTS API. When using azure, environment variables MS_TTS_KEY and MS_TTS_REGION must be set. When using openai, environment variable OPENAI_API_KEY must be set.",
+        help="Choose TTS provider (default: qwen). qwen: Qwen TTS API, openai: MiMo TTS API, edge: Edge TTS, minimax: MiniMax TTS API, piper: Piper TTS, chatterbox: Chatterbox TTS.",
     )
     parser.add_argument(
         "--log",
@@ -42,7 +42,7 @@ def handle_args():
     parser.add_argument(
         "--language",
         default="en-US",
-        help="Language for the text-to-speech service (default: en-US). For Azure TTS (--tts=azure), check https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts#text-to-speech for supported languages. For OpenAI TTS (--tts=openai), their API detects the language automatically. But setting this will also help on splitting the text into chunks with different strategies in this tool, especially for Chinese characters. For Chinese books, use zh-CN, zh-TW, or zh-HK.",
+        help="Language for the text-to-speech service (default: en-US). For Qwen TTS (--tts=qwen), supported languages include Auto, English, Chinese, Japanese, Korean, etc. For OpenAI TTS (--tts=openai), their API detects the language automatically. But setting this will also help on splitting the text into chunks with different strategies in this tool, especially for Chinese characters. For Chinese books, use zh-CN, zh-TW, or zh-HK.",
     )
     parser.add_argument(
         "--newline_mode",
@@ -107,7 +107,7 @@ def handle_args():
         "--use_pydub_merge",
         action="store_true",
         help="Use pydub to merge audio segments of one chapter into single file instead of direct write. "
-        "Currently only supported for OpenAI and Azure TTS. "
+        "Currently only supported for OpenAI and Qwen TTS. "
         "Direct write is faster but might skip audio segments if formats differ. "
         "Pydub merge is slower but more reliable for different audio formats. It requires ffmpeg to be installed first. "
         "You can use this option to avoid the issue of skipping audio segments in some cases. "
@@ -179,11 +179,11 @@ def handle_args():
         help="Proxy server for the TTS provider. Format: http://[username:password@]proxy.server:port",
     )
 
-    azure_edge_tts_group = parser.add_argument_group(title="azure/edge specific")
-    azure_edge_tts_group.add_argument(
+    qwen_edge_tts_group = parser.add_argument_group(title="qwen/edge specific")
+    qwen_edge_tts_group.add_argument(
         "--break_duration",
         default="1250",
-        help="Break duration in milliseconds for the different paragraphs or sections (default: 1250, means 1.25 s). Valid values range from 0 to 5000 milliseconds for Azure TTS.",
+        help="Break duration in milliseconds for the different paragraphs or sections (default: 1250, means 1.25 s). Valid values range from 0 to 5000 milliseconds for Qwen TTS.",
     )
 
     piper_tts_group = parser.add_argument_group(title="piper specific")
