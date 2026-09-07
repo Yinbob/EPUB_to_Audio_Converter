@@ -46,6 +46,11 @@ from audiobook_generator.tts_providers.minimax_tts_provider import (
     get_minimax_voice_choices,
     get_minimax_voice_id_from_choice,
 )
+from audiobook_generator.tts_providers.chatterbox_tts_provider import (
+    get_chatterbox_supported_models,
+    get_chatterbox_supported_devices,
+    get_chatterbox_supported_output_formats,
+)
 from audiobook_generator.utils.log_handler import generate_unique_log_path
 from audiobook_generator.utils.mimo_config import (
     load_mimo_config, save_mimo_config, mask_api_key as mimo_mask_api_key, test_mimo_connection
@@ -219,6 +224,7 @@ _PROVIDER_LABEL = {
     "MiniMax": "MiniMax",
     "Edge": "Edge",
     "Qwen": "Qwen TTS",
+    "Chatterbox": "Chatterbox",
 }
 
 
@@ -312,7 +318,9 @@ def process_form(provider,
                  minimax_model, minimax_voice, minimax_output_format,
                  edge_language, edge_voice, edge_output_format, proxy, edge_voice_rate,
                  edge_volume, edge_pitch, edge_break_duration,
-                 qwen_language, qwen_voice):
+                 qwen_language, qwen_voice,
+                 chatterbox_model, chatterbox_device, chatterbox_output_format,
+                 chatterbox_reference_audio, chatterbox_exaggeration, chatterbox_cfg_weight):
     if not input_file:
         gr.Warning("请先选择至少一个书籍文件")
         return gr.Timer(active=False)
@@ -375,6 +383,16 @@ def process_form(provider,
             config.tts = "qwen"
             config.language = qwen_language
             config.voice_name = qwen_voice
+        elif provider == "Chatterbox":
+            config.tts = "chatterbox"
+            config.model_name = chatterbox_model
+            config.output_format = chatterbox_output_format
+            config.chatterbox_device = chatterbox_device
+            config.chatterbox_reference_audio = (chatterbox_reference_audio.name
+                                                 if hasattr(chatterbox_reference_audio, 'name')
+                                                 else chatterbox_reference_audio)
+            config.chatterbox_exaggeration = chatterbox_exaggeration
+            config.chatterbox_cfg_weight = chatterbox_cfg_weight
         else:
             raise ValueError("Unsupported TTS provider selected")
 
@@ -916,7 +934,7 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
 /* ── 引擎分段选择器（原生 Tabs） ── */
 .engine-tabs { gap: 0 !important; }
 .engine-tabs > .tab-nav {
-  display: grid !important; grid-template-columns: repeat(4, 1fr) !important;
+  display: grid !important; grid-template-columns: repeat(5, 1fr) !important;
   gap: 4px !important; padding: 4px !important; margin: 0 0 16px !important;
   background: var(--apple-surface-2) !important; border-radius: var(--radius-sm) !important;
   border: 1px solid var(--apple-border-soft) !important;
@@ -1356,6 +1374,49 @@ def host_ui(config):
                             with gr.Row():
                                 qwen_language = gr.Dropdown(get_qwen_supported_languages(), label="语言", value="Auto", interactive=True)
                                 qwen_voice = gr.Dropdown(get_qwen_supported_voices(), label="音色", value="Vivian", interactive=True)
+                        # ── Chatterbox ──
+                        with gr.Tab("🎯 Chatterbox", id="Chatterbox") as chatterbox_tab:
+                            gr.HTML('<p class="card-desc">本地 TTS 模型，支持语音克隆，完全离线运行。首次使用需安装 <code>pip install chatterbox-tts</code></p>')
+                            with gr.Row():
+                                chatterbox_model = gr.Dropdown(
+                                    get_chatterbox_supported_models(),
+                                    value="chatterbox-multilingual-v3",
+                                    label="模型版本",
+                                    interactive=True,
+                                    info="multilingual-v3 支持中文，v0.5 仅支持英文"
+                                )
+                                chatterbox_device = gr.Dropdown(
+                                    get_chatterbox_supported_devices(),
+                                    value="auto",
+                                    label="运行设备",
+                                    interactive=True,
+                                    info="auto 会自动选择最佳设备"
+                                )
+                            chatterbox_output_format = gr.Dropdown(
+                                get_chatterbox_supported_output_formats(),
+                                value="wav",
+                                label="输出格式",
+                                interactive=True
+                            )
+                            chatterbox_reference_audio = gr.File(
+                                label="参考音频（可选）",
+                                file_count="single",
+                                file_types=["audio"],
+                                info="上传音频文件用于语音克隆，留空使用默认声音"
+                            )
+                            with gr.Row():
+                                chatterbox_exaggeration = gr.Slider(
+                                    minimum=0.0, maximum=1.0, step=0.05,
+                                    label="表现力",
+                                    value=0.5,
+                                    info="控制语音的情感表现力"
+                                )
+                                chatterbox_cfg_weight = gr.Slider(
+                                    minimum=0.0, maximum=1.0, step=0.05,
+                                    label="稳定性",
+                                    value=0.5,
+                                    info="控制生成的稳定性"
+                                )
 
                 # —— 高级设置弹窗（纯客户端控制；默认 display:none，JS 切换 .show） ——
                 with gr.Group(elem_classes="modal-overlay", elem_id="advanced_modal") as advanced_modal:
@@ -1489,9 +1550,10 @@ def host_ui(config):
         # ════════════ 事件绑定 ════════════
         # 引擎标签切换 → 同步 provider_state（服务端）+ 更新徽标文字（客户端 js）
         # js 在 Tab 被选中时立即执行，不经过服务端 queue，零延迟更新徽标
-        _PROVIDER_IDS = {"MiMo": "Mimo", "MiniMax": "MiniMax", "Edge": "Edge", "Qwen": "Qwen"}
+        _PROVIDER_IDS = {"MiMo": "Mimo", "MiniMax": "MiniMax", "Edge": "Edge", "Qwen": "Qwen", "Chatterbox": "Chatterbox"}
         for _tab, _display in [(mimo_tab, "MiMo"), (minimax_tab, "MiniMax"),
-                            (edge_tab, "Edge"), (qwen_tab, "Qwen")]:
+                            (edge_tab, "Edge"), (qwen_tab, "Qwen"),
+                            (chatterbox_tab, "Chatterbox")]:
             _id = _PROVIDER_IDS[_display]
             _js = f"() => {{ const el = document.getElementById('engine_badge_name'); if (el) el.textContent = '{_display}'; }}"
             _tab.select(fn=lambda n=_id: n,
@@ -1508,7 +1570,9 @@ def host_ui(config):
                     minimax_model, minimax_voice, minimax_output_format,
                     edge_language, edge_voice, edge_output_format, proxy, edge_voice_rate,
                     edge_volume, edge_pitch, edge_break_duration,
-                    qwen_language, qwen_voice],
+                    qwen_language, qwen_voice,
+                    chatterbox_model, chatterbox_device, chatterbox_output_format,
+                    chatterbox_reference_audio, chatterbox_exaggeration, chatterbox_cfg_weight],
             outputs=progress_timer)
         stop_btn.click(fn=terminate_generator, inputs=None, outputs=progress_timer)
 
