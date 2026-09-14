@@ -1,11 +1,16 @@
 import io
 import logging
 import os
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
 
-import torch
+try:
+    import torch
+except ImportError:  # 未安装 torch 时仍允许项目启动（使用非 Chatterbox 引擎）
+    torch = None
+
 from pydub import AudioSegment
 
 from audiobook_generator.config.general_config import GeneralConfig
@@ -37,10 +42,23 @@ CHATTERBOX_MODELS = {
 # 默认使用多语言版本
 DEFAULT_CHATTERBOX_MODEL = "chatterbox-multilingual-v3"
 
-# ffmpeg 路径（与 main.py 保持一致）
-FFMPEG_PATH = "/opt/homebrew/bin/ffmpeg"
-FFPROBE_PATH = "/opt/homebrew/bin/ffprobe"
+def _resolve_ffmpeg_binary(name):
+    """按 环境变量 -> PATH -> 常见安装路径 的顺序解析 ffmpeg/ffprobe 可执行文件。"""
+    env_value = os.environ.get(f"{name.upper()}_PATH")
+    if env_value:
+        return env_value
+    found = shutil.which(name)
+    if found:
+        return found
+    for path in (f"/usr/bin/{name}", f"/usr/local/bin/{name}", f"/opt/homebrew/bin/{name}"):
+        if os.path.exists(path):
+            return path
+    return name  # 交由 PATH 解析，找不到时由调用方报错
 
+
+# ffmpeg 路径（不再硬编码 macOS 路径，兼容 Linux 服务器）
+FFMPEG_PATH = _resolve_ffmpeg_binary("ffmpeg")
+FFPROBE_PATH = _resolve_ffmpeg_binary("ffprobe")
 
 
 def get_chatterbox_supported_models():
@@ -49,12 +67,13 @@ def get_chatterbox_supported_models():
 
 
 def get_chatterbox_supported_devices():
-    """返回支持的设备列表"""
+    """返回支持的设备列表（torch 未安装时仅返回 CPU 选项）"""
     devices = ["auto", "cpu"]
-    if torch.cuda.is_available():
-        devices.append("cuda")
-    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-        devices.append("mps")
+    if torch is not None:
+        if torch.cuda.is_available():
+            devices.append("cuda")
+        if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            devices.append("mps")
     return devices
 
 
@@ -70,6 +89,12 @@ def get_chatterbox_model_info(model_name):
 
 def _get_device(device_config):
     """根据配置和硬件情况确定设备"""
+    if torch is None:
+        # torch 未安装时只能回退到 CPU；真正使用 Chatterbox 时会在加载模型处给出明确报错
+        if device_config and device_config not in ("auto", "cpu"):
+            logger.warning(f"torch 未安装，无法使用设备 {device_config}，回退到 CPU")
+        return "cpu"
+
     if device_config and device_config != "auto":
         if device_config == "cuda" and not torch.cuda.is_available():
             logger.warning("CUDA 不可用，回退到 CPU")
@@ -90,7 +115,16 @@ def _get_device(device_config):
 def _load_chatterbox_model(device, model_name=None):
     """加载 Chatterbox 模型（带缓存）"""
     global _chatterbox_model, _chatterbox_device, _chatterbox_model_name
-    
+
+    if torch is None:
+        raise ImportError(
+            "Chatterbox 需要 PyTorch，但当前环境未安装 torch。\n"
+            "请创建独立虚拟环境并安装（详见 README「Linux 服务器部署（Miniconda）」章节）：\n"
+            "  python -m venv venv_chatterbox --system-site-packages\n"
+            "  ./venv_chatterbox/bin/pip install torch torchaudio\n"
+            "  ./venv_chatterbox/bin/pip install chatterbox-tts"
+        )
+
     if model_name is None:
         model_name = DEFAULT_CHATTERBOX_MODEL
     

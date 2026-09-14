@@ -1,5 +1,6 @@
 import sys
 import os
+import shutil
 
 # ═══════════════════════════════════════════════════════════════
 # 自动检测 & 切换到 Chatterbox 虚拟环境
@@ -32,9 +33,33 @@ from audiobook_generator.utils.log_handler import setup_logging, generate_unique
 from audiobook_generator.tts_providers.chatterbox_tts_provider import get_chatterbox_supported_devices
 from pydub import AudioSegment
 
-# 手动指定路径（Mac 通用）
-AudioSegment.converter = "/opt/homebrew/bin/ffmpeg"
-AudioSegment.ffprobe = "/opt/homebrew/bin/ffprobe"
+
+def _resolve_ffmpeg_binary(name):
+    """按 环境变量 -> PATH -> 常见安装路径 的顺序解析 ffmpeg/ffprobe。
+
+    - 环境变量 FFMPEG_PATH / FFPROBE_PATH 优先级最高
+    - 其次使用 PATH 中的可执行文件（macOS/Linux 通用）
+    - 最后回退到常见安装路径，找不到时返回 None，交由 pydub 自行解析
+    """
+    env_value = os.environ.get(f"{name.upper()}_PATH")
+    if env_value:
+        return env_value
+    found = shutil.which(name)
+    if found:
+        return found
+    for path in (f"/usr/bin/{name}", f"/usr/local/bin/{name}", f"/opt/homebrew/bin/{name}"):
+        if os.path.exists(path):
+            return path
+    return None
+
+
+# 自动探测 ffmpeg/ffprobe（不再硬编码 macOS 路径，兼容 Linux 服务器）
+_ffmpeg_path = _resolve_ffmpeg_binary("ffmpeg")
+_ffprobe_path = _resolve_ffmpeg_binary("ffprobe")
+if _ffmpeg_path:
+    AudioSegment.converter = _ffmpeg_path
+if _ffprobe_path:
+    AudioSegment.ffprobe = _ffprobe_path
 
 def handle_args():
     parser = argparse.ArgumentParser(description="Convert text book to audiobook")
@@ -259,6 +284,12 @@ def handle_args():
         type=float,
         default=0.5,
         help="CFG 引导权重（0.0-1.0），值越大发音越清晰",
+    )
+    chatterbox_tts_group.add_argument(
+        "--chatterbox_speed",
+        type=float,
+        default=1.0,
+        help="语速倍率（0.25-4.0），1.0 为原始语速，<1.0 变慢，>1.0 变快",
     )
 
     args = parser.parse_args()

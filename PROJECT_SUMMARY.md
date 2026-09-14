@@ -7,7 +7,7 @@
 ### 核心特性
 
 - **6 种 TTS 引擎**：Qwen（通义千问）、MiMo（小米）、Edge（微软免费）、MiniMax、Piper（本地）、Chatterbox（本地离线）
-- **双 WebUI**：经典版（Gradio）+ Apple 风格新版（毛玻璃、胶囊导航）
+- **Apple 风格 WebUI**：单页工作台，毛玻璃 + 胶囊导航（`main_ui.py`）
 - **CLI 命令行**：适合批量/脚本化处理
 - **分章节并行转换**：通过 `multiprocessing.Pool` 实现
 - **智能文本分块**：基于 `sentencex` 的句子感知分块
@@ -20,8 +20,7 @@
 
 ```
 ├── main.py                          # CLI 入口（自动检测 Chatterbox 虚拟环境）
-├── main_ui.py                       # 经典 Gradio WebUI 入口（端口 7860）
-├── main_ui_apple.py                 # Apple 风格 WebUI 入口（端口 7861/7862）
+├── main_ui.py                       # Apple 风格 WebUI 入口（端口 7862）
 ├── entrypoint.sh                    # Docker 容器入口脚本
 ├── requirements.txt                 # 依赖清单
 ├── mimo_config.json.example         # MiMo 配置模板
@@ -51,8 +50,7 @@
 │   │   └── chatterbox_tts_provider.py # Chatterbox 本地离线 TTS
 │   │
 │   ├── ui/
-│   │   ├── web_ui.py                # 经典单页式 Gradio WebUI
-│   │   └── web_ui_apple.py          # Apple 风格 WebUI（三级导航 + 弹窗）
+│   │   └── web_ui.py                # Apple 风格 WebUI（胶囊导航 + 弹窗）
 │   │
 │   └── utils/
 │       ├── utils.py                 # 文本分块、音频合并、ID3 标签写入
@@ -83,7 +81,7 @@
 flowchart TB
     subgraph 输入层["📥 输入层"]
         CLI["CLI: python3 main.py"]
-        UI["WebUI: main_ui.py / main_ui_apple.py"]
+        UI["WebUI: main_ui.py"]
         CHAT_SCRIPT["Chatterbox 脚本\nrun_with_chatterbox.sh"]
     end
 
@@ -185,7 +183,7 @@ flowchart TB
 
 #### 阶段 1：环境检测与切换
 
-`main.py` 和 `main_ui_apple.py` 顶部有一段自动检测逻辑：
+`main.py` 和 `main_ui.py` 顶部有一段自动检测逻辑：
 
 ```python
 # 检测项目根目录下是否存在 venv_chatterbox/
@@ -199,7 +197,7 @@ flowchart TB
 #### 阶段 2：配置解析
 
 - **CLI 模式**：`main.py:handle_args()` 使用 `argparse` 解析完整参数集，返回 `GeneralConfig` 对象
-- **WebUI 模式**：`main_ui_apple.py` / `main_ui.py` 解析 `--host` 和 `--port`，然后通过 Gradio 表单收集用户输入，动态构造 `GeneralConfig`
+- **WebUI 模式**：`main_ui.py` 解析 `--host` 和 `--port`，然后通过 Gradio 表单收集用户输入，动态构造 `GeneralConfig`
 - `GeneralConfig` 包含**所有** TTS 提供商和解析器的参数，未使用的字段保持 `None`
 
 #### 阶段 3：电子书解析
@@ -269,18 +267,18 @@ completion = self.client.chat.completions.create(
 
 ---
 
-## 4. 三种入口模式对比
+## 4. 两种入口模式对比
 
-| 特性 | CLI (main.py) | 经典 WebUI (main_ui.py) | Apple 风格 WebUI (main_ui_apple.py) |
-|------|-------------|----------------------|------------------------------|
-| **端口** | — | 7860 | 7861 / 7862 |
-| **启动方式** | `python3 main.py input.epub output_dir` | `python3 main_ui.py` | `python3 main_ui_apple.py` |
-| **UI 风格** | 无 | 单页堆叠式表单 | 胶囊导航 + 二级页面 + 弹窗 |
-| **TTS 配置** | 命令行参数 | 选项卡 | 卡片选择 + 浮层弹窗 |
-| **密码保护** | 无 | 无 | ✅ 管理员密码 |
-| **资源库** | 无 | ✅ 文件列表 + 打包下载 | ✅ 同左（也支持） |
-| **API 配置 UI** | 环境变量/配置文件 | 无 | ✅ 内置 MiMo/Qwen/MiniMax 配置面板 |
-| **Chatterbox 检测** | ✅ 自动切换 venv | ❌ 需手动执行脚本 | ✅ 自动切换 venv |
+| 特性 | CLI (main.py) | Apple 风格 WebUI (main_ui.py) |
+|------|-------------|------------------------------|
+| **端口** | — | 7862 |
+| **启动方式** | `python3 main.py input.epub output_dir` | `python3 main_ui.py` |
+| **UI 风格** | 无 | 胶囊导航 + 二级页面 + 弹窗 |
+| **TTS 配置** | 命令行参数 | 卡片选择 + 浮层弹窗 |
+| **密码保护** | 无 | ✅ 管理员密码 |
+| **资源库** | 无 | ✅ 文件列表 + 打包下载 |
+| **API 配置 UI** | 环境变量/配置文件 | ✅ 内置 MiMo/Qwen/MiniMax 配置面板 |
+| **Chatterbox 检测** | ✅ 自动切换 venv | ✅ 自动切换 venv |
 
 ---
 

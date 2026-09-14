@@ -1,23 +1,25 @@
 # EPUB to Audiobook Converter [![Discord](https://img.shields.io/discord/1177631634724491385?label=Discord&logo=discord&logoColor=white)](https://discord.com/invite/pgp2G8zhS7) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/p0n1/epub_to_audiobook)
 
-调试：
-git clone https://github.com/p0n1/epub_to_audiobook.git
-cd epub_to_audiobook
+本项目为 `p0n1/epub_to_audiobook` 的中文定制分支，采用 **Apple 风格 Gradio WebUI**（入口 `main_ui.py`），支持 MiMo / MiniMax / Edge / Chatterbox 等语音引擎。
+
+```bash
+git clone https://github.com/Yinbob/EPUB_to_Audio_Converter.git
+cd EPUB_to_Audio_Converter
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-export OPENAI_API_KEY=‘’
-运行：
-cd epub_to_audiobook
-python3 -m venv venv
-source venv/bin/activate
+
+# 启动 Apple 风格 WebUI（默认 http://127.0.0.1:7862）
 python3 main_ui.py
-python3 main_ui.py --host 0.0.0.0 --port 8080
+
+# 对外/后台运行
+nohup python3 main_ui.py --host 0.0.0.0 --port 7862 > logs/webui.out 2>&1 &
+
+# CLI 转换
 python3 main.py <input_file> <output_folder> [options]
-python3 main_ui.py --host 0.0.0.0 --port 8080
-不间断运行：nohup python3 main_ui.py --host 0.0.0.0 --port 8080 > output.log 2>&1 &
-查看进程日志：tail -f output.log
-关闭进程：1.找到进程号 ps -ef | grep main_ui.py
+```
+
+> 服务器（Miniconda / GPU）部署见 [Linux 服务器部署（Miniconda）](#linux-服务器部署miniconda)。
 
 
 ## Recent Updates
@@ -89,6 +91,133 @@ When you import the generated MP3 files into Audiobookshelf, the chapter titles 
     export OPENAI_API_KEY=<your_openai_api_key> # for OpenAI
     ```
 
+## Linux 服务器部署（Miniconda）
+
+> 本节适用于 **Ubuntu / Debian 服务器**（含 NVIDIA GPU）。macOS 本地开发仍可使用上面的 `python3 -m venv` 流程。
+
+### 1️⃣ 系统依赖
+
+```bash
+sudo apt update
+sudo apt install -y ffmpeg git build-essential
+ffmpeg -version
+```
+
+> `ffmpeg` 用于音频合并/转码。项目会自动探测 `ffmpeg` / `ffprobe` 路径（也可用环境变量 `FFMPEG_PATH` / `FFPROBE_PATH` 手动覆盖），不再硬编码 macOS 路径。
+
+### 2️⃣ 安装 Miniconda
+
+```bash
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
+bash /tmp/miniconda.sh -b -p "$HOME/miniconda3"
+"$HOME/miniconda3/bin/conda" init bash
+source ~/.bashrc
+```
+
+### 3️⃣ 创建并激活主环境
+
+```bash
+conda create -n epub_audio python=3.11 -y
+conda activate epub_audio
+cd /path/to/EPUB_to_Audio_Converter
+pip install -r requirements.txt
+```
+
+> - 保持 `gradio==5.50.0`，**不要**升级 gradio，否则前端排版会错乱。
+> - `requirements.txt` 不包含 `torch`；若只使用 API 引擎（MiMo / MiniMax / Edge），此时即可正常启动（代码已把 torch 改为惰性导入）。
+
+验证主环境可启动（无需 torch / Chatterbox）：
+
+```bash
+python3 -c "import gradio; print('gradio', gradio.__version__)"
+python3 -c "from main import handle_args; print('main import ok')"
+```
+
+### 4️⃣ （可选）安装 Chatterbox 本地引擎（NVIDIA GPU）
+
+Chatterbox 依赖 PyTorch（约 2~3 GB）与模型文件（约 3.1 GB）。项目约定将其隔离在 `venv_chatterbox/`，`main.py` / `main_ui.py` 会自动切换到该环境（无需手动 `activate`）。
+
+```bash
+conda activate epub_audio
+python -m venv venv_chatterbox --system-site-packages
+
+# 1) 安装 GPU 版 PyTorch（按驱动选择 cu121 / cu124）
+./venv_chatterbox/bin/pip install torch==2.6.0 torchaudio==2.6.0 \
+    --index-url https://download.pytorch.org/whl/cu124
+
+# 2) 安装 chatterbox-tts
+./venv_chatterbox/bin/pip install chatterbox-tts
+
+# 3) chatterbox-tts 会强制安装 gradio 6.8.0，必须降回 5.50.0，避免前端兼容问题
+./venv_chatterbox/bin/pip install --force-reinstall --no-deps gradio==5.50.0 gradio_client==1.14.0
+
+# 4) 校验
+./venv_chatterbox/bin/pip check
+./venv_chatterbox/bin/python -c "import torch, gradio; print('cuda', torch.cuda.is_available(), 'gradio', gradio.__version__)"
+```
+
+> - 若 CUDA 驱动不支持 `cu124`，改用 `cu121`；无 GPU 时去掉 `--index-url` 安装 CPU 版。
+> - `--system-site-packages` 让 `venv_chatterbox` 继承主环境的 Gradio 5.50.0 等依赖，避免重复安装。
+> - 模型缓存自动下载到 `venv_chatterbox/.cache/huggingface/`；彻底删除：`rm -rf venv_chatterbox/`。
+> - 已知问题：`perth` 缺少 `perth_net` 依赖，已在 `chatterbox/tts.py` 中回退到 `DummyWatermarker`，不影响使用。
+
+### 5️⃣ 配置凭证
+
+```bash
+# 方式一：环境变量
+export OPENAI_API_KEY=<MiMo API Key>          # MiMo TTS 使用 openai 接口
+export OPENAI_BASE_URL=https://token-plan-cn.xiaomimimo.com/v1
+export MINIMAX_API_KEY=<MiniMax Key>          # 使用 MiniMax 时
+export MS_TTS_KEY=<Azure Key>                 # 使用 Azure 时
+export MS_TTS_REGION=<Azure Region>
+
+# 方式二：本地配置文件（WebUI 也可保存）
+cp mimo_config.json.example mimo_config.json
+```
+
+> WebUI 会把 MiMo / MiniMax 配置写入项目根目录的 `mimo_config.json` / `minimax_config.json`（已在 `.gitignore` 中，**请勿提交**）。
+
+### 6️⃣ 启动（nohup 后台，端口 7862）
+
+```bash
+cd /path/to/EPUB_to_Audio_Converter
+mkdir -p logs
+nohup python3 main_ui.py --host 0.0.0.0 --port 7862 > logs/webui.out 2>&1 &
+echo $! > logs/webui.pid
+```
+
+或使用仓库自带脚本（默认监听 `0.0.0.0:7862`）：
+
+```bash
+./run_ui.sh
+# 停止： kill $(cat logs/webui.pid)
+```
+
+启动后访问 `http://<服务器IP>:7862`。若存在 `venv_chatterbox/`，启动时会自动切换到该环境，可直接使用 GPU 版 Chatterbox。
+
+### 7️⃣ 部署后自检
+
+```bash
+# 进程与端口
+curl -sI http://127.0.0.1:7862 | head -1        # 期望 HTTP/1.1 200
+ss -ltnp | grep 7862
+
+# 环境版本
+python3 -c "import gradio; print('gradio', gradio.__version__)"                        # 5.50.0
+./venv_chatterbox/bin/python -c "import torch; print('cuda', torch.cuda.is_available())"  # True
+
+# 冒烟测试：用 Edge（免 Key）跑一章
+python3 main.py examples/your-book.epub /tmp/out --tts edge --chapter_start 1 --chapter_end 1
+```
+
+### 8️⃣ 安全提示
+
+WebUI **没有任何鉴权机制**，直接暴露到公网会让任何人都能调用你的 TTS 额度。生产环境建议：
+
+- 仅监听内网，或用 SSH 隧道访问：`ssh -L 7862:127.0.0.1:7862 user@server`
+- 前置 Nginx / Caddy 反向代理，开启 Basic Auth + HTTPS
+- 反向代理时需为 Gradio 配置 `root_path`
+
 ## Web Interface (WebUI)
 
 For users who prefer a graphical interface, this project includes a web-based UI built with Gradio. The WebUI provides an intuitive way to configure all the options and convert your EPUB files without using the command line.
@@ -118,7 +247,7 @@ To launch the web interface, run:
 python3 main_ui.py
 ```
 
-By default, the WebUI will be available at `http://127.0.0.1:7860`. You can customize the host and port:
+By default, the WebUI will be available at `http://127.0.0.1:7862`. You can customize the host and port:
 
 ```bash
 python3 main_ui.py --host 127.0.0.1 --port 8080
@@ -163,7 +292,7 @@ You can also run the WebUI using Docker. Use the provided `docker-compose.webui.
 docker compose -f docker-compose.webui.yml up
 ```
 
-The WebUI will be accessible at `http://localhost:7860` or `http://127.0.0.1:7860`.
+The WebUI will be accessible at `http://localhost:7862` or `http://127.0.0.1:7862`.
 
 ### Security Considerations of WebUI
 
@@ -455,17 +584,21 @@ For OpenAI TTS, you can specify the model, voice, and format options using `--mo
 
 ### 1️⃣ 虚拟环境搭建
 
-项目根目录下有一个专用的独立虚拟环境 `venv_chatterbox/`，创建方式如下：
+项目约定使用根目录下的独立虚拟环境 `venv_chatterbox/`（`main.py` / `main_ui.py` 会自动切换）。**macOS / CPU 环境**：
 
 ```bash
 # 在项目根目录执行
 python3 -m venv venv_chatterbox --system-site-packages
 ./venv_chatterbox/bin/pip install chatterbox-tts
+# chatterbox-tts 会强制安装 Gradio 6.8.0，需降回 5.50.0 以免前端排版错乱
+./venv_chatterbox/bin/pip install --force-reinstall --no-deps gradio==5.50.0 gradio_client==1.14.0
 ```
+
+**Linux 服务器 + NVIDIA GPU**：请参考上文 [Linux 服务器部署（Miniconda）](#linux-服务器部署miniconda) 的「4️⃣ 安装 Chatterbox 本地引擎」，其中包含 cu124 版 PyTorch 的安装方式。
 
 **为什么要用 `--system-site-packages`？**
 
-项目已有组件（Gradio 5.50.0 等）安装在系统 Python 中。`chatterbox-tts` 强制依赖 Gradio 6.8.0，如果直接安装会覆盖并导致 UI 排版变形。通过 `--system-site-packages` 继承系统版 Gradio，避免冲突。
+项目已有组件（Gradio 5.50.0 等）安装在主环境中。`chatterbox-tts` 强制依赖 Gradio 6.8.0，如果直接安装会覆盖并导致 UI 排版变形。通过 `--system-site-packages` 继承主环境的 Gradio，避免重复安装（安装后仍需按上面的命令把 venv 内的 Gradio 固定回 5.50.0）。
 
 **模型缓存位置**
 
@@ -505,26 +638,26 @@ python3 main.py input.epub output_dir --tts chatterbox
 ```bash
 # 直接运行，main.py 会自动切换到虚拟环境
 python3 main.py input.epub output_dir --tts chatterbox \
-    --chatterbox_device cpu \
+    --chatterbox_device cuda \
     --chapter_start 1 --chapter_end 3
 ```
 
-或者使用封装脚本（同样会自动设置缓存目录）：
+或使用仓库根目录的封装脚本（同样会自动切换到 `venv_chatterbox`）：
 
 ```bash
-./venv_chatterbox/run_with_chatterbox.sh input.epub output_dir \
+./run_cli.sh input.epub output_dir \
     --tts chatterbox \
-    --chatterbox_device cpu \
+    --chatterbox_device cuda \
     --chapter_start 1 --chapter_end 3
 ```
 
 **Apple 风格 WebUI**
 
 ```bash
-./venv_chatterbox/run_ui_chatterbox.sh
+./run_ui.sh
 ```
 
-默认端口 `7862`，浏览器打开后：
+默认监听 `0.0.0.0:7862`，浏览器打开后：
 1. TTS 提供商下拉菜单选择 **Chatterbox**
 2. 在 **🎯 Chatterbox** 标签页配置设备等参数
 3. 上传书籍文件，点击开始生成
@@ -532,11 +665,11 @@ python3 main.py input.epub output_dir --tts chatterbox \
 参数传递：
 
 ```bash
-# 指定端口
-./venv_chatterbox/run_ui_chatterbox.sh --host 0.0.0.0 --port 8080
+# 指定监听的 host / port
+./run_ui.sh --host 127.0.0.1 --port 8080
 
-# 使用旧版 UI（非 Apple 风格）
-./venv_chatterbox/run_ui_chatterbox.sh --old-ui
+# 或直接运行入口
+python3 main_ui.py --host 127.0.0.1 --port 7862
 ```
 
 ### 4️⃣ CLI 参数说明
@@ -577,6 +710,16 @@ python3 main.py input.epub output_dir --tts chatterbox \
 
 ### 7️⃣ Troubleshooting
 
+**`ModuleNotFoundError: No module named 'torch'`**
+
+API 引擎（MiMo / MiniMax / Edge）不需要 torch。若需 Chatterbox，请按 [Linux 服务器部署（Miniconda）](#linux-服务器部署miniconda) 的「4️⃣ 安装 Chatterbox 本地引擎」创建 `venv_chatterbox/` 并安装 PyTorch：
+
+```bash
+python3 -m venv venv_chatterbox --system-site-packages
+./venv_chatterbox/bin/pip install torch torchaudio
+./venv_chatterbox/bin/pip install chatterbox-tts
+```
+
 **`ModuleNotFoundError: chatterbox`**
 
 确认虚拟环境已安装：
@@ -600,12 +743,21 @@ sudo apt install ffmpeg  # Ubuntu
 
 **WebUI 排版错乱**
 
-不要升级 Gradio。Chatterbox 虚拟环境使用 `--system-site-packages` 继承系统已安装的 Gradio 5.50.0。如果意外升级，重新创建虚拟环境：
+不要升级 Gradio。`chatterbox-tts` 会强制安装 Gradio 6.8.0，需将其降回 5.50.0。如果意外升级，执行：
+
+```bash
+./venv_chatterbox/bin/pip install --force-reinstall --no-deps gradio==5.50.0 gradio_client==1.14.0
+./venv_chatterbox/bin/python -c "import gradio; print(gradio.__version__)"  # 期望 5.50.0
+```
+
+如需彻底重建：
 
 ```bash
 rm -rf venv_chatterbox/
 python3 -m venv venv_chatterbox --system-site-packages
+./venv_chatterbox/bin/pip install torch torchaudio        # NVIDIA GPU 见服务器部署章节
 ./venv_chatterbox/bin/pip install chatterbox-tts
+./venv_chatterbox/bin/pip install --force-reinstall --no-deps gradio==5.50.0 gradio_client==1.14.0
 ```
 
 ## More examples
