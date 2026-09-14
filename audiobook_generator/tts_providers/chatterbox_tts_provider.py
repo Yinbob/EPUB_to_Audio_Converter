@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+import subprocess
 import tempfile
 from pathlib import Path
 
@@ -22,12 +23,12 @@ _chatterbox_model_name = None
 # Chatterbox 支持的模型列表
 CHATTERBOX_MODELS = {
     "chatterbox-multilingual-v3": {
-        "hf_repo": "resemble-ai/chatterbox",
+        "hf_repo": "ResembleAI/chatterbox",
         "description": "多语言 V3 版本，支持中文、英文等多种语言",
         "supports_chinese": True
     },
     "chatterbox-v0.5": {
-        "hf_repo": "resemble-ai/chatterbox",
+        "hf_repo": "ResembleAI/chatterbox",
         "description": "原始版本，主要支持英文",
         "supports_chinese": False
     }
@@ -35,6 +36,11 @@ CHATTERBOX_MODELS = {
 
 # 默认使用多语言版本
 DEFAULT_CHATTERBOX_MODEL = "chatterbox-multilingual-v3"
+
+# ffmpeg 路径（与 main.py 保持一致）
+FFMPEG_PATH = "/opt/homebrew/bin/ffmpeg"
+FFPROBE_PATH = "/opt/homebrew/bin/ffprobe"
+
 
 
 def get_chatterbox_supported_models():
@@ -114,7 +120,6 @@ def _load_chatterbox_model(device, model_name=None):
     try:
         # 尝试从 HuggingFace 加载指定模型
         _chatterbox_model = ChatterboxTTS.from_pretrained(
-            repo_id=hf_repo,
             device=device
         )
         _chatterbox_device = device
@@ -132,14 +137,16 @@ class ChatterboxTTSProvider(BaseTTSProvider):
         # 设置默认值
         config.output_format = config.output_format or "wav"
         config.model_name = config.model_name or DEFAULT_CHATTERBOX_MODEL
+        self.model_name = config.model_name
+        self.reference_audio = getattr(config, 'chatterbox_reference_audio', None)
         
         super().__init__(config)
         
         self.device = _get_device(getattr(config, 'chatterbox_device', None))
-        self.reference_audio = getattr(config, 'chatterbox_reference_audio', None)
         self.exaggeration = getattr(config, 'chatterbox_exaggeration', 0.5) or 0.5
         self.cfg_weight = getattr(config, 'chatterbox_cfg_weight', 0.5) or 0.5
-        self.model_name = config.model_name
+
+        self.speed = getattr(config, 'chatterbox_speed', 0.8) or 0.8
         
         model_info = get_chatterbox_model_info(self.model_name)
         
@@ -167,6 +174,55 @@ class ChatterboxTTSProvider(BaseTTSProvider):
         model_info = get_chatterbox_model_info(self.model_name)
         if self.config.language and "zh" in self.config.language.lower() and not model_info["supports_chinese"]:
             logger.warning(f"模型 {self.model_name} 不支持中文，建议使用 chatterbox-multilingual-v3")
+
+    def _adjust_speed_with_ffmpeg(self, wav, sample_rate, speed):
+        """使用 ffmpeg atempo 滤波器调整语速，保持音调不变"""
+        import soundfile as sf
+        import io
+
+        # atempo 单个滤波器范围 0.5~2.0，超出需要链式叠加
+        if speed < 0.5:
+            filters = []
+            remaining = speed
+            while remaining < 0.5:
+                filters.append("atempo=0.5")
+                remaining /= 0.5
+            filters.append(f"atempo={remaining:.6f}")
+            filter_str = ",".join(filters)
+        elif speed > 2.0:
+            filters = []
+            remaining = speed
+            while remaining > 2.0:
+                filters.append("atempo=2.0")
+                remaining /= 2.0
+            filters.append(f"atempo={remaining:.6f}")
+            filter_str = ",".join(filters)
+        else:
+            filter_str = f"atempo={speed:.6f}"
+
+        # 内存中通过 pipe 处理，不写临时文件
+        wav_buffer = io.BytesIO()
+        sf.write(wav_buffer, wav, samplerate=sample_rate, format="wav")
+        wav_buffer.seek(0)
+
+        try:
+            proc = subprocess.Popen(
+                [FFMPEG_PATH, '-y', '-i', 'pipe:0',
+                 '-filter:a', filter_str,
+                 '-f', 'wav', 'pipe:1'],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            out, err = proc.communicate(input=wav_buffer.read(), timeout=30)
+            if proc.returncode != 0:
+                logger.error(f"ffmpeg atempo 失败: {err.decode(errors='replace')}")
+                return wav  # fallback
+            wav_adjusted, _ = sf.read(io.BytesIO(out))
+            return wav_adjusted
+        except Exception as e:
+            logger.error(f"语速调整异常: {e}")
+            return wav  # fallback
 
     def text_to_speech(self, text: str, output_file: str, audio_tags: AudioTags):
         """将文本转换为语音并保存到文件"""
@@ -207,6 +263,11 @@ class ChatterboxTTSProvider(BaseTTSProvider):
                 # wav 是 torch.Tensor，形状为 (1, samples)
                 if isinstance(wav, torch.Tensor):
                     wav = wav.squeeze(0).cpu().numpy()
+
+                # 语速调整（使用 ffmpeg atempo 滤波器，保持音调不变）
+                if self.speed and self.speed != 1.0:
+                    wav = self._adjust_speed_with_ffmpeg(wav, model.sr, self.speed)
+                    logger.debug(f"语速调整为 {self.speed}x，新长度 = {len(wav)} 采样")
                 
                 # 将 numpy 数组转换为 WAV 字节
                 import soundfile as sf

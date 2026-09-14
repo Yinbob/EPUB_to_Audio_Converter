@@ -320,7 +320,7 @@ def process_form(provider,
                  edge_volume, edge_pitch, edge_break_duration,
                  qwen_language, qwen_voice,
                  chatterbox_model, chatterbox_device, chatterbox_output_format,
-                 chatterbox_reference_audio, chatterbox_exaggeration, chatterbox_cfg_weight):
+                 chatterbox_reference_audio, chatterbox_exaggeration, chatterbox_cfg_weight, chatterbox_speed):
     if not input_file:
         gr.Warning("请先选择至少一个书籍文件")
         return gr.Timer(active=False)
@@ -393,6 +393,7 @@ def process_form(provider,
                                                  else chatterbox_reference_audio)
             config.chatterbox_exaggeration = chatterbox_exaggeration
             config.chatterbox_cfg_weight = chatterbox_cfg_weight
+            config.chatterbox_speed = chatterbox_speed
         else:
             raise ValueError("Unsupported TTS provider selected")
 
@@ -1404,6 +1405,13 @@ def host_ui(config):
                                 file_types=["audio"]
                             )
                             with gr.Row():
+                                chatterbox_speed = gr.Slider(
+                                    minimum=0.25, maximum=4.0, step=0.1,
+                                    label="语速",
+                                    value=0.8,
+                                    info="0.8 为默认自然语速，<0.8 变慢，>0.8 变快"
+                                )
+                            with gr.Row():
                                 chatterbox_exaggeration = gr.Slider(
                                     minimum=0.0, maximum=1.0, step=0.05,
                                     label="表现力",
@@ -1571,7 +1579,7 @@ def host_ui(config):
                     edge_volume, edge_pitch, edge_break_duration,
                     qwen_language, qwen_voice,
                     chatterbox_model, chatterbox_device, chatterbox_output_format,
-                    chatterbox_reference_audio, chatterbox_exaggeration, chatterbox_cfg_weight],
+                    chatterbox_reference_audio, chatterbox_exaggeration, chatterbox_cfg_weight, chatterbox_speed],
             outputs=progress_timer)
         stop_btn.click(fn=terminate_generator, inputs=None, outputs=progress_timer)
 

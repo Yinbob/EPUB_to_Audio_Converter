@@ -29,3 +29,37 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
 ## Conventions
 - No packaging/lint/format/typecheck config; deps in `requirements.txt`.
 - UI strings and new comments are in Chinese — match that style for UI-facing text.
+
+## Chatterbox TTS（本地离线语音引擎）
+
+### 环境
+- **虚拟环境**: `venv_chatterbox/`（项目根目录），创建方式：`python3 -m venv venv_chatterbox --system-site-packages`
+- **安装**: `./venv_chatterbox/bin/pip install chatterbox-tts`
+- **注意**: chatterbox-tts 0.1.7 强制依赖 gradio 6.8.0，与项目使用的 gradio 5.50.0 冲突。虚拟环境通过 `--system-site-packages` 继承系统 gradio 5.50.0，不要升级 gradio。
+- **已知问题**: `perth` 包的 `PerthImplicitWatermarker` 因缺少 `perth_net` 依赖无法导入，已在 `chatterbox/tts.py` 中修补为回退到 `DummyWatermarker`。
+
+### 模型缓存
+- 所有模型文件下载到 `venv_chatterbox/.cache/huggingface/`，与虚拟环境一同管理
+- 总计约 3.1 GB（`ve.safetensors`、`t3_cfg.safetensors` ~2GB、`s3gen.safetensors` ~1GB、`tokenizer.json`、`conds.pt`）
+- 删除方式：`rm -rf venv_chatterbox/` 即可清除整个环境和模型缓存
+- 如果网络下载失败，尝试 `unset http_proxy https_proxy ALL_PROXY && curl --noproxy "*"`
+
+### 运行方式
+- **CLI**: `./venv_chatterbox/run_with_chatterbox.sh input.epub output_dir --tts chatterbox --chatterbox_device cpu --chapter_start N --chapter_end N`
+- **Apple 风格 UI**: `./venv_chatterbox/run_ui_chatterbox.sh`（默认端口 7862）
+- **旧版 UI**: `./venv_chatterbox/run_ui_chatterbox.sh --old-ui`（默认端口 7861）
+- UI 启动后在 TTS 提供商下拉菜单中选择 **Chatterbox**，在 **🎯 Chatterbox** 标签页中配置设备等参数
+
+### CLI 参数
+```
+--chatterbox_device {auto,cpu,cuda,mps}  设备选择（默认 auto）
+--chatterbox_reference_audio              参考音频路径，用于语音克隆（可选）
+--chatterbox_exaggeration                 语气夸张程度 0.0-1.0（默认 0.5）
+--chatterbox_cfg_weight                   CFG 引导权重 0.0-1.0（默认 0.5）
+```
+
+### 提供商文件
+- `audiobook_generator/tts_providers/chatterbox_tts_provider.py` — Chatterbox TTS 提供商实现
+- 支持多语言模型 `chatterbox-multilingual-v3`（默认）
+- 支持语音克隆（通过 `reference_audio` 参数）
+- 长文本自动分块处理（每块 500 字符）

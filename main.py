@@ -1,3 +1,25 @@
+import sys
+import os
+
+# ═══════════════════════════════════════════════════════════════
+# 自动检测 & 切换到 Chatterbox 虚拟环境
+# 这样用户只需一条命令即可：
+#   python3 main.py input.epub output_dir --tts chatterbox
+# ═══════════════════════════════════════════════════════════════
+_self_dir = os.path.dirname(os.path.abspath(__file__))
+_venv_python = os.path.join(_self_dir, 'venv_chatterbox', 'bin', 'python3')
+_venv_cache = os.path.join(_self_dir, 'venv_chatterbox', '.cache')
+
+if os.path.exists(_venv_python) and sys.executable != _venv_python:
+    os.environ.setdefault('NUMBA_CACHE_DIR', os.path.join(_venv_cache, 'numba'))
+    os.environ.setdefault('HF_HOME', os.path.join(_venv_cache, 'huggingface'))
+    os.environ.setdefault('HUGGINGFACE_HUB_CACHE', os.path.join(_venv_cache, 'huggingface', 'hub'))
+    os.environ.setdefault('OMP_WAIT_POLICY', 'PASSIVE')
+    os.makedirs(os.environ['NUMBA_CACHE_DIR'], exist_ok=True)
+    os.makedirs(os.path.join(_venv_cache, 'huggingface', 'hub'), exist_ok=True)
+    os.execv(_venv_python, [_venv_python] + sys.argv)
+# ═══════════════════════════════════════════════════════════════
+
 import argparse
 from pathlib import Path
 
@@ -7,6 +29,7 @@ from audiobook_generator.tts_providers.base_tts_provider import (
     get_supported_tts_providers,
 )
 from audiobook_generator.utils.log_handler import setup_logging, generate_unique_log_path
+from audiobook_generator.tts_providers.chatterbox_tts_provider import get_chatterbox_supported_devices
 from pydub import AudioSegment
 
 # 手动指定路径（Mac 通用）
@@ -211,6 +234,31 @@ def handle_args():
         "--piper_length_scale",
         default=1.0,
         help="Phoneme length, a.k.a. speaking rate",
+    )
+
+    chatterbox_tts_group = parser.add_argument_group(title="chatterbox specific")
+    chatterbox_tts_group.add_argument(
+        "--chatterbox_device",
+        default="auto",
+        choices=get_chatterbox_supported_devices(),
+        help="设备选择：auto（自动选择）、cpu、cuda（需NVIDIA GPU）、mps（需Apple Silicon）",
+    )
+    chatterbox_tts_group.add_argument(
+        "--chatterbox_reference_audio",
+        default=None,
+        help="参考音频路径，用于语音克隆（可选）",
+    )
+    chatterbox_tts_group.add_argument(
+        "--chatterbox_exaggeration",
+        type=float,
+        default=0.5,
+        help="语气夸张程度（0.0-1.0），值越大情感越丰富",
+    )
+    chatterbox_tts_group.add_argument(
+        "--chatterbox_cfg_weight",
+        type=float,
+        default=0.5,
+        help="CFG 引导权重（0.0-1.0），值越大发音越清晰",
     )
 
     args = parser.parse_args()

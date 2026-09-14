@@ -55,6 +55,7 @@ class GeneralConfig:
         self.chatterbox_reference_audio = getattr(args, 'chatterbox_reference_audio', None)
         self.chatterbox_exaggeration = getattr(args, 'chatterbox_exaggeration', None)
         self.chatterbox_cfg_weight = getattr(args, 'chatterbox_cfg_weight', None)
+        self.chatterbox_speed = getattr(args, 'chatterbox_speed', None)
 
     def __str__(self):
         return ",\n".join(f"{key}={value}" for key, value in self.__dict__.items())

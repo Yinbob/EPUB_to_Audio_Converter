@@ -446,6 +446,168 @@ python3 main.py <input_file> <output_folder> --voice_name en-GB-LibbyNeural --la
 
 For OpenAI TTS, you can specify the model, voice, and format options using `--model_name`, `--voice_name`, and `--output_format`, respectively.
 
+
+## Chatterbox TTS（本地离线语音引擎）
+
+本项目集成了 [Chatterbox](https://huggingface.co/ResembleAI/chatterbox) 本地 TTS 模型，无需联网、无需 API Key，完全离线运行。支持中英文多语言合成和语音克隆。
+
+> ⚠️ **注意**：Chatterbox 依赖 PyTorch 等较大库（约 2~3 GB），模型文件另需约 3.1 GB 下载空间。为方便管理，所有依赖和模型缓存均隔离在独立虚拟环境中，删除只需删除一个目录。
+
+### 1️⃣ 虚拟环境搭建
+
+项目根目录下有一个专用的独立虚拟环境 `venv_chatterbox/`，创建方式如下：
+
+```bash
+# 在项目根目录执行
+python3 -m venv venv_chatterbox --system-site-packages
+./venv_chatterbox/bin/pip install chatterbox-tts
+```
+
+**为什么要用 `--system-site-packages`？**
+
+项目已有组件（Gradio 5.50.0 等）安装在系统 Python 中。`chatterbox-tts` 强制依赖 Gradio 6.8.0，如果直接安装会覆盖并导致 UI 排版变形。通过 `--system-site-packages` 继承系统版 Gradio，避免冲突。
+
+**模型缓存位置**
+
+模型文件自动下载到 `venv_chatterbox/.cache/huggingface/`，与虚拟环境同目录。**要完全删除 Chatterbox 及其所有模型文件，只需**：
+
+```bash
+rm -rf venv_chatterbox/
+```
+
+**如果下载失败：**
+
+```bash
+unset http_proxy https_proxy ALL_PROXY && curl --noproxy "*"
+```
+
+### 2️⃣ 自动虚拟环境切换机制
+
+`main.py` 顶部有一段自检逻辑（位于 `# 自动检测 & 切换到 Chatterbox 虚拟环境` 注释下方）：
+
+1. 检测 `venv_chatterbox/bin/python3` 是否存在
+2. 如果存在且当前解释器不是该虚拟环境
+3. 设置环境变量 `HF_HOME` / `NUMBA_CACHE_DIR` 等指向虚拟环境内的缓存目录
+4. 通过 `os.execv()` 无缝切换到虚拟环境的 Python 解释器
+
+因此用户**只需一条命令**即可运行 Chatterbox：
+
+```bash
+python3 main.py input.epub output_dir --tts chatterbox
+```
+
+无需手动 `source venv_chatterbox/bin/activate`，系统会自动完成切换。
+
+### 3️⃣ 启动方式
+
+**CLI 模式**
+
+```bash
+# 直接运行，main.py 会自动切换到虚拟环境
+python3 main.py input.epub output_dir --tts chatterbox \
+    --chatterbox_device cpu \
+    --chapter_start 1 --chapter_end 3
+```
+
+或者使用封装脚本（同样会自动设置缓存目录）：
+
+```bash
+./venv_chatterbox/run_with_chatterbox.sh input.epub output_dir \
+    --tts chatterbox \
+    --chatterbox_device cpu \
+    --chapter_start 1 --chapter_end 3
+```
+
+**Apple 风格 WebUI**
+
+```bash
+./venv_chatterbox/run_ui_chatterbox.sh
+```
+
+默认端口 `7862`，浏览器打开后：
+1. TTS 提供商下拉菜单选择 **Chatterbox**
+2. 在 **🎯 Chatterbox** 标签页配置设备等参数
+3. 上传书籍文件，点击开始生成
+
+参数传递：
+
+```bash
+# 指定端口
+./venv_chatterbox/run_ui_chatterbox.sh --host 0.0.0.0 --port 8080
+
+# 使用旧版 UI（非 Apple 风格）
+./venv_chatterbox/run_ui_chatterbox.sh --old-ui
+```
+
+### 4️⃣ CLI 参数说明
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `--chatterbox_device` | 设备选择：`auto` / `cpu` / `cuda` / `mps` | `auto` |
+| `--chatterbox_reference_audio` | 参考音频路径（语音克隆，可选） | 无 |
+| `--chatterbox_exaggeration` | 语气夸张程度，范围 0.0~1.0 | `0.5` |
+| `--chatterbox_cfg_weight` | CFG 引导权重，范围 0.0~1.0 | `0.5` |
+| `--chatterbox_speed` | 语速倍率，范围 0.25~4.0 | `1.0` |
+
+### 5️⃣ WebUI 可用选项（Chatterbox 标签页）
+
+| 选项 | 说明 |
+|------|------|
+| **模型版本** | `chatterbox-multilingual-v3`（默认，支持中文）/ `chatterbox-v0.5`（仅英文） |
+| **运行设备** | auto / cpu / cuda / mps |
+| **输出格式** | wav / mp3 / aac / flac |
+| **参考音频** | 上传 `.wav` / `.mp3` 音频用于语音克隆 |
+| **语速** | 0.25x ~ 4.0x，默认 `1.0`（0.8x 为自然语速） |
+| **表现力** | 0.0~1.0，控制情感表现力 |
+| **稳定性** | 0.0~1.0，控制生成稳定性（CFG 权重） |
+
+### 6️⃣ 语音克隆用法
+
+Chatterbox 支持通过上传参考音频来模仿目标说话人的音色：
+
+1. WebUI 中在 **🎯 Chatterbox** 标签页上传参考音频文件（.wav / .mp3，5~10 秒即可）
+2. 或在 CLI 中指定：
+
+```bash
+python3 main.py input.epub output_dir --tts chatterbox \
+    --chatterbox_reference_audio /path/to/voice_sample.wav
+```
+
+> **注意**：Chatterbox 的默认音色来自内置 `conds.pt`，性别无法通过代码判断。要切换不同音色，需要提供对应性别的参考音频。
+
+### 7️⃣ Troubleshooting
+
+**`ModuleNotFoundError: chatterbox`**
+
+确认虚拟环境已安装：
+
+```bash
+./venv_chatterbox/bin/pip install chatterbox-tts
+```
+
+**`No module named 'perth_net'` 或水印相关错误**
+
+已在 `chatterbox/tts.py` 中修补为回退到 `DummyWatermarker`，不影响使用。
+
+**语音语速过快且音质变糊**
+
+语速调整使用 **ffmpeg atempo** 滤波器，请确保系统中已安装 ffmpeg：
+
+```bash
+brew install ffmpeg    # macOS
+sudo apt install ffmpeg  # Ubuntu
+```
+
+**WebUI 排版错乱**
+
+不要升级 Gradio。Chatterbox 虚拟环境使用 `--system-site-packages` 继承系统已安装的 Gradio 5.50.0。如果意外升级，重新创建虚拟环境：
+
+```bash
+rm -rf venv_chatterbox/
+python3 -m venv venv_chatterbox --system-site-packages
+./venv_chatterbox/bin/pip install chatterbox-tts
+```
+
 ## More examples
 
 Here are some examples that demonstrate various option combinations:
