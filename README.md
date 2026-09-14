@@ -117,8 +117,8 @@ source ~/.bashrc
 ### 3️⃣ 创建并激活主环境
 
 ```bash
-conda create -n epub_audio python=3.11 -y
-conda activate epub_audio
+conda create -n epub2audio python=3.11 -y
+conda activate epub2audio
 cd /path/to/EPUB_to_Audio_Converter
 pip install -r requirements.txt
 ```
@@ -138,7 +138,7 @@ python3 -c "from main import handle_args; print('main import ok')"
 Chatterbox 依赖 PyTorch（约 2~3 GB）与模型文件（约 3.1 GB）。项目约定将其隔离在 `venv_chatterbox/`，`main.py` / `main_ui.py` 会自动切换到该环境（无需手动 `activate`）。
 
 ```bash
-conda activate epub_audio
+conda activate epub2audio
 python -m venv venv_chatterbox --system-site-packages
 
 # 1) 安装 GPU 版 PyTorch（按驱动选择 cu121 / cu124）
