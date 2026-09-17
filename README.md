@@ -682,6 +682,12 @@ python3 main_ui.py --host 127.0.0.1 --port 7862
 | `--chatterbox_cfg_weight` | CFG 引导权重，范围 0.0~1.0 | `0.5` |
 | `--chatterbox_speed` | 语速倍率，范围 0.25~4.0 | `1.0` |
 
+> **GPU（CUDA）注意**：章节并行使用 `multiprocessing` 的 `spawn` 启动方式。
+> Linux 默认的 `fork` 会让子进程继承父进程已初始化的 CUDA 状态，运行时报
+> `Cannot re-initialize CUDA in forked subprocess. To use CUDA with multiprocessing,
+> you must use the 'spawn' start method`。由于每个 worker 会各自加载一份模型，
+> 用 `--chatterbox_device cuda` 时建议保持 `--worker_count 1`（显存占用随并行数成倍增加）。
+
 ### 5️⃣ WebUI 可用选项（Chatterbox 标签页）
 
 | 选项 | 说明 |

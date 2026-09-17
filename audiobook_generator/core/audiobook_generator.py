@@ -146,9 +146,26 @@ class AudiobookGenerator:
             # Track failed chapters
             failed_chapters = []
 
-            # Use multiprocessing to process chapters in parallel
-            with multiprocessing.Pool(
-                processes=self.config.worker_count,
+            # 并行转换章节。
+            #
+            # 这里必须用 spawn 启动方式：Linux 的 multiprocessing 默认是 fork，
+            # 子进程会继承父进程里已经初始化过的 CUDA 状态（父进程在 argparse 校验
+            # 设备、构造 TTS provider 时就会调用 torch.cuda），之后子进程再使用 GPU
+            # 会被 PyTorch 直接拒绝：
+            #   RuntimeError: Cannot re-initialize CUDA in forked subprocess.
+            # spawn 让每个 worker 以全新解释器启动，可以独立初始化 CUDA。
+            # 代价是每个 worker 会各自加载一份模型（GPU 显存随 worker_count 增长），
+            # 且首次启动需要重新 import 依赖，故 GPU 场景建议 worker_count=1。
+            worker_count = self.config.worker_count or 1
+            if worker_count > 1 and getattr(tts_provider, "device", None) == "cuda":
+                logger.warning(
+                    f"检测到 CUDA + worker_count={worker_count}：每个 worker 都会独立加载一份 TTS 模型，"
+                    "显存占用随并行数成倍增加。GPU 场景建议使用 --worker_count 1。"
+                )
+
+            mp_context = multiprocessing.get_context("spawn")
+            with mp_context.Pool(
+                processes=worker_count,
                 initializer=setup_logging,
                 initargs=(self.config.log, self.config.log_file, True)
             ) as pool:
@@ -175,4 +192,3 @@ class AudiobookGenerator:
             logger.exception(f"Error during audiobook generation: {e}")
         finally:
             logger.debug("AudiobookGenerator.run() method finished.")
-

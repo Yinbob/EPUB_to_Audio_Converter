@@ -11,7 +11,7 @@ Apple 风格 WebUI —— 全新设计的有声书生成工作台。
 入口：main_ui.py
 """
 
-from multiprocessing import Process
+from multiprocessing import Process, get_context
 from typing import Optional
 from pathlib import Path
 import os
@@ -424,7 +424,11 @@ def launch_batch(configs):
     if running_process and running_process.is_alive():
         print("Audiobook generator already running")
         return
-    running_process = Process(target=_batch_worker, args=(configs, str(webui_log_file.absolute())))
+    # 必须用 spawn 启动：Gradio 主进程在构建 UI（设备下拉框）时会探测 CUDA，
+    # fork 出来的子进程继承该状态后无法再用 GPU，详见 audiobook_generator.py 中的说明。
+    running_process = get_context("spawn").Process(
+        target=_batch_worker, args=(configs, str(webui_log_file.absolute()))
+    )
     running_process.start()
 
 

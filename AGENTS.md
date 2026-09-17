@@ -18,6 +18,7 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
 - WebUI (`web_ui.py`) does `from main import main` and builds a `GeneralConfig(None)`, then fills fields manually — config fields default to `None` (not CLI defaults); providers must handle `None`.
 - Chapters are converted via `multiprocessing.Pool` (`imap_unordered`) — chapter order not guaranteed. `--worker_count` = pool size (default 1).
 - WebUI runs conversion in a subprocess `Process`; the batch worker (`_batch_worker`) must stay module-top-level for pickling.
+- 章节并行必须用 spawn：`audiobook_generator.py` 用 `multiprocessing.get_context("spawn").Pool`，WebUI 的 `_batch_worker` 用 `get_context("spawn").Process`。Linux 默认的 `fork` 会继承父进程已初始化的 CUDA 状态（父进程在 argparse 校验设备、构造 provider 时就会调用 `torch.cuda`），导致 worker 加载模型时报 `Cannot re-initialize CUDA in forked subprocess`。GPU 场景建议 `worker_count=1`（每个 worker 独立加载一份模型）。
 - `.webui_settings.json` (repo root) auto-persists WebUI checkbox state.
 - Logs go to `logs/` (`EtA_*.log`, `EtA_WebUI_*.log`); `setup_logging` resets root handlers.
 
