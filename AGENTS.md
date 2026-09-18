@@ -72,6 +72,11 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
   也不会启动 tick（`ct()` 判定 + Timer 在 onMount 里 setInterval），会导致进度条永远停在「等待开始生成...」（所有引擎一致）。
   另外用 `ui.load(fn=get_progress_info, ...)` 做页面加载同步，保证刷新/新会话也能看到当前进度；`webui_log_file` 需为绝对路径。
   回归测试：`tests/audiobook_generator/ui/progress_wiring_test.py`（结构 + 五态，需在 venv 解释器下运行，其他解释器自动跳过）。
+- **「停止转换」必须整组终止**：`_batch_worker` 会先 `os.setsid()` 自成进程组，章节进程池 worker 继承该组；
+  `web_ui._terminate_running_batch()` 用 `killpg` 先 SIGTERM 后 SIGKILL 终止整组。只 `terminate()` 批处理进程的话，
+  正在合成的 worker 会变孤儿继续跑（表现为"停止按钮没反应"），对所有引擎都适用。停止后状态显示「⏹ 已停止（可再次点击开始）」。
+- **日志页读取窗口**：`gradio_log.Log` 默认只从最后 100 行开始读，页面在生成中途打开/刷新时会显得"日志不全"，
+  因此显式传 `tail=800, xterm_scrollback=2000`；`.app-card` 上不要加 `overflow: hidden`（会裁剪日志终端视图）。
 
 ### 提供商文件
 - `audiobook_generator/tts_providers/chatterbox_tts_provider.py` — Chatterbox TTS 提供商实现

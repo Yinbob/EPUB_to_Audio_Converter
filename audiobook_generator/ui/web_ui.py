@@ -17,6 +17,8 @@ from pathlib import Path
 import os
 import json
 import logging
+import signal
+import time
 import zipfile
 import shutil
 from datetime import datetime
@@ -56,7 +58,7 @@ from audiobook_generator.tts_providers.chatterbox_tts_provider import (
     get_chatterbox_speed_range,
 )
 from audiobook_generator.utils.log_handler import generate_unique_log_path
-from audiobook_generator.ui.progress_parser import parse_progress
+from audiobook_generator.ui.progress_parser import decide_progress_state, parse_progress
 from audiobook_generator.utils.mimo_config import (
     load_mimo_config, save_mimo_config, mask_api_key as mimo_mask_api_key, test_mimo_connection
 )
@@ -222,6 +224,8 @@ def _test_qwen_api(api_key: str, base_url: str, model: str) -> str:
 
 # ── 运行态 ────────────────────────────────────────────────────────
 running_process: Optional[Process] = None
+# 是否由用户点了「停止转换」而结束（用于把状态显示成"已停止"而不是"异常中断"）
+manual_stopped = False
 webui_log_file = None
 
 _PROVIDER_LABEL = {
@@ -328,7 +332,8 @@ def process_form(provider,
                  chatterbox_reference_audio, chatterbox_exaggeration, chatterbox_cfg_weight, chatterbox_speed):
     if not input_file:
         gr.Warning("请先选择至少一个书籍文件")
-        return gr.Timer(active=False)
+        # 保持进度条现状，只关掉轮询
+        return gr.update(), gr.Timer(active=False)
     gr.Info("🚀 有声书生成已开始！请在日志页查看实时进度。")
     if not isinstance(input_file, list):
         input_file = [input_file]
@@ -405,7 +410,8 @@ def process_form(provider,
         configs.append(config)
 
     launch_batch(configs)
-    return gr.Timer(active=True)
+    # 立刻推送一次状态：新批次会把进度条重置为"正在启动 0%"（不用等下一次轮询）
+    return get_progress_info()
 
 
 def _get_batch_logger(log_file_path):
@@ -433,6 +439,13 @@ def _get_batch_logger(log_file_path):
 
 def _batch_worker(config_list, log_file_path):
     """子进程逐个处理每个 EPUB（须在模块顶层以便 spawn pickle）。"""
+    # 自成进程组/会话：章节 worker（进程池）会继承这个进程组，
+    # 这样点「停止转换」时可以用 killpg 一次性终止批处理进程连同所有 worker
+    # （只 terminate 批处理进程的话，正在合成的 worker 会变成孤儿继续跑，表现为"停止无效"）。
+    try:
+        os.setsid()
+    except OSError:
+        pass
     batch_logger = _get_batch_logger(log_file_path)
     total = len(config_list)
     for idx, cfg in enumerate(config_list):
@@ -449,10 +462,11 @@ def _batch_worker(config_list, log_file_path):
 
 
 def launch_batch(configs):
-    global running_process
+    global running_process, manual_stopped
     if running_process and running_process.is_alive():
         print("Audiobook generator already running")
         return
+    manual_stopped = False
     # 必须用 spawn 启动：Gradio 主进程在构建 UI（设备下拉框）时会探测 CUDA，
     # fork 出来的子进程继承该状态后无法再用 GPU，详见 audiobook_generator.py 中的说明。
     running_process = get_context("spawn").Process(
@@ -463,7 +477,12 @@ def launch_batch(configs):
 
 
 def get_progress_info():
-    """解析日志文件获取生成进度，同时控制定时器开关"""
+    """解析日志文件获取生成进度，返回给前端的结构化状态 + 定时器开关。
+
+    注意：这里只把状态以 JSON 形式塞进一个隐藏的载荷组件，可见的进度条 DOM 由页面里
+    的脚本就地更新（见 HEAD_HTML）。早期实现是每 2 秒整块替换进度条 HTML，导致
+    shimmer 等 CSS 动画每 2 秒重新播放一次，看起来"一闪一闪"。
+    """
     global webui_log_file
     run_alive = running_process is not None and running_process.is_alive()
 
@@ -474,71 +493,92 @@ def get_progress_info():
         except Exception:
             state = None
 
-    # 日志暂时读不到（文件还没建好/正在被写入）：只要批次还在跑就继续轮询，别把定时器关掉
-    if state is None:
-        if run_alive:
-            return _progress_html(5, "正在启动...", "", 0, 0), gr.Timer(active=True)
-        return _progress_html(0, "等待开始", "", 0, 0), gr.Timer(active=False)
-
-    book, total, done, extra = state["book"], state["total"], state["done"], state["extra"]
-
-    # 整个批次结束
-    if state["finished"] and total > 0:
-        return _progress_html(100, "✅ 全部完成", book, total, total), gr.Timer(active=False)
-
-    # 子进程已退出却没有结束标记：中途失败/被中断
-    if running_process is not None and not run_alive:
-        if state["has_markers"]:
-            return _progress_html(state["pct"], "⚠️ 生成已中断，详见日志", book, total, done, extra), gr.Timer(active=False)
-        # 连批次标记都没写出来就退出了（例如启动阶段报错）
-        return _progress_html(0, "⚠️ 启动失败，详见日志", "", 0, 0), gr.Timer(active=False)
-
-    # 还没开始任何一本书
-    if not state["has_markers"]:
-        if run_alive:
-            # 批次已启动但还没写出章节标记（chatterbox 加载模型较慢时常见）
-            return _progress_html(5, "正在启动...", "", 0, 0), gr.Timer(active=True)
-        return _progress_html(0, "等待开始", "", 0, 0), gr.Timer(active=False)
-
-    if total > 0:
-        status = "✅ 本书完成" if done >= total else "正在生成..."
-        return _progress_html(state["pct"], status, book, total, done, extra), gr.Timer(active=True)
-
-    return _progress_html(5, "正在初始化...", book, 0, 0), gr.Timer(active=True)
+    payload = decide_progress_state(state, run_alive, batch_started=running_process is not None,
+                                    manually_stopped=manual_stopped)
+    return json.dumps(payload, ensure_ascii=False), gr.Timer(active=payload["active"])
 
 
-def _progress_html(pct, status, book_name, total, done, extra=""):
-    """生成进度条 HTML"""
-    # 只有真正的"未开始"才渲染待机样式；「⚠️ 启动失败」等 0% 状态也要把文案显示出来
-    if pct == 0 and not book_name and status == "等待开始":
-        return """<div class="progress-container idle">
-            <div class="progress-status">等待开始生成...</div>
-        </div>"""
-    
-    book_display = f'<span class="progress-book">📖 {book_name}</span>' if book_name else ""
-    detail = f"章节 {done}/{total}" if total > 0 else ""
-    if extra:
-        detail = f"{detail} · {extra}" if detail else extra
-    
-    return f"""<div class="progress-container active">
+def _progress_scaffold_html():
+    """进度条骨架：只在页面构建时渲染一次，之后全部由前端脚本就地更新。
+
+    结构保持稳定是"动画连续、不闪烁"的前提（每次替换 DOM 都会让 CSS 动画重新开始）。
+    """
+    return """<div class="progress-container idle" id="progress_container">
         <div class="progress-header">
-            <span class="progress-status">{status}</span>
-            <span class="progress-detail">{detail}</span>
-            <span class="progress-pct">{pct}%</span>
+            <span class="progress-status" id="progress_status">等待开始生成...</span>
+            <span class="progress-detail" id="progress_detail"></span>
+            <span class="progress-pct" id="progress_pct">0%</span>
         </div>
-        {book_display}
-        <div class="progress-track">
-            <div class="progress-fill" style="width: {pct}%"></div>
-        </div>
+        <div class="progress-book" id="progress_book" style="display:none"></div>
+        <div class="progress-track"><div class="progress-fill" id="progress_fill" style="width:0%"></div></div>
     </div>"""
 
-def terminate_generator():
-    global running_process
-    if running_process and running_process.is_alive():
-        running_process.terminate()
+def _terminate_running_batch(timeout=3.0):
+    """终止当前批处理进程**及其所有子孙**（章节进程池 worker），返回是否真的停掉了东西。
+
+    之前只调 running_process.terminate()：那样只会杀掉批处理进程本身，
+    真正在合成音频的 worker（spawn 出来的孙进程）会变成孤儿继续跑，
+    所以看起来"停止按钮没反应"——尤其是 chatterbox/GPU 这类单章很慢的引擎。
+    """
+    global running_process, manual_stopped
+    proc = running_process
+    if proc is None:
+        return False
+
+    if not proc.is_alive():
         running_process = None
-        print("Audiobook generator terminated manually")
-    return gr.Timer(active=False)
+        return False
+
+    pid = proc.pid
+    try:
+        pgid = os.getpgid(pid)
+    except (ProcessLookupError, PermissionError):
+        pgid = None
+
+    # 1) 先整组 SIGTERM，给它机会自己收尾
+    try:
+        if pgid:
+            os.killpg(pgid, signal.SIGTERM)
+        else:
+            proc.terminate()
+    except (ProcessLookupError, PermissionError):
+        pass
+
+    deadline = time.time() + timeout
+    while time.time() < deadline and proc.is_alive():
+        time.sleep(0.1)
+
+    # 2) 还赖着就整组 SIGKILL（GPU 合成卡在 CUDA 调用里时常见）
+    if proc.is_alive():
+        try:
+            if pgid:
+                os.killpg(pgid, signal.SIGKILL)
+            else:
+                proc.kill()
+        except (ProcessLookupError, PermissionError):
+            pass
+        proc.join(timeout=2)
+
+    running_process = None
+    manual_stopped = True
+    return True
+
+
+def terminate_generator():
+    stopped = _terminate_running_batch()
+    if stopped:
+        _append_log_line("⏹ 已手动停止当前生成（批次进程与章节 worker 已终止）")
+    return get_progress_info()[0], gr.Timer(active=False)
+
+
+def _append_log_line(message):
+    """把一行提示写进当前 WebUI 日志文件（父进程没有配置 logger，直接追加）"""
+    try:
+        if webui_log_file:
+            with open(webui_log_file, "a", encoding="utf-8") as fh:
+                fh.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
+    except Exception:
+        pass
 
 
 # ── 资源库管理 ────────────────────────────────────────────────────
@@ -693,6 +733,184 @@ def load_files_for_folder(folder_name):
 
 
 # ── 样式 ──────────────────────────────────────────────────────────
+# 页面级脚本：
+# 1) 进度条"就地更新"——服务端只推一个隐藏的状态载荷，可见 DOM 不再每 2 秒被整块替换，
+#    这样 shimmer / 宽度过渡等动画可以连续播放，不会出现"一闪一闪"；
+# 2) 指针交互：卡片跟随鼠标的高光、按钮点击水波纹；
+# 3) 供按钮 js= 调用：点击「开始生成」后平滑滚动到顶部进度条。
+HEAD_HTML = """
+<script>
+(function () {
+  function $(sel, root) { return (root || document).querySelector(sel); }
+
+  var lastPct = null;
+  var lastPayloadKey = null;   // 去重：相同状态不重复应用，否则收起定时器会被反复重置
+  // 结束后自动收起：完成态展示 6 秒、异常/停止态展示 12 秒，然后淡出并把高度收到 0，
+  // 不再占着页面顶部；下一次点「开始生成」会立刻重新展开。
+  var HIDE_DELAY = { finished: 6000, book_done: 6000, interrupted: 12000, failed: 12000 };
+  var hideTimer = null;
+
+  function progressBox() { return $('#progress_container'); }
+
+  function revealProgress() {
+    var box = progressBox();
+    if (!box) return;
+    if (hideTimer) { window.clearTimeout(hideTimer); hideTimer = null; }
+    box.style.maxHeight = '';
+    box.classList.remove('collapsed');
+    box.removeAttribute('aria-hidden');
+  }
+
+  function scheduleHide(mode) {
+    if (hideTimer) { window.clearTimeout(hideTimer); hideTimer = null; }
+    var delay = HIDE_DELAY[mode];
+    if (!delay) return;
+    hideTimer = window.setTimeout(function () {
+      var box = progressBox();
+      if (!box) return;
+      box.style.maxHeight = box.scrollHeight + 'px';   // 先固定当前高度，才能平滑收拢
+      window.requestAnimationFrame(function () {
+        box.classList.add('collapsed');
+        box.setAttribute('aria-hidden', 'true');       // 收起后对读屏软件也隐藏
+      });
+    }, delay);
+  }
+
+  function applyProgress(payload) {
+    var box = progressBox();
+    if (!box) return;
+    var payloadKey = JSON.stringify(payload);
+    if (payloadKey === lastPayloadKey) return;   // 状态没变化（含 boot() 的重复绑定）→ 不做任何事
+    lastPayloadKey = payloadKey;
+    var mode = payload.mode || 'idle';
+    box.classList.remove('idle', 'active', 'starting', 'running', 'done', 'warn');
+    if (mode === 'idle') box.classList.add('idle');
+    else if (mode === 'starting') box.classList.add('active', 'starting');
+    else if (mode === 'finished' || mode === 'book_done') box.classList.add('active', 'done');
+    else if (mode === 'interrupted' || mode === 'failed') box.classList.add('active', 'warn');
+    else box.classList.add('active', 'running');
+
+    var status = $('#progress_status');
+    var detail = $('#progress_detail');
+    var pctEl = $('#progress_pct');
+    var bookEl = $('#progress_book');
+    var fill = $('#progress_fill');
+    if (status && status.textContent !== (payload.status || '')) status.textContent = payload.status || '';
+    if (detail) detail.textContent = payload.detail || '';
+
+    var pct = Math.max(0, Math.min(100, Number(payload.pct) || 0));
+    if (pctEl) pctEl.textContent = pct + '%';
+    if (bookEl) {
+      var showBook = !!payload.book && mode !== 'idle';
+      bookEl.style.display = showBook ? 'inline-block' : 'none';
+      if (showBook) bookEl.textContent = '📖 ' + payload.book;
+    }
+    if (fill) fill.style.width = pct + '%';
+
+    if (lastPct !== null && pct !== lastPct) {
+      box.classList.remove('bump');
+      void box.offsetWidth;               // 触发重排，让 bump 动画可以重复播放
+      box.classList.add('bump');
+      window.setTimeout(function () { box.classList.remove('bump'); }, 520);
+    }
+    lastPct = pct;
+    revealProgress();
+    scheduleHide(mode);
+  }
+
+  function readState() {
+    var node = $('#progress_state');
+    if (!node) return null;
+    var raw = (node.textContent || '').trim();
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (err) { return null; }
+  }
+
+  var observer = null;
+  function bindProgress() {
+    var node = $('#progress_state');
+    if (!node) return;
+    var fresh = observer === null || node.dataset.ataProgressBound !== '1';
+    if (fresh) {
+      node.dataset.ataProgressBound = '1';
+      if (observer) observer.disconnect();
+      observer = new MutationObserver(function () {
+        var payload = readState();
+        if (payload) applyProgress(payload);
+      });
+      observer.observe(node, { childList: true, subtree: true, characterData: true });
+    }
+    var payload = readState();
+    if (payload) applyProgress(payload);
+  }
+
+  function bindInteractions() {
+    if (document.body.dataset.ataInteractions === '1') return;
+    document.body.dataset.ataInteractions = '1';
+
+    // 卡片：跟随鼠标的高光位置（CSS 变量 --mx/--my）
+    document.addEventListener('mousemove', function (event) {
+      var card = event.target && event.target.closest && event.target.closest('.app-card, .engine-card');
+      if (!card) return;
+      var rect = card.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      card.style.setProperty('--mx', (((event.clientX - rect.left) / rect.width) * 100).toFixed(1) + '%');
+      card.style.setProperty('--my', (((event.clientY - rect.top) / rect.height) * 100).toFixed(1) + '%');
+    }, { passive: true });
+
+    // 按钮：点击水波纹
+    document.addEventListener('pointerdown', function (event) {
+      var btn = event.target && event.target.closest && event.target.closest(
+        '.btn-primary, .btn-ghost, .btn-mini, .btn-danger, .tab-nav button, .engine-tab');
+      if (!btn || btn.disabled) return;
+      var rect = btn.getBoundingClientRect();
+      var ink = document.createElement('span');
+      ink.className = 'ata-ripple';
+      ink.style.left = (event.clientX - rect.left) + 'px';
+      ink.style.top = (event.clientY - rect.top) + 'px';
+      btn.appendChild(ink);
+      window.setTimeout(function () { if (ink.parentNode) ink.parentNode.removeChild(ink); }, 640);
+    }, { passive: true });
+
+    // 「开始生成」按钮：点击后平滑滚动到顶部进度条
+    // 注意：这里用原生监听实现，而不是 Gradio 事件的 js=（后者会把表单输入变成空值）
+    document.addEventListener('click', function (event) {
+      var btn = event.target && event.target.closest && event.target.closest('.btn-primary');
+      if (!btn || !btn.textContent || btn.textContent.indexOf('开始生成') < 0) return;
+      // 只滚动，不强行展开：真正展开由新的状态载荷触发（例如"正在启动"），
+      // 这样若表单校验失败（没选文件）也不会把已经收起的进度条留在页面上。
+      window.setTimeout(function () {
+        var box = progressBox();
+        if (box) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 120);
+    }, true);
+  }
+
+  function boot() {
+    bindProgress();
+    bindInteractions();
+  }
+
+  // 供「开始生成」按钮的 js= 调用：平滑滚动到进度条
+  window.__ataScrollToProgress = function () {
+    revealProgress();
+    var box = progressBox();
+    if (box) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+  // Gradio 是渐进渲染的，组件可能稍后才挂载；轻量重试避免漏绑
+  window.setTimeout(boot, 600);
+  window.setTimeout(boot, 2000);
+  window.setInterval(boot, 3000);
+})();
+</script>
+"""
+
 CUSTOM_CSS = """
 :root {
   --apple-bg: #f5f5f7;
@@ -717,7 +935,14 @@ CUSTOM_CSS = """
 }
 * { box-sizing: border-box; }
 html, body, #root, .gradio-container, .main, footer,
-.gradio-container > .main { background: var(--apple-bg) !important;
+.gradio-container > .main {
+  /* 环境光渐变：让毛玻璃面板真正"有东西可虚化" */
+  background:
+    radial-gradient(58% 38% at 10% 0%, rgba(0,113,227,0.10), transparent 72%),
+    radial-gradient(48% 34% at 92% 4%, rgba(94,92,230,0.10), transparent 72%),
+    radial-gradient(46% 32% at 50% 100%, rgba(52,199,89,0.07), transparent 72%),
+    var(--apple-bg) !important;
+  background-attachment: fixed, fixed, fixed, fixed !important;
   color: var(--apple-text) !important;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
                "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif !important;
@@ -788,6 +1013,61 @@ html, body, #root, .gradio-container, .main, footer,
 .app-card .gr-group { background: transparent !important; border-radius: 0 !important;
   border: none !important; box-shadow: none !important; }
 .app-card:hover { box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 16px 40px rgba(0,0,0,0.07) !important; }
+
+/* ── 毛玻璃 + 指针交互 ── */
+/* 顶栏与进度条内部没有 fixed 定位的下拉面板，可以直接用毛玻璃 */
+.app-header, .progress-container {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+/* 卡片里的毛玻璃必须画在伪元素上：
+   backdrop-filter（和 transform 一样）会为 position:fixed 的后代建立包含块，
+   而 Gradio 的 Dropdown 选项面板正是 fixed 定位并挂在卡片内部——直接加在
+   .app-card 上会让面板相对卡片定位、跑到很远的顶部（实测偏移 242px）。
+   伪元素没有后代，既能出磨砂效果又不会影响下拉定位。 */
+.app-card {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.app-card::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  z-index: 0; pointer-events: none;
+}
+/* 注意：这里不能加 overflow: hidden——日志页的 xterm 终端在卡片内，
+   被裁剪后会显得"日志显示不全"。圆角由伪元素的 border-radius: inherit 保证。 */
+.app-card { position: relative; }
+/* 跟随鼠标的高光（--mx/--my 由页面脚本写入） */
+.app-card::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%),
+              rgba(0,113,227,0.10), rgba(94,92,230,0.05) 45%, transparent 68%);
+  opacity: 0; transition: opacity 0.35s ease;
+}
+.app-card:hover::after { opacity: 1; }
+/* 卡片内容要盖在高光之上 */
+.app-card > * { position: relative; z-index: 1; }
+
+/* 点击水波纹（页面脚本插入 .ata-ripple） */
+.btn-primary, .btn-ghost, .btn-mini, .btn-danger, .tab-nav button, .engine-tab {
+  position: relative; overflow: hidden;
+}
+.ata-ripple {
+  position: absolute; width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(0, 0, 0, 0.14); pointer-events: none;
+  transform: translate(-50%, -50%) scale(0);
+  animation: ataRipple 0.62s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+.btn-primary .ata-ripple, .btn-danger .ata-ripple, .tab-nav button.selected .ata-ripple {
+  background: rgba(255, 255, 255, 0.55);
+}
+@keyframes ataRipple {
+  to { transform: translate(-50%, -50%) scale(16); opacity: 0; }
+}
 /* 注意：fadeUp 不能用 transform（translateY），否则 CSS 规范里 transform 会让
    卡片内 Dropdown 的 portal 选项面板（position:fixed）把卡片当作 containing block
    → 坐标全错 → 选项出现在很远的顶部。改为纯 opacity 淡入动画。 */
@@ -908,19 +1188,41 @@ div[data-testid="file"] .file-preview > div {
 
 /* ── 生成进度条 ── */
 .progress-container {
+  position: relative; overflow: hidden;
   margin: 0 0 16px; padding: 16px 20px;
-  background: var(--apple-surface); border-radius: var(--radius);
+  border-radius: var(--radius);
   border: 1px solid var(--apple-border-soft);
-  transition: all 0.3s ease;
+  /* 只过渡会变的属性，避免整块重绘带来的闪烁感 */
+  transition: box-shadow .45s ease, border-color .45s ease, opacity .45s ease, background .45s ease,
+              max-height .55s cubic-bezier(0.22,1,0.36,1), margin-bottom .45s ease,
+              padding-top .45s ease, padding-bottom .45s ease;
+  max-height: 260px;              /* 收起动画需要一个可过渡的高度上限 */
+  overflow: hidden;
+  scroll-margin-top: 88px;   /* 点「开始生成」后平滑滚动到此处的落点偏移 */
+}
+/* 生成结束后自动收起：不占页面空间，也不再固定在顶部 */
+.progress-container.collapsed {
+  max-height: 0 !important; opacity: 0; margin-bottom: 0 !important;
+  padding-top: 0 !important; padding-bottom: 0 !important;
+  border-color: transparent !important; box-shadow: none !important;
+  pointer-events: none;
 }
 .progress-container.idle { opacity: 0.5; }
+.progress-container.idle .progress-header { margin-bottom: 0; }
+.progress-container.idle .progress-detail,
+.progress-container.idle .progress-pct,
+.progress-container.idle .progress-book,
+.progress-container.idle .progress-track { display: none !important; }
 .progress-container.active {
-  background: linear-gradient(135deg, rgba(0,113,227,0.04), rgba(94,92,230,0.04));
-  border-color: rgba(0,113,227,0.15);
+  background: linear-gradient(135deg, rgba(0,113,227,0.05), rgba(94,92,230,0.05)) !important;
+  border-color: rgba(0,113,227,0.18);
+  box-shadow: 0 10px 30px rgba(0,113,227,0.10) !important;
 }
+.progress-container.done { border-color: rgba(52,199,89,0.38); }
+.progress-container.warn { border-color: rgba(255,59,48,0.38); }
 .progress-header {
   display: flex; align-items: center; gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .progress-status {
   font-weight: 600; font-size: 0.92rem; color: var(--apple-text);
@@ -931,7 +1233,10 @@ div[data-testid="file"] .file-preview > div {
 .progress-pct {
   margin-left: auto; font-weight: 700; font-size: 1.1rem;
   color: var(--apple-blue); font-variant-numeric: tabular-nums;
+  transition: color .4s ease;
 }
+.progress-container.done .progress-pct { color: var(--apple-green); }
+.progress-container.warn .progress-pct { color: var(--apple-red); }
 .progress-book {
   display: inline-block; margin-bottom: 10px;
   font-size: 0.85rem; color: var(--apple-text-2);
@@ -939,24 +1244,41 @@ div[data-testid="file"] .file-preview > div {
   border-radius: 8px;
 }
 .progress-track {
-  height: 8px; background: var(--apple-surface-2);
-  border-radius: 4px; overflow: hidden;
+  position: relative; height: 8px; background: rgba(0,0,0,0.06);
+  border-radius: 980px; overflow: hidden;
 }
 .progress-fill {
-  height: 100%; border-radius: 4px;
-  background: linear-gradient(90deg, var(--apple-blue), #5e5ce6);
-  transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
-  position: relative;
+  position: relative; height: 100%; width: 0; border-radius: 980px;
+  background: linear-gradient(90deg, var(--apple-blue), var(--apple-indigo));
+  transition: width 0.9s cubic-bezier(0.22,1,0.36,1), background .5s ease;
+  will-change: width;
 }
+.progress-container.done .progress-fill { background: linear-gradient(90deg, #34c759, #30d158); }
+.progress-container.warn .progress-fill { background: linear-gradient(90deg, #ff9f0a, #ff3b30); }
+/* 光泽只在"正在生成"时流动——DOM 不再被整块替换，动画可以连续播放 */
 .progress-fill::after {
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  animation: shimmer 2s infinite;
+  opacity: 0; transition: opacity .4s ease;
 }
+.progress-container.running .progress-fill::after { opacity: 1; animation: shimmer 2.4s linear infinite; }
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+/* 启动中（还没拿到章节标记）：轨道上跑不确定进度条纹 */
+.progress-container.starting .progress-fill { width: 34% !important; opacity: .8; }
+.progress-container.starting .progress-track::after {
+  content: ""; position: absolute; inset: 0;
+  background: repeating-linear-gradient(115deg, rgba(0,113,227,.18) 0 12px, transparent 12px 24px);
+  animation: ataStripes 1.1s linear infinite;
+}
+@keyframes ataStripes { to { transform: translateX(24px); } }
+/* 百分比变化时轻轻跳一下，给一点"推进感" */
+.progress-container.bump .progress-pct { animation: pctPop .5s cubic-bezier(0.22,1,0.36,1); }
+@keyframes pctPop { 0% { transform: scale(1); } 35% { transform: scale(1.16); } 100% { transform: scale(1); } }
+/* 隐藏的状态载荷组件（前端脚本读取它就地更新进度条） */
+.progress-state-hidden { display: none !important; }
 
 /* 隐藏 Gradio Timer 组件本身的可见元素（拖拽横条等）。
    注意：Timer 必须是"有效可见"的顶层组件——不要再用 visible=False 的容器包它，
@@ -1295,7 +1617,7 @@ def host_ui(config):
     )
 
     with gr.Blocks(theme=theme, css=CUSTOM_CSS, analytics_enabled=False,
-                   title="有声书工坊 · Audiobook Studio") as ui:
+                   head=HEAD_HTML, title="有声书工坊 · Audiobook Studio") as ui:
         provider_state = gr.State("Mimo")
 
         # ── 顶部品牌栏 ──
@@ -1323,7 +1645,11 @@ def host_ui(config):
                 # Gradio 前端对"有效可见性为 false"的组件不会应用 active 更新，也不会启动
                 # tick 定时器（ct() 判定 + Timer 组件在 onMount 里 setInterval），
                 # 那样进度条会永远停在初始的「等待开始生成...」。
-                progress_bar = gr.HTML(_progress_html(0, "等待开始", "", 0, 0), elem_classes="progress-bar-wrap")
+                #
+                # 进度条骨架只渲染一次，之后由 HEAD_HTML 里的脚本就地更新内部元素，
+                # 避免每 2 秒整块替换 DOM 导致动画重放（"一闪一闪"）。
+                progress_bar = gr.HTML(_progress_scaffold_html(), elem_classes="progress-bar-wrap")
+                progress_state = gr.HTML("", elem_id="progress_state", elem_classes="progress-state-hidden")
                 progress_timer = gr.Timer(2, active=False)
                 # 上传按钮隐藏脚本（运行在浏览器端）
                 gr.HTML('''
@@ -1555,7 +1881,10 @@ def host_ui(config):
                     # 固定成绝对路径：进度解析与日志组件都用同一份文件，不受工作目录变化影响
                     webui_log_file = generate_unique_log_path("EtA_WebUI").resolve()
                     webui_log_file.touch()
-                    Log(str(webui_log_file), dark=False, xterm_font_size=12)
+                    # tail 默认只有 100：页面在生成中途打开/刷新时只能看到最后 100 行，
+                    # 看起来就像"日志不全"。这里放宽到 800 行，并同步加大终端回滚缓冲。
+                    Log(str(webui_log_file), dark=False, xterm_font_size=12,
+                        tail=800, xterm_scrollback=2000)
 
             # ════════════ 设置页 ════════════
             with gr.Tab("⚙️ 设置", id="tab_settings"):
@@ -1649,13 +1978,13 @@ def host_ui(config):
                     qwen_language, qwen_voice,
                     chatterbox_model, chatterbox_device, chatterbox_output_format,
                     chatterbox_reference_audio, chatterbox_exaggeration, chatterbox_cfg_weight, chatterbox_speed],
-            outputs=progress_timer)
-        stop_btn.click(fn=terminate_generator, inputs=None, outputs=progress_timer)
+            outputs=[progress_state, progress_timer])
+        stop_btn.click(fn=terminate_generator, inputs=None, outputs=[progress_state, progress_timer])
 
         # 进度条定时更新
-        progress_timer.tick(fn=get_progress_info, inputs=None, outputs=[progress_bar, progress_timer], show_progress="hidden")
+        progress_timer.tick(fn=get_progress_info, inputs=None, outputs=[progress_state, progress_timer], show_progress="hidden")
         # 页面加载/刷新时同步一次状态：新会话也能看到当前进度，并在有批次在跑时自动开始轮询
-        ui.load(fn=get_progress_info, inputs=None, outputs=[progress_bar, progress_timer], show_progress="hidden")
+        ui.load(fn=get_progress_info, inputs=None, outputs=[progress_state, progress_timer], show_progress="hidden")
 
         # 资源库
         refresh_btn.click(fn=refresh_batches, inputs=None, outputs=[folder_dropdown, file_selector], show_progress="hidden")
