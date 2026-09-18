@@ -16,6 +16,7 @@ from typing import Optional
 from pathlib import Path
 import os
 import json
+import logging
 import zipfile
 import shutil
 from datetime import datetime
@@ -47,11 +48,15 @@ from audiobook_generator.tts_providers.minimax_tts_provider import (
     get_minimax_voice_id_from_choice,
 )
 from audiobook_generator.tts_providers.chatterbox_tts_provider import (
+    DEFAULT_CHATTERBOX_OUTPUT_FORMAT,
+    DEFAULT_CHATTERBOX_SPEED,
     get_chatterbox_supported_models,
     get_chatterbox_supported_devices,
     get_chatterbox_supported_output_formats,
+    get_chatterbox_speed_range,
 )
 from audiobook_generator.utils.log_handler import generate_unique_log_path
+from audiobook_generator.ui.progress_parser import parse_progress
 from audiobook_generator.utils.mimo_config import (
     load_mimo_config, save_mimo_config, mask_api_key as mimo_mask_api_key, test_mimo_connection
 )
@@ -403,20 +408,44 @@ def process_form(provider,
     return gr.Timer(active=True)
 
 
+def _get_batch_logger(log_file_path):
+    """批处理子进程专用 logger：同时写日志文件和终端。
+
+    主界面顶部的进度条依赖日志文件里的「开始转换 / 全部处理完毕」标记，
+    而这些信息原本只是 print 到终端，所以这里改成 logger 输出。
+    """
+    batch_logger = logging.getLogger("webui.batch")
+    batch_logger.setLevel(logging.INFO)
+    batch_logger.propagate = False
+    for handler in list(batch_logger.handlers):
+        batch_logger.removeHandler(handler)
+
+    formatter = logging.Formatter("%(asctime)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    file_handler = logging.FileHandler(log_file_path, encoding="utf-8")
+    file_handler.setFormatter(formatter)
+    batch_logger.addHandler(file_handler)
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    batch_logger.addHandler(stream_handler)
+    return batch_logger
+
+
 def _batch_worker(config_list, log_file_path):
     """子进程逐个处理每个 EPUB（须在模块顶层以便 spawn pickle）。"""
+    batch_logger = _get_batch_logger(log_file_path)
     total = len(config_list)
     for idx, cfg in enumerate(config_list):
         book_name = Path(cfg.input_file).stem
-        print(f"\n{'=' * 60}")
-        print(f"📚 [{idx + 1}/{total}] 开始转换: {book_name}")
-        print(f"{'=' * 60}")
+        batch_logger.info("=" * 60)
+        batch_logger.info(f"📚 [{idx + 1}/{total}] 开始转换: {book_name}")
+        batch_logger.info("=" * 60)
         try:
             main(cfg, log_file_path)
-            print(f"✅ [{idx + 1}/{total}] 完成: {book_name}")
+            batch_logger.info(f"✅ [{idx + 1}/{total}] 完成: {book_name}")
         except Exception as e:
-            print(f"❌ [{idx + 1}/{total}] 失败: {book_name} — {e}")
-    print(f"\n🎉 全部处理完毕！共 {total} 本书")
+            batch_logger.error(f"❌ [{idx + 1}/{total}] 失败: {book_name} — {e}")
+    batch_logger.info(f"🎉 全部处理完毕！共 {total} 本书")
 
 
 def launch_batch(configs):
@@ -444,43 +473,32 @@ def get_progress_info():
     except Exception:
         return _progress_html(0, "等待开始", "", 0, 0), gr.Timer(active=True)
 
-    import re
+    state = parse_progress(log_content)
+    book, total, done, extra = state["book"], state["total"], state["done"], state["extra"]
 
-    # 解析当前书名: [idx/total] 开始转换: book_name
-    book_match = re.findall(r"\[\d+/\d+\] 开始转换: (.+)$", log_content, re.MULTILINE)
-    current_book = book_match[-1] if book_match else ""
+    # 整个批次结束
+    if state["finished"] and total > 0:
+        return _progress_html(100, "✅ 全部完成", book, total, total), gr.Timer(active=False)
 
-    # 解析总章节数: Chapters count: X
-    chapters_count_match = re.findall(r"Chapters count: (\d+)", log_content, re.MULTILINE)
-    total_chapters = int(chapters_count_match[-1]) if chapters_count_match else 0
+    # 子进程已退出却没有结束标记：中途失败/被中断
+    if running_process is not None and not running_process.is_alive():
+        if book or total > 0:
+            return _progress_html(state["pct"], "⚠️ 生成已中断，详见日志", book, total, done, extra), gr.Timer(active=False)
+        # 连批次标记都没写出来就退出了（例如启动阶段报错）
+        return _progress_html(0, "⚠️ 启动失败，详见日志", "", 0, 0), gr.Timer(active=False)
 
-    # 解析章节范围: Converting chapters from X to Y
-    range_match = re.findall(r"Converting chapters from (\d+) to (\d+)", log_content, re.MULTILINE)
-    if range_match:
-        chapter_start, chapter_end = int(range_match[-1][0]), int(range_match[-1][1])
-        total_chapters = chapter_end - chapter_start + 1
+    # 还没开始任何一本书
+    if not book and total == 0:
+        return _progress_html(0, "等待开始", "", 0, 0), gr.Timer(active=True)
 
-    # 解析已完成章节: ✅ Converted chapter X
-    completed_match = re.findall(r"✅ Converted chapter (\d+)", log_content, re.MULTILINE)
-    completed = len(completed_match)
+    if total > 0:
+        status = "✅ 本书完成" if done >= total else "正在生成..."
+        return _progress_html(state["pct"], status, book, total, done, extra), gr.Timer(active=True)
 
-    # 检查是否全部完成
-    is_done = "全部处理完毕" in log_content
-
-    if is_done and total_chapters > 0:
-        return _progress_html(100, "✅ 全部完成", current_book, total_chapters, total_chapters), gr.Timer(active=False)
-
-    if total_chapters > 0:
-        pct = min(100, int(completed / total_chapters * 100))
-        return _progress_html(pct, f"正在生成...", current_book, total_chapters, completed), gr.Timer(active=True)
-
-    if current_book:
-        return _progress_html(5, "正在初始化...", current_book, 0, 0), gr.Timer(active=True)
-
-    return _progress_html(0, "等待开始", "", 0, 0), gr.Timer(active=True)
+    return _progress_html(5, "正在初始化...", book, 0, 0), gr.Timer(active=True)
 
 
-def _progress_html(pct, status, book_name, total, done):
+def _progress_html(pct, status, book_name, total, done, extra=""):
     """生成进度条 HTML"""
     if pct == 0 and not book_name:
         return """<div class="progress-container idle">
@@ -489,6 +507,8 @@ def _progress_html(pct, status, book_name, total, done):
     
     book_display = f'<span class="progress-book">📖 {book_name}</span>' if book_name else ""
     detail = f"章节 {done}/{total}" if total > 0 else ""
+    if extra:
+        detail = f"{detail} · {extra}" if detail else extra
     
     return f"""<div class="progress-container active">
         <div class="progress-header">
@@ -1399,7 +1419,7 @@ def host_ui(config):
                                 )
                             chatterbox_output_format = gr.Dropdown(
                                 get_chatterbox_supported_output_formats(),
-                                value="wav",
+                                value=DEFAULT_CHATTERBOX_OUTPUT_FORMAT,
                                 label="输出格式",
                                 interactive=True
                             )
@@ -1409,11 +1429,12 @@ def host_ui(config):
                                 file_types=["audio"]
                             )
                             with gr.Row():
+                                chatterbox_speed_min, chatterbox_speed_max = get_chatterbox_speed_range()
                                 chatterbox_speed = gr.Slider(
-                                    minimum=0.25, maximum=4.0, step=0.1,
+                                    minimum=chatterbox_speed_min, maximum=chatterbox_speed_max, step=0.05,
                                     label="语速",
-                                    value=0.8,
-                                    info="0.8 为默认自然语速，<0.8 变慢，>0.8 变快"
+                                    value=DEFAULT_CHATTERBOX_SPEED,
+                                    info="1.0 为标准语速（相当于旧版的 0.7），越小越慢，越大越快"
                                 )
                             with gr.Row():
                                 chatterbox_exaggeration = gr.Slider(

@@ -680,7 +680,16 @@ python3 main_ui.py --host 127.0.0.1 --port 7862
 | `--chatterbox_reference_audio` | 参考音频路径（语音克隆，可选） | 无 |
 | `--chatterbox_exaggeration` | 语气夸张程度，范围 0.0~1.0 | `0.5` |
 | `--chatterbox_cfg_weight` | CFG 引导权重，范围 0.0~1.0 | `0.5` |
-| `--chatterbox_speed` | 语速倍率，范围 0.25~4.0 | `1.0` |
+| `--chatterbox_speed` | 语速，范围 0.2~2.0（1.0 为标准语速，内部按 0.7 倍处理） | `1.0` |
+
+> **Chatterbox 默认值（v2 调整）**
+> - **输出格式默认 `mp3`**（体积小、播放器兼容好）。mp3/aac/flac 转码与多分片合并都依赖 ffmpeg，
+>   未安装时会在启动时报中文错误提示（Ubuntu: `sudo apt install -y ffmpeg`）。
+> - **语速默认显示 `1.0`**，听感等同于旧版本的 `0.7`：代码内部按 `显示值 × 0.7` 折算成 ffmpeg atempo 倍率，
+>   因此显示范围 `0.2~2.0` 对应实际倍率 `0.14~1.4`。WebUI 滑块与 CLI 参数都用这套"显示值"。
+> - 一章被切成多个音频分片时会**自动改用 pydub 合并**：直接字节拼接会丢音频
+>   （实测 wav 拼接后容器只认第一块、mp3 在拼接处丢帧并让解码器报错），pydub 合并则得到一条完整音轨。
+> - WebUI 顶部进度条已适配 Chatterbox：除章节级进度外，还会显示"第 N 章 x/y 块"的章内进度。
 
 > **GPU（CUDA）注意**：章节并行使用 `multiprocessing` 的 `spawn` 启动方式。
 > Linux 默认的 `fork` 会让子进程继承父进程已初始化的 CUDA 状态，运行时报
@@ -694,9 +703,9 @@ python3 main_ui.py --host 127.0.0.1 --port 7862
 |------|------|
 | **模型版本** | `chatterbox-multilingual-v3`（默认，支持中文）/ `chatterbox-v0.5`（仅英文） |
 | **运行设备** | auto / cpu / cuda / mps |
-| **输出格式** | wav / mp3 / aac / flac |
+| **输出格式** | wav / mp3（默认）/ aac / flac |
 | **参考音频** | 上传 `.wav` / `.mp3` 音频用于语音克隆 |
-| **语速** | 0.25x ~ 4.0x，默认 `1.0`（0.8x 为自然语速） |
+| **语速** | 0.2x ~ 2.0x，默认 `1.0`（1.0 等同于旧版 0.7 的听感） |
 | **表现力** | 0.0~1.0，控制情感表现力 |
 | **稳定性** | 0.0~1.0，控制生成稳定性（CFG 权重） |
 
@@ -746,6 +755,12 @@ python3 -m venv venv_chatterbox --system-site-packages
 brew install ffmpeg    # macOS
 sudo apt install ffmpeg  # Ubuntu
 ```
+
+**默认输出 mp3 报错，或长章节音频缺段**
+
+Chatterbox 默认输出 `mp3`，转码与多分片合并都依赖 ffmpeg；缺失时启动即报
+`Chatterbox: 输出格式 mp3 需要 ffmpeg...`。装好 ffmpeg 后重启进程即可。
+另外，多分片音频会自动用 pydub 合并（避免直接拼接丢音频），这一步同样需要 ffmpeg。
 
 **WebUI 排版错乱**
 

@@ -30,7 +30,12 @@ from audiobook_generator.tts_providers.base_tts_provider import (
     get_supported_tts_providers,
 )
 from audiobook_generator.utils.log_handler import setup_logging, generate_unique_log_path
-from audiobook_generator.tts_providers.chatterbox_tts_provider import get_chatterbox_supported_devices
+from audiobook_generator.tts_providers.chatterbox_tts_provider import (
+    DEFAULT_CHATTERBOX_SPEED,
+    MAX_CHATTERBOX_SPEED,
+    MIN_CHATTERBOX_SPEED,
+    get_chatterbox_supported_devices,
+)
 from pydub import AudioSegment
 
 
@@ -288,8 +293,9 @@ def handle_args():
     chatterbox_tts_group.add_argument(
         "--chatterbox_speed",
         type=float,
-        default=1.0,
-        help="语速倍率（0.25-4.0），1.0 为原始语速，<1.0 变慢，>1.0 变快",
+        default=DEFAULT_CHATTERBOX_SPEED,
+        help=f"语速（{MIN_CHATTERBOX_SPEED}-{MAX_CHATTERBOX_SPEED}），1.0 为标准语速"
+             "（内部按 0.7 倍处理），<1.0 更慢，>1.0 更快",
     )
 
     args = parser.parse_args()

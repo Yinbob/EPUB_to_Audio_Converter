@@ -57,8 +57,17 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
 --chatterbox_reference_audio              参考音频路径，用于语音克隆（可选）
 --chatterbox_exaggeration                 语气夸张程度 0.0-1.0（默认 0.5）
 --chatterbox_cfg_weight                   CFG 引导权重 0.0-1.0（默认 0.5）
---chatterbox_speed                        语速倍率 0.25-4.0（默认 1.0）
+--chatterbox_speed                        语速显示值 0.2-2.0（默认 1.0，实际倍率 = 显示值 × 0.7）
 ```
+
+### 默认值与实现要点（v2 调整）
+- **输出格式默认 `mp3`**（`DEFAULT_CHATTERBOX_OUTPUT_FORMAT`）：非 wav 需要 ffmpeg，`validate_config` 会在缺失时给出中文报错。
+- **语速对外用"显示值"**：`DEFAULT_CHATTERBOX_SPEED=1.0`、`CHATTERBOX_SPEED_SCALE=0.7`、范围 `0.2~2.0`（`get_chatterbox_speed_range()`）。
+  provider 里 `display_speed` 是显示值、`speed` 是折算后的 atempo 倍率；显示 1.0 ≈ 旧版 0.7 的听感。WebUI 滑块与 CLI 默认值都取常量，避免多处硬编码。
+- **分片合并**：`should_use_pydub_merge()` 决定合并方式 —— 只有"单分片 + wav"才用直接写入，
+  其余（多分片或压缩格式）自动切 pydub 合并，否则直接拼接会丢音频（wav 只认第一块、mp3 拼接处丢帧）。无 ffmpeg 时回退直接写入并打 warning。
+- WebUI 顶部进度条解析见 `audiobook_generator/ui/progress_parser.py`（纯函数、有单测），支持 Chatterbox 的块级进度
+  `chapter-<章>_<标题>_chunk_<i>_of_<n>`；批次标记由 `web_ui._batch_worker` 通过 logger 写入同一个日志文件。
 
 ### 提供商文件
 - `audiobook_generator/tts_providers/chatterbox_tts_provider.py` — Chatterbox TTS 提供商实现
