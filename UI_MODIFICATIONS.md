@@ -124,3 +124,76 @@
 3. 可以考虑优化移动端体验
 4. 可以考虑添加更多的 Apple 设计元素（如模糊效果、渐变等）
 
+---
+
+## 氛围背景层 + 毛玻璃（2026-09）
+
+实现文件：`audiobook_generator/ui/ambient_background.py`（`AMBIENT_LAYER_HTML` / `AMBIENT_CSS` / `AMBIENT_ENABLED`），
+由 `audiobook_generator/ui/web_ui.py` 拼到 `HEAD_HTML` 与 `CUSTOM_CSS` 末尾。
+
+### 分层
+
+```
+html/body 兜底渐变（background-image + background-color，不能用带 var() 的多值简写）
+  └─ #ata-bg（position:fixed; z-index:0; pointer-events:none）
+       ├─ #ata-bg-base      静态环境光渐变（生成态叠加 ::after 加强约 1.6 倍）
+       └─ #ata-bg-canvas    canvas 光晕（预渲染 sprite + drawImage）
+  └─ .gradio-container（position:relative; z-index:1; 背景透明）→ 卡片等内容
+```
+
+状态机：`idle → arming`（点「开始生成」）`→ generating`（进度条 `active/starting/running`）
+`→ settling`（`done/warn/collapsed` 或「停止转换」）`→ idle`。
+
+### 白底清理规则（关键）
+
+- 卡片内布局包装层 `.block / .wrap / .form / .panel / .contain / .styler / .gr-group / .gr-box / .gr-form` → **透明**。
+- 交互面（上传拖放区、开关行、幽灵/危险/迷你按钮、输入框/文本域/下拉、引擎分段选择器、
+  文件组件标题标签与悬浮图标按钮）→ `rgba(255,255,255,0.45)`；弹窗内输入框 `0.55`。
+- 阅读面：日志终端 `.xterm-viewport/.xterm-screen` `0.42`、资源库空态 `.lib-empty` `0.35`、
+  Gradio 文件预览表格行 → 透明。
+- 高级设置弹窗：`.modal-box` 透明 + 玻璃画在 `::before`（避开 `backdrop-filter` 包含块问题）。
+- **必须保持不透明**：下拉选项面板 `ul.options`、`.modal-box` 之外的遮罩层。
+
+### 验证清单（每次改 UI 后照做）
+
+1. 四个页面（转换/资源库/日志/设置）扫描卡片内 `backgroundColor` 为不透明浅色的元素，应为 0；
+2. 5 个引擎面板、高级设置弹窗、**已选文件状态**（文件列表行）、有内容的资源库列表同样扫描；
+3. 鼠标停在页面不同位置截图，卡片内外的蓝偏应同步变化（证明玻璃在透背景，而不是被白填充盖住）；
+4. 生成态：边框蓝偏 − 中心蓝偏应为明显正值（当前约 +13），空闲态接近 0；
+5. 纯背景条相邻像素跳变 ≤2（无条带/断层）；`tests/audiobook_generator/ui` 全绿。
+
+## 深色主题（2026-09）
+
+实现文件：`audiobook_generator/ui/theme.py`（`THEME_TOKENS_CSS` / `THEME_CSS` / `THEME_HEAD_HTML`），
+由 `web_ui.py` 拼进 `CUSTOM_CSS` 与 `HEAD_HTML`；顶栏按钮 `#ata-theme-toggle` 循环
+**跟随系统 → 浅色 → 深色**（localStorage `ata-theme`）。
+
+### 设计令牌
+
+| 用途 | 浅色 | 深色 |
+| --- | --- | --- |
+| 页面底 `--apple-bg` | `#f5f5f7` | `#0e0e12` |
+| 文字 `--apple-text` / `-2` / `-3` | `#1d1d1f` / `#5f5f66` / `#6a6a72` | `#f5f5f7` / `#c3c3c9` / `#a5a5ad` |
+| 卡片玻璃 `--ata-glass` | `rgba(255,255,255,.58)` | `rgba(30,30,37,.62)` |
+| 顶栏 / 进度条玻璃 | `.62` 白 | `rgba(18,18,23,.68)` / `rgba(32,32,39,.66)` |
+| 控件面 `--ata-glass-soft` | `rgba(255,255,255,.45)` | `rgba(255,255,255,.07)` |
+| 弹窗玻璃 `--ata-glass-modal` | `rgba(255,255,255,.82)` | `rgba(24,24,30,.86)` |
+| 强调色 `--apple-blue` / 绿 / 红 | `#0071e3` / `#1f7a35` / `#d70015` | `#409cff` / `#4cd964` / `#ff8a82` |
+
+### 两个必须知道的实现点
+
+1. **暗色钩子复用 Gradio 的 `body.dark`**：Gradio 前端的主题 CSS 写成 `:root .dark{}`，我们挂同一个
+   选择器（外加 `:root.dark` 用于首屏不闪白），这样自有组件与 Gradio 组件同时翻转。
+   Gradio 自带文字变量（`--body-text-color-subdued` 等）默认是 slate-400，浅底上仅 2.48:1，
+   已在 `:root` 与 `:root:root .dark`（提高一级特异性）里重映射到本项目文字令牌。
+2. **日志终端只反相文字层**：xterm 用 canvas/DOM 渲染、主题色写死在组件里（浅底深字）。
+   暗色下给 `.xterm-screen` 加 `invert(1) hue-rotate(180deg)`，底色放在不会被反相的
+   `.xterm-viewport`（`--ata-terminal`）。若连 `.xterm` 一起反相，底色会被反成亮板。
+
+### 可读性验证（改配色后照做）
+
+- 用浏览器实测每页所有含文字元素的对比度（前景色叠加到最近的不透明背景上算 WCAG 比值）：
+  正文 ≥ 4.5:1、大字号（≥24px 或 ≥18.66px 粗体）≥ 3:1 —— 两套主题 × 四页当前均为 0 处不达标；
+- 终端、渐变标题、蓝色按钮等"取不到背景色"的元素用像素法复核（终端实测 13–14:1）；
+- 单元测试 `tests/audiobook_generator/ui/theme_test.py` 会直接算两套调色板的对比度，
+  改坏配色会立刻失败。

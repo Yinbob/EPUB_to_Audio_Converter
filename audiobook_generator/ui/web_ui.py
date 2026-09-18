@@ -58,7 +58,9 @@ from audiobook_generator.tts_providers.chatterbox_tts_provider import (
     get_chatterbox_speed_range,
 )
 from audiobook_generator.utils.log_handler import generate_unique_log_path
+from audiobook_generator.ui.ambient_background import AMBIENT_CSS, AMBIENT_LAYER_HTML
 from audiobook_generator.ui.progress_parser import decide_progress_state, parse_progress
+from audiobook_generator.ui.theme import THEME_CSS, THEME_HEAD_HTML, THEME_TOKENS_CSS
 from audiobook_generator.utils.mimo_config import (
     load_mimo_config, save_mimo_config, mask_api_key as mimo_mask_api_key, test_mimo_connection
 )
@@ -734,11 +736,12 @@ def load_files_for_folder(folder_name):
 
 # ── 样式 ──────────────────────────────────────────────────────────
 # 页面级脚本：
+# 0) 氛围背景层（光晕 + 鼠标交互 + 生成态切换）——实现见 ambient_background.py；
 # 1) 进度条"就地更新"——服务端只推一个隐藏的状态载荷，可见 DOM 不再每 2 秒被整块替换，
 #    这样 shimmer / 宽度过渡等动画可以连续播放，不会出现"一闪一闪"；
 # 2) 指针交互：卡片跟随鼠标的高光、按钮点击水波纹；
 # 3) 供按钮 js= 调用：点击「开始生成」后平滑滚动到顶部进度条。
-HEAD_HTML = """
+HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + """
 <script>
 (function () {
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -848,16 +851,6 @@ HEAD_HTML = """
     if (document.body.dataset.ataInteractions === '1') return;
     document.body.dataset.ataInteractions = '1';
 
-    // 卡片：跟随鼠标的高光位置（CSS 变量 --mx/--my）
-    document.addEventListener('mousemove', function (event) {
-      var card = event.target && event.target.closest && event.target.closest('.app-card, .engine-card');
-      if (!card) return;
-      var rect = card.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      card.style.setProperty('--mx', (((event.clientX - rect.left) / rect.width) * 100).toFixed(1) + '%');
-      card.style.setProperty('--my', (((event.clientY - rect.top) / rect.height) * 100).toFixed(1) + '%');
-    }, { passive: true });
-
     // 按钮：点击水波纹
     document.addEventListener('pointerdown', function (event) {
       var btn = event.target && event.target.closest && event.target.closest(
@@ -911,42 +904,31 @@ HEAD_HTML = """
 </script>
 """
 
-CUSTOM_CSS = """
-:root {
-  --apple-bg: #f5f5f7;
-  --apple-surface: #ffffff;
-  --apple-surface-2: #fbfbfd;
-  --apple-text: #1d1d1f;
-  --apple-text-2: #6e6e73;
-  --apple-text-3: #86868b;
-  --apple-border: #d2d2d7;
-  --apple-border-soft: #e8e8ed;
-  --apple-blue: #0071e3;
-  --apple-blue-hover: #0077ed;
-  --apple-blue-soft: #e8f1fd;
-  --apple-indigo: #5e5ce6;
-  --apple-green: #34c759;
-  --apple-red: #ff3b30;
-  --apple-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04);
-  --apple-shadow-lg: 0 24px 60px rgba(0,0,0,0.14);
-  --apple-shadow-blue: 0 8px 20px rgba(0,113,227,0.28);
-  --radius: 20px;
-  --radius-sm: 14px;
-}
+# 设计令牌（浅色 + 暗色两套）在 audiobook_generator/ui/theme.py 里统一定义，
+# 这里只放依赖令牌的组件样式，避免同一批颜色散落在两个文件里。
+CUSTOM_CSS = THEME_TOKENS_CSS + """
 * { box-sizing: border-box; }
 html, body, #root, .gradio-container, .main, footer,
 .gradio-container > .main {
-  /* 环境光渐变：让毛玻璃面板真正"有东西可虚化" */
-  background:
-    radial-gradient(58% 38% at 10% 0%, rgba(0,113,227,0.10), transparent 72%),
-    radial-gradient(48% 34% at 92% 4%, rgba(94,92,230,0.10), transparent 72%),
-    radial-gradient(46% 32% at 50% 100%, rgba(52,199,89,0.07), transparent 72%),
-    var(--apple-bg) !important;
-  background-attachment: fixed, fixed, fixed, fixed !important;
   color: var(--apple-text) !important;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
                "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif !important;
   -webkit-font-smoothing: antialiased; }
+html, body {
+  /* 环境光渐变兜底：真正的环境光画在固定的 #ata-bg 层上（见 ambient_background.py），
+     这里保留同一份渐变，供脚本未挂载 / JS 被禁用时使用。
+     ⚠️ 必须用 background-image + background-color 分开写：Gradio 前端的 CSS 压缩
+     处理多值 background 简写里带 var() 时会整段丢成空值（实测 background-image 变空，
+     渐变和底色都不生效），拆开写才稳定。 */
+  background-image:
+    radial-gradient(58% 38% at 10% 0%, rgba(0,113,227,0.07), transparent 72%),
+    radial-gradient(48% 34% at 92% 4%, rgba(94,92,230,0.07), transparent 72%),
+    radial-gradient(46% 32% at 50% 100%, rgba(52,199,89,0.05), transparent 72%) !important;
+  background-color: var(--apple-bg) !important;
+  background-attachment: fixed !important; }
+/* 内容容器保持透明：让 z-index:0 的氛围背景层透上来（内容由 z-index:1 盖在光晕之上） */
+#root, .gradio-container, .main, footer, .gradio-container > .main {
+  background: transparent !important; }
 .gradio-container { margin: 0 auto !important;
   padding: 0 clamp(14px, 4vw, 48px) 64px !important; width: 100% !important; }
 
@@ -959,7 +941,7 @@ html, body, #root, .gradio-container, .main, footer,
   background: rgba(251,251,253,0.72);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid rgba(210,210,215,0.5);
+  border-bottom: 1px solid var(--apple-border-soft);
 }
 .app-brand { display: flex; align-items: center; gap: 12px; }
 .app-logo {
@@ -986,9 +968,10 @@ html, body, #root, .gradio-container, .main, footer,
   border-radius: 980px !important; margin: 0 4px !important;
   transition: all 0.25s cubic-bezier(0.4,0,0.2,1) !important;
 }
-.tab-nav button:hover { color: var(--apple-text) !important; background: rgba(0,0,0,0.04) !important; }
+.tab-nav button:hover { color: var(--apple-text) !important; background: var(--ata-hover) !important; }
 .tab-nav button.selected {
-  color: #fff !important;
+  /* 选中态是"浅底深字"的反色胶囊：暗色下底色变浅，文字必须跟着变深 */
+  color: var(--apple-bg) !important;
   background: var(--apple-text) !important;
   box-shadow: 0 4px 12px rgba(0,0,0,0.18) !important;
 }
@@ -1012,12 +995,12 @@ html, body, #root, .gradio-container, .main, footer,
 .app-card .block.hide-container,
 .app-card .gr-group { background: transparent !important; border-radius: 0 !important;
   border: none !important; box-shadow: none !important; }
-.app-card:hover { box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 16px 40px rgba(0,0,0,0.07) !important; }
+.app-card:hover { box-shadow: var(--ata-shadow-hover) !important; }
 
 /* ── 毛玻璃 + 指针交互 ── */
 /* 顶栏与进度条内部没有 fixed 定位的下拉面板，可以直接用毛玻璃 */
 .app-header, .progress-container {
-  background: rgba(255, 255, 255, 0.72) !important;
+  background: var(--ata-glass-header) !important;
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
 }
@@ -1033,7 +1016,7 @@ html, body, #root, .gradio-container, .main, footer,
 }
 .app-card::before {
   content: ""; position: absolute; inset: 0; border-radius: inherit;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--ata-glass);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   z-index: 0; pointer-events: none;
@@ -1041,15 +1024,7 @@ html, body, #root, .gradio-container, .main, footer,
 /* 注意：这里不能加 overflow: hidden——日志页的 xterm 终端在卡片内，
    被裁剪后会显得"日志显示不全"。圆角由伪元素的 border-radius: inherit 保证。 */
 .app-card { position: relative; }
-/* 跟随鼠标的高光（--mx/--my 由页面脚本写入） */
-.app-card::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%),
-              rgba(0,113,227,0.10), rgba(94,92,230,0.05) 45%, transparent 68%);
-  opacity: 0; transition: opacity 0.35s ease;
-}
-.app-card:hover::after { opacity: 1; }
-/* 卡片内容要盖在高光之上 */
+/* 卡片内容要盖在玻璃层之上 */
 .app-card > * { position: relative; z-index: 1; }
 
 /* 点击水波纹（页面脚本插入 .ata-ripple） */
@@ -1058,7 +1033,7 @@ html, body, #root, .gradio-container, .main, footer,
 }
 .ata-ripple {
   position: absolute; width: 14px; height: 14px; border-radius: 50%;
-  background: rgba(0, 0, 0, 0.14); pointer-events: none;
+  background: var(--ata-ripple); pointer-events: none;
   transform: translate(-50%, -50%) scale(0);
   animation: ataRipple 0.62s cubic-bezier(0.22,1,0.36,1) forwards;
 }
@@ -1094,7 +1069,8 @@ html, body, #root, .gradio-container, .main, footer,
 .hero { text-align: center; padding: clamp(18px, 4vw, 30px) 8px 24px; animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
 .hero h1 {
   font-size: clamp(1.6rem, 5.5vw, 2.3rem) !important; font-weight: 700 !important; letter-spacing: -0.03em;
-  background: linear-gradient(120deg, #1d1d1f 0%, #0071e3 55%, #5e5ce6 100%);
+  /* 首色用文字令牌：暗色下渐变起点必须跟着变浅，否则标题看不见 */
+  background: linear-gradient(120deg, var(--apple-text) 0%, var(--apple-blue) 55%, var(--apple-indigo) 100%);
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent; margin: 0 0 10px !important;
 }
@@ -1108,7 +1084,7 @@ input, textarea, select {
 }
 input:hover, textarea:hover, select:hover { border-color: var(--apple-border) !important; }
 input:focus, textarea:focus, select:focus {
-  border-color: var(--apple-blue) !important; background: #fff !important;
+  border-color: var(--apple-blue) !important; background: var(--apple-surface) !important;
   box-shadow: 0 0 0 4px rgba(0,113,227,0.14) !important;
 }
 label { color: var(--apple-text-2) !important; font-weight: 500 !important; font-size: 0.85rem !important; }
@@ -1140,8 +1116,8 @@ input[type=range] { accent-color: var(--apple-blue) !important; }
 .book-file-upload button.center.boundedheight.flex::before {
   content: "" !important; display: block !important;
   width: 56px !important; height: 56px !important; border-radius: 50% !important;
-  background: linear-gradient(135deg, var(--apple-blue-soft) 0%, #f0eefe 100%) !important;
-  border: 1px solid #d8e7fc !important;
+  background: var(--ata-ready-bg) !important;
+  border: 1px solid var(--ata-ready-border) !important;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 24 24' fill='none' stroke='%230071e3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/><polyline points='17 8 12 3 7 8'/><line x1='12' y1='3' x2='12' y2='15'/></svg>") !important;
   background-repeat: no-repeat !important; background-position: center !important;
   transition: transform 0.3s cubic-bezier(0.16,1,0.3,1) !important;
@@ -1244,7 +1220,7 @@ div[data-testid="file"] .file-preview > div {
   border-radius: 8px;
 }
 .progress-track {
-  position: relative; height: 8px; background: rgba(0,0,0,0.06);
+  position: relative; height: 8px; background: var(--ata-track);
   border-radius: 980px; overflow: hidden;
 }
 .progress-fill {
@@ -1308,7 +1284,7 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
   border-radius: 10px !important; margin: 0 !important; text-align: center !important;
   transition: color 0.2s ease, background 0.2s ease, box-shadow 0.25s ease !important; box-shadow: none !important;
 }
-.engine-tabs > .tab-nav button:hover { color: var(--apple-text) !important; background: rgba(255,255,255,0.7) !important; }
+.engine-tabs > .tab-nav button:hover { color: var(--apple-text) !important; background: var(--ata-hover) !important; }
 .engine-tabs > .tab-nav button.selected {
   color: var(--apple-blue) !important; background: var(--apple-surface) !important;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
@@ -1333,8 +1309,8 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
 
 .engine-badge {
   display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
-  background: linear-gradient(135deg, #e8f1fd 0%, #f0eefe 100%);
-  border: 1px solid #cfe3fc; border-radius: 980px; margin-bottom: 0;
+  background: var(--ata-ready-bg);
+  border: 1px solid var(--ata-ready-border); border-radius: 980px; margin-bottom: 0;
   /* 徽标本身无动效，切换时文字直接更新 */
 }
 /* 防止 gr.HTML 进入 loading 态时把徽标变灰/变透明（服务端 queue 卡住的兜底） */
@@ -1385,18 +1361,18 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
 
 .btn-danger {
   background: var(--apple-surface) !important; color: var(--apple-red) !important;
-  border: 1px solid #ffd1ce !important; border-radius: 980px !important;
+  border: 1px solid var(--ata-danger-border) !important; border-radius: 980px !important;
   font-weight: 500 !important; font-size: 0.85rem !important; padding: 9px 18px !important;
   transition: background 0.2s ease, border-color 0.2s ease !important; cursor: pointer !important;
 }
-.btn-danger:hover { background: #fff0ef !important; border-color: var(--apple-red) !important; }
+.btn-danger:hover { background: var(--ata-danger-bg) !important; border-color: var(--apple-red) !important; }
 
 .btn-mini {
-  background: #f5f5f7 !important; color: var(--apple-text-2) !important; border: none !important;
+  background: var(--apple-surface-2) !important; color: var(--apple-text-2) !important; border: none !important;
   border-radius: 980px !important; font-size: 0.82rem !important; font-weight: 500 !important;
   padding: 7px 15px !important; transition: all 0.18s ease !important; cursor: pointer !important;
 }
-.btn-mini:hover { background: #ebebed !important; color: var(--apple-text) !important; }
+.btn-mini:hover { background: var(--ata-hover-strong) !important; color: var(--apple-text) !important; }
 
 /* ── 开关组（苹果风 toggle） ── */
 .toggle-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
@@ -1416,10 +1392,10 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
 .toggle label { position: relative; display: flex !important; align-items: center !important;
   cursor: pointer !important; font-weight: 500 !important; color: var(--apple-text) !important;
   font-size: 0.88rem !important; padding-left: 0 !important; }
-.toggle label::before { content: ''; display: block; width: 38px; height: 22px; background: #e8e8ed;
+.toggle label::before { content: ''; display: block; width: 38px; height: 22px; background: var(--ata-track);
   border-radius: 980px; margin-right: 12px; transition: background 0.3s ease; flex-shrink: 0; }
 .toggle label::after { content: ''; position: absolute; left: 3px; top: 50%; transform: translateY(-50%);
-  width: 16px; height: 16px; background: #fff; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  width: 16px; height: 16px; background: var(--apple-surface); border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
 .toggle label:has(input:checked)::before { background: var(--apple-green); }
 .toggle label:has(input:checked)::after { transform: translate(16px, -50%); }
@@ -1438,16 +1414,16 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
 
 /* ── 资源库空态 / 就绪 ── */
 .lib-empty { padding: 36px 20px; text-align: center; color: var(--apple-text-3);
-  background: #f5f5f7; border-radius: 16px; border: 1px dashed var(--apple-border); min-height: 180px;
+  background: var(--ata-empty); border-radius: 16px; border: 1px dashed var(--apple-border); min-height: 180px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .lib-empty-icon { font-size: 2.4rem; margin-bottom: 12px; }
 .lib-empty-text { font-size: 0.95rem; font-weight: 500; line-height: 1.6; }
-.lib-ready { padding: 24px; text-align: center; background: linear-gradient(135deg,#f0f9ff,#f0eefe);
-  border-radius: 16px; border: 1px solid #cfe3fc; margin-top: 12px; }
+.lib-ready { padding: 24px; text-align: center; background: var(--ata-ready-bg);
+  border-radius: 16px; border: 1px solid var(--ata-ready-border); margin-top: 12px; }
 .lib-ready-icon { font-size: 2.2rem; margin-bottom: 6px; }
-.lib-ready h3 { color: #0369a1; margin: 0 0 8px; font-size: 1.1rem; font-weight: 700; }
-.lib-ready p { color: #0c4a6e; font-size: 0.92rem; word-break: break-all; margin: 0; }
-.lib-warn { color: var(--apple-red); font-size: 0.8rem; font-weight: 600; background: #fff0ef;
+.lib-ready h3 { color: var(--ata-ready-title); margin: 0 0 8px; font-size: 1.1rem; font-weight: 700; }
+.lib-ready p { color: var(--ata-ready-text); font-size: 0.92rem; word-break: break-all; margin: 0; }
+.lib-warn { color: var(--apple-red); font-size: 0.8rem; font-weight: 600; background: var(--ata-danger-bg);
   padding: 7px 12px; border-radius: 10px; display: inline-block; margin-top: 10px; }
 .custom-download-zone a { color: var(--apple-blue) !important; font-weight: 600 !important; }
 
@@ -1543,7 +1519,7 @@ body.modal-open { overflow: hidden !important; }
 body.modal-open::before {
   content: "" !important;
   position: fixed !important; inset: 0 !important; z-index: 999 !important;
-  background: rgba(0,0,0,0.08) !important;
+  background: var(--ata-scrim) !important;
   backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;
   pointer-events: none !important;
   display: block !important;
@@ -1567,7 +1543,7 @@ body.modal-open::before {
   justify-content: center !important; width: 100% !important; overflow: visible !important;
   max-height: 100% !important; min-height: 0 !important; }
 #advanced_modal .modal-box, #advanced_modal .modal-box .styler {
-  background: #fff !important; border: none !important;
+  background: var(--apple-surface) !important; border: none !important;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 24px 80px rgba(0,0,0,0.28) !important;
   border-radius: 22px !important; padding: 24px !important;
   width: min(760px, 94vw) !important; max-width: 94vw !important;
@@ -1581,7 +1557,7 @@ body.modal-open::before {
   overflow: visible !important; max-height: none !important; min-height: 0 !important;
   padding: 4px 0 36px 0 !important; display: flex !important; flex-direction: column !important;
   align-items: stretch !important; width: 100% !important; gap: 0 !important; }
-#advanced_modal .modal-box { background: #fff !important; animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1);
+#advanced_modal .modal-box { background: var(--apple-surface) !important; animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1);
   display: block !important; }
 @keyframes modalIn { from { opacity:0; transform: translateY(14px) scale(0.97); } to { opacity:1; transform:none; } }
 #advanced_modal .modal-header { display:flex !important; align-items:center !important; justify-content:space-between !important; margin-bottom:4px; }
@@ -1602,7 +1578,7 @@ body.modal-open::before {
 @media (min-width: 1440px) {
   .gradio-container { max-width: 1320px !important; }
 }
-"""
+""" + AMBIENT_CSS + THEME_CSS
 
 # ── 主装配 ────────────────────────────────────────────────────────
 def host_ui(config):
@@ -1614,6 +1590,17 @@ def host_ui(config):
         body_background_fill="#fbfbfd",
         block_background_fill="#ffffff", block_border_width="0px", block_radius="18px",
         button_large_radius="980px", input_background_fill="#f5f5f7", input_border_color="#e8e8ed",
+        # 暗色一套：与 theme.py 的令牌对齐，保证 Gradio 自带组件（下拉/滑块/勾选）同步变暗
+        body_background_fill_dark="#0e0e12",
+        body_text_color_dark="#f5f5f7",
+        block_background_fill_dark="#1c1c22",
+        block_label_text_color_dark="#e8e8ed",
+        block_title_text_color_dark="#f5f5f7",
+        input_background_fill_dark="#232329",
+        input_border_color_dark="#3a3a42",
+        block_border_color_dark="#2c2c33",
+        border_color_primary_dark="#3a3a42",
+        panel_background_fill_dark="#1c1c22",
     )
 
     with gr.Blocks(theme=theme, css=CUSTOM_CSS, analytics_enabled=False,
@@ -1630,6 +1617,11 @@ def host_ui(config):
                     <div class="app-sub">EPUB · DOC · DOCX → 高品质语音</div>
                 </div>
             </div>
+            <button id="ata-theme-toggle" class="ata-theme-toggle" type="button"
+                    aria-label="切换深浅色主题">
+                <span class="ata-theme-icon" id="ata-theme-icon">☀️</span>
+                <span id="ata-theme-label">跟随系统</span>
+            </button>
         </div>''')
 
         with gr.Tabs(selected="tab_convert") as main_tabs:

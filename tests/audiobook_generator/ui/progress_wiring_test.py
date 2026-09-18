@@ -172,6 +172,44 @@ class TestProgressWiring(unittest.TestCase):
         self.assertNotIn(".app-card { position: relative; overflow: hidden; }", css,
                          "卡片不能裁剪内容：日志页的终端会被切掉")
 
+    def test_ambient_background_layer_is_wired_in(self):
+        """氛围背景层（光晕 + 鼠标交互）要同时挂在 head 与样式里"""
+        head = str(self.config.get("head", ""))
+        self.assertIn("ata-bg-canvas", head, "页面头里没有背景层脚本")
+        self.assertIn("ata-bg-base", head, "页面头里没有背景层渐变")
+        for token in ("#ata-bg", ".app-card::before", "body.modal-open #ata-bg"):
+            self.assertIn(token, self.web_ui.CUSTOM_CSS, f"页面样式里缺少：{token}")
+        # 背景层必须垫在内容之下：容器提升到 z-index:1 且背景透明
+        self.assertIn("z-index: 1", self.web_ui.CUSTOM_CSS)
+
+    def test_card_mouse_follow_highlight_is_removed(self):
+        """卡片内部跟随鼠标的高光动效已按要求移除（只留背景层的光晕）"""
+        self.assertNotIn(".app-card::after", self.web_ui.CUSTOM_CSS,
+                         "卡片跟随鼠标的高光（.app-card::after）应已移除")
+        self.assertNotIn("--mx", self.web_ui.HEAD_HTML,
+                         "写 --mx/--my 的 mousemove 监听应已移除")
+        self.assertNotIn("--my", self.web_ui.CUSTOM_CSS)
+
+    def test_content_containers_keep_no_containing_block_properties(self):
+        """页面样式整体也要守住 Dropdown 定位约束（不只是 ambient 模块自己的样式）"""
+        from tests.audiobook_generator.ui.ambient_background_test import (
+            FORBIDDEN_ON_CONTAINERS,
+            _bare_selectors,
+            _css_rules,
+            _declares,
+        )
+
+        for selector, body in _css_rules(self.web_ui.CUSTOM_CSS):
+            for token in _bare_selectors(selector):
+                if token not in (".app-card", ".gradio-container"):
+                    continue
+                for prop in FORBIDDEN_ON_CONTAINERS:
+                    self.assertFalse(
+                        _declares(body, prop),
+                        f"{token} 上不能声明 {prop}（Gradio Dropdown 的选项面板会定位错乱）")
+                self.assertFalse(_declares(body, "overflow"),
+                                 f"{token} 上不能声明 overflow（日志页终端会被裁剪）")
+
 
 @unittest.skipUnless(RUNNABLE, SKIP_REASON)
 class TestStopKillsWholeProcessGroup(unittest.TestCase):

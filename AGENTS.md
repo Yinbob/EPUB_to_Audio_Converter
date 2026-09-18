@@ -77,6 +77,32 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
   正在合成的 worker 会变孤儿继续跑（表现为"停止按钮没反应"），对所有引擎都适用。停止后状态显示「⏹ 已停止（可再次点击开始）」。
 - **日志页读取窗口**：`gradio_log.Log` 默认只从最后 100 行开始读，页面在生成中途打开/刷新时会显得"日志不全"，
   因此显式传 `tail=800, xterm_scrollback=2000`；`.app-card` 上不要加 `overflow: hidden`（会裁剪日志终端视图）。
+- **氛围背景层**：`audiobook_generator/ui/ambient_background.py` 提供固定全屏 canvas 光晕
+  （`#ata-bg` / `#ata-bg-base` / `#ata-bg-canvas`），由 `web_ui.py` 拼到 `HEAD_HTML` 与 `CUSTOM_CSS` 末尾。
+  空闲态光晕随鼠标收束、移开缓慢漂移；点「开始生成」进入 `arming`，进度条类名变为 `active/starting/running`
+  后进入 `generating`（光晕散向视口四周边框并呼吸），`done/warn/collapsed/idle` 或点「停止转换」回到 `settling`。
+  分层靠 `.gradio-container { position: relative; z-index: 1 }` + 容器背景透明，所以**不要在 `.app-card` /
+  `.gradio-container` 上写 `transform` / `filter` / `backdrop-filter` / `contain` / `will-change`**
+  （会为 fixed 后代建立包含块，Gradio Dropdown 的选项面板会跑偏；毛玻璃只能画在 `.app-card::before` 上）。
+  另外 `html, body` 的环境光渐变必须拆成 `background-image` + `background-color`：Gradio 前端压缩多值
+  `background` 简写里带 `var()` 时会整段丢成空值。回归测试见 `tests/audiobook_generator/ui/ambient_background_test.py`。
+- **板块内不能留不透明白底**：Gradio 的布局包装层（`.block` / `.wrap` / `.form` / `.panel` / `.contain` /
+  `.styler` / `.gr-group`）默认白底，会整块盖住卡片毛玻璃，`AMBIENT_CSS` 里已统一改成透明；
+  交互面（上传拖放区、开关行、幽灵/危险/迷你按钮、输入框、引擎分段选择器、日志终端、资源库空态）改成
+  半透明白。高级设置弹窗的玻璃画在 `#advanced_modal .modal-box::before` 上，同样是为了避开
+  `backdrop-filter` 建立包含块导致内部下拉面板错位的老问题。新增卡片/面板时请按同样思路检查：
+  **只要发现白底元素，就把它改成透明或半透明白，并确认下拉选项面板（`ul.options`）保持不透明。**
+- **深浅双主题**：设计令牌与切换脚本在 `audiobook_generator/ui/theme.py`，由 `web_ui.py` 拼到
+  `CUSTOM_CSS` 头部（`THEME_TOKENS_CSS`）与末尾（`THEME_CSS`）。暗色选择器是 `:root .dark` /
+  `:root.dark`——前者正是 Gradio 的暗色钩子（前端给 `body` 加 `.dark`，主题 CSS 写成 `:root .dark{}`），
+  所以切换到暗色时 Gradio 自带组件会一起变暗。顶栏 `#ata-theme-toggle` 循环 跟随系统 → 浅色 → 深色，
+  存 localStorage `ata-theme`。
+  ⚠️ 三条容易踩的坑：① 整站颜色必须走 `var(--apple-*)` / `var(--ata-*)`，写死 `#fff` 之类会在暗色下漏白；
+  ② Gradio 自带的 `--body-text-color-subdued` 等默认是 slate-400（浅底上仅 2.48:1），必须在
+  `:root` 和 `:root:root .dark` 里重映射到我们的文字令牌（后者提高一级特异性，防止注入顺序不利）；
+  ③ xterm 日志终端主题写死在组件里（浅底深字），暗色下只对 `.xterm-screen`（画字层）加
+  `invert(1) hue-rotate(180deg)`，底色放在不会被反相的 `.xterm-viewport`。回归测试见
+  `tests/audiobook_generator/ui/theme_test.py`（含两套主题的 WCAG 对比度计算）。
 
 ### 提供商文件
 - `audiobook_generator/tts_providers/chatterbox_tts_provider.py` — Chatterbox TTS 提供商实现
