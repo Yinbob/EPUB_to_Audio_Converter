@@ -865,7 +865,7 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + """
       window.setTimeout(function () { if (ink.parentNode) ink.parentNode.removeChild(ink); }, 640);
     }, { passive: true });
 
-    // 「开始生成」按钮：点击后平滑滚动到顶部进度条
+    // 「开始生成」按钮：点击后整页平滑滑回最顶端（进度条就在顶部区域）
     // 注意：这里用原生监听实现，而不是 Gradio 事件的 js=（后者会把表单输入变成空值）
     document.addEventListener('click', function (event) {
       var btn = event.target && event.target.closest && event.target.closest('.btn-primary');
@@ -873,8 +873,7 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + """
       // 只滚动，不强行展开：真正展开由新的状态载荷触发（例如"正在启动"），
       // 这样若表单校验失败（没选文件）也不会把已经收起的进度条留在页面上。
       window.setTimeout(function () {
-        var box = progressBox();
-        if (box) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 120);
     }, true);
   }
@@ -887,8 +886,7 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + """
   // 供「开始生成」按钮的 js= 调用：平滑滚动到进度条
   window.__ataScrollToProgress = function () {
     revealProgress();
-    var box = progressBox();
-    if (box) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (document.readyState === 'loading') {

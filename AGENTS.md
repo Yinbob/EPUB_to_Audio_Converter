@@ -103,6 +103,15 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
   ③ xterm 日志终端主题写死在组件里（浅底深字），暗色下只对 `.xterm-screen`（画字层）加
   `invert(1) hue-rotate(180deg)`，底色放在不会被反相的 `.xterm-viewport`。回归测试见
   `tests/audiobook_generator/ui/theme_test.py`（含两套主题的 WCAG 对比度计算）。
+- **光晕的色彩断层与点击扩散**（`ambient_background.py`）：
+  ① 断层三道防线——色相 32 档 + 相邻 sprite 交叉淡入（`drawGlowSprite` 画两次）、
+  sprite 224px（减少放大倍率）、每帧最后铺一层"平均为零"的抖动噪声
+  （`bakeDither`/`drawDither`，黑白各半 alpha 6 ≈ ±3/255）。实测色带平台从 27 段/最长 403px
+  降到 8 段/最长 1px，取值档数 43 → 190；**改回写死渐变或去掉抖动会立刻复现条带**。
+  ② 点「开始生成」的扩散：`signalStart()` 把 `spreadAnchorX/Y` 设成当前鼠标位置，
+  `assignEdgeTargets()` 从该点向四周射线到视口边框，方向按**黄金角**（2.39996323）均匀铺开，
+  保证每个方向都有粒子；`arming` 目标 0.5、约 1.2 秒可见地散开，收到 `active` 状态后走满量程。
+  ③ 同一按钮的点击监听里 `window.scrollTo({top: 0, behavior: 'smooth'})`，整页滑回最顶端。
 
 ### 提供商文件
 - `audiobook_generator/tts_providers/chatterbox_tts_provider.py` — Chatterbox TTS 提供商实现

@@ -132,6 +132,9 @@ class TestProgressWiring(unittest.TestCase):
                          "不要在「开始生成」事件上使用 js=（会清空表单输入），滚动请用 HEAD_HTML 的原生监听")
         self.assertIn("开始生成", self.web_ui.HEAD_HTML,
                       "页面脚本里没有「开始生成」按钮的滚动监听")
+        # 点击后整页滑回最顶端（原来是滚到进度条）
+        self.assertIn("window.scrollTo({ top: 0, behavior: 'smooth' })", self.web_ui.HEAD_HTML,
+                      "「开始生成」点击后应平滑滚到页面最顶端")
 
     def test_start_and_stop_push_state_immediately(self):
         """点开始/停止要立刻推送状态：新批次必须马上把进度条重置，而不是等下一次轮询。"""

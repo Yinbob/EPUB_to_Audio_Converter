@@ -109,6 +109,38 @@ class TestAmbientLayerContract(unittest.TestCase):
         self.assertIn("MutationObserver", AMBIENT_LAYER_HTML)
         self.assertNotIn("fetch(", AMBIENT_LAYER_HTML)
 
+    def test_click_spread_starts_from_pointer_and_is_angularly_even(self):
+        """点「开始生成」时光晕要从鼠标位置、按黄金角均匀散向四周"""
+        for token in ("spreadAnchorX", "spreadAnchorY", "angleJitter", "edgeAngle"):
+            self.assertIn(token, AMBIENT_LAYER_HTML, "扩散动效缺少：" + token)
+        self.assertIn("2.39996323", AMBIENT_LAYER_HTML, "缺少黄金角（保证各方向都有粒子）")
+        # 起点必须取自当前鼠标位置
+        self.assertIn("spreadAnchorX = mouseX", AMBIENT_LAYER_HTML)
+        self.assertIn("spreadAnchorY = mouseY", AMBIENT_LAYER_HTML)
+        # 点击后要先重算边缘目标再进入 arming
+        start = AMBIENT_LAYER_HTML.index("function signalStart()")
+        body = AMBIENT_LAYER_HTML[start:start + 600]
+        self.assertIn("assignEdgeTargets()", body)
+        self.assertIn('setState("arming")', body)
+
+    def test_banding_mitigations_are_in_place(self):
+        """色彩断层的三道防线：色相交叉淡入 + 更密的色相档 + 抖动噪声层"""
+        from audiobook_generator.ui.ambient_background import (
+            AMBIENT_HUE_COUNT,
+            AMBIENT_SPRITE_SIZE,
+        )
+        self.assertGreaterEqual(AMBIENT_HUE_COUNT, 32, "色相档位太少会出现跳色")
+        self.assertGreaterEqual(AMBIENT_SPRITE_SIZE, 224, "sprite 太小放大后会有条带")
+        # 相邻两张 sprite 交叉淡入（f 与 1-f 两次绘制）
+        self.assertIn("function drawGlowSprite", AMBIENT_LAYER_HTML)
+        self.assertIn("a * (1 - f)", AMBIENT_LAYER_HTML)
+        self.assertIn("a * f", AMBIENT_LAYER_HTML)
+        # 抖动噪声层：预烘焙瓦片 + pattern 平铺
+        self.assertIn("function bakeDither", AMBIENT_LAYER_HTML)
+        self.assertIn("createPattern", AMBIENT_LAYER_HTML)
+        self.assertIn("drawDither", AMBIENT_LAYER_HTML)
+        self.assertIn("data[i * 4 + 3] = 6", AMBIENT_LAYER_HTML, "噪声强度应为 ±3/255 级别")
+
     def test_renders_without_per_frame_gradients(self):
         self.assertIn("drawImage", AMBIENT_LAYER_HTML)
         self.assertIn('globalCompositeOperation = "lighter"', AMBIENT_LAYER_HTML)

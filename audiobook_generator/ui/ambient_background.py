@@ -28,8 +28,10 @@ AMBIENT_ENABLED = True
 # ── 视觉参数（JS 侧通过 window.__ATA_AMBIENT_CONFIG 读取，Python 侧便于单测断言） ──
 AMBIENT_HUE_PALETTE = (212, 250, 196, 288)   # 浅色苹果风的蓝 / 靛 / 青 / 紫
 AMBIENT_HUE_SEGMENT_MS = 10000               # 每段色相停留时长（整轮 = 段数-1 倍）
-AMBIENT_HUE_COUNT = 24                       # 预渲染 sprite 的色相数量
-AMBIENT_SPRITE_SIZE = 160                    # 单张 sprite 的边长（px）
+# 色相档位越密，随时间流动和粒子之间的颜色过渡越平滑（24 档会看出跳色）
+AMBIENT_HUE_COUNT = 32
+# sprite 会被放大到 800px 左右，边长太小时低透明度渐变会被拉出条带
+AMBIENT_SPRITE_SIZE = 224
 AMBIENT_IDLE_COUNT = 42                      # 空闲态粒子数
 AMBIENT_IDLE_CORE_COUNT = 8                  # 其中贴近核心的粒子数
 AMBIENT_IDLE_SPREAD = 380                    # 空闲态粒子扩散半径（px）
@@ -233,6 +235,7 @@ _AMBIENT_JS = """
 
   var layer = null, base = null, canvas = null, ctx = null;
   var sprites = { core: [], wash: [] };
+  var ditherPattern = null;
   var vw = 0, vh = 0, homeX = 0, homeY = 0;
   var idleParts = [], edgeParts = [];
   var state = "idle";
@@ -241,6 +244,7 @@ _AMBIENT_JS = """
   var gather = 0;             // 鼠标收束程度
   var focusX = 0, focusY = 0, mouseX = 0, mouseY = 0;
   var driftX = 0, driftY = 0, driftTargetX = 0, driftTargetY = 0;
+  var spreadAnchorX = 0, spreadAnchorY = 0;   // 扩散起点（点开始生成时的鼠标位置）
   var pointerActive = false;
   var wanderAt = 0;
   var t0 = (window.performance && performance.now()) || Date.now();
@@ -307,6 +311,58 @@ _AMBIENT_JS = """
     return sprites[profile][idx];
   }
 
+  // 色相按最近邻取整会产生"跳色"（24 档时尤其明显），这里在相邻两张 sprite
+  // 之间按比例交叉淡入：两张叠加的亮度之和不变，但颜色是连续过渡的。
+  function drawGlowSprite(hue, profile, x, y, size, alpha) {
+    var n = sprites.core.length;
+    if (!n || alpha <= 0.002) return;
+    var h = ((hue % 360) + 360) % 360;
+    var pos = (h / 360) * n;
+    var i0 = Math.floor(pos) % n;
+    var i1 = (i0 + 1) % n;
+    var f = pos - Math.floor(pos);
+    var a = Math.min(1, alpha * themeAlpha);
+    ctx.globalAlpha = Math.min(1, a * (1 - f));
+    ctx.drawImage(sprites[profile][i0], x - size, y - size, size * 2, size * 2);
+    if (f > 0.002) {
+      ctx.globalAlpha = Math.min(1, a * f);
+      ctx.drawImage(sprites[profile][i1], x - size, y - size, size * 2, size * 2);
+    }
+  }
+
+  // 抖动噪声：预烘焙一张 1:1 设备像素的瓦片（黑白各半、alpha 6 ≈ ±3/255，
+  // 平均亮度为 0），每帧用 pattern 铺一次，把色带边界打散成噪点。
+  function bakeDither() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var px = Math.max(32, Math.round(128 * dpr));
+    var c = document.createElement("canvas");
+    c.width = c.height = px;
+    var g = c.getContext("2d");
+    var img = g.createImageData(px, px);
+    var data = img.data;
+    for (var i = 0; i < px * px; i++) {
+      var white = Math.random() < 0.5;
+      var v = white ? 255 : 0;
+      data[i * 4] = v;
+      data[i * 4 + 1] = v;
+      data[i * 4 + 2] = v;
+      data[i * 4 + 3] = 6;
+    }
+    g.putImageData(img, 0, 0);
+    ditherPattern = ctx.createPattern(c, "repeat");
+  }
+
+  function drawDither() {
+    if (!ditherPattern || !canvas) return;
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);          // 按设备像素 1:1 铺，避免被放大成色块
+    ctx.globalCompositeOperation = "source-over";
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = ditherPattern;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
+
   // 主题切换：换一套 sprite 亮度和整体强度（同一帧内只重建一次）
   function refreshTheme(force) {
     var dark = isDarkTheme();
@@ -324,28 +380,38 @@ _AMBIENT_JS = """
     vh = Math.max(window.innerHeight || 0, 320);
     homeX = vw * 0.5;
     homeY = vh * 0.32;
+    // 扩散起点默认在光晕家位置；视口变化后若已跑到画面外就拉回来
+    if (!spreadAnchorX && !spreadAnchorY) { spreadAnchorX = homeX; spreadAnchorY = homeY; }
+    if (spreadAnchorX > vw || spreadAnchorY > vh) { spreadAnchorX = homeX; spreadAnchorY = homeY; }
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(vw * dpr);
     canvas.height = Math.round(vh * dpr);
     canvas.style.width = vw + "px";
     canvas.style.height = vh + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    bakeDither();                       // DPR 可能变化，噪声瓦片按设备像素重建
   }
 
   function assignEdgeTargets() {
-    for (var i = 0; i < idleParts.length; i++) {
+    // 从"扩散起点"（点开始生成时的鼠标位置）向四周射线到视口边框；
+    // 角度用黄金角均匀铺开，保证每个方向都有粒子，不会随机挤成一堆。
+    var ax = spreadAnchorX, ay = spreadAnchorY;
+    var GOLDEN = 2.39996323;
+    var n = idleParts.length;
+    for (var i = 0; i < n; i++) {
       var p = idleParts[i];
-      var angle = Math.atan2(p.offY, p.offX);
+      var angle = i * GOLDEN + p.angleJitter;
       var cosA = Math.cos(angle), sinA = Math.sin(angle);
       var t = Infinity, tt;
-      if (sinA < 0) { tt = -homeY / sinA; if (tt > 0 && tt < t) t = tt; }
-      if (sinA > 0) { tt = (vh - homeY) / sinA; if (tt > 0 && tt < t) t = tt; }
-      if (cosA < 0) { tt = -homeX / cosA; if (tt > 0 && tt < t) t = tt; }
-      if (cosA > 0) { tt = (vw - homeX) / cosA; if (tt > 0 && tt < t) t = tt; }
+      if (sinA < 0) { tt = -ay / sinA; if (tt > 0 && tt < t) t = tt; }
+      if (sinA > 0) { tt = (vh - ay) / sinA; if (tt > 0 && tt < t) t = tt; }
+      if (cosA < 0) { tt = -ax / cosA; if (tt > 0 && tt < t) t = tt; }
+      if (cosA > 0) { tt = (vw - ax) / cosA; if (tt > 0 && tt < t) t = tt; }
       if (!isFinite(t) || t <= 0) t = 0;
       var margin = 20;
-      p.edgeX = homeX + cosA * Math.max(t - margin, 0);
-      p.edgeY = homeY + sinA * Math.max(t - margin, 0);
+      p.edgeAngle = angle;
+      p.edgeX = ax + cosA * Math.max(t - margin, 0);
+      p.edgeY = ay + sinA * Math.max(t - margin, 0);
       p.edgeSize = rand(80, 150);
       p.edgeAlpha = rand(0.022, 0.040);
     }
@@ -372,6 +438,7 @@ _AMBIENT_JS = """
         idleAlpha: (i < core) ? rand(0.025, 0.045) : rand(0.012, 0.025),
         gatherAlpha: rand(0.030, 0.050),
         hueOff: rand(-18, 18),
+        angleJitter: rand(-0.12, 0.12),
         edgeX: 0, edgeY: 0, edgeSize: 0, edgeAlpha: 0
       });
     }
@@ -441,11 +508,9 @@ _AMBIENT_JS = """
     // 中心弥散光（生成态淡出）
     if (centerAlpha > 0.002) {
       var washR = (CFG.idleSpread || 380) + 60;
-      ctx.globalAlpha = Math.min(1, 0.028 * centerAlpha * themeAlpha);
-      ctx.drawImage(spriteFor(hue, "wash"), cx - washR, cy - washR, washR * 2, washR * 2);
-      ctx.globalAlpha = Math.min(1, 0.090 * centerAlpha * themeAlpha);
       var coreR = 300;
-      ctx.drawImage(spriteFor(hue, "core"), cx - coreR, cy - coreR, coreR * 2, coreR * 2);
+      drawGlowSprite(hue, "wash", cx, cy, washR, 0.028 * centerAlpha);
+      drawGlowSprite(hue, "core", cx, cy, coreR, 0.090 * centerAlpha);
     }
 
     // 中心粒子（生成态飞向视口边缘）
@@ -473,9 +538,7 @@ _AMBIENT_JS = """
         alpha = baseA;
       }
       if (alpha <= 0.002 || size <= 1) continue;
-      ctx.globalAlpha = Math.min(1, alpha * themeAlpha);
-      ctx.drawImage(spriteFor(hue + p.hueOff, "core"),
-                    p.x - size, p.y - size, size * 2, size * 2);
+      drawGlowSprite(hue + p.hueOff, "core", p.x, p.y, size, alpha);
     }
 
     // 边缘粒子（生成态）
@@ -491,11 +554,13 @@ _AMBIENT_JS = """
         var ey2 = ep.y + (dy / dist) * pull;
         var ea = ep.alpha * blend * breathe * (1 + 0.5 * near * g);
         if (ea <= 0.002) continue;
-        ctx.globalAlpha = Math.min(1, ea * themeAlpha);
-        ctx.drawImage(spriteFor(hue + ep.hueOff, "wash"),
-                      ex2 - ep.size, ey2 - ep.size, ep.size * 2, ep.size * 2);
+        drawGlowSprite(hue + ep.hueOff, "wash", ex2, ey2, ep.size, ea);
       }
     }
+
+    // 抖动层：低透明度的大面积渐变在 8bit 下必然出现色带，
+    // 最后盖一层"平均为零"的极淡噪声把色带边界打散（约 ±3/255，肉眼不可见）。
+    drawDither(ts);
 
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = "source-over";
@@ -519,6 +584,15 @@ _AMBIENT_JS = """
   }
 
   function signalStart() {
+    // 扩散起点 = 当前鼠标位置（没有指针时退回光晕当前位置），并据此重算边缘目标
+    if (pointerActive && !coarse) {
+      spreadAnchorX = mouseX;
+      spreadAnchorY = mouseY;
+    } else {
+      spreadAnchorX = focusX || homeX;
+      spreadAnchorY = focusY || homeY;
+    }
+    assignEdgeTargets();
     setState("arming");
     if (armTimer) clearTimeout(armTimer);
     armTimer = setTimeout(function () {
@@ -619,7 +693,7 @@ _AMBIENT_JS = """
     if (!layer || !layer.isConnected) { cleanup(); return; }
 
     if (state === "generating") blend += (1 - blend) * 0.03;
-    else if (state === "arming") blend += (0.35 - blend) * 0.03;
+    else if (state === "arming") blend += (0.5 - blend) * 0.03;
     else blend += (0 - blend) * (state === "settling" ? 0.045 : 0.05);
     if (blend < 0.001) blend = 0;
     if (blend > 0.999) blend = 1;
