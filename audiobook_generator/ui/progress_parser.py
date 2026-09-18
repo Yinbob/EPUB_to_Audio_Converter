@@ -34,9 +34,11 @@ def parse_progress(log_content: str) -> dict:
     - pct:      进度百分比（0~100，含章内块级插值）
     - extra:    附加说明，例如「第 1 章 2/16 块」
     - finished: 整批是否结束
+    - has_markers: 是否已经出现当前书籍的进度标记（用于区分"尚未启动"和"已开始"）
     """
     if not log_content:
-        return {"book": "", "total": 0, "done": 0, "pct": 0, "extra": "", "finished": False}
+        return {"book": "", "total": 0, "done": 0, "pct": 0, "extra": "",
+                "finished": False, "has_markers": False}
 
     # 只解析当前这本书：从最后一次「开始转换」标记之后开始
     start_matches = list(_BOOK_PATTERN.finditer(log_content))
@@ -85,4 +87,5 @@ def parse_progress(log_content: str) -> dict:
         "pct": pct,
         "extra": extra,
         "finished": _FINISHED_MARKER in log_content,
+        "has_markers": bool(current_book) or total_chapters > 0,
     }

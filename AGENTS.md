@@ -68,6 +68,10 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
   其余（多分片或压缩格式）自动切 pydub 合并，否则直接拼接会丢音频（wav 只认第一块、mp3 拼接处丢帧）。无 ffmpeg 时回退直接写入并打 warning。
 - WebUI 顶部进度条解析见 `audiobook_generator/ui/progress_parser.py`（纯函数、有单测），支持 Chatterbox 的块级进度
   `chapter-<章>_<标题>_chunk_<i>_of_<n>`；批次标记由 `web_ui._batch_worker` 通过 logger 写入同一个日志文件。
+- **进度条的 `gr.Timer` 绝不能放进 `visible=False` 的容器**：Gradio 前端对"有效可见性为 false"的组件不应用 `active` 更新、
+  也不会启动 tick（`ct()` 判定 + Timer 在 onMount 里 setInterval），会导致进度条永远停在「等待开始生成...」（所有引擎一致）。
+  另外用 `ui.load(fn=get_progress_info, ...)` 做页面加载同步，保证刷新/新会话也能看到当前进度；`webui_log_file` 需为绝对路径。
+  回归测试：`tests/audiobook_generator/ui/progress_wiring_test.py`（结构 + 五态，需在 venv 解释器下运行，其他解释器自动跳过）。
 
 ### 提供商文件
 - `audiobook_generator/tts_providers/chatterbox_tts_provider.py` — Chatterbox TTS 提供商实现

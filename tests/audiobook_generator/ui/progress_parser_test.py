@@ -19,6 +19,15 @@ class TestParseProgress(unittest.TestCase):
         self.assertEqual(state["total"], 0)
         self.assertEqual(state["pct"], 0)
         self.assertFalse(state["finished"])
+        self.assertFalse(state["has_markers"])
+
+    def test_has_markers_turns_true_once_book_or_chapters_known(self):
+        # 只有书名标记
+        self.assertTrue(parse_progress(BOOK_START)["has_markers"])
+        # 只有章节数标记
+        self.assertTrue(parse_progress(CHAPTERS_COUNT)["has_markers"])
+        # 无关日志行不算已开始
+        self.assertFalse(parse_progress("2026-09-18 08:00:00 - 加载 Chatterbox TTS 模型\n")["has_markers"])
 
     def test_log_without_book_marker_reports_counts_only(self):
         state = parse_progress(CHAPTERS_COUNT + CONVERTED_1)

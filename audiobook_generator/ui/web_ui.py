@@ -465,15 +465,21 @@ def launch_batch(configs):
 def get_progress_info():
     """解析日志文件获取生成进度，同时控制定时器开关"""
     global webui_log_file
-    if not webui_log_file or not webui_log_file.exists():
+    run_alive = running_process is not None and running_process.is_alive()
+
+    state = None
+    if webui_log_file and webui_log_file.exists():
+        try:
+            state = parse_progress(webui_log_file.read_text(encoding="utf-8", errors="ignore"))
+        except Exception:
+            state = None
+
+    # 日志暂时读不到（文件还没建好/正在被写入）：只要批次还在跑就继续轮询，别把定时器关掉
+    if state is None:
+        if run_alive:
+            return _progress_html(5, "正在启动...", "", 0, 0), gr.Timer(active=True)
         return _progress_html(0, "等待开始", "", 0, 0), gr.Timer(active=False)
 
-    try:
-        log_content = webui_log_file.read_text(encoding="utf-8", errors="ignore")
-    except Exception:
-        return _progress_html(0, "等待开始", "", 0, 0), gr.Timer(active=True)
-
-    state = parse_progress(log_content)
     book, total, done, extra = state["book"], state["total"], state["done"], state["extra"]
 
     # 整个批次结束
@@ -481,15 +487,18 @@ def get_progress_info():
         return _progress_html(100, "✅ 全部完成", book, total, total), gr.Timer(active=False)
 
     # 子进程已退出却没有结束标记：中途失败/被中断
-    if running_process is not None and not running_process.is_alive():
-        if book or total > 0:
+    if running_process is not None and not run_alive:
+        if state["has_markers"]:
             return _progress_html(state["pct"], "⚠️ 生成已中断，详见日志", book, total, done, extra), gr.Timer(active=False)
         # 连批次标记都没写出来就退出了（例如启动阶段报错）
         return _progress_html(0, "⚠️ 启动失败，详见日志", "", 0, 0), gr.Timer(active=False)
 
     # 还没开始任何一本书
-    if not book and total == 0:
-        return _progress_html(0, "等待开始", "", 0, 0), gr.Timer(active=True)
+    if not state["has_markers"]:
+        if run_alive:
+            # 批次已启动但还没写出章节标记（chatterbox 加载模型较慢时常见）
+            return _progress_html(5, "正在启动...", "", 0, 0), gr.Timer(active=True)
+        return _progress_html(0, "等待开始", "", 0, 0), gr.Timer(active=False)
 
     if total > 0:
         status = "✅ 本书完成" if done >= total else "正在生成..."
@@ -500,7 +509,8 @@ def get_progress_info():
 
 def _progress_html(pct, status, book_name, total, done, extra=""):
     """生成进度条 HTML"""
-    if pct == 0 and not book_name:
+    # 只有真正的"未开始"才渲染待机样式；「⚠️ 启动失败」等 0% 状态也要把文案显示出来
+    if pct == 0 and not book_name and status == "等待开始":
         return """<div class="progress-container idle">
             <div class="progress-status">等待开始生成...</div>
         </div>"""
@@ -948,7 +958,9 @@ div[data-testid="file"] .file-preview > div {
   100% { transform: translateX(100%); }
 }
 
-/* 隐藏 Gradio Timer 组件本身的可见元素（拖拽横条等） */
+/* 隐藏 Gradio Timer 组件本身的可见元素（拖拽横条等）。
+   注意：Timer 必须是"有效可见"的顶层组件——不要再用 visible=False 的容器包它，
+   否则 Gradio 前端不会应用 active 更新、也不会启动 tick（进度条会永远停在等待态）。 */
 .progress-bar-wrap + .gr-timer,
 .progress-bar-wrap ~ [data-testid="timer"],
 .gradio-timer { display: none !important; height: 0 !important; overflow: hidden !important; }
@@ -1117,6 +1129,25 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
   padding: 7px 12px; border-radius: 10px; display: inline-block; margin-top: 10px; }
 .custom-download-zone a { color: var(--apple-blue) !important; font-weight: 600 !important; }
 
+/* ── 资源库：操作区排版 ── */
+/* Gradio 卡片内组件默认只有 1px 间隙：开关、主按钮、下载区会贴在一起，这里统一留白 */
+.lib-card .styler { gap: 12px !important; }
+.lib-card .section-divider { margin: 0; }
+/* 分隔线自带的 html 容器上下各 10px 内边距，会和卡片 gap 叠加成大段空白 */
+.lib-card .html-container:has(> .prose > .section-divider) { padding-top: 0 !important; padding-bottom: 0 !important; }
+/* 行内控件：按钮按内容宽度排布（不再被 Gradio 的 160px 最小宽度撑开）并统一高度 */
+.lib-row { gap: 10px !important; align-items: center !important; }
+.lib-row > .form { min-width: 0 !important; flex: 1 1 auto !important; }
+.lib-row > button { min-width: 0 !important; flex: 0 0 auto !important; }
+.lib-row .btn-mini, .lib-row .btn-danger {
+  height: 38px !important; padding: 0 16px !important;
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  font-size: 0.86rem !important; white-space: nowrap !important;
+}
+.lib-row .lib-push-right { margin-left: auto !important; }
+/* 「打包并生成下载通道」与上方开关、下方下载区之间多留一点呼吸空间 */
+.lib-generate { margin-top: 4px !important; margin-bottom: 2px !important; }
+
 /* ── 杂项 ── */
 h1, h2, h3 { color: var(--apple-text) !important; }
 hr { border: none !important; border-top: 1px solid var(--apple-border-soft) !important; margin: 16px 0; }
@@ -1137,6 +1168,11 @@ hr { border: none !important; border-top: 1px solid var(--apple-border-soft) !im
   .row-stack > * { width: 100% !important; }
 }
 
+/* 小屏：资源库的批次行换行——下拉框独占一行，操作按钮另起一行 */
+@media (max-width: 520px) {
+  .lib-row > .form { flex: 1 1 100% !important; }
+}
+
 /* 小屏：CTA 行按钮等宽撑满 */
 @media (max-width: 520px) {
   .row-cta { flex-direction: column !important; gap: 10px !important; }
@@ -1148,6 +1184,7 @@ hr { border: none !important; border-top: 1px solid var(--apple-border-soft) !im
 @media (pointer: coarse) {
   .btn-mini { padding: 11px 18px !important; font-size: 0.88rem !important; }
   .btn-danger { padding: 11px 18px !important; }
+  .lib-row .btn-mini, .lib-row .btn-danger { height: 44px !important; padding: 0 18px !important; }
   .engine-card { min-height: 72px !important; padding: 18px !important; }
   .file-checks label { padding: 14px 16px !important; margin-bottom: 8px !important; }
   .toggle { padding: 14px 16px !important; }
@@ -1282,9 +1319,12 @@ def host_ui(config):
                     <p>上传书籍，选择语音引擎，一键生成有声书。多引擎、多格式、批量处理。</p>
                 </div>''')
                 # 进度条
+                # 注意：Timer 必须放在可见层级，不能包进 visible=False 的容器。
+                # Gradio 前端对"有效可见性为 false"的组件不会应用 active 更新，也不会启动
+                # tick 定时器（ct() 判定 + Timer 组件在 onMount 里 setInterval），
+                # 那样进度条会永远停在初始的「等待开始生成...」。
                 progress_bar = gr.HTML(_progress_html(0, "等待开始", "", 0, 0), elem_classes="progress-bar-wrap")
-                with gr.Group(visible=False, elem_classes="timer-hidden"):
-                    progress_timer = gr.Timer(2, active=False)
+                progress_timer = gr.Timer(2, active=False)
                 # 上传按钮隐藏脚本（运行在浏览器端）
                 gr.HTML('''
                 <script>
@@ -1482,25 +1522,28 @@ def host_ui(config):
                 gr.HTML('<div class="hero"><h1>资源库</h1><p>管理已生成的音频文件：批量下载、打包导出、一键清理。</p></div>')
                 with gr.Row(elem_classes="row-stack"):
                     with gr.Column(scale=3):
-                        with gr.Group(elem_classes="app-card"):
+                        with gr.Group(elem_classes="app-card lib-card"):
                             gr.HTML('<p class="card-title">选择导出批次</p>')
-                            with gr.Row():
-                                folder_dropdown = gr.Dropdown(choices=get_folders_list(), label="批次", show_label=False, interactive=True, scale=4)
-                                refresh_btn = gr.Button("🔄 刷新", elem_classes="btn-mini", scale=1)
-                                delete_folder_btn = gr.Button("🗑️ 删除批次", elem_classes="btn-danger", scale=1)
-                        with gr.Group(elem_classes="app-card"):
+                            with gr.Row(elem_classes="lib-row"):
+                                folder_dropdown = gr.Dropdown(choices=get_folders_list(), label="批次", show_label=False,
+                                                              interactive=True, scale=1)
+                                refresh_btn = gr.Button("🔄 刷新", elem_classes="btn-mini", scale=0, min_width=0)
+                                delete_folder_btn = gr.Button("🗑️ 删除批次", elem_classes="btn-danger", scale=0, min_width=0)
+                        with gr.Group(elem_classes="app-card lib-card"):
                             gr.HTML('<p class="card-title">选择分卷文件（默认全选）</p>')
                             file_selector = gr.CheckboxGroup(choices=[], label="", show_label=False, interactive=True, elem_classes="file-checks")
-                            with gr.Row():
-                                select_all_btn = gr.Button("全选", elem_classes="btn-mini")
-                                deselect_all_btn = gr.Button("取消", elem_classes="btn-mini")
-                                delete_btn = gr.Button("🗑️ 删除选中", elem_classes="btn-danger")
+                            gr.HTML('<div class="section-divider"></div>')
+                            with gr.Row(elem_classes="lib-row"):
+                                select_all_btn = gr.Button("全选", elem_classes="btn-mini", scale=0, min_width=0)
+                                deselect_all_btn = gr.Button("取消", elem_classes="btn-mini", scale=0, min_width=0)
+                                delete_btn = gr.Button("🗑️ 删除选中", elem_classes="btn-danger lib-push-right", scale=0, min_width=0)
                     with gr.Column(scale=2):
-                        with gr.Group(elem_classes="app-card"):
+                        with gr.Group(elem_classes="app-card lib-card"):
                             gr.HTML('<p class="card-title">下载与清理</p>')
                             gr.HTML('<p class="card-desc">勾选「阅后即焚」将在打包后自动删除源文件。</p>')
                             auto_delete_cb = gr.Checkbox(label="阅后即焚（打包后删除源文件）", value=False, elem_classes="toggle")
-                            generate_btn = gr.Button("⚡ 打包并生成下载通道", elem_classes="btn-primary")
+                            gr.HTML('<div class="section-divider"></div>')
+                            generate_btn = gr.Button("⚡ 打包并生成下载通道", elem_classes="btn-primary lib-generate")
                             download_card = gr.HTML(_placeholder_html())
                             real_download_file = gr.File(label="下载通道", interactive=False, visible=False, elem_classes="custom-download-zone")
 
@@ -1509,9 +1552,10 @@ def host_ui(config):
                 gr.HTML('<div class="hero"><h1>运行日志</h1><p>实时查看转换进度与详细信息。</p></div>')
                 with gr.Group(elem_classes="app-card"):
                     global webui_log_file
-                    webui_log_file = generate_unique_log_path("EtA_WebUI")
+                    # 固定成绝对路径：进度解析与日志组件都用同一份文件，不受工作目录变化影响
+                    webui_log_file = generate_unique_log_path("EtA_WebUI").resolve()
                     webui_log_file.touch()
-                    Log(str(webui_log_file.absolute()), dark=False, xterm_font_size=12)
+                    Log(str(webui_log_file), dark=False, xterm_font_size=12)
 
             # ════════════ 设置页 ════════════
             with gr.Tab("⚙️ 设置", id="tab_settings"):
@@ -1610,6 +1654,8 @@ def host_ui(config):
 
         # 进度条定时更新
         progress_timer.tick(fn=get_progress_info, inputs=None, outputs=[progress_bar, progress_timer], show_progress="hidden")
+        # 页面加载/刷新时同步一次状态：新会话也能看到当前进度，并在有批次在跑时自动开始轮询
+        ui.load(fn=get_progress_info, inputs=None, outputs=[progress_bar, progress_timer], show_progress="hidden")
 
         # 资源库
         refresh_btn.click(fn=refresh_batches, inputs=None, outputs=[folder_dropdown, file_selector], show_progress="hidden")
