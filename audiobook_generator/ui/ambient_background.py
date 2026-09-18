@@ -30,10 +30,11 @@ AMBIENT_HUE_PALETTE = (212, 250, 196, 288)   # 浅色苹果风的蓝 / 靛 / 青
 AMBIENT_HUE_SEGMENT_MS = 10000               # 每段色相停留时长（整轮 = 段数-1 倍）
 # 色相档位越密，随时间流动和粒子之间的颜色过渡越平滑（24 档会看出跳色）
 AMBIENT_HUE_COUNT = 32
-# sprite 会被放大到 800px 左右，边长太小时低透明度渐变会被拉出条带
-AMBIENT_SPRITE_SIZE = 224
-AMBIENT_IDLE_COUNT = 42                      # 空闲态粒子数
-AMBIENT_IDLE_CORE_COUNT = 8                  # 其中贴近核心的粒子数
+# sprite 会被放大到 800px 上下，边长越大放大倍率越低、过渡越顺（256 起步）
+AMBIENT_SPRITE_SIZE = 256
+# 柔和光晕：少量大半径、低透明度的光斑叠加成一整团过渡顺滑的光晕
+AMBIENT_IDLE_COUNT = 46                      # 空闲态粒子数
+AMBIENT_IDLE_CORE_COUNT = 10                 # 其中贴近核心的粒子数
 AMBIENT_IDLE_SPREAD = 380                    # 空闲态粒子扩散半径（px）
 AMBIENT_EDGE_PER_SIDE = 12                   # 生成态每条边的边缘粒子数
 AMBIENT_ARM_TIMEOUT_MS = 6000                # 点「开始生成」后等不到真实状态的兜底回退时长
@@ -273,13 +274,22 @@ _AMBIENT_JS = """
     }
     var grad = g.createRadialGradient(r, r, 0, r, r, r);
     if (profile === "wash") {
+      // 大范围弥散光：多段近似高斯，避免出现被看成"圈边"的肩部
       grad.addColorStop(0, stop(0, 1));
-      grad.addColorStop(0.5, stop(0, 0.74));
+      grad.addColorStop(0.22, stop(0, 0.90));
+      grad.addColorStop(0.42, stop(0, 0.70));
+      grad.addColorStop(0.60, stop(0, 0.46));
+      grad.addColorStop(0.76, stop(0, 0.24));
+      grad.addColorStop(0.89, stop(0, 0.09));
       grad.addColorStop(1, stop(0, 0));
     } else {
+      // 主体光斑：同样用平滑衰减，靠大量低透明度叠加出连续光晕
       grad.addColorStop(0, stop(0, 1));
-      grad.addColorStop(0.35, stop(0, 0.72));
-      grad.addColorStop(0.7, stop(0, 0.26));
+      grad.addColorStop(0.20, stop(0, 0.86));
+      grad.addColorStop(0.38, stop(0, 0.65));
+      grad.addColorStop(0.56, stop(0, 0.42));
+      grad.addColorStop(0.72, stop(0, 0.22));
+      grad.addColorStop(0.86, stop(0, 0.08));
       grad.addColorStop(1, stop(0, 0));
     }
     g.fillStyle = grad;
@@ -330,8 +340,9 @@ _AMBIENT_JS = """
     }
   }
 
-  // 抖动噪声：预烘焙一张 1:1 设备像素的瓦片（黑白各半、alpha 6 ≈ ±3/255，
-  // 平均亮度为 0），每帧用 pattern 铺一次，把色带边界打散成噪点。
+  // 抖动噪声：预烘焙一张 1:1 设备像素的瓦片，每帧用 pattern 铺一次。
+  // ⚠️ 必须"逐通道独立"取 0/255（而不是黑/白像素）：只抖动亮度动不了色度，
+  // 实测 B-R（色偏）会停在 2/4/8/10 这种偶数档上，看起来就是彩色色带。
   function bakeDither() {
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var px = Math.max(32, Math.round(128 * dpr));
@@ -341,12 +352,10 @@ _AMBIENT_JS = """
     var img = g.createImageData(px, px);
     var data = img.data;
     for (var i = 0; i < px * px; i++) {
-      var white = Math.random() < 0.5;
-      var v = white ? 255 : 0;
-      data[i * 4] = v;
-      data[i * 4 + 1] = v;
-      data[i * 4 + 2] = v;
-      data[i * 4 + 3] = 6;
+      data[i * 4] = Math.random() < 0.5 ? 0 : 255;
+      data[i * 4 + 1] = Math.random() < 0.5 ? 0 : 255;
+      data[i * 4 + 2] = Math.random() < 0.5 ? 0 : 255;
+      data[i * 4 + 3] = 6;          // ±3/255，平均色为中性
     }
     g.putImageData(img, 0, 0);
     ditherPattern = ctx.createPattern(c, "repeat");
@@ -412,8 +421,9 @@ _AMBIENT_JS = """
       p.edgeAngle = angle;
       p.edgeX = ax + cosA * Math.max(t - margin, 0);
       p.edgeY = ay + sinA * Math.max(t - margin, 0);
-      p.edgeSize = rand(80, 150);
-      p.edgeAlpha = rand(0.022, 0.040);
+      // 散到边缘后收成小一些的光斑（同时提亮一点，边缘才有存在感）
+      p.edgeSize = rand(70, 130);
+      p.edgeAlpha = rand(0.020, 0.038);
     }
   }
 
@@ -428,16 +438,19 @@ _AMBIENT_JS = """
     for (var i = 0; i < count; i++) {
       var angle = Math.random() * TAU;
       var radius = (i < core) ? Math.random() * 60 : Math.sqrt(Math.random()) * spread;
+      var isCore = i < core;
       idleParts.push({
         offX: Math.cos(angle) * radius,
         offY: Math.sin(angle) * radius,
         jx: rand(-1, 1), jy: rand(-1, 1),
         x: homeX + Math.cos(angle) * radius,
         y: homeY + Math.sin(angle) * radius,
-        idleSize: rand(140, 240), gatherSize: rand(55, 95),
-        idleAlpha: (i < core) ? rand(0.025, 0.045) : rand(0.012, 0.025),
-        gatherAlpha: rand(0.030, 0.050),
-        hueOff: rand(-18, 18),
+        // 大半径、低透明度的光斑：靠叠加形成连续光晕（不要能看出一个个圈）
+        idleSize: isCore ? rand(150, 240) : rand(110, 200),
+        gatherSize: isCore ? rand(60, 105) : rand(45, 90),
+        idleAlpha: isCore ? rand(0.030, 0.055) : rand(0.014, 0.030),
+        gatherAlpha: isCore ? rand(0.034, 0.060) : rand(0.018, 0.036),
+        hueOff: rand(-16, 16),
         angleJitter: rand(-0.12, 0.12),
         edgeX: 0, edgeY: 0, edgeSize: 0, edgeAlpha: 0
       });
@@ -455,7 +468,7 @@ _AMBIENT_JS = """
         else if (s === 1) { ex = vw - d; ey = pos * vh; }
         else if (s === 2) { ex = pos * vw; ey = vh - d; }
         else { ex = d; ey = pos * vh; }
-        edgeParts.push({ x: ex, y: ey, size: rand(140, 220), alpha: rand(0.030, 0.050),
+        edgeParts.push({ x: ex, y: ey, size: rand(130, 210), alpha: rand(0.022, 0.042),
                          hueOff: rand(-18, 18) });
       }
     }
@@ -465,14 +478,14 @@ _AMBIENT_JS = """
       var cx = corners[c][0], cy = corners[c][1];
       var a2 = Math.atan2(cy - vh / 2, cx - vw / 2);
       edgeParts.push({ x: cx + Math.cos(a2) * 8, y: cy + Math.sin(a2) * 8,
-                       size: rand(320, 420), alpha: rand(0.050, 0.080), hueOff: rand(-10, 10) });
+                       size: rand(300, 400), alpha: rand(0.040, 0.070), hueOff: rand(-10, 10) });
       edgeParts.push({ x: cx + Math.cos(a2) * 26, y: cy + Math.sin(a2) * 26,
-                       size: rand(240, 320), alpha: rand(0.035, 0.060), hueOff: rand(-14, 14) });
+                       size: rand(220, 300), alpha: rand(0.030, 0.055), hueOff: rand(-14, 14) });
     }
     // 顶边：4 颗大粒子横跨顶部
     for (var t = 0; t < 4; t++) {
       edgeParts.push({ x: vw * (t + 0.5) / 4, y: 0,
-                       size: rand(300, 400), alpha: rand(0.040, 0.070), hueOff: rand(-10, 10) });
+                       size: rand(280, 380), alpha: rand(0.035, 0.065), hueOff: rand(-10, 10) });
     }
   }
 
@@ -500,17 +513,16 @@ _AMBIENT_JS = """
     var g = gather * mouseWeight;
     var ease = reduce ? 1 : 0.07;
     var edgeEase = Math.min(1, blend * 1.5);
-    var centerAlpha = Math.max(0, 1 - blend * 1.2);
+    var centerAlpha = Math.max(0, 1 - blend * 1.2);   // 生成态中心光晕淡出
 
     ctx.clearRect(0, 0, vw, vh);
     ctx.globalCompositeOperation = "lighter";
 
-    // 中心弥散光（生成态淡出）
+    // 中心弥散光：整团光晕的"底"，用两张超大幅度、极低透明度的平滑 sprite 铺，
+    // 与粒子叠加后过渡连续，看不出一个个圈（生成态淡出）。
     if (centerAlpha > 0.002) {
-      var washR = (CFG.idleSpread || 380) + 60;
-      var coreR = 300;
-      drawGlowSprite(hue, "wash", cx, cy, washR, 0.028 * centerAlpha);
-      drawGlowSprite(hue, "core", cx, cy, coreR, 0.090 * centerAlpha);
+      drawGlowSprite(hue, "wash", cx, cy, (CFG.idleSpread || 380) + 60, 0.045 * centerAlpha);
+      drawGlowSprite(hue, "core", cx, cy, 320, 0.085 * centerAlpha);
     }
 
     // 中心粒子（生成态飞向视口边缘）
@@ -543,7 +555,8 @@ _AMBIENT_JS = """
 
     // 边缘粒子（生成态）
     if (blend > 0.002) {
-      var breathe = 0.85 + 0.15 * Math.sin(ts * 0.0008 + t0 * 0.001);
+      // 呼吸幅度收小，避免整片背景"一跳一跳"
+      var breathe = 0.94 + 0.06 * Math.sin(ts * 0.0008 + t0 * 0.001);
       for (var j = 0; j < edgeParts.length; j++) {
         var ep = edgeParts[j];
         var dx = focusX - ep.x, dy = focusY - ep.y;

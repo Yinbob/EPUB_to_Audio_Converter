@@ -142,6 +142,15 @@ class TestThemeTokens(unittest.TestCase):
         self.assertIn("invert(1) hue-rotate(180deg)", THEME_CSS)
         self.assertIn("#ata-bg-base", THEME_CSS)
 
+    def test_tab_hover_uses_glass_instead_of_solid_fill(self):
+        """Gradio 默认给标签页 hover 实心填充（浅色下像一块白框），必须换成毛玻璃"""
+        self.assertIn(".tab-container:not(.visually-hidden) button:hover", THEME_CSS)
+        idx = THEME_CSS.index(".tab-container:not(.visually-hidden) button:hover")
+        rule = THEME_CSS[idx:idx + 400]
+        self.assertIn("var(--ata-glass-soft)", rule)
+        self.assertIn("backdrop-filter", rule)
+        self.assertIn("var(--ata-glass-ring)", rule)
+
 
 class TestThemeToggle(unittest.TestCase):
     def test_toggle_script_contract(self):

@@ -112,6 +112,18 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
   `assignEdgeTargets()` 从该点向四周射线到视口边框，方向按**黄金角**（2.39996323）均匀铺开，
   保证每个方向都有粒子；`arming` 目标 0.5、约 1.2 秒可见地散开，收到 `active` 状态后走满量程。
   ③ 同一按钮的点击监听里 `window.scrollTo({top: 0, behavior: 'smooth'})`，整页滑回最顶端。
+- **背景是"柔光光晕"**（需求确认过：要光晕观感，但必须过渡顺滑、看不到色带）：
+  46 颗大半径低透明度光斑（主体 110~200px、核心 150~240px）+ 中心弥散光（440/320px）
+  + 边缘泛光场（130~400px）叠加成一整团；衰减曲线用多段近似高斯
+  （`0.22/0.42/0.60/0.76/0.89` 五个中间停止点），**不要**改回"少数几个停止点"的写法，
+  否则会出现被看成"圈边"的肩部。呼吸幅度只留 ±6%（`0.94 + 0.06 * Math.sin`）。
+  改这些参数后请量三个指标：色带最长平台（应 ≤2px）、可见边缘像素比例（越低调表越连续）、
+  静态鼠标帧间差；当前实测 1–2px / 6.7% / 0.5‰（同级版本里最低）。
+  另外抖动噪声**必须逐通道独立取 0/255**（`bakeDither`）：只抖亮度动不了色度，
+  B−R 这类色差会停在偶数档上、看起来仍是彩色色带。
+- **标签页 hover 一律毛玻璃**：Gradio 默认给 `.tab-container button:hover` 实心填充
+  （浅色下 `rgb(248,250,252)`，看着像贴了一块白框），`THEME_CSS` 里统一改成
+  `var(--ata-glass-soft)` + `blur(14px)` + 内描边；新增标签类组件时记得别让默认白底漏出来。
 
 ### 提供商文件
 - `audiobook_generator/tts_providers/chatterbox_tts_provider.py` — Chatterbox TTS 提供商实现

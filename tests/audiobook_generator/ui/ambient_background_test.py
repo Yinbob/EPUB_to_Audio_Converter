@@ -141,6 +141,30 @@ class TestAmbientLayerContract(unittest.TestCase):
         self.assertIn("drawDither", AMBIENT_LAYER_HTML)
         self.assertIn("data[i * 4 + 3] = 6", AMBIENT_LAYER_HTML, "噪声强度应为 ±3/255 级别")
 
+    def test_soft_glow_is_kept_and_stays_smooth(self):
+        """柔光光晕的观感要保留（大半径、低透明度叠加），同时必须没有色带/硬边"""
+        from audiobook_generator.ui.ambient_background import (
+            AMBIENT_HUE_COUNT,
+            AMBIENT_IDLE_COUNT,
+            AMBIENT_IDLE_SPREAD,
+        )
+        # 少量大半径光斑 + 中心弥散光 = 柔和光晕（不是一堆清晰小圆点）
+        self.assertLessEqual(AMBIENT_IDLE_COUNT, 80, "粒子过多会变成颗粒感，不是光晕")
+        self.assertGreaterEqual(AMBIENT_IDLE_SPREAD, 300)
+        self.assertIn("rand(110, 200)", AMBIENT_LAYER_HTML, "主体光斑半径应保持大半径柔光")
+        self.assertIn('"wash", cx, cy', AMBIENT_LAYER_HTML, "中心弥散光不能丢")
+        self.assertIn('"core", cx, cy', AMBIENT_LAYER_HTML)
+        # 衰减曲线必须多段平滑（近似高斯），否则会看出"圈边"
+        self.assertIn("0.22, stop(0, 0.90)", AMBIENT_LAYER_HTML)
+        self.assertIn("0.60, stop(0, 0.46)", AMBIENT_LAYER_HTML)
+        self.assertIn("0.89, stop(0, 0.09)", AMBIENT_LAYER_HTML)
+        # 抗断层的三道防线必须同时在位
+        self.assertGreaterEqual(AMBIENT_HUE_COUNT, 32)
+        self.assertIn("a * (1 - f)", AMBIENT_LAYER_HTML, "缺少色相交叉淡入")
+        self.assertIn("createPattern", AMBIENT_LAYER_HTML, "缺少抖动噪声层")
+        # 呼吸幅度收小，避免整片背景一跳一跳
+        self.assertIn("0.94 + 0.06 * Math.sin", AMBIENT_LAYER_HTML)
+
     def test_renders_without_per_frame_gradients(self):
         self.assertIn("drawImage", AMBIENT_LAYER_HTML)
         self.assertIn('globalCompositeOperation = "lighter"', AMBIENT_LAYER_HTML)

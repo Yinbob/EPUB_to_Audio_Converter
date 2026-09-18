@@ -210,6 +210,19 @@ THEME_CSS = """
 :root .dark textarea::placeholder,
 :root.dark input::placeholder,
 :root.dark textarea::placeholder { color: var(--apple-text-3) !important; }
+
+/* ── 标签页悬停：Gradio 默认给的是实心填充（浅色下 rgb(248,250,252)，像贴了一块白框），
+   改成毛玻璃高亮 —— 半透明底 + 轻微模糊 + 一圈内描边，和卡片玻璃同一套观感。
+   `.visually-hidden` 的那个是 Gradio 的隐形导航，跳过它。 ── */
+.tab-container:not(.visually-hidden) button:hover,
+.tab-container:not(.visually-hidden) button.selected:hover {
+  background: var(--ata-glass-soft) !important;
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  backdrop-filter: saturate(180%) blur(14px);
+  color: var(--apple-text) !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 0 0 1px var(--ata-glass-ring) !important;
+}
 """
 
 
