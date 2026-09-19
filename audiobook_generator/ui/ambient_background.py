@@ -35,7 +35,7 @@ AMBIENT_SPRITE_SIZE = 256
 # 柔和光晕：少量大半径、低透明度的光斑叠加成一整团过渡顺滑的光晕
 AMBIENT_IDLE_COUNT = 46                      # 空闲态粒子数
 AMBIENT_IDLE_CORE_COUNT = 10                 # 其中贴近核心的粒子数
-AMBIENT_IDLE_SPREAD = 380                    # 空闲态粒子扩散半径（px）
+AMBIENT_IDLE_SPREAD = 440                    # 空闲态粒子扩散半径（px）
 AMBIENT_EDGE_PER_SIDE = 12                   # 生成态每条边的边缘粒子数
 AMBIENT_ARM_TIMEOUT_MS = 6000                # 点「开始生成」后等不到真实状态的兜底回退时长
 
@@ -51,9 +51,19 @@ _CONFIG = {
     "edgePerSide": AMBIENT_EDGE_PER_SIDE,
     "armTimeoutMs": AMBIENT_ARM_TIMEOUT_MS,
     # 深色主题：光晕用更亮更饱和的 sprite、整体强度抬高（深底会把浅色雾吃没）
-    "spriteSatLight": 78, "spriteLightLight": 76,
-    "spriteSatDark": 82, "spriteLightDark": 70,
+    # 颜色更"深"：饱和度上调、明度下调（观感更浓，配合整体提亮）
+    "spriteSatLight": 86, "spriteLightLight": 70,
+    "spriteSatDark": 90, "spriteLightDark": 64,
     "alphaScaleLight": 1.0, "alphaScaleDark": 1.05,
+    # 光晕管线：先在 1/3 分辨率离屏画布上画，再高斯模糊后放大回主画布。
+    # 这样几十个大 sprite 之间的叠加轮廓会被抹平成一整团，不会再看出一个个圈。
+    "glowDownscale": 3,
+    "glowBlur": 11,          # 单位是离屏像素（≈33 CSS px）
+    # 光场渲染：分辨率 = 视口 / fieldDiv（浮点累加，整帧只量化一次）
+    "fieldDiv": 5,
+    "hueLUT": 720,
+    "kernelSteps": 256,
+    "fieldMaxRadius": 150,      # 场坐标里的最大半径（≈750 CSS px）：中心大光束不能被截断
 }
 
 
@@ -235,7 +245,12 @@ _AMBIENT_JS = """
   var coarse = mq("(pointer: coarse)");
 
   var layer = null, base = null, canvas = null, ctx = null;
-  var sprites = { core: [], wash: [] };
+  // 光场：浮点 RGB 累加缓冲 + 量化用的 8bit 画布
+  var fw = 0, fh = 0, fieldDiv = 5, fieldR = null, fieldG = null, fieldB = null;
+  var fieldCanvas = null, fieldCtx = null, fieldImage = null, fieldData = null;
+  var hueLUT = null, hueLUTN = 0, kernel = null;
+  var KERNEL_N = 256, FIELD_MAX_R = 60;
+  var dpr = 1;
   var ditherPattern = null;
   var vw = 0, vh = 0, homeX = 0, homeY = 0;
   var idleParts = [], edgeParts = [];
@@ -248,7 +263,13 @@ _AMBIENT_JS = """
   var spreadAnchorX = 0, spreadAnchorY = 0;   // 扩散起点（点开始生成时的鼠标位置）
   var pointerActive = false;
   var wanderAt = 0;
+  var profileBuf = null;             // 调试剖面用的临时缓冲（只在 __ataAmbient.profile / profileAt 里用）
+  var fieldN = 0;                    // data-field 诊断快照的帧计数
+  var centerConc = 1;                // 中心光束当前的"聚集度"（见 draw() ③）
+  var massCx = 0, massCy = 0, massRms = 0;   // 粒子团重心与散布半径（诊断用）
+  var RING_EDGES = [0, 25, 60, 120, 200, 320, 460, 640, 900];
   var t0 = (window.performance && performance.now()) || Date.now();
+  var frameAcc = 0, frameN = 0;      // 渲染耗时统计（写到 dataset.frameMs，便于排查性能）
   var raf = null, looping = false;
   var armTimer = null;
   var boxObserver = null, payloadObserver = null, observedBox = null, observedPayload = null;
@@ -258,45 +279,44 @@ _AMBIENT_JS = """
   function gauss() { return (Math.random() + Math.random() + Math.random() - 1.5) / 1.5; }
   function now() { return (window.performance && performance.now()) || Date.now(); }
 
-  // ── sprite：每个色相两条衰减曲线，绘制时只做缩放 + globalAlpha ──
-  function makeSprite(hue, profile) {
-    var size = CFG.spriteSize || 160;
-    var c = document.createElement("canvas");
-    c.width = c.height = size;
-    var g = c.getContext("2d");
-    var r = size / 2;
-    // 浅色主题：饱和度降一档、明度抬一档（"浅"而不是"艳"）；
-    // 深色主题反过来用更亮更饱和的色，否则深底上几乎看不见。
-    var sat = themeDark ? (CFG.spriteSatDark || 84) : (CFG.spriteSatLight || 78);
-    var light = themeDark ? (CFG.spriteLightDark || 66) : (CFG.spriteLightLight || 76);
-    function stop(p, a) {
-      return "hsla(" + hue.toFixed(1) + ", " + sat + "%, " + light + "%, " + a + ")";
+  // ══ 光场构造（这一版的核心改动） ══
+  // 每颗粒子 = 一个光源：在**浮点缓冲**里累加高斯贡献，整帧只在最后量化一次（并带抖动）。
+  // 旧做法是几十张预渲染 8bit 光斑按不同透明度叠加——各自的量化台阶会露出可见边界与色带；
+  // 浮点累加则不同色相在浮点域自然混合，从构造上就不存在"叠加边界"和"跳色"。
+  function hslToRgb(h, s, l) {          // h/s/l ∈ 0..1 → [r,g,b] ∈ 0..1
+    if (s <= 0) return [l, l, l];
+    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    var p = 2 * l - q;
+    function f(t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
     }
-    var grad = g.createRadialGradient(r, r, 0, r, r, r);
-    if (profile === "wash") {
-      // 大范围弥散光：多段近似高斯，避免出现被看成"圈边"的肩部
-      grad.addColorStop(0, stop(0, 1));
-      grad.addColorStop(0.22, stop(0, 0.90));
-      grad.addColorStop(0.42, stop(0, 0.70));
-      grad.addColorStop(0.60, stop(0, 0.46));
-      grad.addColorStop(0.76, stop(0, 0.24));
-      grad.addColorStop(0.89, stop(0, 0.09));
-      grad.addColorStop(1, stop(0, 0));
-    } else {
-      // 主体光斑：同样用平滑衰减，靠大量低透明度叠加出连续光晕
-      grad.addColorStop(0, stop(0, 1));
-      grad.addColorStop(0.20, stop(0, 0.86));
-      grad.addColorStop(0.38, stop(0, 0.65));
-      grad.addColorStop(0.56, stop(0, 0.42));
-      grad.addColorStop(0.72, stop(0, 0.22));
-      grad.addColorStop(0.86, stop(0, 0.08));
-      grad.addColorStop(1, stop(0, 0));
+    return [f(h + 1 / 3), f(h), f(h - 1 / 3)];
+  }
+
+  // 色相 → RGB 查找表；取用时线性插值，色相是连续量，不会"跳档"
+  function buildHueLUT() {
+    var sat = themeDark ? (CFG.spriteSatDark || 82) : (CFG.spriteSatLight || 78);
+    var light = themeDark ? (CFG.spriteLightDark || 70) : (CFG.spriteLightLight || 76);
+    var n = CFG.hueLUT || 720;
+    hueLUT = new Float32Array(n * 3);
+    for (var i = 0; i < n; i++) {
+      var rgb = hslToRgb(i / n, sat / 100, light / 100);
+      hueLUT[i * 3] = rgb[0];
+      hueLUT[i * 3 + 1] = rgb[1];
+      hueLUT[i * 3 + 2] = rgb[2];
     }
-    g.fillStyle = grad;
-    g.beginPath();
-    g.arc(r, r, r, 0, TAU);
-    g.fill();
-    return c;
+    hueLUTN = n;
+  }
+
+  // 高斯衰减 exp(-3t)，t=(d/R)²：曲线与旧的多段渐变 stops 基本一致，保证样式不变
+  function buildKernel() {
+    kernel = new Float32Array(KERNEL_N + 1);
+    for (var i = 0; i <= KERNEL_N; i++) kernel[i] = Math.exp(-3 * (i / KERNEL_N));
   }
 
   function isDarkTheme() {
@@ -304,40 +324,67 @@ _AMBIENT_JS = """
     return !!(document.body && document.body.classList.contains("dark"));
   }
 
-  function buildSprites() {
-    var n = CFG.hueCount || 24;
-    sprites = { core: [], wash: [] };
-    for (var i = 0; i < n; i++) {
-      var hue = (i / n) * 360;
-      sprites.core.push(makeSprite(hue, "core"));
-      sprites.wash.push(makeSprite(hue, "wash"));
+  // 往光场里累加一个光源（坐标/半径都是 CSS 像素）
+  function splat(x, y, radius, hue, alpha) {
+    if (alpha <= 0.0008) return;
+    var R = radius / fieldDiv;
+    if (R < 0.7) R = 0.7;
+    if (R > FIELD_MAX_R) R = FIELD_MAX_R;
+    var h = ((hue % 360) + 360) % 360;
+    var pos = (h / 360) * hueLUTN;
+    var i0 = Math.floor(pos), f = pos - i0;
+    var j0 = (i0 % hueLUTN) * 3, j1 = ((i0 + 1) % hueLUTN) * 3;
+    var cr = hueLUT[j0] + (hueLUT[j1] - hueLUT[j0]) * f;
+    var cg = hueLUT[j0 + 1] + (hueLUT[j1 + 1] - hueLUT[j0 + 1]) * f;
+    var cb = hueLUT[j0 + 2] + (hueLUT[j1 + 2] - hueLUT[j0 + 2]) * f;
+    var e = Math.min(1, alpha * themeAlpha);
+    var cx = x / fieldDiv, cy = y / fieldDiv;
+    var x0 = Math.max(0, Math.floor(cx - R)), x1 = Math.min(fw - 1, Math.ceil(cx + R));
+    var y0 = Math.max(0, Math.floor(cy - R)), y1 = Math.min(fh - 1, Math.ceil(cy + R));
+    var invR2 = 1 / (R * R);
+    for (var py = y0; py <= y1; py++) {
+      var dy = py - cy, dy2 = dy * dy, row = py * fw;
+      for (var px = x0; px <= x1; px++) {
+        var dx = px - cx;
+        var t = (dx * dx + dy2) * invR2;
+        if (t >= 1) continue;
+        var k = kernel[(t * KERNEL_N) | 0] * e;
+        var idx = row + px;
+        fieldR[idx] += cr * k;
+        fieldG[idx] += cg * k;
+        fieldB[idx] += cb * k;
+      }
     }
   }
 
-  function spriteFor(hue, profile) {
-    var n = sprites.core.length || 1;
-    var h = ((hue % 360) + 360) % 360;
-    var idx = Math.round((h / 360) * n) % n;
-    return sprites[profile][idx];
+  function clearField() {
+    fieldR.fill(0); fieldG.fill(0); fieldB.fill(0);
   }
 
-  // 色相按最近邻取整会产生"跳色"（24 档时尤其明显），这里在相邻两张 sprite
-  // 之间按比例交叉淡入：两张叠加的亮度之和不变，但颜色是连续过渡的。
-  function drawGlowSprite(hue, profile, x, y, size, alpha) {
-    var n = sprites.core.length;
-    if (!n || alpha <= 0.002) return;
-    var h = ((hue % 360) + 360) % 360;
-    var pos = (h / 360) * n;
-    var i0 = Math.floor(pos) % n;
-    var i1 = (i0 + 1) % n;
-    var f = pos - Math.floor(pos);
-    var a = Math.min(1, alpha * themeAlpha);
-    ctx.globalAlpha = Math.min(1, a * (1 - f));
-    ctx.drawImage(sprites[profile][i0], x - size, y - size, size * 2, size * 2);
-    if (f > 0.002) {
-      ctx.globalAlpha = Math.min(1, a * f);
-      ctx.drawImage(sprites[profile][i1], x - size, y - size, size * 2, size * 2);
+  // 光场 → 8bit（全流程唯一的量化点）→ 放大回主画布；抖动在 display 分辨率上叠加
+  function compositeField() {
+    var data = fieldData.data;
+    var fi = 0, di = 0;
+    for (var y = 0; y < fh; y++) {
+      for (var x = 0; x < fw; x++, fi++, di += 4) {
+        var sr = fieldR[fi], sg = fieldG[fi], sb = fieldB[fi];
+        var a = sr > sg ? sr : sg;
+        if (sb > a) a = sb;
+        if (a <= 0.0005) { data[di + 3] = 0; continue; }
+        var inv = 255 / a;
+        data[di] = Math.min(255, sr * inv) | 0;
+        data[di + 1] = Math.min(255, sg * inv) | 0;
+        data[di + 2] = Math.min(255, sb * inv) | 0;
+        data[di + 3] = Math.min(255, a * 255) | 0;
+      }
     }
+    fieldCtx.putImageData(fieldImage, 0, 0);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalCompositeOperation = "source-over";
+    ctx.globalAlpha = 1;
+    ctx.imageSmoothingEnabled = true;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(fieldCanvas, 0, 0, canvas.width, canvas.height);
   }
 
   // 抖动噪声：预烘焙一张 1:1 设备像素的瓦片，每帧用 pattern 铺一次。
@@ -375,11 +422,10 @@ _AMBIENT_JS = """
   // 主题切换：换一套 sprite 亮度和整体强度（同一帧内只重建一次）
   function refreshTheme(force) {
     var dark = isDarkTheme();
-    if (!force && dark === themeDark && sprites.core.length) return;
+    if (!force && dark === themeDark && hueLUT) return;
     themeDark = dark;
     themeAlpha = dark ? (CFG.alphaScaleDark || 1.7) : (CFG.alphaScaleLight || 1);
-    sprites = { core: [], wash: [] };
-    buildSprites();
+    buildHueLUT();          // 主题决定饱和度/明度，色相表要重建
     if (reduce) draw(now());
   }
 
@@ -392,12 +438,29 @@ _AMBIENT_JS = """
     // 扩散起点默认在光晕家位置；视口变化后若已跑到画面外就拉回来
     if (!spreadAnchorX && !spreadAnchorY) { spreadAnchorX = homeX; spreadAnchorY = homeY; }
     if (spreadAnchorX > vw || spreadAnchorY > vh) { spreadAnchorX = homeX; spreadAnchorY = homeY; }
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(vw * dpr);
     canvas.height = Math.round(vh * dpr);
     canvas.style.width = vw + "px";
     canvas.style.height = vh + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // 光场缓冲：低分辨率浮点累加（每帧只用一次 8bit 量化）
+    fieldDiv = Math.max(3, CFG.fieldDiv || 5);
+    fw = Math.max(1, Math.ceil(vw / fieldDiv));
+    fh = Math.max(1, Math.ceil(vh / fieldDiv));
+    KERNEL_N = CFG.kernelSteps || 256;
+    FIELD_MAX_R = CFG.fieldMaxRadius || 60;
+    fieldR = new Float32Array(fw * fh);
+    fieldG = new Float32Array(fw * fh);
+    fieldB = new Float32Array(fw * fh);
+    if (!fieldCanvas) {
+      fieldCanvas = document.createElement("canvas");
+      fieldCtx = fieldCanvas.getContext("2d");
+    }
+    fieldCanvas.width = fw;
+    fieldCanvas.height = fh;
+    fieldImage = fieldCtx.createImageData(fw, fh);
+    fieldData = fieldImage;
     bakeDither();                       // DPR 可能变化，噪声瓦片按设备像素重建
   }
 
@@ -422,8 +485,8 @@ _AMBIENT_JS = """
       p.edgeX = ax + cosA * Math.max(t - margin, 0);
       p.edgeY = ay + sinA * Math.max(t - margin, 0);
       // 散到边缘后收成小一些的光斑（同时提亮一点，边缘才有存在感）
-      p.edgeSize = rand(70, 130);
-      p.edgeAlpha = rand(0.020, 0.038);
+      p.edgeSize = rand(85, 155);
+      p.edgeAlpha = rand(0.027, 0.050);
     }
   }
 
@@ -446,10 +509,12 @@ _AMBIENT_JS = """
         x: homeX + Math.cos(angle) * radius,
         y: homeY + Math.sin(angle) * radius,
         // 大半径、低透明度的光斑：靠叠加形成连续光晕（不要能看出一个个圈）
-        idleSize: isCore ? rand(150, 240) : rand(110, 200),
-        gatherSize: isCore ? rand(60, 105) : rand(45, 90),
-        idleAlpha: isCore ? rand(0.030, 0.055) : rand(0.014, 0.030),
-        gatherAlpha: isCore ? rand(0.034, 0.060) : rand(0.018, 0.036),
+        idleSize: isCore ? rand(200, 320) : rand(150, 270),
+        // 汇聚时靠"抖动收紧"来集中（粒子半径要保持足够大：它们靠在光标处密集重叠
+        // 把中心顶亮，半径缩太小反而会让中心变暗）
+        gatherSize: isCore ? rand(60, 105) : rand(45, 85),
+        idleAlpha: isCore ? rand(0.042, 0.075) : rand(0.020, 0.042),
+        gatherAlpha: isCore ? rand(0.048, 0.085) : rand(0.026, 0.052),
         hueOff: rand(-16, 16),
         angleJitter: rand(-0.12, 0.12),
         edgeX: 0, edgeY: 0, edgeSize: 0, edgeAlpha: 0
@@ -468,7 +533,7 @@ _AMBIENT_JS = """
         else if (s === 1) { ex = vw - d; ey = pos * vh; }
         else if (s === 2) { ex = pos * vw; ey = vh - d; }
         else { ex = d; ey = pos * vh; }
-        edgeParts.push({ x: ex, y: ey, size: rand(130, 210), alpha: rand(0.022, 0.042),
+        edgeParts.push({ x: ex, y: ey, size: rand(150, 240), alpha: rand(0.029, 0.055),
                          hueOff: rand(-18, 18) });
       }
     }
@@ -478,54 +543,93 @@ _AMBIENT_JS = """
       var cx = corners[c][0], cy = corners[c][1];
       var a2 = Math.atan2(cy - vh / 2, cx - vw / 2);
       edgeParts.push({ x: cx + Math.cos(a2) * 8, y: cy + Math.sin(a2) * 8,
-                       size: rand(300, 400), alpha: rand(0.040, 0.070), hueOff: rand(-10, 10) });
+                       size: rand(340, 460), alpha: rand(0.052, 0.091), hueOff: rand(-10, 10) });
       edgeParts.push({ x: cx + Math.cos(a2) * 26, y: cy + Math.sin(a2) * 26,
-                       size: rand(220, 300), alpha: rand(0.030, 0.055), hueOff: rand(-14, 14) });
+                       size: rand(250, 345), alpha: rand(0.039, 0.072), hueOff: rand(-14, 14) });
     }
     // 顶边：4 颗大粒子横跨顶部
     for (var t = 0; t < 4; t++) {
       edgeParts.push({ x: vw * (t + 0.5) / 4, y: 0,
-                       size: rand(280, 380), alpha: rand(0.035, 0.065), hueOff: rand(-10, 10) });
+                       size: rand(320, 435), alpha: rand(0.046, 0.085), hueOff: rand(-10, 10) });
     }
   }
 
   // ── 色相缓慢流动 ──
   function slowHue(ts) {
     var pal = CFG.huePalette || [212, 250, 196, 288];
-    if (pal.length < 2) return pal[0] || 212;
-    var span = (CFG.hueSegmentMs || 10000) * (pal.length - 1);
-    var elapsed = Math.max(0, ts - t0);
-    var pos = ((elapsed % span) / span) * (pal.length - 1);
-    var i = Math.min(pal.length - 2, Math.floor(pos));
-    var f = pos - i;
-    var e = f * f * (3 - 2 * f);
-    return pal[i] + (pal[i + 1] - pal[i]) * e;
+    var n = pal.length;
+    if (n < 2) return pal[0] || 212;
+    // 闭环 + Catmull-Rom 插值：
+    // ⚠️ 旧写法是"线性扫过调色板再回到第一色"，最后一段 [288 → 212] 会瞬间跳 ~76°，
+    //    看起来就是"卡一下突然换了个颜色"。改成把首尾相接成环、并用 Catmull-Rom
+    //    取相邻四点插值：跨段的一阶导连续，既不会有循环回绕的瞬跳，也不会在每个
+    //    色相点上"到站停一下再走"。整轮时长 = 色相段长 × 段数（默认 4×10s = 40s）。
+    var span = (CFG.hueSegmentMs || 10000) * n;
+    var pos = ((Math.max(0, ts - t0)) % span) / span * n;
+    var i = Math.floor(pos) % n;
+    var f = pos - Math.floor(pos);
+    var p0 = pal[(i - 1 + n) % n], p1 = pal[i];
+    var p2 = pal[(i + 1) % n], p3 = pal[(i + 2) % n];
+    var f2 = f * f, f3 = f2 * f;
+    return 0.5 * (2 * p1 + (-p0 + p2) * f
+                  + (2 * p0 - 5 * p1 + 4 * p2 - p3) * f2
+                  + (-p0 + 3 * p1 - 3 * p2 + p3) * f3);
+  }
+
+  // 读出当前光场的亮度分布：峰值强度 + 峰值位置（CSS px）+ 内部缓冲。
+  // 传 (px,py) 时顺带按"到该点的距离"分桶，给出同心环平均亮度（一趟扫完，不额外多扫）。
+  // 亮度取 max(r,g,b)——和 compositeField() 里决定 alpha 的量一致。
+  function profileAt(px, py) {
+    if (!fieldR || !fw || !fh) return null;
+    var n = fw * fh, i;
+    if (!profileBuf || profileBuf.length !== n) profileBuf = new Float32Array(n);
+    var max = 0, maxI = 0;
+    for (i = 0; i < n; i++) {
+      var a = fieldR[i];
+      if (fieldG[i] > a) a = fieldG[i];
+      if (fieldB[i] > a) a = fieldB[i];
+      profileBuf[i] = a;
+      if (a > max) { max = a; maxI = i; }
+    }
+    var out = { peak: max, peakX: (maxI % fw) * fieldDiv, peakY: ((maxI / fw) | 0) * fieldDiv };
+    if (px == null || py == null) return out;
+    var rings = RING_EDGES.length - 1, sum = new Float64Array(rings), cnt = new Float64Array(rings);
+    var fx = px / fieldDiv, fy = py / fieldDiv;
+    var edge = [], r;
+    for (r = 0; r < RING_EDGES.length; r++) edge.push(RING_EDGES[r] / fieldDiv);
+    for (var y = 0; y < fh; y++) {
+      var dy = y - fy, dy2 = dy * dy;
+      for (var x = 0; x < fw; x++) {
+        var dx = x - fx;
+        var d = Math.sqrt(dx * dx + dy2);
+        for (r = 0; r < rings; r++) {
+          if (d < edge[r + 1]) { sum[r] += profileBuf[y * fw + x]; cnt[r]++; break; }
+        }
+      }
+    }
+    out.rings = [];
+    for (r = 0; r < rings; r++) out.rings.push(cnt[r] ? sum[r] / cnt[r] : 0);
+    return out;
   }
 
   // ── 绘制 ──
   function draw(ts) {
-    if (!ctx) return;
+    if (!ctx || !fieldCtx) return;
     var hue = slowHue(ts);
     var cx = homeX + driftX;
     var cy = homeY + driftY;
     // 生成中鼠标只保留 15% 的参与度
     var mouseWeight = 0.15 + 0.85 * (1 - Math.min(1, blend));
     var g = gather * mouseWeight;
-    var ease = reduce ? 1 : 0.07;
+    var ease = reduce ? 1 : 0.08;
     var edgeEase = Math.min(1, blend * 1.5);
     var centerAlpha = Math.max(0, 1 - blend * 1.2);   // 生成态中心光晕淡出
 
-    ctx.clearRect(0, 0, vw, vh);
-    ctx.globalCompositeOperation = "lighter";
+    // ① 清空浮点光场
+    clearField();
 
-    // 中心弥散光：整团光晕的"底"，用两张超大幅度、极低透明度的平滑 sprite 铺，
-    // 与粒子叠加后过渡连续，看不出一个个圈（生成态淡出）。
-    if (centerAlpha > 0.002) {
-      drawGlowSprite(hue, "wash", cx, cy, (CFG.idleSpread || 380) + 60, 0.045 * centerAlpha);
-      drawGlowSprite(hue, "core", cx, cy, 320, 0.085 * centerAlpha);
-    }
-
-    // 中心粒子（生成态飞向视口边缘）
+    // ② 先更新粒子位置/尺寸/透明度（光束要跟着粒子团重心走，所以必须先算）
+    var massX = 0, massY = 0, massXX = 0, massYY = 0, massW = 0;
     for (var i = 0; i < idleParts.length; i++) {
       var p = idleParts[i];
       var bx = cx + p.offX, by = cy + p.offY;
@@ -534,8 +638,8 @@ _AMBIENT_JS = """
         hx = bx + (p.edgeX - bx) * edgeEase;
         hy = by + (p.edgeY - by) * edgeEase;
       }
-      var tx = hx + (focusX + p.jx * 50 - hx) * g;
-      var ty = hy + (focusY + p.jy * 50 - hy) * g;
+      var tx = hx + (focusX + p.jx * 32 - hx) * g;
+      var ty = hy + (focusY + p.jy * 32 - hy) * g;
       p.x += (tx - p.x) * ease;
       p.y += (ty - p.y) * ease;
 
@@ -543,19 +647,63 @@ _AMBIENT_JS = """
       var baseA = p.idleAlpha + (p.gatherAlpha - p.idleAlpha) * g;
       if (blend > 0.01) {
         size = span + (p.edgeSize - span) * edgeEase;
-        alpha = (baseA + (p.edgeAlpha - baseA) * edgeEase) *
-                Math.max(0, 1 - blend * 0.5);
+        alpha = (baseA + (p.edgeAlpha - baseA) * edgeEase) * Math.max(0, 1 - blend * 0.5);
       } else {
         size = span;
         alpha = baseA;
       }
-      if (alpha <= 0.002 || size <= 1) continue;
-      drawGlowSprite(hue + p.hueOff, "core", p.x, p.y, size, alpha);
+      p.curSize = size;
+      p.curAlpha = alpha;
+      if (alpha > 0.0008 && size > 0.5) {
+        var w = alpha;                       // 用亮度当权重求重心
+        massX += p.x * w; massY += p.y * w;
+        massXX += p.x * p.x * w; massYY += p.y * p.y * w;
+        massW += w;
+      }
     }
 
-    // 边缘粒子（生成态）
+    // ③ 中心光束：跟随**粒子团的实际重心**，而不是直接跟光标 ——
+    //    否则快速移动时粒子还在路上、光束已经先到光标，看起来就是"鼠标上粘了一团光，
+    //    其余的再慢慢挪过去"。锚在重心上，整团光晕才是一个整体在移动。
+    //    另外中心亮度还要乘"聚集度"：粒子散在路上的时候（rms 大）只给 30% 亮度，
+    //    否则重心虽然跟着走了，但收得很紧的亮核仍会先成形、看着还是像粘在光标的亮斑。
+    //    鼠标在页面里时它负责收束成形；鼠标移出浏览器后（g→0）淡出，只剩散开的粒子。
+    if (centerAlpha > 0.002 && g > 0.02) {
+      var baseX, baseY, conc = 0.3;
+      if (massW > 0.0001) {
+        massCx = massX / massW; massCy = massY / massW;
+        var vx = Math.max(0, massXX / massW - massCx * massCx);
+        var vy = Math.max(0, massYY / massW - massCy * massCy);
+        massRms = Math.sqrt(vx + vy);         // 粒子团相对重心的散布半径
+        conc = 0.3 + 0.7 * Math.max(0, Math.min(1, 1 - massRms / 110));
+        baseX = massCx;
+        baseY = massCy;
+      } else {
+        baseX = cx + (focusX - cx) * g;
+        baseY = cy + (focusY - cy) * g;
+      }
+      // 三层配比（外圈"大而淡"只负责远处的范围，中间收得紧、中心提亮）：
+      //   ① 560px / 0.040 —— 远处泛光
+      //   ② 190px / 0.155 —— 收束主体
+      //   ③ 100px / 0.540 —— 中心高光核
+      var beam = centerAlpha * g * conc;
+      centerConc = conc;
+      splat(baseX, baseY, 560, hue, 0.040 * beam);
+      splat(baseX, baseY, 190, hue, 0.155 * beam);
+      splat(baseX, baseY, 100, hue, 0.540 * beam);
+    } else {
+      centerConc = 1;
+    }
+
+    // ④ 粒子当光源逐个累加（生成态飞向视口边缘）
+    for (var k = 0; k < idleParts.length; k++) {
+      var pk = idleParts[k];
+      if (pk.curAlpha <= 0.0008 || pk.curSize <= 0.5) continue;
+      splat(pk.x, pk.y, pk.curSize, hue + pk.hueOff, pk.curAlpha);
+    }
+
+    // ⑤ 边缘粒子（生成态）
     if (blend > 0.002) {
-      // 呼吸幅度收小，避免整片背景"一跳一跳"
       var breathe = 0.94 + 0.06 * Math.sin(ts * 0.0008 + t0 * 0.001);
       for (var j = 0; j < edgeParts.length; j++) {
         var ep = edgeParts[j];
@@ -563,18 +711,17 @@ _AMBIENT_JS = """
         var dist = Math.sqrt(dx * dx + dy * dy) || 1;
         var near = Math.max(0, 1 - dist / 520);      // 离光标越近的边缘粒子越亮
         var pull = 14 * g;                            // 被光标轻微牵引
-        var ex2 = ep.x + (dx / dist) * pull;
-        var ey2 = ep.y + (dy / dist) * pull;
         var ea = ep.alpha * blend * breathe * (1 + 0.5 * near * g);
-        if (ea <= 0.002) continue;
-        drawGlowSprite(hue + ep.hueOff, "wash", ex2, ey2, ep.size, ea);
+        if (ea <= 0.0008) continue;
+        splat(ep.x + (dx / dist) * pull, ep.y + (dy / dist) * pull, ep.size, hue + ep.hueOff, ea);
       }
     }
 
-    // 抖动层：低透明度的大面积渐变在 8bit 下必然出现色带，
-    // 最后盖一层"平均为零"的极淡噪声把色带边界打散（约 ±3/255，肉眼不可见）。
+    // ⑥ 一次性量化 + 放大回主画布，最后叠 display 分辨率的抖动层
+    compositeField();
     drawDither(ts);
 
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = "source-over";
   }
@@ -717,8 +864,8 @@ _AMBIENT_JS = """
     if (gather < 0.001) gather = 0;
 
     if (pointerActive && !coarse) {
-      focusX += (mouseX - focusX) * 0.05;           // 光标跟随带一点惯性
-      focusY += (mouseY - focusY) * 0.05;
+      focusX += (mouseX - focusX) * 0.06;           // 光标跟随带一点惯性
+      focusY += (mouseY - focusY) * 0.06;
       driftX += (0 - driftX) * 0.01;
       driftY += (0 - driftY) * 0.01;
     } else {
@@ -735,7 +882,29 @@ _AMBIENT_JS = """
     }
 
     if (state === "settling" && blend <= 0.001) setState("idle");
+    var tDraw = now();
     draw(ts);
+    frameAcc += now() - tDraw;
+    // 光场诊断（和 frameMs 一样只是排查用的快照，不影响渲染）：
+    // 亮度峰值的位置/强度 + 聚集度，用来确认"中心没有粘在光标上"、收束范围有没有变化。
+    if (++fieldN >= 6) {
+      var prof = profileAt(focusX, focusY);
+      if (prof && layer) {
+        layer.dataset.field = (prof.peak * 1000 | 0) + "|"
+          + (prof.peakX | 0) + "|" + (prof.peakY | 0) + "|"
+          + (gather * 1000 | 0) + "|" + (blend * 1000 | 0) + "|"
+          + (centerConc * 1000 | 0) + "|"
+          + (massCx | 0) + "|" + (massCy | 0) + "|" + (massRms | 0) + "|"
+          + (focusX | 0) + "|" + (focusY | 0) + "|"
+          + prof.rings.map(function (v) { return v * 1000 | 0; }).join(",");
+      }
+      fieldN = 0;
+    }
+    if (++frameN >= 30) {
+      if (layer) layer.dataset.frameMs = (frameAcc / frameN).toFixed(2);
+      frameAcc = 0;
+      frameN = 0;
+    }
     raf = requestAnimationFrame(step);
   }
 
@@ -776,13 +945,13 @@ _AMBIENT_JS = """
 
   function boot() {
     if (!ensureLayer()) return;
-    refreshTheme(false);                       // 主题变了就换一套 sprite
-    if (!sprites.core.length) buildSprites();
+    refreshTheme(false);                       // 主题变了就重建色相表
     if (!idleParts.length) {
       measure();
       focusX = homeX; focusY = homeY;
       rebuildParticles();
     }
+    if (!kernel) buildKernel();                // 高斯衰减表（一次）
     paintClass();
     bindObservers();
     syncFromProgress();
@@ -813,6 +982,20 @@ _AMBIENT_JS = """
     getBlend: function () { return blend; },
     draw: draw,
     rebuild: function () { measure(); rebuildParticles(); draw(now()); },
+    // 调试用：读当前光场的亮度剖面（a = alpha 通道强度，1.0 = 满亮），不改动渲染状态。
+    // 传 (px, py) 时额外返回以该 CSS 点为中心的同心环平均值，便于量"收束范围/中心高光"。
+    profile: function (px, py) {
+      var prof = profileAt(px, py);
+      if (!prof) return null;
+      var out = {
+        vw: vw, vh: vh, fieldDiv: fieldDiv,
+        peak: prof.peak, peakX: prof.peakX, peakY: prof.peakY,
+        focusX: focusX, focusY: focusY, gather: gather, blend: blend, state: state,
+        conc: centerConc
+      };
+      if (prof.rings) out.rings = prof.rings;
+      return out;
+    },
     cleanup: cleanup,
     reduceMotion: reduce,
     coarsePointer: coarse

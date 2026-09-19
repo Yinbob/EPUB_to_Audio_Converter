@@ -102,12 +102,34 @@ class TestAmbientLayerContract(unittest.TestCase):
                       "insertBefore", 'setAttribute("aria-hidden", "true")'):
             self.assertIn(token, AMBIENT_LAYER_HTML, "背景层脚本缺少：" + token)
 
+    def test_light_field_diagnostics_are_exposed(self):
+        """调参要靠光场快照，不能靠截图：dataset.field + __ataAmbient.profile 都得在"""
+        self.assertIn("profileAt(focusX, focusY)", AMBIENT_LAYER_HTML)
+        self.assertIn('layer.dataset.field =', AMBIENT_LAYER_HTML)
+        # 快照字段顺序：峰值|峰值x|峰值y|gather|blend|聚集度|重心x|重心y|rms|focusX|focusY|同心环
+        for token in ("(prof.peak * 1000 | 0)", "(massCx | 0)", "(massRms | 0)",
+                      "prof.rings.map"):
+            self.assertIn(token, AMBIENT_LAYER_HTML, "光场快照缺少：" + token)
+        self.assertIn("profile: function (px, py)", AMBIENT_LAYER_HTML)
+        self.assertIn("RING_EDGES", AMBIENT_LAYER_HTML)
+
     def test_state_machine_reuses_progress_contract(self):
         for token in ("progress_container", "collapsed", "generating", "arming", "settling",
                       "开始生成", "停止转换", "signalStart", "signalSettle"):
             self.assertIn(token, AMBIENT_LAYER_HTML, "状态机缺少：" + token)
         self.assertIn("MutationObserver", AMBIENT_LAYER_HTML)
         self.assertNotIn("fetch(", AMBIENT_LAYER_HTML)
+
+    def test_hue_cycle_is_closed_loop_and_smooth(self):
+        """色相循环必须首尾相接 + Catmull-Rom 插值，否则回到起点时会瞬间跳色"""
+        for token in ("(i - 1 + n) % n", "(i + 1) % n", "(i + 2) % n",
+                      "(-p0 + p2) * f", "(2 * p0 - 5 * p1 + 4 * p2 - p3) * f2",
+                      "(-p0 + 3 * p1 - 3 * p2 + p3) * f3",
+                      "(CFG.hueSegmentMs || 10000) * n"):
+            self.assertIn(token, AMBIENT_LAYER_HTML, "色相循环缺少：" + token)
+        # 旧的"线性扫过 + 直接回绕"写法必须消失（它会在 288 → 212 处跳 ~76°）
+        self.assertNotIn("pal[i] + (pal[i + 1] - pal[i])", AMBIENT_LAYER_HTML)
+        self.assertNotIn("f * f * (3 - 2 * f)", AMBIENT_LAYER_HTML)
 
     def test_click_spread_starts_from_pointer_and_is_angularly_even(self):
         """点「开始生成」时光晕要从鼠标位置、按黄金角均匀散向四周"""
@@ -124,22 +146,26 @@ class TestAmbientLayerContract(unittest.TestCase):
         self.assertIn('setState("arming")', body)
 
     def test_banding_mitigations_are_in_place(self):
-        """色彩断层的三道防线：色相交叉淡入 + 更密的色相档 + 抖动噪声层"""
+        """断层的防线：浮点光场（只量化一次）+ 细色相表 + 抖动噪声层"""
         from audiobook_generator.ui.ambient_background import (
             AMBIENT_HUE_COUNT,
             AMBIENT_SPRITE_SIZE,
         )
-        self.assertGreaterEqual(AMBIENT_HUE_COUNT, 32, "色相档位太少会出现跳色")
-        self.assertGreaterEqual(AMBIENT_SPRITE_SIZE, 224, "sprite 太小放大后会有条带")
-        # 相邻两张 sprite 交叉淡入（f 与 1-f 两次绘制）
-        self.assertIn("function drawGlowSprite", AMBIENT_LAYER_HTML)
-        self.assertIn("a * (1 - f)", AMBIENT_LAYER_HTML)
-        self.assertIn("a * f", AMBIENT_LAYER_HTML)
-        # 抖动噪声层：预烘焙瓦片 + pattern 平铺
+        self.assertTrue(AMBIENT_HUE_COUNT >= 32)
+        self.assertTrue(AMBIENT_SPRITE_SIZE >= 128)
+        # 光场：浮点累加 + 只在最后量化一次 + 色相查表线性插值
+        self.assertIn("new Float32Array", AMBIENT_LAYER_HTML, "缺少浮点光场缓冲")
+        self.assertIn("fieldR[idx] += cr * k", AMBIENT_LAYER_HTML)
+        self.assertIn("putImageData", AMBIENT_LAYER_HTML, "光场应只在这里量化一次")
+        self.assertIn("hueLUT[j0]", AMBIENT_LAYER_HTML, "色相应查表 + 线性插值")
+        # 抖动噪声层：预烘焙瓦片 + pattern 平铺（display 分辨率上叠）
         self.assertIn("function bakeDither", AMBIENT_LAYER_HTML)
         self.assertIn("createPattern", AMBIENT_LAYER_HTML)
         self.assertIn("drawDither", AMBIENT_LAYER_HTML)
         self.assertIn("data[i * 4 + 3] = 6", AMBIENT_LAYER_HTML, "噪声强度应为 ±3/255 级别")
+        # 不能再回到"叠预渲染 sprite"的老路：那正是叠加边界/色带的来源
+        self.assertNotIn("drawImage(sprites", AMBIENT_LAYER_HTML)
+        self.assertNotIn("createRadialGradient", AMBIENT_LAYER_HTML)
 
     def test_soft_glow_is_kept_and_stays_smooth(self):
         """柔光光晕的观感要保留（大半径、低透明度叠加），同时必须没有色带/硬边"""
@@ -151,25 +177,50 @@ class TestAmbientLayerContract(unittest.TestCase):
         # 少量大半径光斑 + 中心弥散光 = 柔和光晕（不是一堆清晰小圆点）
         self.assertLessEqual(AMBIENT_IDLE_COUNT, 80, "粒子过多会变成颗粒感，不是光晕")
         self.assertGreaterEqual(AMBIENT_IDLE_SPREAD, 300)
-        self.assertIn("rand(110, 200)", AMBIENT_LAYER_HTML, "主体光斑半径应保持大半径柔光")
-        self.assertIn('"wash", cx, cy', AMBIENT_LAYER_HTML, "中心弥散光不能丢")
-        self.assertIn('"core", cx, cy', AMBIENT_LAYER_HTML)
-        # 衰减曲线必须多段平滑（近似高斯），否则会看出"圈边"
-        self.assertIn("0.22, stop(0, 0.90)", AMBIENT_LAYER_HTML)
-        self.assertIn("0.60, stop(0, 0.46)", AMBIENT_LAYER_HTML)
-        self.assertIn("0.89, stop(0, 0.09)", AMBIENT_LAYER_HTML)
-        # 抗断层的三道防线必须同时在位
-        self.assertGreaterEqual(AMBIENT_HUE_COUNT, 32)
-        self.assertIn("a * (1 - f)", AMBIENT_LAYER_HTML, "缺少色相交叉淡入")
+        # 半径用区间断言（数值允许调优，但必须保持"大半径柔光"这一性质）
+        m = re.search(
+            r"idleSize: isCore \? rand\((\d+), (\d+)\) : rand\((\d+), (\d+)\)",
+            AMBIENT_LAYER_HTML)
+        self.assertIsNotNone(m, "找不到粒子半径设置")
+        self.assertGreaterEqual(int(m.group(1)), 100, "核心光斑半径应保持大半径柔光")
+        self.assertGreaterEqual(int(m.group(2)), 200)
+        self.assertGreaterEqual(int(m.group(3)), 100, "主体光斑半径应保持大半径柔光")
+        self.assertGreaterEqual(int(m.group(4)), 180)
+        # 中心弥散光必须跟着鼠标走：早先画在家位置，鼠标挪开后正中会残留浅色圆
+        self.assertIn("splat(baseX, baseY", AMBIENT_LAYER_HTML, "中心弥散光不能丢")
+        self.assertIn("cx + (focusX - cx) * g", AMBIENT_LAYER_HTML, "中心弥散光要跟随光标")
+        # 鼠标移出页面时（g→0）中心光要淡出，只留散开的粒子
+        self.assertIn("centerAlpha > 0.002 && g > 0.02", AMBIENT_LAYER_HTML)
+        # 光束要锚在"粒子团重心"上，不能直接跟光标：否则快速移动时粒子还在路上、
+        # 光束已先到光标 → 看起来就是"鼠标上粘了一团光，其余的再挪过去"
+        self.assertIn("massX += p.x * w", AMBIENT_LAYER_HTML)
+        self.assertIn("massY += p.y * w", AMBIENT_LAYER_HTML)
+        self.assertIn("massCx = massX / massW", AMBIENT_LAYER_HTML)
+        self.assertIn("baseX = massCx", AMBIENT_LAYER_HTML)
+        # 中心亮度还要乘"聚集度"：云团还没聚起来时不能先冒出一个亮核
+        self.assertIn("massRms", AMBIENT_LAYER_HTML)
+        self.assertIn("var beam = centerAlpha * g * conc", AMBIENT_LAYER_HTML)
+        # 粒子位置必须先更新（重心才有效），再画中心光束
+        self.assertLess(AMBIENT_LAYER_HTML.index("massX += p.x * w"),
+                        AMBIENT_LAYER_HTML.index("splat(baseX, baseY"),
+                        "必须先更新粒子位置求重心，再画中心光束")
+        # 衰减曲线必须是高斯（exp(-3t)），保证叠加后仍是一整团、看不出圈边
+        self.assertIn("Math.exp(-3 *", AMBIENT_LAYER_HTML)
+        # 抗断层组件必须同时在位
         self.assertIn("createPattern", AMBIENT_LAYER_HTML, "缺少抖动噪声层")
+        self.assertIn("new Float32Array", AMBIENT_LAYER_HTML, "缺少浮点光场")
         # 呼吸幅度收小，避免整片背景一跳一跳
         self.assertIn("0.94 + 0.06 * Math.sin", AMBIENT_LAYER_HTML)
 
     def test_renders_without_per_frame_gradients(self):
-        self.assertIn("drawImage", AMBIENT_LAYER_HTML)
-        self.assertIn('globalCompositeOperation = "lighter"', AMBIENT_LAYER_HTML)
-        self.assertEqual(AMBIENT_LAYER_HTML.count("createRadialGradient"), 1,
-                         "createRadialGradient 只应在预渲染 sprite 时出现一次")
+        """每帧只做「浮点累加 + 一次 putImageData + 一次 drawImage」，不创建任何渐变对象"""
+        self.assertEqual(AMBIENT_LAYER_HTML.count("createRadialGradient"), 0,
+                         "光场实现不应再创建径向渐变（那是叠加边界/色带的来源）")
+        self.assertEqual(AMBIENT_LAYER_HTML.count("putImageData"), 2,
+                         "只有光场量化与抖动瓦片两处会写 ImageData")
+        self.assertIn("ctx.drawImage(fieldCanvas", AMBIENT_LAYER_HTML)
+        # 叠加发生在浮点域（fieldR/G/B += ...），不再靠 canvas 的 lighter 合成
+        self.assertNotIn('globalCompositeOperation = "lighter"', AMBIENT_LAYER_HTML)
 
     def test_degradation_paths(self):
         for token in ("prefers-reduced-motion",

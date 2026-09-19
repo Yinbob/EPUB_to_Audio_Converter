@@ -23,7 +23,7 @@ THEME_TOKENS_CSS = """
   --apple-surface-2: #fbfbfd;
   /* 文字三档：主 / 次 / 弱，两套主题都保证在各自背景上有足够对比度 */
   --apple-text: #1d1d1f;
-  --apple-text-2: #5f5f66;
+  --apple-text-2: #52525a;
   --apple-text-3: #6a6a72;
   /* 描边 */
   --apple-border: #d2d2d7;
