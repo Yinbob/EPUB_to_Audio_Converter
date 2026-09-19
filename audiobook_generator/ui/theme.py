@@ -62,6 +62,12 @@ THEME_TOKENS_CSS = """
   --ata-danger-border: #ffd1ce;
   --ata-warn-bg: #fff8e1;
   --ata-scrim: rgba(0,0,0,0.08);
+  /* 大标题的渐变（.hero h1 用 background-clip: text 涂在文字上）。
+     ⚠️ 必须是"纯 var() 引用"，渐变本身不能写在 background 简写里、也不要在里面再套 var()：
+     Gradio 处理 CSS 时会把 `background: linear-gradient(... var(...) ...)` 拆成空值长写属性
+     （实测 background-image 变空），而标题还有 -webkit-text-fill-color: transparent，
+     结果就是标题整段透明消失。颜色对齐 --apple-text / --apple-blue / --apple-indigo。 */
+  --ata-title-grad: linear-gradient(120deg, #1d1d1f 0%, #0071e3 55%, #5e5ce6 100%);
   /* 阴影 */
   --apple-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.04);
   --apple-shadow-lg: 0 24px 60px rgba(0,0,0,0.14);
@@ -125,6 +131,8 @@ THEME_TOKENS_CSS = """
   --ata-danger-border: rgba(255,105,97,0.42);
   --ata-warn-bg: rgba(255,179,64,0.16);
   --ata-scrim: rgba(0,0,0,0.55);
+  /* 暗色下标题渐变要跟着变浅（同 --apple-text / --apple-blue / --apple-indigo） */
+  --ata-title-grad: linear-gradient(120deg, #f5f5f7 0%, #409cff 55%, #9a97ff 100%);
   --apple-shadow: 0 1px 2px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.45);
   --apple-shadow-lg: 0 24px 60px rgba(0,0,0,0.6);
   --apple-shadow-blue: 0 8px 20px rgba(0,80,180,0.45);
@@ -244,6 +252,19 @@ THEME_HEAD_HTML = """
   function systemDark() { return !!(mq && mq.matches); }
   function isDark() { return mode === "dark" || (mode === "auto" && systemDark()); }
 
+  // 大标题兜底：.hero h1 是"渐变文字"（background-clip: text + 透明填充），
+  // 万一渐变的 background-image 没生效（Gradio 处理 CSS 时会把带 var() 的渐变丢成空值，
+  // 实测过整段透明消失），就给它加 ata-title-solid 退回纯色，保证标题永远看得见。
+  function guardTitles() {
+    var titles = document.querySelectorAll ? document.querySelectorAll(".hero h1") : [];
+    for (var i = 0; i < titles.length; i++) {
+      var el = titles[i], bg = "";
+      try { bg = window.getComputedStyle ? window.getComputedStyle(el).backgroundImage : ""; } catch (e) {}
+      if (!bg || bg === "none") el.classList.add("ata-title-solid");
+      else el.classList.remove("ata-title-solid");
+    }
+  }
+
   function apply() {
     var dark = isDark();
     var root = document.documentElement;
@@ -261,6 +282,7 @@ THEME_HEAD_HTML = """
     try {
       document.dispatchEvent(new CustomEvent("ata-theme-change", { detail: { dark: dark, mode: mode } }));
     } catch (e) {}
+    guardTitles();
   }
 
   function set(next) {

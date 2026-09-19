@@ -72,6 +72,14 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
   也不会启动 tick（`ct()` 判定 + Timer 在 onMount 里 setInterval），会导致进度条永远停在「等待开始生成...」（所有引擎一致）。
   另外用 `ui.load(fn=get_progress_info, ...)` 做页面加载同步，保证刷新/新会话也能看到当前进度；`webui_log_file` 需为绝对路径。
   回归测试：`tests/audiobook_generator/ui/progress_wiring_test.py`（结构 + 五态，需在 venv 解释器下运行，其他解释器自动跳过）。
+  ⚠️ **页面上加载到的"终态"要按会话过滤**：`webui_log_file` 是**服务进程启动时创建一次**并一直累积的，
+  批次结束（`running_process` 还在但已不存活）后 `decide_progress_state()` 会**永远**返回
+  `mode=finished/interrupted/failed`。不设闸门的话，每次新开浏览器都会把"上一个文件已完成"的卡片
+  弹出来闪一下（用户反馈过，顺带还会让背景跑马灯闪一下）。所以 `HEAD_HTML` 里用 `sawActive`
+  记录"本会话见过 starting/running/book_done"，终态且 `!sawActive` 时**直接 return**——
+  注意必须在 `box.classList.remove('idle', 'active', …)` **之前**返回，否则仍会被标成 `active`。
+  实时状态（正在跑）对新会话照常显示；本次会话真跑完的终态仍按 `scheduleHide()` 显示
+  （完成 6s、中断/失败 12s 后收起）。
 - **「停止转换」必须整组终止**：`_batch_worker` 会先 `os.setsid()` 自成进程组，章节进程池 worker 继承该组；
   `web_ui._terminate_running_batch()` 用 `killpg` 先 SIGTERM 后 SIGKILL 终止整组。只 `terminate()` 批处理进程的话，
   正在合成的 worker 会变孤儿继续跑（表现为"停止按钮没反应"），对所有引擎都适用。停止后状态显示「⏹ 已停止（可再次点击开始）」。
@@ -97,11 +105,20 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
   `:root.dark`——前者正是 Gradio 的暗色钩子（前端给 `body` 加 `.dark`，主题 CSS 写成 `:root .dark{}`），
   所以切换到暗色时 Gradio 自带组件会一起变暗。顶栏 `#ata-theme-toggle` 循环 跟随系统 → 浅色 → 深色，
   存 localStorage `ata-theme`。
-  ⚠️ 三条容易踩的坑：① 整站颜色必须走 `var(--apple-*)` / `var(--ata-*)`，写死 `#fff` 之类会在暗色下漏白；
+  ⚠️ 四条容易踩的坑：① 整站颜色必须走 `var(--apple-*)` / `var(--ata-*)`，写死 `#fff` 之类会在暗色下漏白；
   ② Gradio 自带的 `--body-text-color-subdued` 等默认是 slate-400（浅底上仅 2.48:1），必须在
   `:root` 和 `:root:root .dark` 里重映射到我们的文字令牌（后者提高一级特异性，防止注入顺序不利）；
   ③ xterm 日志终端主题写死在组件里（浅底深字），暗色下只对 `.xterm-screen`（画字层）加
-  `invert(1) hue-rotate(180deg)`，底色放在不会被反相的 `.xterm-viewport`。回归测试见
+  `invert(1) hue-rotate(180deg)`，底色放在不会被反相的 `.xterm-viewport`；
+  ④ **带 `var()` 的渐变绝不能写在 `background` 简写里**：Gradio 处理 CSS 时会把
+  `background: linear-gradient(... var(...) ...)` 拆成**空值长写属性**（实测规则被改写成
+  `background-image: ; background-color: ;`）。普通元素只是丢了渐变，但渐变文字
+  （`.hero h1`：`background-clip: text` + `-webkit-text-fill-color: transparent`）会**整段透明消失**——
+  "让文字化作声音"就是这样在 4 个页面同时消失的（用户反馈"转换完标题不见了"）。
+  正解：渐变值的定义放进主题令牌（`--ata-title-grad`，值里不带 `var()`），
+  规则里用长写属性引用（`background-image: var(--ata-title-grad)`）；
+  `theme.py` 的 `guardTitles()` 还会在运行期检查 `getComputedStyle(h1).backgroundImage === "none"`，
+  真丢了就加 `.ata-title-solid` 退回纯色，保证标题永远看得见。回归测试见
   `tests/audiobook_generator/ui/theme_test.py`（含两套主题的 WCAG 对比度计算）。
 - **光晕的色彩断层与"跑马灯"扩散**（`ambient_background.py`）：
   ① 断层三道防线——色相 32 档 + 相邻 sprite 交叉淡入（`drawGlowSprite` 画两次）、

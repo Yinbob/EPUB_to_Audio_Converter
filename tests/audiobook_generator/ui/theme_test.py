@@ -77,6 +77,15 @@ class TestThemeTokens(unittest.TestCase):
         self.assertIn(DARK_SELECTOR, THEME_TOKENS_CSS)
         self.assertIn(":root.dark", THEME_TOKENS_CSS, "html.dark 用于首屏不闪白")
 
+    def test_title_gradient_token_survives_css_processing(self):
+        """大标题渐变必须走令牌，且令牌值里不能再套 var()（否则会被 Gradio 处理成空值）"""
+        for selector in (LIGHT_SELECTOR, DARK_SELECTOR):
+            value = _token(THEME_TOKENS_CSS, selector, "ata-title-grad")
+            self.assertIsNotNone(value, f"{selector} 缺少 --ata-title-grad")
+            self.assertIn("linear-gradient(", value)
+            self.assertNotIn("var(", value,
+                             "渐变里再套 var() 会被 Gradio 的 CSS 处理丢成空值（标题曾整段透明）")
+
     def test_both_palettes_define_the_same_keys(self):
         light = set(re.findall(r"--([\w-]+)\s*:", _block(THEME_TOKENS_CSS, LIGHT_SELECTOR)))
         # 暗色分两块：调色板 + 需要更高特异性的 Gradio 变量重映射

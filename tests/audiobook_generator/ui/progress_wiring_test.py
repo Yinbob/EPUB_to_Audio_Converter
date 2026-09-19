@@ -186,6 +186,45 @@ class TestProgressWiring(unittest.TestCase):
         # 背景层必须垫在内容之下：容器提升到 z-index:1 且背景透明
         self.assertIn("z-index: 1", self.web_ui.CUSTOM_CSS)
 
+    def test_hero_title_uses_token_gradient_and_has_solid_fallback(self):
+        """大标题的渐变文字不能再写成 background 简写（Gradio 会把带 var() 的渐变丢成空值）"""
+        from tests.audiobook_generator.ui.ambient_background_test import _css_rules
+
+        css = self.web_ui.CUSTOM_CSS
+        body = None
+        for selector, decl in _css_rules(css):
+            if ".hero h1" in [s.strip() for s in selector.split(",")]:
+                body = decl
+                break
+        self.assertIsNotNone(body, "找不到 .hero h1 规则")
+        self.assertIn("background-image: var(--ata-title-grad)", body,
+                      "渐变要走长写属性 + 纯 var() 引用（简写会被 Gradio 处理成空值）")
+        self.assertNotIn("background: linear-gradient", body,
+                         "不能再把渐变写进 background 简写")
+        self.assertIn("-webkit-text-fill-color: transparent", body)
+        self.assertIn("color: var(--apple-text)", body, "缺少纯色兜底")
+        # 兜底类 + 运行期检测脚本
+        self.assertIn(".hero h1.ata-title-solid", css)
+        self.assertIn("-webkit-text-fill-color: var(--apple-text) !important",
+                      css.split(".hero h1.ata-title-solid")[1][:200])
+        head = str(self.config.get("head", ""))
+        self.assertIn("ata-title-solid", head, "缺少标题可见性兜底脚本")
+        self.assertIn("getComputedStyle(el).backgroundImage", head)
+
+    def test_stale_terminal_payload_is_ignored_on_fresh_session(self):
+        """新会话只认实时状态：上个批次的完成/中断/失败不能弹卡（用户反馈每次新开浏览器都闪一下）"""
+        head = str(self.config.get("head", ""))
+        self.assertIn("var sawActive = false;", head, "缺少'本次会话见过它在跑'的闸门")
+        for token in ("mode === 'starting'", "mode === 'running'", "mode === 'book_done'"):
+            self.assertIn(token, head)
+        for token in ("mode === 'finished'", "mode === 'interrupted'", "mode === 'failed'"):
+            self.assertIn(token, head)
+        self.assertIn("if (!sawActive) return;", head)
+        # 闸门必须在改类名之前返回：否则旧终态仍会把进度卡标成 active（并触发背景跑马灯）
+        self.assertLess(head.index("if (!sawActive) return;"),
+                        head.index("box.classList.remove('idle', 'active'"),
+                        "旧终态必须在改 classList 之前就被丢弃")
+
     def test_header_is_a_rounded_glass_bar_spanning_the_card_band(self):
         """顶栏是圆角玻璃条，且要和卡片同宽（gr.HTML 包装层会把它挤窄、logo 贴边）"""
         from tests.audiobook_generator.ui.ambient_background_test import _css_rules

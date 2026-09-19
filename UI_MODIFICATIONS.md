@@ -514,3 +514,52 @@ logo 距边框只有 4px。现在：
 **语音引擎 hover 白框**：Gradio 给 `.tab-container button:hover` 的是实心填充
 `rgb(248,250,252)`。改为毛玻璃：`var(--ata-glass-soft)` + `blur(14px)` + 10px 圆角 + 内描边；
 实测浅色 `rgba(255,255,255,0.45)`、深色 `rgba(255,255,255,0.07)`，两套主题都不再出现白色实心块。
+
+### 标题"消失"与"新会话闪出旧完成弹窗"（2026-09）
+
+用户反馈（服务器常驻、不重启进程）：转换成功后弹窗消失、但大标题「让文字化作声音」不见了；
+而且每次新开浏览器都会闪一下"上一个文件已完成"的弹窗。两件事其实无关，各有独立根因。
+
+**① 标题消失 = 渐变文字被 Gradio 的 CSS 处理吃掉**
+
+`.hero h1` 是渐变文字：`background: linear-gradient(120deg, var(--apple-text) …)` +
+`background-clip: text` + `-webkit-text-fill-color: transparent`。实测服务端处理后的规则被改写成
+`background-image: ; background-position-x: ; … background-color: ;`（**空值长写属性**），
+而 `background-clip: text` 与透明填充保留 → 文字被涂成透明
+（`getComputedStyle(h1).backgroundImage === "none"` 实锤）。所以**四个页面的 `.hero h1` 都是不可见的**，
+与弹窗无关；旁证是开了系统"减少动态效果"的用户反而能看到——那条媒体查询里有一句
+`-webkit-text-fill-color: var(--apple-text)` 兜底。
+
+修法（三件套）：
+
+1. 渐变值挪进主题令牌：`:root { --ata-title-grad: linear-gradient(120deg, #1d1d1f 0%, #0071e3 55%, #5e5ce6 100%) }`，
+   暗色 `#f5f5f7 → #409cff → #9a97ff`；**令牌值里不带 `var()`**。
+2. 规则改用长写属性引用：`background-image: var(--ata-title-grad);`（不再用 `background` 简写），
+   并补 `color: var(--apple-text)` 作为纯色兜底。
+   > 同样是"渐变 + var()"，`.card-num` / `.progress-fill` / `.app-logo` 写在 `background` 简写里却没事——
+   > 只有同一规则里还声明了 `background-clip` 的 `.hero h1` 触发了"拆成空值长写"这条路径。
+3. `theme.py` 的 `guardTitles()` 运行期兜底：`getComputedStyle(el).backgroundImage === "none"`
+   就给标题加 `.ata-title-solid` 退回纯色（跟随主题与 `ata-theme-change` 一起刷新），
+   保证标题永远看得见。
+
+实测：修复后 `backgroundImage` = `linear-gradient(120deg, rgb(29,29,31) 0%, rgb(0,113,227) 55%, rgb(94,92,230) 100%)`；
+截图采样标题区域，笔画像素占比 20%（对照空白区最暗 180 → 无笔画），"资源库"页标题 6%（三字标题）。
+
+**② 新会话闪旧弹窗 = 累积日志里的终态被当成"刚刚发生"**
+
+`webui_log_file` 在服务进程启动时创建一次并一直累积；批次结束后 `running_process` 仍非空但已不存活，
+于是 `decide_progress_state()` **永远**返回 `mode=finished`。新会话 `ui.load(get_progress_info)`
+首次就拿到这个载荷 → 前端 `applyProgress()` 展开完成卡片（6s 后自动收起），顺带还让背景跑马灯闪一下。
+
+修法：前端按**会话**过滤终态。`HEAD_HTML` 新增 `sawActive`，收到 `starting/running/book_done` 就置位；
+`finished/interrupted/failed` 且 `!sawActive` 时**直接 return**（放在改 `classList` 之前，
+所以既不会展开卡片、也不会给容器加 `active` 触发跑马灯）。实时状态（正在跑）对新会话照常显示；
+本次会话真跑完的终态仍按原节奏显示，后端与 `progress_parser` 一行未改。
+
+实测（服务全程不重启）：
+
+| 场景 | 服务端载荷 | 卡片表现 |
+| --- | --- | --- |
+| 往日志追加结束标记后**新开**标签页 | `{"mode":"finished","status":"✅ 全部完成",…}` | 仍是 `progress-container idle`、"等待开始生成..."（**不再弹**） |
+| 本页真实跑一次（Edge）→ 结束 | `active running` → `active done` | "✅ 全部完成 / 100%"，**约 6 秒后自动收起**（高度 114 → 2px） |
+| 完成后再**新开**标签页 | `{"mode":"finished",…}` | 仍是 idle（不弹） |

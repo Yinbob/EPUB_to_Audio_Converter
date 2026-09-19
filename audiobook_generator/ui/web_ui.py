@@ -748,6 +748,10 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + """
 
   var lastPct = null;
   var lastPayloadKey = null;   // 去重：相同状态不重复应用，否则收起定时器会被反复重置
+  // 本次页面会话里是否见过"批次真的在跑"。日志文件在服务进程启动时创建一次、之后一直累积，
+  // 批次跑完后 decide_progress_state() 会一直返回 finished/interrupted/failed；如果不加这道闸门，
+  // 每次新开浏览器都会把"上一个文件已完成/已中断"的卡片弹出来闪一下（用户反馈过）。
+  var sawActive = false;
   // 结束后自动收起：完成态展示 6 秒、异常/停止态展示 12 秒，然后淡出并把高度收到 0，
   // 不再占着页面顶部；下一次点「开始生成」会立刻重新展开。
   var HIDE_DELAY = { finished: 6000, book_done: 6000, interrupted: 12000, failed: 12000 };
@@ -786,6 +790,14 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + """
     if (payloadKey === lastPayloadKey) return;   // 状态没变化（含 boot() 的重复绑定）→ 不做任何事
     lastPayloadKey = payloadKey;
     var mode = payload.mode || 'idle';
+    // 实时状态（正在启动/生成中/本书完成）→ 记住"这个会话见过它在跑"；
+    // 终态（完成/中断/失败）而本次会话没见过它在跑 → 是上一个批次留下的残留，直接忽略：
+    // 不改类名、不展开卡片、不排收起定时器，也就不会触发背景的跑马灯。
+    if (mode === 'starting' || mode === 'running' || mode === 'book_done') {
+      sawActive = true;
+    } else if (mode === 'finished' || mode === 'interrupted' || mode === 'failed') {
+      if (!sawActive) return;
+    }
     box.classList.remove('idle', 'active', 'starting', 'running', 'done', 'warn');
     if (mode === 'idle') box.classList.add('idle');
     else if (mode === 'starting') box.classList.add('active', 'starting');
@@ -1071,10 +1083,21 @@ html, body {
 .hero { text-align: center; padding: clamp(18px, 4vw, 30px) 8px 24px; animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
 .hero h1 {
   font-size: clamp(1.6rem, 5.5vw, 2.3rem) !important; font-weight: 700 !important; letter-spacing: -0.03em;
-  /* 首色用文字令牌：暗色下渐变起点必须跟着变浅，否则标题看不见 */
-  background: linear-gradient(120deg, var(--apple-text) 0%, var(--apple-blue) 55%, var(--apple-indigo) 100%);
+  /* ⚠️ 渐变必须走"长写属性 + 纯 var() 引用"（令牌定义在 theme.py）：
+     写成 `background: linear-gradient(... var(...) ...)` 简写时，Gradio 处理 CSS 会把这条
+     拆成空值长写属性（实测 background-image 变空），而这里又有 -webkit-text-fill-color:
+     transparent → 标题整段透明消失（"让文字化作声音"曾经因此看不见）。
+     另外保留 color 作为兜底，theme.py 的脚本检测到渐变缺失时会加 .ata-title-solid。 */
+  background-image: var(--ata-title-grad);
   -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent; margin: 0 0 10px !important;
+  -webkit-text-fill-color: transparent; color: var(--apple-text);
+  margin: 0 0 10px !important;
+}
+/* 渐变没生效时的兜底样式（由 theme.py 的 guardTitles() 挂类） */
+.hero h1.ata-title-solid {
+  background-image: none !important;
+  -webkit-text-fill-color: var(--apple-text) !important;
+  color: var(--apple-text) !important;
 }
 .hero p { color: var(--apple-text-2); font-size: clamp(0.92rem, 2.6vw, 1.05rem); margin: 0 auto; max-width: 560px; line-height: 1.5; }
 
