@@ -186,6 +186,20 @@ class TestProgressWiring(unittest.TestCase):
         # 背景层必须垫在内容之下：容器提升到 z-index:1 且背景透明
         self.assertIn("z-index: 1", self.web_ui.CUSTOM_CSS)
 
+    def test_open_dropdown_escapes_sibling_card_stacking_context(self):
+        """展开的下拉不能被后续卡片盖住：只提升含展开选项的直接子包装层。"""
+        css = self.web_ui.CUSTOM_CSS
+        selectors = (
+            ".app-card > *:has(ul.options:not([inert]))",
+            "#advanced_modal .modal-box > *:has(ul.options:not([inert]))",
+        )
+        for selector in selectors:
+            self.assertIn(selector, css, f"缺少展开下拉的层叠修复：{selector}")
+        rule_start = css.index(selectors[0])
+        rule_body = css[rule_start:css.index("}", rule_start)]
+        self.assertIn("z-index: 2 !important", rule_body,
+                      "展开下拉的包装层必须高于后续卡片的 z-index:1")
+
     def test_hero_title_uses_token_gradient_and_has_solid_fallback(self):
         """大标题的渐变文字不能再写成 background 简写（Gradio 会把带 var() 的渐变丢成空值）"""
         from tests.audiobook_generator.ui.ambient_background_test import _css_rules

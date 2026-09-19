@@ -1040,6 +1040,13 @@ html, body {
 .app-card { position: relative; }
 /* 卡片内容要盖在玻璃层之上 */
 .app-card > * { position: relative; z-index: 1; }
+/* Gradio 的 ul.options 虽然用 fixed + 超高 z-index，但仍受所在包装层的堆叠上下文约束。
+   后续卡片的内容层同为 z-index:1，DOM 更靠后时会盖住前面卡片展开的选项。
+   只提升“当前含展开下拉”的包装层；不要抬高整张卡片，避免越过 sticky 顶栏。 */
+.app-card > *:has(ul.options:not([inert])),
+#advanced_modal .modal-box > *:has(ul.options:not([inert])) {
+  z-index: 2 !important;
+}
 
 /* 点击水波纹（页面脚本插入 .ata-ripple） */
 .btn-primary, .btn-ghost, .btn-mini, .btn-danger, .tab-nav button, .engine-tab {
