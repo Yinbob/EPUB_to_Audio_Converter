@@ -1,3 +1,4 @@
+import os
 import unittest
 from unittest.mock import patch
 
@@ -81,6 +82,27 @@ class TestQwenTTSProvider(unittest.TestCase):
 
             self.assertEqual(mock_req.call_count, 1)
             self.assertFalse(merge.call_args.args[4])
+
+    def test_500_word_english_speech_is_chunked_into_short_requests(self):
+        provider = self._make_provider()
+        text = " ".join(["word"] * 500)  # 约 2500 字符，旧逻辑一次性发送容易超时
+
+        with (
+            patch.object(provider, "_request_audio", return_value=b"mp3data") as mock_req,
+            patch("audiobook_generator.tts_providers.qwen_tts_provider.merge_audio_segments"),
+            patch("audiobook_generator.tts_providers.qwen_tts_provider.set_audio_tags"),
+        ):
+            provider.text_to_speech(text, "out.mp3", audio_tags=None)
+
+        self.assertGreater(mock_req.call_count, 1)
+        for call in mock_req.call_args_list:
+            self.assertLessEqual(len(call.args[0]), DEFAULT_QWEN_MAX_CHARS)
+
+    def test_max_chars_can_be_overridden_by_env(self):
+        with patch.dict(os.environ, {"QWEN_TTS_MAX_CHARS": "320"}):
+            provider = self._make_provider()
+
+        self.assertEqual(provider.max_chars, 320)
 
     def test_read_timeout_retries_then_succeeds(self):
         provider = self._make_provider()

@@ -15,13 +15,24 @@ from audiobook_generator.utils.utils import split_text, merge_audio_segments, se
 
 logger = logging.getLogger(__name__)
 
-# 单次请求的最大文本长度：Qwen3-TTS VoiceDesign 模型对输入长度有限制，
-# 整章一次性发送容易触发服务端排队/超时（实测故障：Read timed out (read timeout=300)）。
-DEFAULT_QWEN_MAX_CHARS = 1500
+# 单次请求的最大文本长度：实测 100 词（约 500 字符）的英文请求可正常完成，
+# 250 词以上会明显增加服务端处理时间并触发 Read timed out。
+# 控制在 600 字符左右，兼顾英文/中文并避免单片请求长时间卡住。
+# 可用环境变量 QWEN_TTS_MAX_CHARS 覆盖。
+DEFAULT_QWEN_MAX_CHARS = 600
 # 每次请求的超时时间（秒），可用环境变量 QWEN_TTS_TIMEOUT 覆盖
 DEFAULT_QWEN_TIMEOUT = 300
 # 单分片失败重试次数（指数退避），网络抖动/服务端繁忙时自动重试
 DEFAULT_QWEN_MAX_RETRIES = 3
+
+
+def _get_positive_int_env(name: str, default: int) -> int:
+    """读取正整数环境变量；未设置或非法时返回默认值。"""
+    try:
+        value = int(os.environ.get(name, default))
+    except (TypeError, ValueError):
+        return default
+    return value if value > 0 else default
 
 
 class _NoRetryError(RuntimeError):
@@ -56,11 +67,15 @@ class QwenTTSProvider(BaseTTSProvider):
         # 获取配置中的语言设置，若无则默认 "Auto"
         self.language = getattr(self.config, "language", "Auto")
 
-        # 每次请求的超时时间，可通过环境变量 QWEN_TTS_TIMEOUT 调大/调小
-        try:
-            self.timeout = int(os.environ.get("QWEN_TTS_TIMEOUT", DEFAULT_QWEN_TIMEOUT))
-        except ValueError:
-            self.timeout = DEFAULT_QWEN_TIMEOUT
+        # 可通过环境变量调整单次请求超时和分片大小
+        self.timeout = _get_positive_int_env("QWEN_TTS_TIMEOUT", DEFAULT_QWEN_TIMEOUT)
+        self.max_chars = _get_positive_int_env("QWEN_TTS_MAX_CHARS", DEFAULT_QWEN_MAX_CHARS)
+        logger.info(
+            "Qwen TTS Provider 已加载 | 分片上限: %s 字符 | 单次超时: %ss | 重试: %s 次",
+            self.max_chars,
+            self.timeout,
+            DEFAULT_QWEN_MAX_RETRIES,
+        )
 
     def _request_audio(self, text: str) -> bytes:
         """
@@ -125,10 +140,10 @@ class QwenTTSProvider(BaseTTSProvider):
         """
         调用 Qwen TTS API 并将返回的音频数据保存到指定路径。
 
-        长文本会先按 DEFAULT_QWEN_MAX_CHARS 分片，逐片请求，避免单次请求
+        长文本会先按 self.max_chars 分片，逐片请求，避免单次请求
         文本过长导致服务端超时；多分片时用 pydub 合并，保证音频完整。
         """
-        text_chunks = split_text(text, DEFAULT_QWEN_MAX_CHARS, self.language) or [text]
+        text_chunks = split_text(text, self.max_chars, self.language) or [text]
 
         audio_segments = []
         chunk_ids = []

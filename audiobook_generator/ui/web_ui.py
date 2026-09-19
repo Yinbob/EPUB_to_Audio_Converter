@@ -1047,6 +1047,15 @@ html, body {
 #advanced_modal .modal-box > *:has(ul.options:not([inert])) {
   z-index: 2 !important;
 }
+/* 下拉选项面板同样是「圆角 + 内滚动」：Gradio 给 ul.options 设了 overflow:auto，
+   原生滚动条的方块轨道会盖住右侧上下圆角（选项多时最明显）。轨道透明 + 上下内缩。 */
+ul.options { scrollbar-width: thin; scrollbar-color: var(--ata-scroll-thumb) transparent; }
+ul.options::-webkit-scrollbar { width: 8px; height: 8px; }
+ul.options::-webkit-scrollbar-track,
+ul.options::-webkit-scrollbar-corner { background: transparent; }
+ul.options::-webkit-scrollbar-track { margin-block: var(--container-radius, 4px); }
+ul.options::-webkit-scrollbar-thumb { border-radius: 999px; background: var(--ata-scroll-thumb); }
+ul.options::-webkit-scrollbar-thumb:hover { background: var(--ata-scroll-thumb-hover); }
 
 /* 点击水波纹（页面脚本插入 .ata-ripple） */
 .btn-primary, .btn-ghost, .btn-mini, .btn-danger, .tab-nav button, .engine-tab {
@@ -1548,6 +1557,10 @@ hr { border: none !important; border-top: 1px solid var(--apple-border-soft) !im
    → Gradio Dropdown 的选项面板（portal, fixed）坐标计算全错 → 选项出现在很远的顶部。
    解决方案：把模糊层改成 body::before（弹窗的外部兄弟），由它承担 backdrop-filter，不影响 fixed 定位。 */
 body.modal-open { overflow: hidden !important; }
+/* .gradio-container 默认 z-index:1，会形成层叠上下文并把 fixed 弹窗困在
+   body::before（z-index:999）之下，导致遮罩把弹窗本身也一起模糊。
+   弹窗打开时释放容器的层叠上下文，让 #advanced_modal 回到根层叠层。 */
+body.modal-open .gradio-container { z-index: auto !important; }
 body.modal-open::before {
   content: "" !important;
   position: fixed !important; inset: 0 !important; z-index: 999 !important;
@@ -1591,6 +1604,17 @@ body.modal-open::before {
   align-items: stretch !important; width: 100% !important; gap: 0 !important; }
 #advanced_modal .modal-box { background: var(--apple-surface) !important; animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1);
   display: block !important; }
+/* 弹窗自身是滚动容器：原生滚动条的方块轨道会盖住右上/右下圆角，看起来右侧是直角。
+   把轨道改透明、上下各内缩一个圆角半径，滑块画成胶囊并限制在轨道内 → 四角恢复圆角。 */
+#advanced_modal .modal-box { scrollbar-width: thin;
+  scrollbar-color: var(--ata-scroll-thumb) transparent; }
+#advanced_modal .modal-box::-webkit-scrollbar { width: 8px; height: 8px; }
+#advanced_modal .modal-box::-webkit-scrollbar-track,
+#advanced_modal .modal-box::-webkit-scrollbar-corner { background: transparent; }
+#advanced_modal .modal-box::-webkit-scrollbar-track { margin-block: 22px; }
+#advanced_modal .modal-box::-webkit-scrollbar-thumb { border-radius: 999px;
+  background: var(--ata-scroll-thumb); }
+#advanced_modal .modal-box::-webkit-scrollbar-thumb:hover { background: var(--ata-scroll-thumb-hover); }
 @keyframes modalIn { from { opacity:0; transform: translateY(14px) scale(0.97); } to { opacity:1; transform:none; } }
 #advanced_modal .modal-header { display:flex !important; align-items:center !important; justify-content:space-between !important; margin-bottom:4px; }
 #advanced_modal .modal-title { font-size: clamp(1.05rem, 3vw, 1.25rem); font-weight:700; margin:0; color: var(--apple-text); }

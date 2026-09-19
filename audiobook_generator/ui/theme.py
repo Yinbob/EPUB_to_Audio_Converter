@@ -53,6 +53,9 @@ THEME_TOKENS_CSS = """
   --ata-empty: rgba(255,255,255,0.35);
   --ata-terminal: rgba(255,255,255,0.42);
   --ata-book-chip: var(--apple-surface-2);
+  /* 滚动条：轨道透明，避免原生滚动条的方块轨道盖住圆角卡片的两侧 */
+  --ata-scroll-thumb: rgba(0,0,0,0.22);
+  --ata-scroll-thumb-hover: rgba(0,0,0,0.34);
   /* 语义提示块 */
   --ata-ready-bg: linear-gradient(135deg,#f0f9ff,#f0eefe);
   --ata-ready-border: #cfe3fc;
@@ -123,6 +126,8 @@ THEME_TOKENS_CSS = """
   --ata-empty: rgba(255,255,255,0.05);
   --ata-terminal: rgba(10,10,14,0.55);
   --ata-book-chip: rgba(255,255,255,0.07);
+  --ata-scroll-thumb: rgba(255,255,255,0.22);
+  --ata-scroll-thumb-hover: rgba(255,255,255,0.34);
   --ata-ready-bg: linear-gradient(135deg, rgba(64,156,255,0.16), rgba(154,151,255,0.14));
   --ata-ready-border: rgba(100,170,255,0.35);
   --ata-ready-title: #9ecbff;

@@ -186,6 +186,23 @@ class TestProgressWiring(unittest.TestCase):
         # 背景层必须垫在内容之下：容器提升到 z-index:1 且背景透明
         self.assertIn("z-index: 1", self.web_ui.CUSTOM_CSS)
 
+    def test_advanced_modal_escapes_container_stacking_context(self):
+        """弹窗打开时不能被根层模糊遮罩困住并一起糊掉。"""
+        css = self.web_ui.CUSTOM_CSS
+        selector = "body.modal-open .gradio-container"
+        self.assertIn(selector, css, "缺少弹窗打开时的容器层叠上下文修复")
+        rule_start = css.index(selector)
+        rule_body = css[rule_start:css.index("}", rule_start)]
+        self.assertIn("z-index: auto !important", rule_body,
+                      "必须释放 .gradio-container 的层叠上下文，弹窗才能高于全屏模糊层")
+
+        modal_rule_start = css.index("#advanced_modal {")
+        modal_rule = css[modal_rule_start:css.index("}", modal_rule_start)]
+        scrim_rule_start = css.index("body.modal-open::before")
+        scrim_rule = css[scrim_rule_start:css.index("}", scrim_rule_start)]
+        self.assertIn("z-index: 1000", modal_rule)
+        self.assertIn("z-index: 999 !important", scrim_rule)
+
     def test_open_dropdown_escapes_sibling_card_stacking_context(self):
         """展开的下拉不能被后续卡片盖住：只提升含展开选项的直接子包装层。"""
         css = self.web_ui.CUSTOM_CSS
@@ -199,6 +216,30 @@ class TestProgressWiring(unittest.TestCase):
         rule_body = css[rule_start:css.index("}", rule_start)]
         self.assertIn("z-index: 2 !important", rule_body,
                       "展开下拉的包装层必须高于后续卡片的 z-index:1")
+
+    def test_advanced_modal_scrollbar_keeps_rounded_corners(self):
+        """弹窗自带的滚动条不能把右上/右下圆角盖成直角。"""
+        css = self.web_ui.CUSTOM_CSS
+        self.assertIn("#advanced_modal .modal-box::-webkit-scrollbar", css,
+                      "缺少弹窗滚动条样式，原生方块轨道会盖住圆角")
+        for token in ("scrollbar-width: thin",
+                      "scrollbar-color: var(--ata-scroll-thumb) transparent",
+                      "#advanced_modal .modal-box::-webkit-scrollbar-track",
+                      "#advanced_modal .modal-box::-webkit-scrollbar-corner",
+                      "margin-block: 22px",
+                      "#advanced_modal .modal-box::-webkit-scrollbar-thumb"):
+            self.assertIn(token, css, f"弹窗滚动条样式缺少：{token}")
+        # 轨道必须透明且滑块是圆角，否则四角依然会露出方块轨道
+        track_start = css.index("#advanced_modal .modal-box::-webkit-scrollbar-track")
+        track_body = css[track_start:css.index("}", track_start)]
+        self.assertIn("background: transparent", track_body)
+        thumb_start = css.index("#advanced_modal .modal-box::-webkit-scrollbar-thumb")
+        thumb_body = css[thumb_start:css.index("}", thumb_start)]
+        self.assertIn("border-radius: 999px", thumb_body)
+        # 下拉选项面板（选项多时会滚动）有同样的「圆角 + 内滚动」结构，必须一起修
+        self.assertIn("ul.options::-webkit-scrollbar", css)
+        self.assertIn("ul.options::-webkit-scrollbar-track", css)
+        self.assertIn("ul.options::-webkit-scrollbar-thumb", css)
 
     def test_hero_title_uses_token_gradient_and_has_solid_fallback(self):
         """大标题的渐变文字不能再写成 background 简写（Gradio 会把带 var() 的渐变丢成空值）"""
