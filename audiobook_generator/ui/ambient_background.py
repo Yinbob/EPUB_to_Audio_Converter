@@ -36,7 +36,25 @@ AMBIENT_SPRITE_SIZE = 256
 AMBIENT_IDLE_COUNT = 46                      # 空闲态粒子数
 AMBIENT_IDLE_CORE_COUNT = 10                 # 其中贴近核心的粒子数
 AMBIENT_IDLE_SPREAD = 440                    # 空闲态粒子扩散半径（px）
-AMBIENT_EDGE_PER_SIDE = 12                   # 生成态每条边的边缘粒子数
+
+# ── 生成态"跑马灯"光条：沿视口四边均匀铺开，亮块绕着边框跑 ──
+AMBIENT_MARQUEE_SEG = 230                    # 相邻光条的间距（px），越小越密
+AMBIENT_MARQUEE_ACROSS = 200                 # 垂直边框方向的厚度（px）
+# 光条的不透明度按主题分开：浅色底是近白，同样 alpha 的淡色叠上去几乎看不出来，
+# 深色底则相反（一点点提亮就很明显）——所以浅色模式要比深色模式给得更足。
+AMBIENT_MARQUEE_ALPHA_LIGHT = 0.30
+AMBIENT_MARQUEE_ALPHA_DARK = 0.18
+# 光条专用配色（比空闲光晕更深更浓）：饱和度拉满、明度压低，
+# 通道比值更"深"，叠在白底上是浓色带而不是粉彩。
+AMBIENT_MARQUEE_SAT_LIGHT = 96
+AMBIENT_MARQUEE_LIGHT_LIGHT = 52
+AMBIENT_MARQUEE_SAT_DARK = 96
+AMBIENT_MARQUEE_LIGHT_DARK = 62
+AMBIENT_MARQUEE_WAVES = 5                    # 一圈上同时有几个亮块（5 个 → 每条边都摊到，分布更均匀）
+AMBIENT_MARQUEE_FLOOR = 0.5                  # 暗段保底亮度：整圈都亮着，只是亮块处更亮（原来 0.34 会出现明显暗段）
+AMBIENT_MARQUEE_LAP_MS = 19000               # 亮块绕视口跑一整圈的时间
+AMBIENT_MARQUEE_HUE_SPREAD = 52              # 各光条之间的色相偏移（±度），一圈上同时出现多种颜色
+AMBIENT_MARQUEE_BREATH = 0.14                # 呼吸幅度（±14%）
 AMBIENT_ARM_TIMEOUT_MS = 6000                # 点「开始生成」后等不到真实状态的兜底回退时长
 
 _CONFIG = {
@@ -48,7 +66,19 @@ _CONFIG = {
     "idleCount": AMBIENT_IDLE_COUNT,
     "idleCoreCount": AMBIENT_IDLE_CORE_COUNT,
     "idleSpread": AMBIENT_IDLE_SPREAD,
-    "edgePerSide": AMBIENT_EDGE_PER_SIDE,
+    "marqueeSeg": AMBIENT_MARQUEE_SEG,
+    "marqueeAcross": AMBIENT_MARQUEE_ACROSS,
+    "marqueeAlphaLight": AMBIENT_MARQUEE_ALPHA_LIGHT,
+    "marqueeAlphaDark": AMBIENT_MARQUEE_ALPHA_DARK,
+    "marqueeSatLight": AMBIENT_MARQUEE_SAT_LIGHT,
+    "marqueeLightLight": AMBIENT_MARQUEE_LIGHT_LIGHT,
+    "marqueeSatDark": AMBIENT_MARQUEE_SAT_DARK,
+    "marqueeLightDark": AMBIENT_MARQUEE_LIGHT_DARK,
+    "marqueeWaves": AMBIENT_MARQUEE_WAVES,
+    "marqueeFloor": AMBIENT_MARQUEE_FLOOR,
+    "marqueeLapMs": AMBIENT_MARQUEE_LAP_MS,
+    "marqueeHueSpread": AMBIENT_MARQUEE_HUE_SPREAD,
+    "marqueeBreath": AMBIENT_MARQUEE_BREATH,
     "armTimeoutMs": AMBIENT_ARM_TIMEOUT_MS,
     # 深色主题：光晕用更亮更饱和的 sprite、整体强度抬高（深底会把浅色雾吃没）
     # 颜色更"深"：饱和度上调、明度下调（观感更浓，配合整体提亮）
@@ -213,6 +243,9 @@ body.modal-open #ata-bg { opacity: 0.45; }
   .app-header {
     backdrop-filter: saturate(180%) blur(18px);
     -webkit-backdrop-filter: saturate(180%) blur(18px);
+    /* 窄屏：玻璃条内边距收一点，给 logo 留更多空间（顶部保留安全区） */
+    padding: max(10px, env(safe-area-inset-top)) 14px 10px;
+    margin-bottom: 8px;
   }
   .progress-container {
     backdrop-filter: saturate(180%) blur(18px);
@@ -243,17 +276,23 @@ _AMBIENT_JS = """
   var mq = function (q) { return !!(window.matchMedia && window.matchMedia(q).matches); };
   var reduce = mq("(prefers-reduced-motion: reduce)");
   var coarse = mq("(pointer: coarse)");
+  // 调试用：URL 上带 ?ata-state=generating 就强制停在某个状态，
+  // 方便不跑一次真实转换也能预览"跑马灯"（见 AGENTS.md）。
+  var forcedState = (function () {
+    var m = /[?&#]ata-state=([a-z]+)/.exec((location.search || "") + "&" + (location.hash || ""));
+    return m && ["idle", "arming", "generating", "settling"].indexOf(m[1]) >= 0 ? m[1] : null;
+  })();
 
   var layer = null, base = null, canvas = null, ctx = null;
   // 光场：浮点 RGB 累加缓冲 + 量化用的 8bit 画布
   var fw = 0, fh = 0, fieldDiv = 5, fieldR = null, fieldG = null, fieldB = null;
   var fieldCanvas = null, fieldCtx = null, fieldImage = null, fieldData = null;
-  var hueLUT = null, hueLUTN = 0, kernel = null;
+  var hueLUT = null, hueLUTDeep = null, hueLUTN = 0, kernel = null;
   var KERNEL_N = 256, FIELD_MAX_R = 60;
   var dpr = 1;
   var ditherPattern = null;
   var vw = 0, vh = 0, homeX = 0, homeY = 0;
-  var idleParts = [], edgeParts = [];
+  var idleParts = [], marquee = [], marqueeP = 0;
   var state = "idle";
   var themeDark = false, themeAlpha = 1;   // 主题相关的 sprite 亮度与整体强度
   var blend = 0;              // 生成态过渡：0 = 空闲，1 = 生成中
@@ -268,6 +307,7 @@ _AMBIENT_JS = """
   var centerConc = 1;                // 中心光束当前的"聚集度"（见 draw() ③）
   var massCx = 0, massCy = 0, massRms = 0;   // 粒子团重心与散布半径（诊断用）
   var RING_EDGES = [0, 25, 60, 120, 200, 320, 460, 640, 900];
+  var EDGE_BAND = 26;                // 贴边光带的统计宽度（CSS px，诊断用）
   var t0 = (window.performance && performance.now()) || Date.now();
   var frameAcc = 0, frameN = 0;      // 渲染耗时统计（写到 dataset.frameMs，便于排查性能）
   var raf = null, looping = false;
@@ -276,7 +316,6 @@ _AMBIENT_JS = """
   var bootInterval = null;
 
   function rand(a, b) { return a + Math.random() * (b - a); }
-  function gauss() { return (Math.random() + Math.random() + Math.random() - 1.5) / 1.5; }
   function now() { return (window.performance && performance.now()) || Date.now(); }
 
   // ══ 光场构造（这一版的核心改动） ══
@@ -310,6 +349,18 @@ _AMBIENT_JS = """
       hueLUT[i * 3 + 1] = rgb[1];
       hueLUT[i * 3 + 2] = rgb[2];
     }
+    // 光条专用的"深色"表：饱和度更高、明度更低 → 通道比值更浓。
+    // 注意 compositeField() 会按最大通道归一化，所以明度只影响"颜色有多深"，
+    // 不影响画出来的不透明度（不透明度由累加量 alpha 决定）。
+    var dsat = themeDark ? (CFG.marqueeSatDark || 96) : (CFG.marqueeSatLight || 96);
+    var dlight = themeDark ? (CFG.marqueeLightDark || 62) : (CFG.marqueeLightLight || 52);
+    hueLUTDeep = new Float32Array(n * 3);
+    for (var j = 0; j < n; j++) {
+      var rgb2 = hslToRgb(j / n, dsat / 100, dlight / 100);
+      hueLUTDeep[j * 3] = rgb2[0];
+      hueLUTDeep[j * 3 + 1] = rgb2[1];
+      hueLUTDeep[j * 3 + 2] = rgb2[2];
+    }
     hueLUTN = n;
   }
 
@@ -324,29 +375,30 @@ _AMBIENT_JS = """
     return !!(document.body && document.body.classList.contains("dark"));
   }
 
-  // 往光场里累加一个光源（坐标/半径都是 CSS 像素）
-  function splat(x, y, radius, hue, alpha) {
+  // 往光场里累加一个**椭圆**光源（中心/半轴都是 CSS 像素，轴对齐）。
+  // 边缘光条就是用它画的：一长一短两个半轴 → 贴着边框的一条光带。
+  function splatEllipse(x, y, rx, ry, hue, alpha, deep) {
     if (alpha <= 0.0008) return;
-    var R = radius / fieldDiv;
-    if (R < 0.7) R = 0.7;
-    if (R > FIELD_MAX_R) R = FIELD_MAX_R;
+    var R2x = Math.max(0.7, Math.min(rx / fieldDiv, FIELD_MAX_R));
+    var R2y = Math.max(0.7, Math.min(ry / fieldDiv, FIELD_MAX_R));
+    var lut = deep ? hueLUTDeep : hueLUT;
     var h = ((hue % 360) + 360) % 360;
     var pos = (h / 360) * hueLUTN;
     var i0 = Math.floor(pos), f = pos - i0;
     var j0 = (i0 % hueLUTN) * 3, j1 = ((i0 + 1) % hueLUTN) * 3;
-    var cr = hueLUT[j0] + (hueLUT[j1] - hueLUT[j0]) * f;
-    var cg = hueLUT[j0 + 1] + (hueLUT[j1 + 1] - hueLUT[j0 + 1]) * f;
-    var cb = hueLUT[j0 + 2] + (hueLUT[j1 + 2] - hueLUT[j0 + 2]) * f;
+    var cr = lut[j0] + (lut[j1] - lut[j0]) * f;
+    var cg = lut[j0 + 1] + (lut[j1 + 1] - lut[j0 + 1]) * f;
+    var cb = lut[j0 + 2] + (lut[j1 + 2] - lut[j0 + 2]) * f;
     var e = Math.min(1, alpha * themeAlpha);
     var cx = x / fieldDiv, cy = y / fieldDiv;
-    var x0 = Math.max(0, Math.floor(cx - R)), x1 = Math.min(fw - 1, Math.ceil(cx + R));
-    var y0 = Math.max(0, Math.floor(cy - R)), y1 = Math.min(fh - 1, Math.ceil(cy + R));
-    var invR2 = 1 / (R * R);
+    var x0 = Math.max(0, Math.floor(cx - R2x)), x1 = Math.min(fw - 1, Math.ceil(cx + R2x));
+    var y0 = Math.max(0, Math.floor(cy - R2y)), y1 = Math.min(fh - 1, Math.ceil(cy + R2y));
+    var invX = 1 / (R2x * R2x), invY = 1 / (R2y * R2y);
     for (var py = y0; py <= y1; py++) {
-      var dy = py - cy, dy2 = dy * dy, row = py * fw;
+      var dy = py - cy, ty = dy * dy * invY, row = py * fw;
       for (var px = x0; px <= x1; px++) {
         var dx = px - cx;
-        var t = (dx * dx + dy2) * invR2;
+        var t = dx * dx * invX + ty;
         if (t >= 1) continue;
         var k = kernel[(t * KERNEL_N) | 0] * e;
         var idx = row + px;
@@ -355,6 +407,11 @@ _AMBIENT_JS = """
         fieldB[idx] += cb * k;
       }
     }
+  }
+
+  // 圆形光源 = 两个半轴相等
+  function splat(x, y, radius, hue, alpha) {
+    splatEllipse(x, y, radius, radius, hue, alpha);
   }
 
   function clearField() {
@@ -464,29 +521,73 @@ _AMBIENT_JS = """
     bakeDither();                       // DPR 可能变化，噪声瓦片按设备像素重建
   }
 
+  // ── 视口周长参数化 ──
+  // 沿边框顺时针走：上边（左→右）→ 右边（上→下）→ 下边（右→左）→ 左边（下→上）。
+  // 跑马灯的"亮块"和汇聚光束的落点都用这一套坐标，保证散开的光正好落在光条上。
+  function perimeterPoint(s) {
+    s = ((s % marqueeP) + marqueeP) % marqueeP;
+    if (s < vw) return { x: s, y: 0 };
+    s -= vw;
+    if (s < vh) return { x: vw, y: s };
+    s -= vh;
+    if (s < vw) return { x: vw - s, y: vh };
+    s -= vw;
+    return { x: 0, y: vh - s };
+  }
+
+  // 沿四边均匀铺一排椭圆光条：中心压在边框线上（窗口里只看得到内侧一半，
+  // 于是越靠边颜色越深、朝画面内渐淡）；每条的色相按周长位置错开 → 一圈上同时有几种颜色。
+  function buildMarquee() {
+    marqueeP = 2 * (vw + vh);
+    marquee = [];
+    var seg = Math.max(90, CFG.marqueeSeg || 230);
+    var across = Math.max(60, CFG.marqueeAcross || 200);
+    var spread = CFG.marqueeHueSpread || 46;
+    var half = seg * 0.95;
+    // 每条边的光条数按边长算，四边密度一致
+    var nx = Math.max(2, Math.round(vw / seg));
+    var ny = Math.max(2, Math.round(vh / seg));
+    for (var axis = 0; axis < 2; axis++) {
+      var count = axis === 0 ? nx : ny, len = axis === 0 ? vw : vh;
+      for (var i = 0; i < count; i++) {
+        var pos = len * (i + 0.5) / count;
+        // 每边两个方向各一条（上/下、左/右）
+        for (var side = 0; side < 2; side++) {
+          var s, x, y;
+          if (axis === 0 && side === 0) { s = pos; x = pos; y = 0; }                       // 上
+          else if (axis === 0) { s = vw + vh + (vw - pos); x = pos; y = vh; }              // 下
+          else if (side === 0) { s = vw + pos; x = vw; y = pos; }                          // 右
+          else { s = vw + vh + vw + (vh - pos); x = 0; y = pos; }                          // 左
+          marquee.push({
+            x: x, y: y,
+            rx: axis === 0 ? half : across,
+            ry: axis === 0 ? across : half,
+            sn: s / marqueeP,                              // 0..1 的周长坐标（行进波用它）
+            hueOff: Math.sin((s / marqueeP) * TAU * 2) * spread
+          });
+        }
+      }
+    }
+  }
+
   function assignEdgeTargets() {
-    // 从"扩散起点"（点开始生成时的鼠标位置）向四周射线到视口边框；
-    // 角度用黄金角均匀铺开，保证每个方向都有粒子，不会随机挤成一堆。
+    // 汇聚的光束散开时**沿周长均匀分配**落点（不是按角度射线）：这样四边会被均匀铺满，
+    // 正好铺在跑马灯光条上。粒子按相对扩散起点的角度排序后依次取点，减少航线交叉。
+    if (!marqueeP) buildMarquee();
     var ax = spreadAnchorX, ay = spreadAnchorY;
-    var GOLDEN = 2.39996323;
     var n = idleParts.length;
-    for (var i = 0; i < n; i++) {
-      var p = idleParts[i];
-      var angle = i * GOLDEN + p.angleJitter;
-      var cosA = Math.cos(angle), sinA = Math.sin(angle);
-      var t = Infinity, tt;
-      if (sinA < 0) { tt = -ay / sinA; if (tt > 0 && tt < t) t = tt; }
-      if (sinA > 0) { tt = (vh - ay) / sinA; if (tt > 0 && tt < t) t = tt; }
-      if (cosA < 0) { tt = -ax / cosA; if (tt > 0 && tt < t) t = tt; }
-      if (cosA > 0) { tt = (vw - ax) / cosA; if (tt > 0 && tt < t) t = tt; }
-      if (!isFinite(t) || t <= 0) t = 0;
-      var margin = 20;
-      p.edgeAngle = angle;
-      p.edgeX = ax + cosA * Math.max(t - margin, 0);
-      p.edgeY = ay + sinA * Math.max(t - margin, 0);
-      // 散到边缘后收成小一些的光斑（同时提亮一点，边缘才有存在感）
-      p.edgeSize = rand(85, 155);
-      p.edgeAlpha = rand(0.027, 0.050);
+    var order = [];
+    for (var i = 0; i < n; i++) order.push(i);
+    order.sort(function (a, b) {
+      var pa = idleParts[a], pb = idleParts[b];
+      return Math.atan2(pa.y - ay, pa.x - ax) - Math.atan2(pb.y - ay, pb.x - ax);
+    });
+    for (var k = 0; k < n; k++) {
+      var p = idleParts[order[k]];
+      var pt = perimeterPoint((k + 0.5 + p.angleJitter * 0.8) / n * marqueeP);
+      p.edgeX = pt.x; p.edgeY = pt.y;
+      p.edgeSize = rand(70, 120);
+      p.edgeAlpha = rand(0.030, 0.058);
     }
   }
 
@@ -520,38 +621,8 @@ _AMBIENT_JS = """
         edgeX: 0, edgeY: 0, edgeSize: 0, edgeAlpha: 0
       });
     }
+    buildMarquee();
     assignEdgeTargets();
-
-    edgeParts = [];
-    var perSide = Math.max(6, Math.round((CFG.edgePerSide || 12) * scale));
-    for (var s = 0; s < 4; s++) {
-      for (var k = 0; k < perSide; k++) {
-        var pos = (k + Math.random() * 0.7) / perSide;
-        var d = Math.abs(gauss()) * 25 + 10;
-        var ex, ey;
-        if (s === 0) { ex = pos * vw; ey = d; }
-        else if (s === 1) { ex = vw - d; ey = pos * vh; }
-        else if (s === 2) { ex = pos * vw; ey = vh - d; }
-        else { ex = d; ey = pos * vh; }
-        edgeParts.push({ x: ex, y: ey, size: rand(150, 240), alpha: rand(0.029, 0.055),
-                         hueOff: rand(-18, 18) });
-      }
-    }
-    // 四角：每个角两颗大粒子（主角落压住角本身，副角落覆盖角内侧）
-    var corners = [[0, 0], [vw, 0], [vw, vh], [0, vh]];
-    for (var c = 0; c < 4; c++) {
-      var cx = corners[c][0], cy = corners[c][1];
-      var a2 = Math.atan2(cy - vh / 2, cx - vw / 2);
-      edgeParts.push({ x: cx + Math.cos(a2) * 8, y: cy + Math.sin(a2) * 8,
-                       size: rand(340, 460), alpha: rand(0.052, 0.091), hueOff: rand(-10, 10) });
-      edgeParts.push({ x: cx + Math.cos(a2) * 26, y: cy + Math.sin(a2) * 26,
-                       size: rand(250, 345), alpha: rand(0.039, 0.072), hueOff: rand(-14, 14) });
-    }
-    // 顶边：4 颗大粒子横跨顶部
-    for (var t = 0; t < 4; t++) {
-      edgeParts.push({ x: vw * (t + 0.5) / 4, y: 0,
-                       size: rand(320, 435), alpha: rand(0.046, 0.085), hueOff: rand(-10, 10) });
-    }
   }
 
   // ── 色相缓慢流动 ──
@@ -597,6 +668,11 @@ _AMBIENT_JS = """
     var fx = px / fieldDiv, fy = py / fieldDiv;
     var edge = [], r;
     for (r = 0; r < RING_EDGES.length; r++) edge.push(RING_EDGES[r] / fieldDiv);
+    // 顺便统计"贴边光带"：离视口四边 EDGE_BAND 像素以内的平均亮度，
+    // 以及顶边光带沿长度方向的 16 段剖面（看跑马灯的亮块有没有在跑）。
+    var BAND = Math.max(1, Math.round(EDGE_BAND / fieldDiv));
+    var PROFN = 16;
+    var ebSum = 0, ebCnt = 0, prof = new Float64Array(PROFN), pcnt = new Float64Array(PROFN);
     for (var y = 0; y < fh; y++) {
       var dy = y - fy, dy2 = dy * dy;
       for (var x = 0; x < fw; x++) {
@@ -605,10 +681,19 @@ _AMBIENT_JS = """
         for (r = 0; r < rings; r++) {
           if (d < edge[r + 1]) { sum[r] += profileBuf[y * fw + x]; cnt[r]++; break; }
         }
+        var v = profileBuf[y * fw + x];
+        if (y < BAND || y >= fh - BAND || x < BAND || x >= fw - BAND) { ebSum += v; ebCnt++; }
+        if (y < BAND) {
+          var bi = Math.min(PROFN - 1, Math.floor(x * PROFN / fw));
+          prof[bi] += v; pcnt[bi]++;
+        }
       }
     }
     out.rings = [];
     for (r = 0; r < rings; r++) out.rings.push(cnt[r] ? sum[r] / cnt[r] : 0);
+    out.edgeMean = ebCnt ? ebSum / ebCnt : 0;
+    out.topProf = [];
+    for (r = 0; r < PROFN; r++) out.topProf.push(pcnt[r] ? prof[r] / pcnt[r] : 0);
     return out;
   }
 
@@ -638,8 +723,8 @@ _AMBIENT_JS = """
         hx = bx + (p.edgeX - bx) * edgeEase;
         hy = by + (p.edgeY - by) * edgeEase;
       }
-      var tx = hx + (focusX + p.jx * 32 - hx) * g;
-      var ty = hy + (focusY + p.jy * 32 - hy) * g;
+      var tx = hx + (focusX + p.jx * 26 - hx) * g;
+      var ty = hy + (focusY + p.jy * 26 - hy) * g;
       p.x += (tx - p.x) * ease;
       p.y += (ty - p.y) * ease;
 
@@ -684,13 +769,13 @@ _AMBIENT_JS = """
       }
       // 三层配比（外圈"大而淡"只负责远处的范围，中间收得紧、中心提亮）：
       //   ① 560px / 0.040 —— 远处泛光
-      //   ② 190px / 0.155 —— 收束主体
-      //   ③ 100px / 0.540 —— 中心高光核
+      //   ② 190px / 0.158 —— 收束主体
+      //   ③  76px / 0.600 —— 中心高光核（半径越小、高光越集中在正中）
       var beam = centerAlpha * g * conc;
       centerConc = conc;
       splat(baseX, baseY, 560, hue, 0.040 * beam);
-      splat(baseX, baseY, 190, hue, 0.155 * beam);
-      splat(baseX, baseY, 100, hue, 0.540 * beam);
+      splat(baseX, baseY, 190, hue, 0.158 * beam);
+      splat(baseX, baseY, 76, hue, 0.600 * beam);
     } else {
       centerConc = 1;
     }
@@ -702,18 +787,24 @@ _AMBIENT_JS = """
       splat(pk.x, pk.y, pk.curSize, hue + pk.hueOff, pk.curAlpha);
     }
 
-    // ⑤ 边缘粒子（生成态）
-    if (blend > 0.002) {
-      var breathe = 0.94 + 0.06 * Math.sin(ts * 0.0008 + t0 * 0.001);
-      for (var j = 0; j < edgeParts.length; j++) {
-        var ep = edgeParts[j];
-        var dx = focusX - ep.x, dy = focusY - ep.y;
-        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        var near = Math.max(0, 1 - dist / 520);      // 离光标越近的边缘粒子越亮
-        var pull = 14 * g;                            // 被光标轻微牵引
-        var ea = ep.alpha * blend * breathe * (1 + 0.5 * near * g);
-        if (ea <= 0.0008) continue;
-        splat(ep.x + (dx / dist) * pull, ep.y + (dy / dist) * pull, ep.size, hue + ep.hueOff, ea);
+    // ⑤ 生成态：沿四边铺开的彩色光条 + 绕圈跑动的亮块（跑马灯）
+    if (blend > 0.002 && marquee.length) {
+      var lapMs = CFG.marqueeLapMs || 19000;
+      var waves = CFG.marqueeWaves || 3;
+      // 相位按"亮块绕视口跑一整圈 = lapMs"来推进（所以乘 waves：一圈里有 waves 个亮块）
+      var phase = (ts % lapMs) / lapMs * waves;
+      var breath = 1 + (CFG.marqueeBreath || 0.12) * Math.sin(ts * 0.0007 + t0 * 0.0009);
+      // 不透明度按主题取（浅色底要更足），色相用"深色表" → 浓而且醒目
+      var marqueeA = themeDark ? (CFG.marqueeAlphaDark || 0.18) : (CFG.marqueeAlphaLight || 0.30);
+      var baseA = marqueeA * blend * breath;
+      var floor = CFG.marqueeFloor || 0.45;
+      for (var j = 0; j < marquee.length; j++) {
+        var mq = marquee[j];
+        // 行进波：亮块沿周长移动（方波化后是"亮段 + 暗段"，即跑马灯）
+        var wv = 0.5 + 0.5 * Math.sin(TAU * (mq.sn * waves - phase));
+        var a = baseA * (floor + (1 - floor) * wv * wv);
+        if (a <= 0.0008) continue;
+        splatEllipse(mq.x, mq.y, mq.rx, mq.ry, hue + mq.hueOff, a, true);
       }
     }
 
@@ -776,6 +867,7 @@ _AMBIENT_JS = """
   }
 
   function syncFromProgress() {
+    if (forcedState) return;                  // 调试强制态：不被页面状态覆盖
     var mode = modeFromDom();
     if (mode === "generating") { setState("generating"); return; }
     if (mode === "settle") { setState("settling"); return; }
@@ -853,7 +945,9 @@ _AMBIENT_JS = """
     if (!layer || !layer.isConnected) { cleanup(); return; }
 
     if (state === "generating") blend += (1 - blend) * 0.03;
-    else if (state === "arming") blend += (0.5 - blend) * 0.03;
+    // arming（已点按钮、还没收到后端"真的开跑"）里**不散开**：没选文件 / 表单报错时
+    // 点按钮不会触发跑马灯，只有等进度条真的变成 active（blend 才会朝 1 走）才播放。
+    else if (state === "arming") blend += (0 - blend) * 0.05;
     else blend += (0 - blend) * (state === "settling" ? 0.045 : 0.05);
     if (blend < 0.001) blend = 0;
     if (blend > 0.999) blend = 1;
@@ -896,7 +990,9 @@ _AMBIENT_JS = """
           + (centerConc * 1000 | 0) + "|"
           + (massCx | 0) + "|" + (massCy | 0) + "|" + (massRms | 0) + "|"
           + (focusX | 0) + "|" + (focusY | 0) + "|"
-          + prof.rings.map(function (v) { return v * 1000 | 0; }).join(",");
+          + prof.rings.map(function (v) { return v * 1000 | 0; }).join(",") + "|"
+          + (prof.edgeMean * 1000 | 0) + "|"
+          + prof.topProf.map(function (v) { return v * 1000 | 0; }).join(",");
       }
       fieldN = 0;
     }
@@ -955,6 +1051,7 @@ _AMBIENT_JS = """
     paintClass();
     bindObservers();
     syncFromProgress();
+    if (forcedState) setState(forcedState);     // 调试强制态（?ata-state=...）
     if (reduce) draw(now());
     else startLoop();
   }
@@ -994,11 +1091,13 @@ _AMBIENT_JS = """
         conc: centerConc
       };
       if (prof.rings) out.rings = prof.rings;
+      if (prof.topProf) { out.edgeMean = prof.edgeMean; out.topProf = prof.topProf; }
       return out;
     },
     cleanup: cleanup,
     reduceMotion: reduce,
-    coarsePointer: coarse
+    coarsePointer: coarse,
+    forcedState: forcedState
   };
 
   function init() {

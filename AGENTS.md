@@ -103,17 +103,40 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
   ③ xterm 日志终端主题写死在组件里（浅底深字），暗色下只对 `.xterm-screen`（画字层）加
   `invert(1) hue-rotate(180deg)`，底色放在不会被反相的 `.xterm-viewport`。回归测试见
   `tests/audiobook_generator/ui/theme_test.py`（含两套主题的 WCAG 对比度计算）。
-- **光晕的色彩断层与点击扩散**（`ambient_background.py`）：
+- **光晕的色彩断层与"跑马灯"扩散**（`ambient_background.py`）：
   ① 断层三道防线——色相 32 档 + 相邻 sprite 交叉淡入（`drawGlowSprite` 画两次）、
   sprite 224px（减少放大倍率）、每帧最后铺一层"平均为零"的抖动噪声
   （`bakeDither`/`drawDither`，黑白各半 alpha 6 ≈ ±3/255）。实测色带平台从 27 段/最长 403px
   降到 8 段/最长 1px，取值档数 43 → 190；**改回写死渐变或去掉抖动会立刻复现条带**。
-  ② 点「开始生成」的扩散：`signalStart()` 把 `spreadAnchorX/Y` 设成当前鼠标位置，
-  `assignEdgeTargets()` 从该点向四周射线到视口边框，方向按**黄金角**（2.39996323）均匀铺开，
-  保证每个方向都有粒子；`arming` 目标 0.5、约 1.2 秒可见地散开，收到 `active` 状态后走满量程。
+  ② 生成态的"跑马灯"：`signalStart()`（点「开始生成」）只记下扩散起点 `spreadAnchorX/Y`
+  **不散开**；等进度条真的变成 `active`（后端确认开跑）才把 `blend` 推向 1，汇聚的光束
+  沿视口**周长等分**飞出去，同时四边亮起彩色光条、亮块绕圈跑（见下一条）。
+  ⚠️ 触发条件必须是"点了按钮 + 真的开跑"：没选文件/表单报错时进度条不会变 `active`，
+  于是**什么都不播**（早期版本 arming 就散到 0.5，导致没选文件点一下也会整屏散开）。
   ③ 同一按钮的点击监听里 `window.scrollTo({top: 0, behavior: 'smooth'})`，整页滑回最顶端。
+- **生成态光条 = 跑马灯**（`buildMarquee()` + `draw()` ⑤）：沿视口周长把椭圆光源铺满，
+  每个椭圆中心压在边框线上、长轴沿边（`marqueeSeg` 230px 间距、`marqueeAcross` 200px 厚），
+  窗口里只看得到内侧一半 → **越靠边颜色越深、朝画面内渐淡**。亮度乘一个沿周长移动的
+  行进波 `sin(TAU*(sn*waves - phase))`（`marqueeWaves` **5** 个亮块、`marqueeLapMs` 19s 跑一圈），
+  压一下得到 `marqueeFloor`~1.0（**0.5**~1.0）的亮暗起伏 = 亮块绕圈跑；
+  再乘 `marqueeBreath`（±14%）做呼吸。
+  每条光条的色相按 `sin(周长*2π)` 偏移 ±`marqueeHueSpread`（52°）→ 一圈上同时有几种颜色。
+  ⚠️ 三个"看不见/不好看"的坑：① **浅色模式必须单独给更足的不透明度**——`alpha` 是"颜色叠在底色上的比例"，
+  近白底上 0.085 的淡色几乎看不出来（实测边框只暗 7/255），深色底同样 0.085 却很明显；
+  所以用 `marqueeAlphaLight`（0.30）/`marqueeAlphaDark`（0.18）分开给。实测浅色模式边框暗 25~38/255。
+  ② **光条要用更"深"的配色**：`compositeField()` 会按最大通道归一化，于是颜色深浅只由**通道比值**决定，
+  所以另建了一张 `hueLUTDeep`（`marqueeSat*` 96 / `marqueeLight*` 52~62），叠出来是浓色带而不是粉彩；
+  只调 alpha 不改配色，颜色会越来越"白亮"而不是"深"。
+  ③ `marqueeFloor` 太低（0.34）时暗段几乎看不见，看着就是"某几条边没亮" → 用户反馈"周围不够均匀"；
+  现在 0.5 保底 + 5 个亮块，四边始终亮着、只有亮块处更亮。
+  椭圆光源用 `splatEllipse(x, y, rx, ry, ...)`（轴对齐，不需要旋转矩阵）；
+  `splat()` 只是它两轴相等的特例。实测量（浅色模式）：贴边 26px 带内平均亮度 **0.25**、
+  顶边剖面的暗段 0.19 / 亮块 0.36，
+  顶边 16 段剖面的波峰约 7 秒扫过整条上边（= 19s 跑完一圈的 0.32），`frameMs` 1.4~2.1ms。
+  ⚠️ 旧的"每条边 12 颗圆形粒子 + 四角大粒子"那层已经删掉（`edgeParts`/`edgePerSide` 不再存在），
+  别把圆形光斑层加回来——圆斑只会在边上糊成一片，出不来"光条"的形。
 - **光晕是"浮点光场"，不是"叠 sprite"**（重要约束，别改回去）：
-  每颗粒子（46 颗，半径 110~240px，另有中心 440/320px 与边缘层）只作为一个**光源**，
+  每颗粒子（46 颗，半径 110~240px，另有中心三层光束与边缘光条）只作为一个**光源**，
   在 `Float32Array` 的 RGB 缓冲里按高斯核 `exp(-3t)` 累加（`splat()`），
   整帧只在 `compositeField()` 里量化一次，再放大到主画布、最后叠 display 分辨率的抖动层。
   **绝不能回到"预渲染多张 8bit 光斑再叠加"**：那样各自的量化台阶会露出可见边界与色带
@@ -124,7 +147,7 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
   否则鼠标挪开后正中会残留一团浅色圆、颜色还随色相变化（"中间有个圆在闪"）。
   亮度/范围/浓淡的调参位置：粒子半径与透明度在 `rebuildParticles()`（当前 150~270 / 200~320，
   核心更亮），中心三层 `splat()` 的半径与 alpha 在 `draw()`
-  （560px/0.040 大而淡负责远处范围、190px/0.155 收束主体、100px/0.540 中心高光核），
+  （560px/0.040 大而淡负责远处范围、190px/0.158 收束主体、76px/0.600 中心高光核），
   色彩浓淡在 `CFG.spriteSat*/spriteLight*`（浅 86/70、深 90/64）。注意 `CFG.fieldMaxRadius`
   必须大于最大半径，否则中心光束会被静默截断（曾经 60 格 = 300px，把 580px 的光束切掉了，
   表现为"改大了却没变化"）。光晕变强后浅色主题的次要文字压到了 `#52525a`，
@@ -142,17 +165,38 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
   **调参验证不要再靠截图差分**：`draw()` 每 6 帧把光场快照写到 `#ata-bg.dataset.field`
   （`峰值|峰值x|峰值y|gather|blend|conc|重心x|重心y|rms|focusX|focusY|8 个同心环均值`，
   都是 ×1000 整数，环边界见 `RING_EDGES`）。它比截图干净（只有光晕、没有页面内容），
-  但**每次刷新粒子布局都是随机的**，同一档位重复测量噪声约 ±5%（远环 ±12%），
-  要比就得按"reload 后固定延时再采样"的统一相位、并多帧平均。
+  但**每次刷新粒子布局都是随机的**，同一档位重复测量噪声约 ±5%。
+  ⚠️ 更坑的是：reload 后如果鼠标事件还没被监听到，`gather` 会一直停在 0，
+  量到的是"散开态"（峰值从 2.1 掉到 0.7、远环翻倍），拿这种帧做 A/B 会得出反向结论
+  （踩过一次：三连测平均出"高光更散了"）。**采样前必须校验 `gather > 0.98 && 0 < rms < 27`**，
+  不满足就重发一次 mousemove / 再等，然后 5 帧平均。
   ⚠️ 浏览器自动化的只读 evaluate 作用域里读不到 `window.__ataAmbient`（自定义全局被过滤），
   `dataset` 是唯一可靠的读取口——这也是保留 `data-field` 的原因。
-  色相循环（`slowHue`）必须是**闭环 + Catmull-Rom**：旧写法"线性扫过调色板再回到第一色"
+  三层各自的职责：**③ 中心高光核的半径决定"高光集中不集中"**（100px → 76px 时
+  25–60px 环 −6%、60–120px 环 −27%，而 120px 以外几乎不动），
+  ② 主体决定肩部、① 外圈决定整团的范围——想让"高光更集中但整体别变小"就只动③，
+  想整体收小就动①（踩过：三层一起收，结果整团缩了一圈）。
+  另外汇聚抖动（`p.jx * N`，当前 ±26px）同时影响中心浓度与粒子云脚印，别和③一起大改。
+  **想不跑一次真实转换就预览生成态**：URL 上加 `?ata-state=generating`（也认 `#ata-state=`），
+  页面加载后强制停在该状态（`forcedState`，见 `boot()`/`syncFromProgress()`），
+  调跑马灯的亮度/速度/厚度时用它，省得反复上传文件。
+  诊断快照 `#ata-bg.dataset.field` 末尾还多带两项：贴边 26px 带的平均亮度 `edgeMean`
+  与顶边 16 段剖面 `topProf`（看亮块有没有在跑：波峰索引应随时间单调移动）。
+ 色相循环（`slowHue`）必须是**闭环 + Catmull-Rom**：旧写法"线性扫过调色板再回到第一色"
   在最后一段 `288 → 212` 会瞬间跳 ~76°（实测 -72.2°/2.5s，是典型步进的 4.9 倍），
   看起来就是"卡一下突然换色"。现在首尾相接成环、取相邻四点插值，跨段一阶导连续，
   整轮 40s（`hueSegmentMs × 段数`），接缝处步进只有 0.21°。
 - **标签页 hover 一律毛玻璃**：Gradio 默认给 `.tab-container button:hover` 实心填充
   （浅色下 `rgb(248,250,252)`，看着像贴了一块白框），`THEME_CSS` 里统一改成
   `var(--ata-glass-soft)` + `blur(14px)` + 内描边；新增标签类组件时记得别让默认白底漏出来。
+- **顶栏是一块圆角玻璃条，必须和卡片同宽**（`.app-header`，规则在 `web_ui.CUSTOM_CSS`）：
+  `gr.HTML` 的包装层 `.html-container.padding` 自带 `10px 12px` 内边距，会把玻璃条挤得比卡片
+  窄 24px、logo 贴到离边框 4px 的地方（实测顶栏 680px vs 卡片 704px）。修法是给顶栏加
+  `margin: 0 -12px` 把宽度撑回卡片带，内边距改由它自己给（`padding: 12px 18px`），
+  再配 `border-radius: var(--radius)` + 卡片同款 `border`/`box-shadow`、`top: 8px` 悬浮式 sticky。
+  为什么不用 `:has()` 去改包装层：那是 Gradio 生成的 DOM，直接改包装层会波及其他 `gr.HTML`
+  （hero 段落也用它），负外边距只影响顶栏自己。窄屏（<720px）在 `AMBIENT_CSS` 的媒体查询里
+  收到 `14px`（顶部保留 `env(safe-area-inset-top)`）。
 
 ### 提供商文件
 - `audiobook_generator/tts_providers/chatterbox_tts_provider.py` — Chatterbox TTS 提供商实现

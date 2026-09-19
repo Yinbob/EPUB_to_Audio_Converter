@@ -932,14 +932,18 @@ html, body {
 
 /* ── 顶部品牌栏 ── */
 .app-header {
-  position: sticky; top: 0; z-index: 100;
+  position: sticky; top: 8px; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  gap: 10px; padding: 14px 4px; margin-bottom: 8px;
-  padding-top: max(14px, env(safe-area-inset-top));
+  gap: 12px; padding: 12px 18px; margin: 0 -12px 10px;
+  padding-top: max(12px, env(safe-area-inset-top));
   background: rgba(251,251,253,0.72);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid var(--apple-border-soft);
+  /* 圆角玻璃条：width 用负外边距抵消 gr.HTML 包装层的 12px 内边距，
+     让它和下面的卡片同为一条带（原来 680px、比卡片窄 24px，logo 还贴在 4px 处） */
+  border: 1px solid var(--apple-border-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--apple-shadow);
 }
 .app-brand { display: flex; align-items: center; gap: 12px; }
 .app-logo {

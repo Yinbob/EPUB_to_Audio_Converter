@@ -13,6 +13,7 @@
 
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -184,6 +185,28 @@ class TestProgressWiring(unittest.TestCase):
             self.assertIn(token, self.web_ui.CUSTOM_CSS, f"页面样式里缺少：{token}")
         # 背景层必须垫在内容之下：容器提升到 z-index:1 且背景透明
         self.assertIn("z-index: 1", self.web_ui.CUSTOM_CSS)
+
+    def test_header_is_a_rounded_glass_bar_spanning_the_card_band(self):
+        """顶栏是圆角玻璃条，且要和卡片同宽（gr.HTML 包装层会把它挤窄、logo 贴边）"""
+        from tests.audiobook_generator.ui.ambient_background_test import _css_rules
+
+        rules = _css_rules(self.web_ui.CUSTOM_CSS)
+        body = None
+        for selector, decl in rules:
+            if ".app-header" in [s.strip() for s in selector.split(",")]:
+                body = decl
+                break
+        self.assertIsNotNone(body, "找不到 .app-header 规则")
+        self.assertIn("border-radius: var(--radius)", body, "顶栏必须是圆角（原来是直角）")
+        self.assertIn("border: 1px solid var(--apple-border-soft)", body, "顶栏要和卡片同款描边")
+        self.assertIn("box-shadow: var(--apple-shadow)", body, "顶栏要和卡片同款投影")
+        # 负外边距抵消 .html-container 的 12px 内边距，让玻璃条铺满卡片带
+        self.assertIn("margin: 0 -12px", body, "顶栏要横向撑满卡片带")
+        # logo 不能贴边：左右内边距要够（>=16px）
+        pad = re.search(r"padding:\s*([^;]+);", body)
+        self.assertIsNotNone(pad, "顶栏缺少内边距")
+        nums = [float(v) for v in re.findall(r"([\d.]+)px", pad.group(1))]
+        self.assertTrue(nums and max(nums) >= 16, f"顶栏左右内边距太小：{pad.group(1)}")
 
     def test_card_mouse_follow_highlight_is_removed(self):
         """卡片内部跟随鼠标的高光动效已按要求移除（只留背景层的光晕）"""

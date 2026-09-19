@@ -131,19 +131,38 @@ class TestAmbientLayerContract(unittest.TestCase):
         self.assertNotIn("pal[i] + (pal[i + 1] - pal[i])", AMBIENT_LAYER_HTML)
         self.assertNotIn("f * f * (3 - 2 * f)", AMBIENT_LAYER_HTML)
 
-    def test_click_spread_starts_from_pointer_and_is_angularly_even(self):
-        """点「开始生成」时光晕要从鼠标位置、按黄金角均匀散向四周"""
-        for token in ("spreadAnchorX", "spreadAnchorY", "angleJitter", "edgeAngle"):
+    def test_click_spread_starts_from_pointer_and_is_evenly_distributed(self):
+        """点「开始生成」时，汇聚的光束要从鼠标位置出发、沿周长**均匀**散到屏幕四周"""
+        for token in ("spreadAnchorX", "spreadAnchorY", "angleJitter",
+                      "perimeterPoint", "marqueeP"):
             self.assertIn(token, AMBIENT_LAYER_HTML, "扩散动效缺少：" + token)
-        self.assertIn("2.39996323", AMBIENT_LAYER_HTML, "缺少黄金角（保证各方向都有粒子）")
         # 起点必须取自当前鼠标位置
         self.assertIn("spreadAnchorX = mouseX", AMBIENT_LAYER_HTML)
         self.assertIn("spreadAnchorY = mouseY", AMBIENT_LAYER_HTML)
-        # 点击后要先重算边缘目标再进入 arming
+        # 落点按周长等分（不是按角度射线），且按相对起点的角度排序以减少航线交叉
+        self.assertIn("perimeterPoint((k + 0.5 + p.angleJitter * 0.8) / n * marqueeP)",
+                      AMBIENT_LAYER_HTML, "落点应按周长均匀分配")
+        self.assertIn("Math.atan2(pa.y - ay, pa.x - ax)", AMBIENT_LAYER_HTML)
+        # 点击后要先重算落点再进入 arming
         start = AMBIENT_LAYER_HTML.index("function signalStart()")
         body = AMBIENT_LAYER_HTML[start:start + 600]
         self.assertIn("assignEdgeTargets()", body)
         self.assertIn('setState("arming")', body)
+
+    def test_marquee_runs_along_the_border(self):
+        """生成态：沿四边铺开的彩色光条 + 绕圈跑动的亮块（跑马灯）"""
+        for token in ("splatEllipse", "buildMarquee", "marqueeSeg", "marqueeAcross",
+                      "marqueeLapMs", "marqueeWaves", "marqueeHueSpread",
+                      "mq.sn * waves - phase", "splatEllipse(mq.x, mq.y, mq.rx, mq.ry"):
+            self.assertIn(token, AMBIENT_LAYER_HTML, "跑马灯缺少：" + token)
+        # 光条中心压在边框线上（窗口里只看得到内侧一半 → 越靠边颜色越深）
+        self.assertIn("y: 0", AMBIENT_LAYER_HTML)
+        self.assertIn("x: vw", AMBIENT_LAYER_HTML)
+        # 呼吸
+        self.assertIn("CFG.marqueeBreath", AMBIENT_LAYER_HTML)
+        # 旧的圆形边缘粒子层必须已经被光条取代
+        self.assertNotIn("edgeParts", AMBIENT_LAYER_HTML)
+        self.assertNotIn("edgePerSide", AMBIENT_LAYER_HTML)
 
     def test_banding_mitigations_are_in_place(self):
         """断层的防线：浮点光场（只量化一次）+ 细色相表 + 抖动噪声层"""
@@ -157,7 +176,9 @@ class TestAmbientLayerContract(unittest.TestCase):
         self.assertIn("new Float32Array", AMBIENT_LAYER_HTML, "缺少浮点光场缓冲")
         self.assertIn("fieldR[idx] += cr * k", AMBIENT_LAYER_HTML)
         self.assertIn("putImageData", AMBIENT_LAYER_HTML, "光场应只在这里量化一次")
-        self.assertIn("hueLUT[j0]", AMBIENT_LAYER_HTML, "色相应查表 + 线性插值")
+        # 色相查表 + 线性插值（普通表与光条专用的"深色"表都走同一条路径）
+        self.assertIn("var lut = deep ? hueLUTDeep : hueLUT", AMBIENT_LAYER_HTML)
+        self.assertIn("lut[j0] + (lut[j1] - lut[j0]) * f", AMBIENT_LAYER_HTML)
         # 抖动噪声层：预烘焙瓦片 + pattern 平铺（display 分辨率上叠）
         self.assertIn("function bakeDither", AMBIENT_LAYER_HTML)
         self.assertIn("createPattern", AMBIENT_LAYER_HTML)
@@ -209,8 +230,8 @@ class TestAmbientLayerContract(unittest.TestCase):
         # 抗断层组件必须同时在位
         self.assertIn("createPattern", AMBIENT_LAYER_HTML, "缺少抖动噪声层")
         self.assertIn("new Float32Array", AMBIENT_LAYER_HTML, "缺少浮点光场")
-        # 呼吸幅度收小，避免整片背景一跳一跳
-        self.assertIn("0.94 + 0.06 * Math.sin", AMBIENT_LAYER_HTML)
+        # 呼吸幅度收小，避免整片背景一跳一跳（生成态的呼吸在跑马灯那层）
+        self.assertIn("CFG.marqueeBreath", AMBIENT_LAYER_HTML)
 
     def test_renders_without_per_frame_gradients(self):
         """每帧只做「浮点累加 + 一次 putImageData + 一次 drawImage」，不创建任何渐变对象"""
@@ -240,7 +261,10 @@ class TestAmbientLayerContract(unittest.TestCase):
         self.assertEqual(cfg["idleCount"], AMBIENT_IDLE_COUNT)
         self.assertEqual(cfg["idleSpread"], AMBIENT_IDLE_SPREAD)
         self.assertTrue(cfg["enabled"])
-        for key in ("hueSegmentMs", "hueCount", "spriteSize", "edgePerSide", "armTimeoutMs"):
+        for key in ("hueSegmentMs", "hueCount", "spriteSize", "marqueeSeg",
+                    "marqueeAlphaLight", "marqueeAlphaDark", "marqueeSatLight",
+                    "marqueeLightLight", "marqueeFloor",
+                    "marqueeLapMs", "marqueeWaves", "marqueeHueSpread", "armTimeoutMs"):
             self.assertIn(key, cfg)
 
 
