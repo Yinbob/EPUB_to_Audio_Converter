@@ -32,6 +32,8 @@ PIP_RETRIES="${PIP_RETRIES:-10}"
 # torch cu124 官方源在国内同样可能很慢；可换阿里镜像：
 #   TORCH_INDEX_URL=https://mirrors.aliyun.com/pytorch-wheels/cu124 bash deploy_voxcpm.sh
 TORCH_INDEX_URL="${TORCH_INDEX_URL:-https://download.pytorch.org/whl/cu124}"
+# HuggingFace 国内镜像（模型权重下载；可环境变量覆盖）
+export HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
 
 echo "★ 0/5 环境检查"
 PYTHON_BIN="${PYTHON_BIN:-python3}"

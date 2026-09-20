@@ -73,6 +73,8 @@ def check_environment(device):
     import shutil
     _require(shutil.which("ffmpeg") is not None, "ffmpeg 未安装（sudo apt install -y ffmpeg）")
     logger.info(f"ffmpeg {shutil.which('ffmpeg')}")
+    hf_endpoint = os.environ.get("HF_ENDPOINT") or "（未设置，走官方 huggingface.co）"
+    logger.info(f"HF_ENDPOINT={hf_endpoint}（国内网络请使用 https://hf-mirror.com）")
 
 
 def build_provider(args):

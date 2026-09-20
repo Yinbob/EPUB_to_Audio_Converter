@@ -15,6 +15,8 @@ if os.path.exists(_venv_python) and sys.executable != _venv_python:
     os.environ.setdefault('NUMBA_CACHE_DIR', os.path.join(_venv_cache, 'numba'))
     os.environ.setdefault('HF_HOME', os.path.join(_venv_cache, 'huggingface'))
     os.environ.setdefault('HUGGINGFACE_HUB_CACHE', os.path.join(_venv_cache, 'huggingface', 'hub'))
+    # 国内部署默认走 HuggingFace 镜像（GitHub/HF 国际链路常被阻断）；可用环境变量 HF_ENDPOINT 覆盖
+    os.environ.setdefault('HF_ENDPOINT', 'https://hf-mirror.com')
     os.environ.setdefault('MODELSCOPE_CACHE', os.path.join(_venv_cache, 'modelscope'))
     os.environ.setdefault('TORCHINDUCTOR_CACHE_DIR', os.path.join(_venv_cache, 'torchinductor'))
     os.environ.setdefault('OMP_WAIT_POLICY', 'PASSIVE')

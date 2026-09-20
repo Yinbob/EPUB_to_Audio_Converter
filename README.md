@@ -840,7 +840,8 @@ sudo apt install -y ffmpeg libsndfile1
 国内网络下载模型：
 
 ```bash
-export HF_ENDPOINT=https://hf-mirror.com   # 百度网盘离线包见官方仓库 README
+# 入口脚本 main.py / main_ui.py 已默认设置 HF_ENDPOINT=https://hf-mirror.com，
+# 无需手动 export；如需官方源或自定义镜像，在启动前设置环境变量覆盖即可
 ./venv_chatterbox/bin/python -c "from voxcpm import VoxCPM; VoxCPM.from_pretrained('openbmb/VoxCPM2', load_denoiser=False)"
 ```
 
