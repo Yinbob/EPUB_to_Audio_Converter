@@ -17,6 +17,9 @@ if os.path.exists(_venv_python) and sys.executable != _venv_python:
     os.environ.setdefault('HUGGINGFACE_HUB_CACHE', os.path.join(_venv_cache, 'huggingface', 'hub'))
     # 国内部署默认走 HuggingFace 镜像（GitHub/HF 国际链路常被阻断）；可用环境变量 HF_ENDPOINT 覆盖
     os.environ.setdefault('HF_ENDPOINT', 'https://hf-mirror.com')
+    # 新版 huggingface_hub 对大文件默认走 Xet/CAS 协议，会绕过镜像直连官方后端（国内 401）；
+    # 统一禁用，走镜像的普通 HTTP 下载。官方网络用户可显式设 HF_HUB_DISABLE_XET=0 覆盖
+    os.environ.setdefault('HF_HUB_DISABLE_XET', '1')
     os.environ.setdefault('MODELSCOPE_CACHE', os.path.join(_venv_cache, 'modelscope'))
     os.environ.setdefault('TORCHINDUCTOR_CACHE_DIR', os.path.join(_venv_cache, 'torchinductor'))
     os.environ.setdefault('OMP_WAIT_POLICY', 'PASSIVE')

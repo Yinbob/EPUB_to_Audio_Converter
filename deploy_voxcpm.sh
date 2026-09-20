@@ -34,6 +34,8 @@ PIP_RETRIES="${PIP_RETRIES:-10}"
 TORCH_INDEX_URL="${TORCH_INDEX_URL:-https://download.pytorch.org/whl/cu124}"
 # HuggingFace 国内镜像（模型权重下载；可环境变量覆盖）
 export HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
+# 禁用 Xet/CAS 加速协议：它会绕过镜像直连官方后端（国内 401），强制走普通 HTTP
+export HF_HUB_DISABLE_XET="${HF_HUB_DISABLE_XET:-1}"
 
 echo "★ 0/5 环境检查"
 PYTHON_BIN="${PYTHON_BIN:-python3}"

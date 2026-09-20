@@ -25,6 +25,9 @@ import time
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("voxcpm_smoke")
 
+# 国内网络默认关闭 HuggingFace Xet/CAS 加速：它会绕过镜像直连官方后端（401）
+os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+
 # 验收门（RTX 4090 + timesteps=10 + torch.compile 官方基准 RTF≈0.3 / 显存≈8GB）
 RTF_GATE = 0.5
 VRAM_GATE_GB = 12.0
@@ -75,6 +78,7 @@ def check_environment(device):
     logger.info(f"ffmpeg {shutil.which('ffmpeg')}")
     hf_endpoint = os.environ.get("HF_ENDPOINT") or "（未设置，走官方 huggingface.co）"
     logger.info(f"HF_ENDPOINT={hf_endpoint}（国内网络请使用 https://hf-mirror.com）")
+    logger.info(f"HF_HUB_DISABLE_XET={os.environ.get('HF_HUB_DISABLE_XET', '0')}")
 
 
 def build_provider(args):
