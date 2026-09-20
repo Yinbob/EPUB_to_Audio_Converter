@@ -24,6 +24,15 @@ for arg in "$@"; do
   esac
 done
 
+# 国内网络优化：默认走清华 PyPI 镜像；可用环境变量覆盖
+# （官方 files.pythonhosted.org 在国内不稳定，容易 incomplete-download）
+PIP_MIRROR="${PIP_MIRROR:-https://pypi.tuna.tsinghua.edu.cn/simple}"
+PIP_TIMEOUT="${PIP_TIMEOUT:-120}"
+PIP_RETRIES="${PIP_RETRIES:-10}"
+# torch cu124 官方源在国内同样可能很慢；可换阿里镜像：
+#   TORCH_INDEX_URL=https://mirrors.aliyun.com/pytorch-wheels/cu124 bash deploy_voxcpm.sh
+TORCH_INDEX_URL="${TORCH_INDEX_URL:-https://download.pytorch.org/whl/cu124}"
+
 echo "★ 0/5 环境检查"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 MAJOR_MINOR=$("$PYTHON_BIN" -c 'import platform; v=platform.python_version_tuple(); print(f"{v[0]}.{v[1]}")')
@@ -49,9 +58,10 @@ echo "✓ venv Python $("$VENV_PY" -c 'import platform; print(platform.python_ve
 
 echo "★ 3/5 安装 GPU PyTorch 2.6.0（cu124）"
 if [ "$SKIP_TORCH" -eq 0 ]; then
-  venv_chatterbox/bin/pip install --upgrade pip wheel
+  venv_chatterbox/bin/pip install --upgrade pip wheel \
+    -i "$PIP_MIRROR" --timeout "$PIP_TIMEOUT" --retries "$PIP_RETRIES"
   venv_chatterbox/bin/pip install torch==2.6.0 torchaudio==2.6.0 \
-    --index-url https://download.pytorch.org/whl/cu124
+    --index-url "$TORCH_INDEX_URL" --timeout "$PIP_TIMEOUT" --retries "$PIP_RETRIES"
 fi
 if ! venv_chatterbox/bin/python -c "import torch" 2>/dev/null; then
   echo "✗ torch 未就绪，请移除 --skip-install 重新运行" >&2
@@ -60,11 +70,13 @@ fi
 
 echo "★ 4/5 安装 voxcpm"
 if [ "$SKIP_TORCH" -eq 0 ]; then
-  venv_chatterbox/bin/pip install voxcpm
+  venv_chatterbox/bin/pip install -i "$PIP_MIRROR" \
+    --timeout "$PIP_TIMEOUT" --retries "$PIP_RETRIES" voxcpm
 fi
 
 echo "★ gradio 固定回 5.50.0（gradio 版本不能变）"
-venv_chatterbox/bin/pip install --force-reinstall --no-deps gradio==5.50.0 gradio_client==1.14.0
+venv_chatterbox/bin/pip install --force-reinstall --no-deps -i "$PIP_MIRROR" \
+  --timeout "$PIP_TIMEOUT" --retries "$PIP_RETRIES" gradio==5.50.0 gradio_client==1.14.0
 
 echo "★ 5/5 校验"
 venv_chatterbox/bin/pip check || echo "（pip check 告警可接受：voxcpm 依赖树与固定版本冲突通常只在这些条目上）"
