@@ -57,5 +57,24 @@ class GeneralConfig:
         self.chatterbox_cfg_weight = getattr(args, 'chatterbox_cfg_weight', None)
         self.chatterbox_speed = getattr(args, 'chatterbox_speed', None)
 
+        # TTS provider: VoxCPM specific arguments
+        self.voxcpm_device = getattr(args, 'voxcpm_device', None)
+        self.voxcpm_mode = getattr(args, 'voxcpm_mode', None)
+        self.voxcpm_voice = getattr(args, 'voxcpm_voice', None)
+        self.voxcpm_voice_description = getattr(args, 'voxcpm_voice_description', None)
+        self.voxcpm_voice_dir = getattr(args, 'voxcpm_voice_dir', None)
+        self.voxcpm_regenerate_voice = getattr(args, 'voxcpm_regenerate_voice', None)
+        self.voxcpm_reference_audio = getattr(args, 'voxcpm_reference_audio', None)
+        self.voxcpm_reference_text = getattr(args, 'voxcpm_reference_text', None)
+        self.voxcpm_auto_transcribe = getattr(args, 'voxcpm_auto_transcribe', None)
+        self.voxcpm_denoise = getattr(args, 'voxcpm_denoise', None)
+        self.voxcpm_normalize = getattr(args, 'voxcpm_normalize', None)
+        self.voxcpm_cfg_value = getattr(args, 'voxcpm_cfg_value', None)
+        self.voxcpm_inference_timesteps = getattr(args, 'voxcpm_inference_timesteps', None)
+        self.voxcpm_speed = getattr(args, 'voxcpm_speed', None)
+        self.voxcpm_chunk_chars = getattr(args, 'voxcpm_chunk_chars', None)
+        self.voxcpm_optimize = getattr(args, 'voxcpm_optimize', None)
+        self.voxcpm_seed = getattr(args, 'voxcpm_seed', None)
+
     def __str__(self):
         return ",\n".join(f"{key}={value}" for key, value in self.__dict__.items())

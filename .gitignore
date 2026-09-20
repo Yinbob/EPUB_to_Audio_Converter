@@ -45,6 +45,13 @@ scripts/
 # Models
 piper_models/*
 
+# VoxCPM 音色库（预设参考音频缓存 + 指纹；占位 README 除外）
+voices/*.wav
+voices/*.json
+voices/*.lock
+voices/*.tmp.*
+!voices/README.md
+
 # Env files
 .env
 

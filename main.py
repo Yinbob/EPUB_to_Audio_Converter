@@ -15,9 +15,13 @@ if os.path.exists(_venv_python) and sys.executable != _venv_python:
     os.environ.setdefault('NUMBA_CACHE_DIR', os.path.join(_venv_cache, 'numba'))
     os.environ.setdefault('HF_HOME', os.path.join(_venv_cache, 'huggingface'))
     os.environ.setdefault('HUGGINGFACE_HUB_CACHE', os.path.join(_venv_cache, 'huggingface', 'hub'))
+    os.environ.setdefault('MODELSCOPE_CACHE', os.path.join(_venv_cache, 'modelscope'))
+    os.environ.setdefault('TORCHINDUCTOR_CACHE_DIR', os.path.join(_venv_cache, 'torchinductor'))
     os.environ.setdefault('OMP_WAIT_POLICY', 'PASSIVE')
     os.makedirs(os.environ['NUMBA_CACHE_DIR'], exist_ok=True)
     os.makedirs(os.path.join(_venv_cache, 'huggingface', 'hub'), exist_ok=True)
+    os.makedirs(os.environ['MODELSCOPE_CACHE'], exist_ok=True)
+    os.makedirs(os.environ['TORCHINDUCTOR_CACHE_DIR'], exist_ok=True)
     os.execv(_venv_python, [_venv_python] + sys.argv)
 # ═══════════════════════════════════════════════════════════════
 
@@ -35,6 +39,20 @@ from audiobook_generator.tts_providers.chatterbox_tts_provider import (
     MAX_CHATTERBOX_SPEED,
     MIN_CHATTERBOX_SPEED,
     get_chatterbox_supported_devices,
+)
+from audiobook_generator.tts_providers.voxcpm_tts_provider import (
+    DEFAULT_VOXCPM_CFG_VALUE,
+    DEFAULT_VOXCPM_CHUNK_CHARS,
+    DEFAULT_VOXCPM_INFERENCE_TIMESTEPS,
+    DEFAULT_VOXCPM_MODE,
+    DEFAULT_VOXCPM_SPEED,
+    MAX_VOXCPM_SPEED,
+    MIN_VOXCPM_SPEED,
+    VOXCPM_MODES,
+)
+from audiobook_generator.utils.voxcpm_voices import (
+    VOXCPM_DEFAULT_VOICE_VALUE,
+    get_preset_keys,
 )
 from pydub import AudioSegment
 
@@ -74,7 +92,7 @@ def handle_args():
         "--tts",
         choices=get_supported_tts_providers(),
         default=get_supported_tts_providers()[0],
-        help="Choose TTS provider (default: qwen). qwen: Qwen TTS API, openai: MiMo TTS API, edge: Edge TTS, minimax: MiniMax TTS API, piper: Piper TTS, chatterbox: Chatterbox TTS.",
+        help="Choose TTS provider (default: qwen). qwen: Qwen TTS API, openai: MiMo TTS API, edge: Edge TTS, minimax: MiniMax TTS API, piper: Piper TTS, chatterbox: Chatterbox TTS, voxcpm: VoxCPM2 本地模型.",
     )
     parser.add_argument(
         "--log",
@@ -296,6 +314,103 @@ def handle_args():
         default=DEFAULT_CHATTERBOX_SPEED,
         help=f"语速（{MIN_CHATTERBOX_SPEED}-{MAX_CHATTERBOX_SPEED}），1.0 为标准语速"
              "（内部按 0.7 倍处理），<1.0 更慢，>1.0 更快",
+    )
+
+    voxcpm_tts_group = parser.add_argument_group(title="voxcpm specific")
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_device",
+        default="auto",
+        help="设备选择：auto（自动）、cpu、cuda、cuda:N（指定 GPU 序号）。"
+             "多卡/与其它项目共用 GPU 时，推荐再用环境变量 CUDA_VISIBLE_DEVICES 隔离",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_mode",
+        choices=list(VOXCPM_MODES.keys()),
+        default=DEFAULT_VOXCPM_MODE,
+        help="合成模式：design 描述生成音色（默认）、clone 声音克隆、hifi 极致克隆（参考音频+转写文本）",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_voice",
+        default=VOXCPM_DEFAULT_VOICE_VALUE,
+        help=f"音色：内置预设（preset:沉稳男声 或直接写 {get_preset_keys()}）、"
+             "音色库文件（file:xxx.wav）、或 wav/mp3 文件路径",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_voice_description",
+        default=None,
+        help="声音描述（design 模式，自定义时覆盖预设描述，例如：成熟稳重的男声，中低音）",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_voice_dir",
+        default=None,
+        help="音色库目录（默认 <仓库根目录>/voices，预设参考音频与自定义音频都在这里）",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_regenerate_voice",
+        action="store_true",
+        help="重新生成预设音色的参考音频（忽略已有缓存）",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_reference_audio",
+        default=None,
+        help="参考音频路径（clone / hifi 模式；不填时使用音色下拉里的预设/音色库文件）",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_reference_text",
+        default=None,
+        help="参考音频的转写文本（hifi 模式，手填优先；预设音色会自动带上试听文本）",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_auto_transcribe",
+        action="store_true",
+        help="hifi 模式未手填转写时，用 SenseVoice 自动识别参考音频",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_denoise",
+        action="store_true",
+        help="对参考音频降噪（需额外下载 ZipEnhancer，会改变音色，默认关闭）",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_normalize",
+        default=True,
+        action=argparse.BooleanOptionalAction,
+        help="文本规范化：展开数字/日期等（默认开启）",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_cfg_value",
+        type=float,
+        default=DEFAULT_VOXCPM_CFG_VALUE,
+        help=f"CFG 引导权重（默认 {DEFAULT_VOXCPM_CFG_VALUE}），越高越贴合描述/参考音色",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_inference_timesteps",
+        type=int,
+        default=DEFAULT_VOXCPM_INFERENCE_TIMESTEPS,
+        help=f"推理步数（默认 {DEFAULT_VOXCPM_INFERENCE_TIMESTEPS}，越大越精细但越慢）",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_speed",
+        type=float,
+        default=DEFAULT_VOXCPM_SPEED,
+        help=f"语速（{MIN_VOXCPM_SPEED}-{MAX_VOXCPM_SPEED}），1.0 为原生语速",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_chunk_chars",
+        type=int,
+        default=DEFAULT_VOXCPM_CHUNK_CHARS,
+        help=f"长文本按句分块字数（默认 {DEFAULT_VOXCPM_CHUNK_CHARS}，VoxCPM 长文本会语速漂移/OOM）",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_optimize",
+        default=True,
+        action=argparse.BooleanOptionalAction,
+        help="启用 torch.compile（CUDA Graphs）。多线程并发推理会冲突时改为 --no-voxcpm_optimize",
+    )
+    voxcpm_tts_group.add_argument(
+        "--voxcpm_seed",
+        type=int,
+        default=None,
+        help="固定 seed（design 模式未指定时使用预设固定 seed，保证音色可复现）",
     )
 
     args = parser.parse_args()

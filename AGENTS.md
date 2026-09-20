@@ -220,3 +220,30 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
 - 支持多语言模型 `chatterbox-multilingual-v3`（默认）
 - 支持语音克隆（通过 `reference_audio` 参数）
 - 长文本自动分块处理（每块 500 字符）
+
+## VoxCPM TTS（本地多模态语音引擎）
+
+### 环境
+- **Python 版本硬限制**：voxcpm 只支持 Python 3.10~3.12（本机 venv_chatterbox 是 3.13，装不上）；Ubuntu 部署必须用 README「Linux 服务器部署（Miniconda）」的 conda **3.11** 环境创建 `venv_chatterbox --system-site-packages`。
+- 安装顺序：cu124 torch 2.6.0 → `pip install voxcpm` → **必须** `pip install --force-reinstall --no-deps gradio==5.50.0 gradio_client==1.14.0`（voxcpm 依赖 gradio>=6,<7，会破坏 UI）。
+- 系统依赖：`ffmpeg`、`libsndfile1`（soundfile 底层）；国内模型下载用 `export HF_ENDPOINT=https://hf-mirror.com`，SenseVoice/降噪走 ModelScope（入口脚本已设 `MODELSCOPE_CACHE`）。
+
+### 关键实现约定
+- **模型没有内置音色表**：不开参考音频每次随机音色。内置 6 个中文预设 = 固定描述+固定 seed+固定试听文本，首次使用生成 5~10s 参考音频缓存到 `voices/preset_*.wav` + 指纹 `*.json`（原子写入 + flock）；指纹字段见 `voxcpm_voices.py` 的 `VOXCPM_FINGERPRINT_FIELDS`，任一变化自动重生成。生成文件被 .gitignore 忽略。
+- **三种模式**（`voxcpm_tts_provider.py`）：design（`(描述)正文` + 固定 seed，预设自动用缓存参考音频）、clone（`reference_wav_path` + 可选风格描述）、hifi（`prompt_wav_path + prompt_text + reference_wav_path` 同一份音频；描述被模型忽略）。hifi 转写：手填优先 → 预设自带试听文本（仅当没用用户上传的参考音频）→ SenseVoice 自动（`utils/voxcpm_asr.py`，固定 CPU）。
+- **长文本必须分块**：官方警告语速漂移/爆音/OOM/不停止；默认 `chunk_chars=400` 按句分块、尾部 <80 字并入前块、pydub 合并、逐块打 `chunk_i_of_n` 进度标记（progress_parser 已支持）。
+- **CUDA Graphs 不支持多线程**：`optimize=True` 默认开；转换走 spawn 子进程单 worker（`worker_count=1` 默认），WebUI 试听用 `cache=False` 临时加载模型、用完 `del + torch.cuda.empty_cache()` 释放，避免主进程长期占显存与 worker 抢资源。
+- **设备惰性解析**：provider `__init__` 不碰 `torch.cuda`（只有构造 WebUI 下拉时的 `get_voxcpm_supported_devices()` 会探测），设备规范化与模型加载都在 worker 内完成，避免父进程 CUDA 状态被 fork 继承（配合 spawn 双保险）。
+- **输出格式**：默认 mp3（非 wav 需 ffmpeg，validate_config 报中文错误）；多分片/压缩格式一律 pydub 合并（复用 `should_use_pydub_merge`）。
+- **时长校验**：每块按 4.5 字/秒估算，实际时长偏差 >0.2~3.0 倍仅告警不中断。
+
+### 提供文件
+- `audiobook_generator/tts_providers/voxcpm_tts_provider.py` — Provider + 试听/加载/速度工具
+- `audiobook_generator/utils/voxcpm_voices.py` — 预设音色库、指纹、文件锁、原子写入
+- `audiobook_generator/utils/voxcpm_asr.py` — SenseVoice 懒加载自动转写
+- `tests/audiobook_generator/tts_providers/voxcpm_tts_provider_test.py`、`tests/audiobook_generator/utils/voxcpm_voices_test.py` — 单元测试（mock 模型，不需要 GPU）
+
+### WebUI 接线（web_ui.py）
+- 引擎标签「🔊 VoxCPM」在 Chatterbox 之后；`_PROVIDER_LABEL`、`process_form`（参数顺序必须与 `start_btn.inputs` 一致）、`_PROVIDER_IDS`、tab.select 循环、试听按钮 click 都要同步新增。
+- 引擎标签列数：`.engine-tabs > .tab-nav` 已从 `repeat(5,1fr)` 改为 `repeat(6,1fr)`，窄屏 3 列。
+- 试听按钮走 `voxcpm_preview_voice` → `preview_voxcpm_preset_audio`（缓存命中不加载模型；失败返回 `gr.update()` 并 `gr.Warning`，不阻塞开始按钮）。

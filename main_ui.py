@@ -15,10 +15,14 @@ if os.path.exists(_venv_python) and sys.executable != _venv_python:
     os.environ.setdefault('NUMBA_CACHE_DIR', os.path.join(_venv_cache, 'numba'))
     os.environ.setdefault('HF_HOME', os.path.join(_venv_cache, 'huggingface'))
     os.environ.setdefault('HUGGINGFACE_HUB_CACHE', os.path.join(_venv_cache, 'huggingface', 'hub'))
+    os.environ.setdefault('MODELSCOPE_CACHE', os.path.join(_venv_cache, 'modelscope'))
+    os.environ.setdefault('TORCHINDUCTOR_CACHE_DIR', os.path.join(_venv_cache, 'torchinductor'))
     os.environ.setdefault('OMP_WAIT_POLICY', 'PASSIVE')
     # 确保缓存目录存在
     os.makedirs(os.environ['NUMBA_CACHE_DIR'], exist_ok=True)
     os.makedirs(os.path.join(_venv_cache, 'huggingface', 'hub'), exist_ok=True)
+    os.makedirs(os.environ['MODELSCOPE_CACHE'], exist_ok=True)
+    os.makedirs(os.environ['TORCHINDUCTOR_CACHE_DIR'], exist_ok=True)
     # 用 venv 的 Python 重新执行当前脚本（保留所有参数）
     os.execv(_venv_python, [_venv_python] + sys.argv)
 # ═══════════════════════════════════════════════════════════════

@@ -57,6 +57,25 @@ from audiobook_generator.tts_providers.chatterbox_tts_provider import (
     get_chatterbox_supported_output_formats,
     get_chatterbox_speed_range,
 )
+from audiobook_generator.tts_providers.voxcpm_tts_provider import (
+    DEFAULT_VOXCPM_CFG_VALUE,
+    DEFAULT_VOXCPM_CHUNK_CHARS,
+    DEFAULT_VOXCPM_INFERENCE_TIMESTEPS,
+    DEFAULT_VOXCPM_MODEL,
+    DEFAULT_VOXCPM_OUTPUT_FORMAT,
+    DEFAULT_VOXCPM_SPEED,
+    VOXCPM_MODES,
+    get_voxcpm_speed_range,
+    get_voxcpm_supported_devices,
+    get_voxcpm_supported_output_formats,
+    preview_voxcpm_preset_audio,
+)
+from audiobook_generator.utils.voxcpm_voices import (
+    VOXCPM_DEFAULT_VOICE_VALUE,
+    get_default_voxcpm_voice_dir,
+    get_voxcpm_voice_choices,
+    resolve_voxcpm_voice,
+)
 from audiobook_generator.utils.log_handler import generate_unique_log_path
 from audiobook_generator.ui.ambient_background import AMBIENT_CSS, AMBIENT_LAYER_HTML
 from audiobook_generator.ui.progress_parser import decide_progress_state, parse_progress
@@ -229,6 +248,8 @@ running_process: Optional[Process] = None
 # 是否由用户点了「停止转换」而结束（用于把状态显示成"已停止"而不是"异常中断"）
 manual_stopped = False
 webui_log_file = None
+# VoxCPM 试听任务互斥（模型加载+生成耗时长，且临时占用约 8GB 显存）
+_voxcpm_preview_busy = False
 
 _PROVIDER_LABEL = {
     "Mimo": "MiMo",
@@ -236,6 +257,7 @@ _PROVIDER_LABEL = {
     "Edge": "Edge",
     "Qwen": "Qwen TTS",
     "Chatterbox": "Chatterbox",
+    "VoxCPM": "VoxCPM",
 }
 
 
@@ -320,6 +342,48 @@ def get_qwen_languages_gui():
     return gr.Dropdown(languages_list, value="Auto", label="语言 Language", interactive=True)
 
 
+# ── VoxCPM 试听 ─────────────────────────────────────────────────
+def voxcpm_preview_voice(voice, model_name, device, voice_dir, cfg_value, inference_timesteps,
+                         regenerate):
+    """生成/返回预设音色试听音频。缓存命中时不加载模型；否则临时加载并立即释放。
+
+    释放模型是为了避免 WebUI 主进程长期占用显存，与转换 worker 抢资源
+    （多项目共用一张 GPU 时的基本防护）。
+    """
+    global _voxcpm_preview_busy
+    if _voxcpm_preview_busy:
+        gr.Warning("已有试听任务正在生成，请稍候…")
+        return gr.update()
+    if running_process and running_process.is_alive():
+        gr.Warning(
+            "当前有转换任务正在运行：试听会临时再占约 8GB 显存，"
+            "如需稳定转换请等转换结束再试听，或用 CUDA_VISIBLE_DEVICES 隔离显卡。"
+        )
+    _voxcpm_preview_busy = True
+    try:
+        resolved = resolve_voxcpm_voice(voice, voice_dir)
+        if resolved.get("kind") != "preset":
+            gr.Warning("试听仅支持内置预设音色；自定义参考音频可直接上传参考音频后试听。")
+            return gr.update()
+        path = preview_voxcpm_preset_audio(
+            voice_value=voice,
+            voice_dir=voice_dir,
+            model_name=model_name,
+            device=device,
+            cfg_value=cfg_value,
+            inference_timesteps=inference_timesteps,
+            regenerate=bool(regenerate),
+        )
+    except Exception as e:
+        gr.Warning(f"生成试听音频失败：{e}")
+        logger.warning(f"VoxCPM 试听失败: {e}", exc_info=True)
+        return gr.update()
+    finally:
+        _voxcpm_preview_busy = False
+    gr.Info("试听音频已就绪")
+    return gr.update(value=path)
+
+
 # ── 转换核心 ──────────────────────────────────────────────────────
 def process_form(provider,
                  input_file, output_dir, worker_count, log_level, output_text, preview,
@@ -331,7 +395,12 @@ def process_form(provider,
                  edge_volume, edge_pitch, edge_break_duration,
                  qwen_language, qwen_voice,
                  chatterbox_model, chatterbox_device, chatterbox_output_format,
-                 chatterbox_reference_audio, chatterbox_exaggeration, chatterbox_cfg_weight, chatterbox_speed):
+                 chatterbox_reference_audio, chatterbox_exaggeration, chatterbox_cfg_weight, chatterbox_speed,
+                 voxcpm_model, voxcpm_mode, voxcpm_voice, voxcpm_voice_dir, voxcpm_voice_description,
+                 voxcpm_regenerate_voice, voxcpm_reference_audio, voxcpm_reference_text, voxcpm_auto_transcribe,
+                 voxcpm_device, voxcpm_denoise, voxcpm_normalize, voxcpm_cfg_value,
+                 voxcpm_inference_timesteps, voxcpm_speed, voxcpm_chunk_chars, voxcpm_optimize,
+                 voxcpm_output_format):
     if not input_file:
         gr.Warning("请先选择至少一个书籍文件")
         # 保持进度条现状，只关掉轮询
@@ -406,6 +475,28 @@ def process_form(provider,
             config.chatterbox_exaggeration = chatterbox_exaggeration
             config.chatterbox_cfg_weight = chatterbox_cfg_weight
             config.chatterbox_speed = chatterbox_speed
+        elif provider == "VoxCPM":
+            config.tts = "voxcpm"
+            config.model_name = voxcpm_model
+            config.output_format = voxcpm_output_format
+            config.voxcpm_device = voxcpm_device
+            config.voxcpm_mode = voxcpm_mode
+            config.voxcpm_voice = voxcpm_voice
+            config.voxcpm_voice_dir = voxcpm_voice_dir
+            config.voxcpm_voice_description = voxcpm_voice_description
+            config.voxcpm_regenerate_voice = voxcpm_regenerate_voice
+            config.voxcpm_reference_audio = (voxcpm_reference_audio.name
+                                             if hasattr(voxcpm_reference_audio, 'name')
+                                             else voxcpm_reference_audio)
+            config.voxcpm_reference_text = voxcpm_reference_text
+            config.voxcpm_auto_transcribe = voxcpm_auto_transcribe
+            config.voxcpm_denoise = voxcpm_denoise
+            config.voxcpm_normalize = voxcpm_normalize
+            config.voxcpm_cfg_value = voxcpm_cfg_value
+            config.voxcpm_inference_timesteps = voxcpm_inference_timesteps
+            config.voxcpm_speed = voxcpm_speed
+            config.voxcpm_chunk_chars = voxcpm_chunk_chars
+            config.voxcpm_optimize = voxcpm_optimize
         else:
             raise ValueError("Unsupported TTS provider selected")
 
@@ -1310,13 +1401,13 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
 /* ── 引擎分段选择器（原生 Tabs） ── */
 .engine-tabs { gap: 0 !important; }
 .engine-tabs > .tab-nav {
-  display: grid !important; grid-template-columns: repeat(5, 1fr) !important;
+  display: grid !important; grid-template-columns: repeat(6, 1fr) !important;
   gap: 4px !important; padding: 4px !important; margin: 0 0 16px !important;
   background: var(--apple-surface-2) !important; border-radius: var(--radius-sm) !important;
   border: 1px solid var(--apple-border-soft) !important;
 }
 @media (max-width: 560px) {
-  .engine-tabs > .tab-nav { grid-template-columns: repeat(2, 1fr) !important; }
+  .engine-tabs > .tab-nav { grid-template-columns: repeat(3, 1fr) !important; }
 }
 .engine-tabs > .tab-nav button {
   border: none !important; background: transparent !important;
@@ -1863,6 +1954,126 @@ def host_ui(config):
                                     value=0.5,
                                     info="控制生成的稳定性"
                                 )
+                        # ── VoxCPM ──
+                        with gr.Tab("🔊 VoxCPM", id="VoxCPM") as voxcpm_tab:
+                            gr.HTML('<p class="card-desc">本地多模态 TTS 模型（VoxCPM2，48kHz / 30 语言）。支持「描述生成 / 声音克隆 / 极致克隆」三种模式；首次使用需安装 <code>pip install voxcpm</code> 并固定 gradio 5.50.0（见 README）。</p>')
+                            with gr.Row():
+                                voxcpm_model = gr.Textbox(
+                                    value=DEFAULT_VOXCPM_MODEL,
+                                    label="模型",
+                                    interactive=True,
+                                    info="HuggingFace 模型 ID（openbmb/VoxCPM2）或本地模型目录",
+                                )
+                                voxcpm_device = gr.Dropdown(
+                                    get_voxcpm_supported_devices(),
+                                    value="auto",
+                                    label="运行设备",
+                                    interactive=True,
+                                    allow_custom_value=True,
+                                    info="多卡可填 cuda:0 / cuda:1；与其他项目共用 GPU 时建议用 CUDA_VISIBLE_DEVICES 隔离",
+                                )
+                            voxcpm_mode = gr.Dropdown(
+                                [(label, key) for key, label in VOXCPM_MODES.items()],
+                                value="design",
+                                label="合成模式",
+                                interactive=True,
+                                info="design 描述生成音色；clone 参考音频克隆；hifi 极致克隆（参考音频+转写）",
+                            )
+                            with gr.Row():
+                                voxcpm_voice = gr.Dropdown(
+                                    get_voxcpm_voice_choices(),
+                                    value=VOXCPM_DEFAULT_VOICE_VALUE,
+                                    label="音色",
+                                    interactive=True,
+                                    allow_custom_value=True,
+                                    info="内置预设首次使用会自动生成并缓存；可手动放入 wav 到音色库目录自动并入下拉",
+                                )
+                                voxcpm_voice_dir = gr.Textbox(
+                                    value=get_default_voxcpm_voice_dir(),
+                                    label="音色库目录",
+                                    interactive=True,
+                                )
+                            with gr.Row():
+                                voxcpm_preview_btn = gr.Button("🎧 试听当前预设音色", elem_classes="btn-ghost", scale=1)
+                                voxcpm_preview_audio = gr.Audio(label="试听", type="filepath", interactive=False, scale=2)
+                            voxcpm_regenerate_voice = gr.Checkbox(
+                                label="重新生成预设音色（忽略已有缓存，需重新生成参考音频）",
+                                value=False,
+                                elem_classes="toggle",
+                            )
+                            voxcpm_voice_description = gr.TextArea(
+                                label="声音描述（design / clone 模式可选）",
+                                lines=2,
+                                placeholder="例如：成熟稳重的男声，中低音，语速适中。留空则使用所选预设的描述。",
+                                interactive=True,
+                            )
+                            with gr.Row():
+                                voxcpm_reference_audio = gr.File(
+                                    label="参考音频（clone / hifi 模式，可选）",
+                                    file_count="single",
+                                    file_types=["audio"],
+                                )
+                                voxcpm_reference_text = gr.Textbox(
+                                    label="参考音频转写文本（hifi 模式）",
+                                    lines=2,
+                                    placeholder="手填优先；预设音色会自动带试听文本；留空并开启自动转写时用 SenseVoice 识别",
+                                    interactive=True,
+                                )
+                            voxcpm_auto_transcribe = gr.Checkbox(
+                                label="自动转写参考音频（hifi 模式，首次需下载 SenseVoice 模型，固定 CPU 运行）",
+                                value=False,
+                                elem_classes="toggle",
+                            )
+                            with gr.Row():
+                                voxcpm_output_format = gr.Dropdown(
+                                    get_voxcpm_supported_output_formats(),
+                                    value=DEFAULT_VOXCPM_OUTPUT_FORMAT,
+                                    label="输出格式",
+                                    interactive=True,
+                                )
+                                voxcpm_speed_min, voxcpm_speed_max = get_voxcpm_speed_range()
+                                voxcpm_speed = gr.Slider(
+                                    minimum=voxcpm_speed_min, maximum=voxcpm_speed_max, step=0.05,
+                                    label="语速",
+                                    value=DEFAULT_VOXCPM_SPEED,
+                                    info="1.0 为模型原生语速，越小越慢，越大越快",
+                                )
+                            with gr.Row():
+                                voxcpm_cfg_value = gr.Slider(
+                                    minimum=0.5, maximum=8.0, step=0.1,
+                                    label="CFG 引导",
+                                    value=DEFAULT_VOXCPM_CFG_VALUE,
+                                    info="越高越贴合描述/参考音色，越低越自由（官方推荐 2.0）",
+                                )
+                                voxcpm_inference_timesteps = gr.Slider(
+                                    minimum=1, maximum=50, step=1,
+                                    label="推理步数",
+                                    value=DEFAULT_VOXCPM_INFERENCE_TIMESTEPS,
+                                    info="越高质量越好但越慢；官方基准使用 10 步",
+                                )
+                            with gr.Row():
+                                voxcpm_chunk_chars = gr.Slider(
+                                    minimum=50, maximum=1200, step=50,
+                                    label="分块字数",
+                                    value=DEFAULT_VOXCPM_CHUNK_CHARS,
+                                    info="VoxCPM 长文本会语速漂移/爆音/OOM，按句分块逐块合成（默认 400 字）",
+                                )
+                                voxcpm_denoise = gr.Checkbox(
+                                    label="降噪参考音频（需额外下载 ZipEnhancer，可能改变音色）",
+                                    value=False,
+                                    elem_classes="toggle",
+                                )
+                            with gr.Row():
+                                voxcpm_normalize = gr.Checkbox(
+                                    label="文本规范化（展开数字/日期等）",
+                                    value=True,
+                                    elem_classes="toggle",
+                                )
+                                voxcpm_optimize = gr.Checkbox(
+                                    label="启用 torch.compile 优化（CUDA Graphs 不支持多线程并发，GPU 场景请保持 worker_count=1）",
+                                    value=True,
+                                    elem_classes="toggle",
+                                )
 
                 # —— 高级设置弹窗（纯客户端控制；默认 display:none，JS 切换 .show） ——
                 with gr.Group(elem_classes="modal-overlay", elem_id="advanced_modal") as advanced_modal:
@@ -2003,15 +2214,25 @@ def host_ui(config):
         # ════════════ 事件绑定 ════════════
         # 引擎标签切换 → 同步 provider_state（服务端）+ 更新徽标文字（客户端 js）
         # js 在 Tab 被选中时立即执行，不经过服务端 queue，零延迟更新徽标
-        _PROVIDER_IDS = {"MiMo": "Mimo", "MiniMax": "MiniMax", "Edge": "Edge", "Qwen": "Qwen", "Chatterbox": "Chatterbox"}
+        _PROVIDER_IDS = {"MiMo": "Mimo", "MiniMax": "MiniMax", "Edge": "Edge", "Qwen": "Qwen",
+                         "Chatterbox": "Chatterbox", "VoxCPM": "VoxCPM"}
         for _tab, _display in [(mimo_tab, "MiMo"), (minimax_tab, "MiniMax"),
                             (edge_tab, "Edge"), (qwen_tab, "Qwen"),
-                            (chatterbox_tab, "Chatterbox")]:
+                            (chatterbox_tab, "Chatterbox"),
+                            (voxcpm_tab, "VoxCPM")]:
             _id = _PROVIDER_IDS[_display]
             _js = f"() => {{ const el = document.getElementById('engine_badge_name'); if (el) el.textContent = '{_display}'; }}"
             _tab.select(fn=lambda n=_id: n,
                         inputs=None, outputs=provider_state, show_progress="hidden",
                         js=_js)
+
+        voxcpm_preview_btn.click(
+            fn=voxcpm_preview_voice,
+            inputs=[voxcpm_voice, voxcpm_model, voxcpm_device, voxcpm_voice_dir,
+                    voxcpm_cfg_value, voxcpm_inference_timesteps, voxcpm_regenerate_voice],
+            outputs=[voxcpm_preview_audio],
+            show_progress="hidden",
+        )
 
         # 开始 / 停止
         start_btn.click(
@@ -2025,7 +2246,12 @@ def host_ui(config):
                     edge_volume, edge_pitch, edge_break_duration,
                     qwen_language, qwen_voice,
                     chatterbox_model, chatterbox_device, chatterbox_output_format,
-                    chatterbox_reference_audio, chatterbox_exaggeration, chatterbox_cfg_weight, chatterbox_speed],
+                    chatterbox_reference_audio, chatterbox_exaggeration, chatterbox_cfg_weight, chatterbox_speed,
+                    voxcpm_model, voxcpm_mode, voxcpm_voice, voxcpm_voice_dir, voxcpm_voice_description,
+                    voxcpm_regenerate_voice, voxcpm_reference_audio, voxcpm_reference_text, voxcpm_auto_transcribe,
+                    voxcpm_device, voxcpm_denoise, voxcpm_normalize, voxcpm_cfg_value,
+                    voxcpm_inference_timesteps, voxcpm_speed, voxcpm_chunk_chars, voxcpm_optimize,
+                    voxcpm_output_format],
             outputs=[progress_state, progress_timer])
         stop_btn.click(fn=terminate_generator, inputs=None, outputs=[progress_state, progress_timer])
 

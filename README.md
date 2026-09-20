@@ -160,6 +160,7 @@ python -m venv venv_chatterbox --system-site-packages
 > - `--system-site-packages` 让 `venv_chatterbox` 继承主环境的 Gradio 5.50.0 等依赖，避免重复安装。
 > - 模型缓存自动下载到 `venv_chatterbox/.cache/huggingface/`；彻底删除：`rm -rf venv_chatterbox/`。
 > - 已知问题：`perth` 缺少 `perth_net` 依赖，已在 `chatterbox/tts.py` 中回退到 `DummyWatermarker`，不影响使用。
+> - 若需要 **VoxCPM 本地引擎**（推荐，效果更好、支持中文多音色），在同一虚拟环境中追加安装 `voxcpm`，见下文 [VoxCPM TTS（本地多模态语音引擎）](#voxcpm-tts本地多模态语音引擎)。
 
 ### 5️⃣ 配置凭证
 
@@ -780,6 +781,181 @@ python3 -m venv venv_chatterbox --system-site-packages
 ./venv_chatterbox/bin/pip install chatterbox-tts
 ./venv_chatterbox/bin/pip install --force-reinstall --no-deps gradio==5.50.0 gradio_client==1.14.0
 ```
+
+## VoxCPM TTS（本地多模态语音引擎）
+
+本项目集成了 [VoxCPM2](https://github.com/OpenBMB/VoxCPM)（OpenBMB / ModelBest 开源多模态 TTS，2B 参数、48kHz、支持 30 种语言）。相比 Chatterbox：音质更高、支持中英文混合、可用**文字描述直接设计音色**，也支持参考音频克隆与「极致克隆」。全部推理在本机完成，无需 API Key。
+
+> ⚠️ **模型权重大小**：`openbmb/VoxCPM2` 权重约 **9.5 GB**（`model.safetensors` ≈4.58GB + `audiovae.pth` ≈377MB 等），下载与运行时请预留 ≥30GB 磁盘空间。
+
+### 1️⃣ 三种合成模式
+
+| 模式 | 参数 | 说明 |
+|------|------|------|
+| **描述生成（design）** | 声音描述（+ 固定 seed） | 无需参考音频，描述即音色。内置 6 个中文预设，预设会生成参考音频缓存，保证整本书音色一致 |
+| **声音克隆（clone）** | 参考音频 | 参考音频提供音色（免转写），可叠加风格描述（如「语速稍快，语气温和」） |
+| **极致克隆（hifi）** | 参考音频 + 逐字转写 | 相似度最高（音频+文本对齐）。转写文本手填优先；开启自动转写时用 SenseVoice 识别（固定 CPU 运行） |
+
+### 2️⃣ 安装（Ubuntu + RTX 4090，Python 3.11）
+
+VoxCPM 要求 **Python 3.10~3.12**、`torch>=2.5`、CUDA≥12，因此必须与主环境（或 Chatterbox 环境）一起放进 `venv_chatterbox/`，`main.py` / `main_ui.py` 会自动切换解释器：
+
+> 💡 **一键部署**（推荐，等价于下面 1~6 步）：
+> ```bash
+> bash deploy_voxcpm.sh --smoke      # 安装 + gradio 固定 + 冒烟/性能验收
+> ```
+
+```bash
+conda activate epub2audio
+cd /path/to/EPUB_to_Audio_Converter
+
+# 已有步骤 4️⃣ 的 venv 可直接复用；没有则先创建（--system-site-packages 继承 gradio 5.50.0）
+python -m venv venv_chatterbox --system-site-packages
+
+# 1) GPU 版 PyTorch（torch>=2.5；这里与 Chatterbox 共用 2.6.0 cu124）
+./venv_chatterbox/bin/pip install torch==2.6.0 torchaudio==2.6.0 \
+    --index-url https://download.pytorch.org/whl/cu124
+
+# 2) 安装 voxcpm（Python<=3.12；本仓库主 venv 若是 3.13 会装不上，务必用 conda 3.11 建的 venv）
+./venv_chatterbox/bin/pip install voxcpm
+
+# 3) voxcpm 依赖 gradio>=6,<7，会破坏本项目 UI，必须固定回 5.50.0（gradio 版本不能变）
+./venv_chatterbox/bin/pip install --force-reinstall --no-deps gradio==5.50.0 gradio_client==1.14.0
+
+# 4) 系统依赖（ffmpeg 用于音频合并/变速；libsndfile1 是 soundfile 的底层库）
+sudo apt install -y ffmpeg libsndfile1
+
+# 5) 校验
+./venv_chatterbox/bin/pip check
+./venv_chatterbox/bin/python -c "import torch, gradio; print('cuda', torch.cuda.is_available(), 'gradio', gradio.__version__)"
+./venv_chatterbox/bin/python -c "import voxcpm; print('voxcpm ok')"
+
+# 6) 冒烟/性能验收（环境 + 端到端 + RTF≤0.5 + 显存≤12GB；三种模式各跑一次）
+./venv_chatterbox/bin/python3 voxcpm_smoke_test.py --device cuda
+./venv_chatterbox/bin/python3 voxcpm_smoke_test.py --device cuda --mode clone --reference /path/to/voice.wav
+./venv_chatterbox/bin/python3 voxcpm_smoke_test.py --device cuda --mode hifi \
+    --reference /path/to/voice.wav --reference_text "参考音频里的原话"
+```
+
+国内网络下载模型：
+
+```bash
+export HF_ENDPOINT=https://hf-mirror.com   # 百度网盘离线包见官方仓库 README
+./venv_chatterbox/bin/python -c "from voxcpm import VoxCPM; VoxCPM.from_pretrained('openbmb/VoxCPM2', load_denoiser=False)"
+```
+
+模型默认缓存到 `venv_chatterbox/.cache/huggingface/`，ASR（SenseVoice）与降噪模型缓存到 `venv_chatterbox/.cache/modelscope/`（入口脚本已自动设置 `HF_HOME` / `MODELSCOPE_CACHE` / `TORCHINDUCTOR_CACHE_DIR`）。
+
+### 3️⃣ 内置音色库（描述预设 + 参考音频缓存）
+
+VoxCPM2 **没有内置音色表**：不开参考音频时每次生成都是随机音色，跨分块会变声。因此本项目内置 6 个中文预设（**沉稳男声 / 温柔女声 / 青年男声 / 知性女声 / 新闻播报 / 亲切老者**），每个预设 = **固定描述 + 固定 seed + 固定试听文本**：
+
+- 首次使用某个预设（或点「🎧 试听」）时，自动生成一段 5~10 秒参考音频缓存到 `voices/preset_<预设名>.wav`（旁边 `<预设名>.json` 记录指纹）；
+- 指纹（模型 ID / 描述 / seed / 试听文本 / CFG / 步数）任一变化 → 缓存失效自动重生成；勾选「重新生成预设音色」可强制重建；
+- 生成文件已被 `.gitignore` 忽略，删掉 `voices/` 即可全部清空；
+- **自定义音色**：把你的 `.wav` / `.mp3` 等直接放进 `voices/`，WebUI 下拉自动出现；或 CLI 直接传音频路径。
+
+### 4️⃣ 启动与使用
+
+WebUI：在 TTS 引擎下拉选择 **🔊 VoxCPM**，按需配置后点击「开始生成」。CLI 示例：
+
+```bash
+# 描述生成（默认音色：沉稳男声）
+python3 main.py input.epub output_dir --tts voxcpm --voxcpm_device cuda
+
+# 指定内置预设
+python3 main.py input.epub output_dir --tts voxcpm \
+    --voxcpm_voice "preset:温柔女声" --voxcpm_device cuda
+
+# 声音克隆（用户自己的参考音频）
+python3 main.py input.epub output_dir --tts voxcpm \
+    --voxcpm_mode clone --voxcpm_reference_audio /path/to/voice.wav
+
+# 极致克隆（参考音频 + 转写；或加 --voxcpm_auto_transcribe 自动识别）
+python3 main.py input.epub output_dir --tts voxcpm \
+    --voxcpm_mode hifi --voxcpm_reference_audio /path/to/voice.wav \
+    --voxcpm_reference_text "参考音频里说的话"
+```
+
+### 5️⃣ CLI 参数表
+
+| 参数 | 默认 | 说明 |
+|------|------|------|
+| `--voxcpm_device` | `auto` | auto / cpu / cuda / cuda:N（多卡时指定序号） |
+| `--voxcpm_mode` | `design` | design / clone / hifi |
+| `--voxcpm_voice` | `preset:沉稳男声` | 预设、音色库文件（file:xxx.wav）或音频路径 |
+| `--voxcpm_voice_description` | 空 | design/clone 模式的声音或风格描述 |
+| `--voxcpm_voice_dir` | `<仓库>/voices` | 音色库目录 |
+| `--voxcpm_regenerate_voice` | 关 | 重新生成预设参考音频 |
+| `--voxcpm_reference_audio` | 空 | clone/hifi 参考音频 |
+| `--voxcpm_reference_text` | 空 | hifi 转写文本（手填优先） |
+| `--voxcpm_auto_transcribe` | 关 | SenseVoice 自动转写（固定 CPU） |
+| `--voxcpm_cfg_value` | `2.0` | CFG 引导，越大越贴描述/参考 |
+| `--voxcpm_inference_timesteps` | `10` | 推理步数（官方基准 10；更大更精细更慢） |
+| `--voxcpm_chunk_chars` | `400` | 长文本分块字数（VoxCPM 长文本会语速漂移/OOM） |
+| `--voxcpm_speed` | `1.0` | 语速 0.5~2.0（ffmpeg atempo，保持音调） |
+| `--voxcpm_normalize / --no-voxcpm_normalize` | 开 | 文本规范化（展开数字/日期） |
+| `--voxcpm_denoise` | 关 | 参考音频降噪（需下载 ZipEnhancer，可能改变音色） |
+| `--voxcpm_optimize / --no-voxcpm_optimize` | 开 | torch.compile（CUDA Graphs，不支持多线程并发） |
+| `--voxcpm_seed` | 空 | 固定 seed（design 默认使用预设 seed） |
+
+### 6️⃣ GPU 多项目共存注意事项（重要）
+
+机器上同时跑多个 PyTorch 项目时请遵循以下约定，避免互相冲突：
+
+1. **环境隔离**：VoxCPM 的 PyTorch / CUDA 依赖独立在 `venv_chatterbox/`，与其它项目的 Python 环境互不干扰（不同 CUDA 运行时可由驱动层共存，不必共用一个 torch）；
+2. **显存隔离（推荐）**：启动 WebUI 前用 `CUDA_VISIBLE_DEVICES` 固定显卡，例如 `CUDA_VISIBLE_DEVICES=1 ./run_ui.sh`（服务器有 2 张卡时各自用一张）；只有单卡时留意其它项目占用，VoxCPM2 推理显存约 **8GB**（`timesteps=10` + torch.compile，RTX 4090 实测）；
+3. **单实例推理**：`worker_count` 保持默认 **1**（每个 worker 独立加载一份模型，显存随并行数成倍增加）；torch.compile 的 CUDA Graphs **不支持多线程并发**，WebUI 的转换走独立 spawn 子进程，不要在后台线程里再调模型；
+4. **试听不占显存**：点「🎧 试听」时 WebUI 主进程临时加载模型，生成完立即释放并 `torch.cuda.empty_cache()`，转换过程中点试听会短暂多占约 8GB，请留意总显存；
+5. **性能预期**：RTX 4090、`timesteps=10`、torch.compile 下官方 RTF≈0.3（1 秒音频约 0.3 秒生成），显存≈8GB；首次运行会有编译/预热开销。若遇 Triton/CUDA Graphs 报错或需要多线程，改用 `--no-voxcpm_optimize`（性能下降，但稳定）；
+6. 若担心显存碎片，可设 `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` 后再启动。
+
+### 7️⃣ WebUI 可用选项（VoxCPM 标签页）
+
+| 选项 | 说明 |
+|------|------|
+| **模型** | HF 模型 ID（默认 `openbmb/VoxCPM2`）或本地目录 |
+| **运行设备** | auto / cpu / cuda / cuda:N |
+| **合成模式** | 描述生成 / 声音克隆 / 极致克隆 |
+| **音色** | 6 个内置预设 + `voices/` 里的自定义音频，预设首个使用自动生成缓存 |
+| **试听当前预设音色** | 生成/返回预设参考音频（缓存命中不加载模型） |
+| **重新生成预设音色** | 忽略已有缓存，重新生成参考音频 |
+| **声音描述** | design/clone 模式的自定义描述（默认用预设描述） |
+| **参考音频 / 转写文本 / 自动转写** | clone/hifi 模式使用；转写手填优先 |
+| **输出格式** | wav / mp3（默认）/ aac / flac |
+| **语速 / CFG / 推理步数 / 分块字数** | 生成参数，见 CLI 参数表 |
+| **文本规范化 / torch.compile / 降噪** | 开关 |
+
+### 8️⃣ Troubleshooting
+
+**`Python 3.13` 装不上 voxcpm（依赖不兼容）**
+
+VoxCPM 仅支持 Python 3.10~3.12。请按 [Linux 服务器部署（Miniconda）](#linux-服务器部署miniconda) 用 **conda 3.11** 环境创建 `venv_chatterbox --system-site-packages`，再安装。
+
+**`gradio 6.x` 导致 WebUI 排版错乱**
+
+`voxcpm` 依赖 `gradio>=6,<7`，装完必须固定回 5.50.0：
+
+```bash
+./venv_chatterbox/bin/pip install --force-reinstall --no-deps gradio==5.50.0 gradio_client==1.14.0
+./venv_chatterbox/bin/python -c "import gradio; print(gradio.__version__)"   # 期望 5.50.0
+```
+
+**`AssertionError` / CUDA Graphs 报错**
+
+torch.compile 的 CUDA Graphs 不支持多线程推理。请确认 `worker_count=1`、WebUI 没有同时跑第二个转换，或在 VoxCPM 标签页关闭「torch.compile 优化」（等价 CLI `--no-voxcpm_optimize`）。
+
+**长章节报 OOM / 爆音 / 生成不停止**
+
+VoxCPM 官方明确警告长文本会出现语速漂移、爆音、OOM 或生成不停止。本引擎已默认按 400 字/句分块逐块合成后合并；如仍异常，把「分块字数」调小到 200~300。
+
+**中文朗读每块时长明显异常（太快/太慢）**
+
+引擎会对每块做「字数/4.5字每秒」合理性校验，偏差超过 0.2~3.0 倍会在日志告警。若告警频繁，可调 `--voxcpm_cfg_value`、`--voxcpm_inference_timesteps` 或更换音色重试。
+
+**Hi-Fi 模式报「需要转写文本」**
+
+手填「参考音频转写文本」、勾选「自动转写」，或切换 Clone 模式。自动转写首次会从 ModelScope 下载 `iic/SenseVoiceSmall`（若国内网络问题，设置 `MODELSCOPE_CACHE` 环境变量到可用目录）。
 
 ## More examples
 

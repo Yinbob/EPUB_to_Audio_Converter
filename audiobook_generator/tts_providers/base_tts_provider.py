@@ -8,6 +8,7 @@ TTS_EDGE = "edge"
 TTS_PIPER = "piper"
 TTS_MINIMAX = "minimax"
 TTS_CHATTERBOX = "chatterbox"
+TTS_VOXCPM = "voxcpm"
 
 
 class BaseTTSProvider:  # Base interface for TTS providers
@@ -37,7 +38,7 @@ class BaseTTSProvider:  # Base interface for TTS providers
 
 # Common support methods for all TTS providers
 def get_supported_tts_providers() -> List[str]:
-    return [TTS_QWEN, TTS_OPENAI, TTS_EDGE, TTS_PIPER, TTS_MINIMAX, TTS_CHATTERBOX]
+    return [TTS_QWEN, TTS_OPENAI, TTS_EDGE, TTS_PIPER, TTS_MINIMAX, TTS_CHATTERBOX, TTS_VOXCPM]
 
 
 def get_tts_provider(config) -> BaseTTSProvider:
@@ -69,5 +70,9 @@ def get_tts_provider(config) -> BaseTTSProvider:
         from audiobook_generator.tts_providers.chatterbox_tts_provider import ChatterboxTTSProvider
 
         return ChatterboxTTSProvider(config)
+    elif config.tts == TTS_VOXCPM:
+        from audiobook_generator.tts_providers.voxcpm_tts_provider import VoxCPMTTSProvider
+
+        return VoxCPMTTSProvider(config)
     else:
         raise ValueError(f"Invalid TTS provider: {config.tts}")
