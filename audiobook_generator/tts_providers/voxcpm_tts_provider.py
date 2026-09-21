@@ -192,6 +192,22 @@ def _import_voxcpm():
         ) from e
 
 
+def _voxcpm_accepts_seed(model) -> bool:
+    """探测当前 voxcpm 版本是否支持 seed 参数。
+
+    PyPI 发布的 voxcpm 与 GitHub 最新版存在差异：旧版 `_generate()` 不接受
+    `seed`（`generate()` 会把 kwargs 原样透传给它，传了会直接 TypeError）。
+    因此调用前探测 `_generate`；不支持时降级（预设音色的一致性由缓存参考音频保证，
+    自定义描述的 design 模式改用固定描述保证音色，代价是无法精确复现随机音色）。
+    """
+    try:
+        import inspect
+        target = getattr(model, "_generate", None) or model.generate
+        return "seed" in inspect.signature(target).parameters
+    except Exception:
+        return False
+
+
 def _load_voxcpm_model(model_name=None, device="auto", optimize=True, cache=True):
     """加载 VoxCPM 模型。
 
@@ -279,14 +295,16 @@ def preview_voxcpm_preset_audio(voice_value=None, voice_dir=None, model_name=Non
         tmp_model = _load_voxcpm_model(model_name, device, optimize, cache=False)
         try:
             description = VOXCPM_VOICE_PRESETS[preset_key]["description"]
-            wav = tmp_model.generate(
+            gen_kwargs = dict(
                 text=f"({description}){text}",
-                seed=seed,
                 cfg_value=float(cfg_value),
                 inference_timesteps=int(inference_timesteps),
                 normalize=True,
                 retry_badcase=True,
             )
+            if _voxcpm_accepts_seed(tmp_model):
+                gen_kwargs["seed"] = seed
+            wav = tmp_model.generate(**gen_kwargs)
             sample_rate = getattr(tmp_model.tts_model, "sample_rate", VOXCPM_SAMPLE_RATE)
             return wav, sample_rate
         finally:
@@ -494,14 +512,16 @@ class VoxCPMTTSProvider(BaseTTSProvider):
 
             def _gen(text, seed):
                 description = self.voice_ctx["description"]
-                wav = model.generate(
+                gen_kwargs = dict(
                     text=f"({description}){text}",
-                    seed=seed,
                     cfg_value=self.cfg_value,
                     inference_timesteps=self.inference_timesteps,
                     normalize=True,
                     retry_badcase=DEFAULT_VOXCPM_RETRY_BADCASE,
                 )
+                if _voxcpm_accepts_seed(model):
+                    gen_kwargs["seed"] = seed
+                wav = model.generate(**gen_kwargs)
                 sample_rate = getattr(model.tts_model, "sample_rate", VOXCPM_SAMPLE_RATE)
                 return wav, sample_rate
 
@@ -618,8 +638,9 @@ class VoxCPMTTSProvider(BaseTTSProvider):
                     normalize=self.normalize,
                     denoise=self.denoise,
                     retry_badcase=DEFAULT_VOXCPM_RETRY_BADCASE,
-                    seed=seed,
                 )
+                if _voxcpm_accepts_seed(model):
+                    gen_kwargs["seed"] = seed
                 if reference_audio:
                     gen_kwargs["reference_wav_path"] = reference_audio
                 if self.mode == VOXCPM_MODE_HIFI:

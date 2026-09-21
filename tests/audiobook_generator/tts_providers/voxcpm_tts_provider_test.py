@@ -67,16 +67,60 @@ def get_voxcpm_config(**overrides):
 
 
 class _FakeVoxCPMModel:
-    """模拟 VoxCPM 模型：返回 4 秒 48kHz 静音并记录调用参数。"""
+    """模拟新版 VoxCPM 模型（_generate 支持 seed）：返回 4 秒 48kHz 静音并记录调用参数。"""
 
     def __init__(self):
         self.tts_model = MagicMock()
         self.tts_model.sample_rate = 48000
         self.calls = []
 
+    def _generate(self, text=None, seed=None, **kwargs):
+        return None
+
     def generate(self, **kwargs):
         self.calls.append(kwargs)
         return np.zeros(48000 * 4, dtype="float32")
+
+
+class _FakeOldVoxCPMModel(_FakeVoxCPMModel):
+    """模拟旧版 voxcpm（PyPI 发布版）：_generate 不接受 seed 参数。"""
+
+    def _generate(self, text=None, **kwargs):
+        return None
+
+
+class TestSeedCompat(unittest.TestCase):
+    def test_seed_support_detection(self):
+        from audiobook_generator.tts_providers.voxcpm_tts_provider import (
+            _voxcpm_accepts_seed,
+        )
+        self.assertTrue(_voxcpm_accepts_seed(_FakeVoxCPMModel()))
+        self.assertFalse(_voxcpm_accepts_seed(_FakeOldVoxCPMModel()))
+
+    def test_old_model_omits_seed_kwarg(self):
+        provider = VoxCPMTTSProvider(get_voxcpm_config())
+        old_model = _FakeOldVoxCPMModel()
+        out = os.path.join(tempfile.mkdtemp(), "chapter_1.mp3")
+        with patch(
+            "audiobook_generator.tts_providers.voxcpm_tts_provider._load_voxcpm_model",
+            return_value=old_model,
+        ), patch(
+            "audiobook_generator.tts_providers.voxcpm_tts_provider.merge_audio_segments",
+        ), patch(
+            "audiobook_generator.tts_providers.voxcpm_tts_provider.set_audio_tags",
+        ), patch(
+            "audiobook_generator.tts_providers.voxcpm_tts_provider.ensure_preset_audio",
+            return_value="/tmp/preset_沉稳男声.wav",
+        ):
+            provider.text_to_speech(
+                "这是第一章的内容。" * 40, out,
+                AudioTags(title="第一章", author="作者", book_title="测试书", idx=1),
+            )
+        self.assertTrue(old_model.calls)
+        for call in old_model.calls:
+            self.assertNotIn("seed", call, "旧版 voxcpm 不应传 seed 参数")
+            self.assertIn("reference_wav_path", call)
+            self.assertIn("cfg_value", call)
 
 
 class TestProviderDefaults(unittest.TestCase):

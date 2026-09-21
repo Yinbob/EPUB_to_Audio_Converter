@@ -946,6 +946,13 @@ VoxCPM 仅支持 Python 3.10~3.12。请按 [Linux 服务器部署（Miniconda）
 
 torch.compile 的 CUDA Graphs 不支持多线程推理。请确认 `worker_count=1`、WebUI 没有同时跑第二个转换，或在 VoxCPM 标签页关闭「torch.compile 优化」（等价 CLI `--no-voxcpm_optimize`）。
 
+**`TypeError: VoxCPM._generate() got an unexpected keyword argument 'seed'`**
+
+PyPI 发布的 `voxcpm` 与 GitHub 最新版存在差异（旧版 `_generate` 不支持 `seed` 参数）。
+新版本代码已自动探测并降级：不支持时不传 `seed`（预设音色仍由缓存参考音频保证一致），
+无需手动处理；如需精确复现随机音色，可把 `voxcpm` 升级到 GitHub 最新源码版
+（`pip install git+https://github.com/OpenBMB/VoxCPM.git`）。
+
 **长章节报 OOM / 爆音 / 生成不停止**
 
 VoxCPM 官方明确警告长文本会出现语速漂移、爆音、OOM 或生成不停止。本引擎已默认按 400 字/句分块逐块合成后合并；如仍异常，把「分块字数」调小到 200~300。
