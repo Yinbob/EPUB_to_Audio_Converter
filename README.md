@@ -957,6 +957,39 @@ PyPI 发布的 `voxcpm` 与 GitHub 最新版存在差异（旧版 `_generate` �
 
 VoxCPM 官方明确警告长文本会出现语速漂移、爆音、OOM 或生成不停止。本引擎已默认按 400 字/句分块逐块合成后合并；如仍异常，把「分块字数」调小到 200~300。
 
+**加载模型卡在 `Loading model from safetensors` 好几分钟 / 进程被 `Killed`**
+
+这是**宿主机内存**不够，不是显卡问题。voxcpm 的 `VoxCPM2Model.from_local()` 会先用 torch 默认
+dtype（fp32）建好整套 2.29B 参数、再 `.to(bfloat16)`，中间同时存在两份权重：实测进程峰值
+**RSS ≈ 10.4~10.8GB**（最终 bf16 权重只有 4.58GB）。7.8GB 内存的虚机上，多出来的几 GB 匿名页
+会被挤进 HDD swap，于是加载要等 5~10 分钟，swap 小时甚至直接被 OOM killer 杀掉。
+
+本项目已在构造期临时把默认 dtype 压到 `bfloat16`（`VOXCPM_LOW_MEMORY_INIT`，默认开启），
+峰值降到 **≈ 5.6GB**；日志里会打印一行 `- 进程内存：加载前 x.xxGB → 现在 x.xxGB，峰值 x.xxGB`，
+可直接确认效果。排查/回退：
+
+```bash
+# 看瓶颈到底在哪：若 read 速度只有几十 MB/s，说明是 HDD（4.58GB 权重就要读几分钟）
+dd if=~/.cache/huggingface/hub/models--openbmb--VoxCPM2/snapshots/*/model.safetensors of=/dev/null bs=8M
+free -h; swapon --show; vmstat 1 5        # si/so 常年非 0 = 正在 swap 抖动
+export VOXCPM_LOW_MEMORY_INIT=0           # 关闭低内存初始化（排查用，会更慢更容易 OOM）
+```
+
+根治顺序：① 确认低内存初始化已开启（默认开启，先把峰值砍掉一半）；② 把 `~/.cache/huggingface` 放到 SSD；
+③ 虚机内存加到 16GB（OpenStack 需要平台侧 resize，见下）；④ 确认 `voxcpm>=2.0.3`（老版本
+`load_file` 行为不同）。注意 safetensors 的 `load_file` **本身就是 mmap 零拷贝**（实测读 1.5GB
+文件 RSS 不变），所以「改成 mmap 惰性加载」不会再有额外收益——瓶颈是 fp32 中转 + 慢盘。
+
+**虚机加内存（OpenStack）**
+
+OpenStack 虚机不能自己加热插内存，需要平台侧 `openstack server resize`（管理员或控制台操作），
+或者直接找机房管理员给一个 16GB 规格的实例。resize 后回收旧的 swap 文件即可腾出磁盘：
+
+```bash
+sudo swapoff /swapfile2 && sudo rm -f /swapfile2 && sudo sed -i '/swapfile2/d' /etc/fstab
+df -h /    # 磁盘占用会从 80% 降到 ~59%
+```
+
 **中文朗读每块时长明显异常（太快/太慢）**
 
 引擎会对每块做「字数/4.5字每秒」合理性校验，偏差超过 0.2~3.0 倍会在日志告警。若告警频繁，可调 `--voxcpm_cfg_value`、`--voxcpm_inference_timesteps` 或更换音色重试。

@@ -233,6 +233,7 @@ Fork of `p0n1/epub_to_audiobook`, customized for a Chinese workflow (MiMo + Mini
 - **三种模式**（`voxcpm_tts_provider.py`）：design（`(描述)正文` + 固定 seed，预设自动用缓存参考音频）、clone（`reference_wav_path` + 可选风格描述）、hifi（`prompt_wav_path + prompt_text + reference_wav_path` 同一份音频；描述被模型忽略）。hifi 转写：手填优先 → 预设自带试听文本（仅当没用用户上传的参考音频）→ SenseVoice 自动（`utils/voxcpm_asr.py`，固定 CPU）。
 - **长文本必须分块**：官方警告语速漂移/爆音/OOM/不停止；默认 `chunk_chars=400` 按句分块、尾部 <80 字并入前块、pydub 合并、逐块打 `chunk_i_of_n` 进度标记（progress_parser 已支持）。
 - **CUDA Graphs 不支持多线程**：`optimize=True` 默认开；转换走 spawn 子进程单 worker（`worker_count=1` 默认），WebUI 试听用 `cache=False` 临时加载模型、用完 `del + torch.cuda.empty_cache()` 释放，避免主进程长期占显存与 worker 抢资源。
+- **低内存初始化（重要，别删）**：voxcpm 的 `VoxCPM2Model.from_local()` 先用 torch 默认 dtype 建整套 2.29B 参数再 `.to(bfloat16)`，fp32 中转使进程峰值 RSS 达 10.4~10.8GB（bf16 权重只有 4.58GB），在 8GB 内存虚机上必然 swap 卡死/被 OOM kill。因此 `_load_voxcpm_model()` 用 `_low_memory_model_init()` 把构造期默认 dtype 临时设成 bfloat16（峰值 ≈5.6GB），并用 `try/finally` 还原；`VOXCPM_LOW_MEMORY_INIT=0` 可关闭。加载后会打印 `/proc/self/status` 的 RSS/峰值便于现场确认。另注：safetensors 的 `load_file` 本身已是 mmap 零拷贝（实测读 1.5GB 文件 RSS 不增长），「再上 mmap 惰性加载」没有额外收益，别在那边折腾。
 - **设备惰性解析**：provider `__init__` 不碰 `torch.cuda`（只有构造 WebUI 下拉时的 `get_voxcpm_supported_devices()` 会探测），设备规范化与模型加载都在 worker 内完成，避免父进程 CUDA 状态被 fork 继承（配合 spawn 双保险）。
 - **输出格式**：默认 mp3（非 wav 需 ffmpeg，validate_config 报中文错误）；多分片/压缩格式一律 pydub 合并（复用 `should_use_pydub_merge`）。
 - **时长校验**：每块按 4.5 字/秒估算，实际时长偏差 >0.2~3.0 倍仅告警不中断。

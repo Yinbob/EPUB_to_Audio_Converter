@@ -386,5 +386,66 @@ class TestTextToSpeechFlow(unittest.TestCase):
         self.assertIsInstance(provider, VoxCPMTTSProvider)
 
 
+class TestLowMemoryInit(unittest.TestCase):
+    """构造期低内存初始化（fp32 → bf16 中转会让峰值内存翻倍）。"""
+
+    def setUp(self):
+        from audiobook_generator.tts_providers import voxcpm_tts_provider as mod
+        self.mod = mod
+        if mod.torch is None:
+            self.skipTest("未安装 torch")
+
+    def test_default_dtype_is_bf16_inside_and_restored_after(self):
+        original = self.mod.torch.get_default_dtype()
+        seen = []
+        with self.mod._low_memory_model_init() as enabled:
+            self.assertTrue(enabled)
+            seen.append(self.mod.torch.get_default_dtype())
+        self.assertEqual(seen, [self.mod.torch.bfloat16])
+        self.assertEqual(self.mod.torch.get_default_dtype(), original)
+
+    def test_default_dtype_restored_even_on_exception(self):
+        original = self.mod.torch.get_default_dtype()
+        with self.assertRaises(RuntimeError):
+            with self.mod._low_memory_model_init():
+                raise RuntimeError("boom")
+        self.assertEqual(self.mod.torch.get_default_dtype(), original)
+
+    def test_env_var_can_disable_it(self):
+        original = self.mod.torch.get_default_dtype()
+        with patch.dict(os.environ, {"VOXCPM_LOW_MEMORY_INIT": "0"}):
+            with self.mod._low_memory_model_init() as enabled:
+                self.assertFalse(enabled)
+                self.assertEqual(self.mod.torch.get_default_dtype(), original)
+        self.assertEqual(self.mod.torch.get_default_dtype(), original)
+
+    def test_load_voxcpm_model_constructs_in_bf16(self):
+        """from_pretrained 必须在默认 dtype=bfloat16 的窗口内被调用。"""
+        seen = {}
+        fake_model = MagicMock()
+
+        class _FakeVoxCPM:
+            @staticmethod
+            def from_pretrained(*args, **kwargs):
+                seen["dtype"] = self.mod.torch.get_default_dtype()
+                return fake_model
+
+        original = self.mod.torch.get_default_dtype()
+        with patch.object(self.mod, "_import_voxcpm", return_value=_FakeVoxCPM), patch.object(
+            self.mod, "_voxcpm_model", None
+        ):
+            model = self.mod._load_voxcpm_model(
+                "openbmb/VoxCPM2", device="cuda", optimize=False, cache=False
+            )
+        self.assertIs(model, fake_model)
+        self.assertEqual(seen["dtype"], self.mod.torch.bfloat16)
+        self.assertEqual(self.mod.torch.get_default_dtype(), original)
+
+    def test_read_process_memory_gb_never_raises(self):
+        current, peak = self.mod._read_process_memory_gb()
+        for value in (current, peak):
+            self.assertTrue(value is None or value > 0)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -15,6 +15,7 @@
   ./venv_chatterbox/bin/pip install --force-reinstall --no-deps gradio==5.50.0 gradio_client==1.14.0
 """
 
+import contextlib
 import io
 import logging
 import os
@@ -178,6 +179,61 @@ def _ffmpeg_available():
     return shutil.which(FFMPEG_PATH) is not None
 
 
+VOXCPM_LOW_MEMORY_INIT_ENV = "VOXCPM_LOW_MEMORY_INIT"
+
+
+def _low_memory_init_enabled() -> bool:
+    """低内存初始化开关（默认开启，设 VOXCPM_LOW_MEMORY_INIT=0 可关闭）。"""
+    raw = os.environ.get(VOXCPM_LOW_MEMORY_INIT_ENV, "")
+    return raw.strip().lower() not in {"0", "false", "no", "off"}
+
+
+@contextlib.contextmanager
+def _low_memory_model_init():
+    """构造 VoxCPM 模型期间把 torch 默认 dtype 临时压到 bfloat16。
+
+    voxcpm 的 `VoxCPM2Model.from_local()` 先用 **torch 默认 dtype（fp32）** 建好整套
+    2.29B 参数，再 `.to(bfloat16)`，中间同时存在 fp32 + bf16 两份权重：实测进程峰值
+    RSS ≈ 10.4~10.8GB（最终 bf16 权重只有 4.58GB）。在 7.8GB 内存 + HDD swap 的虚机上，
+    这会把数 GB 匿名页推进 swap，表现为「Loading model from safetensors」卡住 5 分钟
+    甚至被 OOM killer 干掉。
+
+    构造期把默认 dtype 设成 bfloat16 后峰值降到 ≈ 5.6GB；由于权重随后会被
+    safetensors checkpoint 逐张量覆盖，最终参数取值与 dtype 和原路径完全一致
+    （dtype 仍由 config.json 的 `dtype` 字段决定）。
+    """
+    if torch is None or not _low_memory_init_enabled():
+        yield False
+        return
+
+    try:
+        previous = torch.get_default_dtype()
+        torch.set_default_dtype(torch.bfloat16)
+    except Exception as e:  # 兜底：任何异常都退回原加载路径
+        logger.warning(f"设置默认 dtype=bfloat16 失败，按原路径加载：{e}")
+        yield False
+        return
+
+    try:
+        yield True
+    finally:
+        torch.set_default_dtype(previous)
+
+
+def _read_process_memory_gb():
+    """读取 (当前 RSS, 峰值 RSS)，单位 GB；非 Linux 或读取失败时返回 (None, None)。"""
+    try:
+        values = {}
+        with open("/proc/self/status", "r", encoding="utf-8") as fh:
+            for line in fh:
+                if line.startswith("VmRSS:") or line.startswith("VmHWM:"):
+                    key, raw = line.split(":", 1)
+                    values[key] = int(raw.split()[0]) / 1024 / 1024  # KB → GB
+        return values.get("VmRSS"), values.get("VmHWM")
+    except Exception:
+        return None, None
+
+
 def _import_voxcpm():
     try:
         from voxcpm import VoxCPM
@@ -232,16 +288,29 @@ def _load_voxcpm_model(model_name=None, device="auto", optimize=True, cache=True
         "CUDA_VISIBLE_DEVICES 固定本应用使用的 GPU。"
     )
 
-    model = VoxCPM.from_pretrained(
-        model_name,
-        load_denoiser=False,  # denoise=True 时才需要 ZipEnhancer，默认不加载省显存
-        optimize=optimize,
-        device=normalized_device,
-    )
+    with _low_memory_model_init() as low_memory_init:
+        if low_memory_init:
+            logger.info(
+                "  - 低内存初始化：构造期默认 dtype=bfloat16"
+                "（避免 fp32 中转的 ~10.4GB 峰值，预计省 4~5GB 内存）"
+            )
+        rss_before, _ = _read_process_memory_gb()
+        model = VoxCPM.from_pretrained(
+            model_name,
+            load_denoiser=False,  # denoise=True 时才需要 ZipEnhancer，默认不加载省显存
+            optimize=optimize,
+            device=normalized_device,
+        )
 
     if cache:
         _voxcpm_model = model
         _voxcpm_model_key = key
+    rss_after, peak = _read_process_memory_gb()
+    if rss_before is not None and rss_after is not None:
+        logger.info(
+            f"  - 进程内存：加载前 {rss_before:.2f}GB → 现在 {rss_after:.2f}GB"
+            + (f"，峰值 {peak:.2f}GB" if peak is not None else "")
+        )
     logger.info(f"VoxCPM 模型加载完成：{model_name}")
     return model
 
