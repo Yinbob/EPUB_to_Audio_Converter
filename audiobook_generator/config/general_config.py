@@ -12,11 +12,16 @@ class GeneralConfig:
         self.use_pydub_merge = getattr(args, 'use_pydub_merge', None)
 
         # Multi-role script mode. CLI stores a path; WebUI stores a parsed,
-        # pickle-safe RoleScriptV1 instance.
+        # pickle-safe RoleScriptV1/V2 instance.
         self.role_script = getattr(args, 'role_script', None)
         self.allow_role_text_override = getattr(args, 'allow_role_text_override', False)
         self.allow_role_title_mismatch = getattr(args, 'allow_role_title_mismatch', False)
         self.allow_role_fallback = getattr(args, 'allow_role_fallback', False)
+        self.role_quality_enabled = getattr(args, 'role_quality_enabled', False)
+        self.role_quality_max_rate = getattr(args, 'role_quality_max_rate', 4.3)
+        self.role_quality_deepseek_api_key = getattr(args, 'role_quality_deepseek_api_key', None)
+        self.role_quality_deepseek_base_url = getattr(args, 'role_quality_deepseek_base_url', None)
+        self.role_quality_deepseek_model = getattr(args, 'role_quality_deepseek_model', None)
 
         # Book parser specific arguments
         self.title_mode = getattr(args, 'title_mode', None)
@@ -84,4 +89,7 @@ class GeneralConfig:
         self.voxcpm_seed = getattr(args, 'voxcpm_seed', None)
 
     def __str__(self):
-        return ",\n".join(f"{key}={value}" for key, value in self.__dict__.items())
+        return ",\n".join(
+            f"{key}={'[已隐藏]' if 'api_key' in key.lower() and value else value}"
+            for key, value in self.__dict__.items()
+        )

@@ -40,6 +40,26 @@ class TestRoleScriptUiHelpers(unittest.TestCase):
         self.assertIn("narrator", restored.roles)
         self.assertEqual(restored.chapters[0].segments[0].text[:4], "这是用于")
 
+    def test_v2_review_persists_and_invalidates_confirmation(self):
+        from tests.audiobook_generator.role_script.v2_io_test import _script
+        from audiobook_generator.role_script.project_store import project_path, save_project
+        script, _source = _script()
+        with tempfile.TemporaryDirectory() as folder:
+            path = project_path(folder, script.book_sha256)
+            save_project(script, path)
+            with patch.object(web_ui, "get_output_dir", return_value=folder):
+                queue, entities, _source_choices, _target_choices, _message = web_ui.load_role_review(str(path))
+                self.assertEqual(queue["value"], "ch1_s2")
+                self.assertTrue(entities["choices"])
+                web_ui._remember_role_confirmation(str(path), "old-signature")
+                outputs = web_ui.apply_role_review(str(path), "confirm", "ch1_s2", "char_1", None, None)
+                self.assertIn("已保存", outputs[2])
+                self.assertFalse(outputs[3])
+                self.assertEqual(web_ui._recall_role_confirmation(str(path)), "")
+            saved, report = web_ui._load_uploaded_role_script(str(path))
+            self.assertTrue(report.ok)
+            self.assertEqual(saved.chapters[0].segments[1].speaker.status, "confirmed")
+
     def test_role_table_writeback_handles_nan_blank_rows_and_numeric_cells(self):
         rows = web_ui._role_table_rows(self.script)
         rows[0][2] = "茉莉"
@@ -578,8 +598,8 @@ class TestRoleScriptUiWiring(unittest.TestCase):
                 return True
         return False
 
-    def test_process_form_last_ten_inputs_are_role_parameters(self):
-        signature_names = list(inspect.signature(web_ui.process_form).parameters)[-10:]
+    def test_process_form_last_fifteen_inputs_are_role_parameters(self):
+        signature_names = list(inspect.signature(web_ui.process_form).parameters)[-15:]
         self.assertEqual(
             signature_names,
             [
@@ -593,17 +613,22 @@ class TestRoleScriptUiWiring(unittest.TestCase):
                 "allow_role_text_override",
                 "allow_role_title_mismatch",
                 "allow_role_fallback",
+                "role_quality_enabled",
+                "role_quality_max_rate",
+                "role_quality_deepseek_api_key",
+                "role_quality_deepseek_base_url",
+                "role_quality_deepseek_model",
             ],
         )
         process_form = self._dependency("process_form")
         self.assertIsNotNone(process_form)
         inputs = process_form.get("inputs") or []
-        self.assertEqual(len(inputs[-10:]), 10)
+        self.assertEqual(len(inputs[-15:]), 15)
         components = {component["id"]: component for component in self._components()}
         expected_labels = [
             "启用多角色分段模式",
             "上传书籍后自动调用 DeepSeek 拆分角色",
-            "RoleScriptV1 JSON",
+            "RoleScript JSON",
             "角色参数表",
             None,
             None,
@@ -611,8 +636,13 @@ class TestRoleScriptUiWiring(unittest.TestCase):
             "允许剧本文本覆盖书籍正文",
             "允许章节标题不匹配",
             "允许缺失角色回退",
+            "逐段检测语速",
+            "中文语速上限",
+            "DeepSeek API Key",
+            "DeepSeek Base URL",
+            "DeepSeek Model",
         ]
-        for component_id, label in zip(inputs[-10:], expected_labels):
+        for component_id, label in zip(inputs[-15:], expected_labels):
             if label is None:
                 continue
             actual = str(components[component_id].get("props", {}).get("label") or "")
@@ -621,7 +651,7 @@ class TestRoleScriptUiWiring(unittest.TestCase):
     def test_role_events_are_wired(self):
         auto_split = self._dependency("auto_split_role_script")
         self.assertIsNotNone(auto_split)
-        self.assertEqual(len(auto_split.get("inputs") or []), 14)
+        self.assertEqual(len(auto_split.get("inputs") or []), 15)
         self.assertEqual(len(auto_split.get("outputs") or []), 10)
 
         upload = self._dependency("manual_role_script_uploaded")

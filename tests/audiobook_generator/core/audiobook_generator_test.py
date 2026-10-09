@@ -18,6 +18,7 @@ from audiobook_generator.role_script.models import (
     VoiceProfile,
 )
 from audiobook_generator.role_script.planner import build_synthesis_plans
+from audiobook_generator.role_script.audio_quality import AudioQualityReport
 
 
 def _script(book_sha256):
@@ -200,6 +201,69 @@ class TestRoleScriptCoreOrchestration(unittest.TestCase):
             self.assertFalse(
                 os.path.exists(os.path.join(config.output_folder, ".role_tmp", "chapter_000001"))
             )
+
+    def test_quality_retry_changes_only_failed_segment_and_writes_report(self):
+        with tempfile.TemporaryDirectory() as root:
+            config = self._config(root, preview=False)
+            config.role_quality_enabled = True
+            config.role_quality_max_rate = 4.3
+            generator = AudiobookGenerator(config)
+            content_hash = hashlib.sha256(b"book bytes").hexdigest()
+            plan = build_synthesis_plans(
+                _script(content_hash), [("第一章", "第一段第二段")],
+                expected_book_sha256=content_hash, provider="openai",
+                chapter_start=1, chapter_end=1, output_format="wav",
+            ).plans[0]
+            fast = AudioQualityReport("failed", ("too_fast",), 1, 7.0, 0.0, 0.0, 0.0, -9, "第一段")
+            passed = AudioQualityReport("passed", (), 2, 3.5, 0.0, 0.0, 0.0, -9, "第一段")
+            provider = _FakeProvider()
+            with patch("audiobook_generator.core.audiobook_generator.get_tts_provider", return_value=provider), \
+                 patch("audiobook_generator.role_script.audio_pipeline.render_role_preview"), \
+                 patch("audiobook_generator.role_script.audio_quality.evaluate_segment_audio",
+                       side_effect=[fast, passed, passed]), \
+                 patch("audiobook_generator.role_script.audio_quality.request_mimo_instruction_patch",
+                       return_value=("clear_articulation", "清晰朗读。")), \
+                 patch("audiobook_generator.role_script.audio_pipeline.assemble_chapter_audio") as assemble:
+                index, ok = generator.process_role_chapter(plan, "作者", "书名")
+            self.assertTrue(ok)
+            self.assertEqual(index, 1)
+            accepted = assemble.call_args.args[0]
+            self.assertLess(accepted.units[0].profile.provider_params["speed"], 1.0)
+            self.assertEqual(accepted.units[1].profile.provider_params["speed"], 1.0)
+            import json
+            report_path = Path(config.output_folder) / "role_quality_reports" / "chapter_000001.json"
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            self.assertEqual(report["segments"][0]["selected_attempt"], 2)
+            self.assertEqual(len(report["segments"][0]["attempts"]), 2)
+            self.assertEqual(len(report["segments"][1]["attempts"]), 1)
+
+    def test_quality_failed_retry_is_bounded_and_reported(self):
+        with tempfile.TemporaryDirectory() as root:
+            config = self._config(root, preview=False)
+            config.role_quality_enabled = True
+            unit = SynthesisUnit(
+                "1:1:narrator", 1, "第一章", 1, 1, "narrator", "旁白", "一二三四五六七八九十",
+                VoiceProfile("narrator", "旁白", {"voice": "冰糖", "speed": 1.0}),
+            )
+            plan = ChapterSynthesisPlan(1, "第一章", (unit,), "wav", "openai")
+            failed = AudioQualityReport("failed", ("asr_mismatch",), 3, 3.3, 0.8, 0, 0, -9, "错误转写")
+            provider = _FakeProvider()
+            with patch("audiobook_generator.core.audiobook_generator.get_tts_provider", return_value=provider), \
+                 patch("audiobook_generator.role_script.audio_pipeline.render_role_preview"), \
+                 patch("audiobook_generator.role_script.audio_quality.evaluate_segment_audio", return_value=failed) as evaluate, \
+                 patch("audiobook_generator.role_script.audio_quality.request_mimo_instruction_patch",
+                       side_effect=RuntimeError("DeepSeek 不可用")), \
+                 patch("audiobook_generator.role_script.audio_pipeline.assemble_chapter_audio"):
+                index, ok = AudiobookGenerator(config).process_role_chapter(plan, "作者", "书名")
+            self.assertTrue(ok)
+            self.assertEqual(index, 1)
+            self.assertEqual(evaluate.call_count, 2)
+            import json
+            path = Path(config.output_folder) / "role_quality_reports" / "chapter_000001.json"
+            report = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(report["failed"], 1)
+            self.assertEqual(report["segments"][0]["selected_attempt"], 1)
+            self.assertEqual(report["segments"][0]["action"], "steady_delivery_fallback")
 
 
     def test_english_script_localizes_old_chinese_voices_in_plans(self):

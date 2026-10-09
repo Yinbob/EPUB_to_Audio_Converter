@@ -22,6 +22,11 @@ class SegmentScript:
     text: str
     tone: Optional[str] = None
     pause_after_ms: Optional[int] = None
+    segment_id: Optional[str] = None
+    source_span: Optional[SourceSpan] = None
+    speaker: Optional[SpeakerDecision] = None
+    # 自动拆分时的临时引文候选；写入 V2 前必须解析为带坐标的 evidence。
+    evidence_candidates: Tuple[Tuple[str, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -39,6 +44,58 @@ class RoleScriptV1:
     default_pause_after_ms: int
     roles: Dict[str, RoleDefinition] = field(default_factory=dict)
     chapters: Tuple[ChapterScript, ...] = ()
+
+
+@dataclass(frozen=True)
+class SourceSpan:
+    """解析后的章节正文中的 Unicode 字符区间，左闭右开。"""
+
+    chapter_index: int
+    start: int
+    end: int
+
+
+@dataclass(frozen=True)
+class EvidenceSpan:
+    span: SourceSpan
+    kind: str
+    quote: str
+    relation: str = "said-by"
+
+
+@dataclass(frozen=True)
+class SpeakerDecision:
+    entity_id: Optional[str]
+    status: str
+    confidence: Optional[float] = None
+    evidence: Tuple[EvidenceSpan, ...] = ()
+    model: Optional[str] = None
+    confidence_kind: str = "uncalibrated"
+
+
+@dataclass(frozen=True)
+class AliasRecord:
+    text: str
+    status: str = "proposed"
+    source_span: Optional[SourceSpan] = None
+    confidence: Optional[float] = None
+
+
+@dataclass(frozen=True)
+class CharacterEntity:
+    canonical_name: str
+    aliases: Tuple[AliasRecord, ...] = ()
+    voice_profile_id: Optional[str] = None
+    voice_locked: bool = False
+    gender: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class RoleScriptV2(RoleScriptV1):
+    entities: Dict[str, CharacterEntity] = field(default_factory=dict)
+    parser_fingerprint: str = ""
+    chapter_hashes: Dict[int, str] = field(default_factory=dict)
+    registry_complete: bool = False
 
 
 @dataclass(frozen=True)

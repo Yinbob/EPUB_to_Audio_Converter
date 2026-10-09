@@ -90,6 +90,10 @@ def parse_role_script(raw: Any, report: Optional[ValidationReport] = None) -> Op
     if not isinstance(raw, dict):
         report.error("invalid_root", "$", "剧本根节点必须是 JSON 对象")
         return None
+    if raw.get("schema_version") == 2:
+        from .v2_io import parse_role_script_v2
+
+        return parse_role_script_v2(raw, report)
 
     _unknown_fields(raw, _TOP_LEVEL_FIELDS, "$", report)
 

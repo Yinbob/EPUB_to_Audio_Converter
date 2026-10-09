@@ -194,7 +194,7 @@ def handle_args():
     parser.add_argument(
         "--role_script",
         default=None,
-        help="Path to a RoleScriptV1 JSON file. Enables multi-role segmented TTS for MiMo/MiniMax.",
+        help="Path to a RoleScriptV1/V2 JSON file. Enables multi-role segmented TTS for MiMo/MiniMax.",
     )
     parser.add_argument(
         "--allow_role_text_override",
@@ -210,6 +210,14 @@ def handle_args():
         "--allow_role_fallback",
         action="store_true",
         help="Role mode: fallback missing roles to narrator, then global defaults.",
+    )
+    parser.add_argument(
+        "--role_quality_enabled", action="store_true",
+        help="角色模式逐段评估语速、清晰度和音频完整性；MiMo 失败段最多自动重试一次。",
+    )
+    parser.add_argument(
+        "--role_quality_max_rate", type=float, default=4.3,
+        help="角色音频中文语速上限（汉字/秒，默认 4.3）。",
     )
 
     parser.add_argument(

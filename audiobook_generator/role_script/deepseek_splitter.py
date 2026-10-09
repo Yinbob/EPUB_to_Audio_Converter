@@ -369,6 +369,7 @@ def differentiate_role_voices(
     """
     if script.provider not in _VOICE_POOLS:
         return script, False
+    from .models import RoleScriptV2
 
     language_key = normalize_script_language(language) or detect_role_script_language(script)
     pools = _provider_voice_pools(script.provider, language_key)
@@ -383,7 +384,10 @@ def differentiate_role_voices(
     roles: Dict[str, RoleDefinition] = dict(script.roles)
     changed = False
     narrator_role = roles.get("narrator")
-    if narrator_role is not None:
+    narrator_locked = isinstance(script, RoleScriptV2) and bool(
+        script.entities.get("narrator") and script.entities["narrator"].voice_locked
+    )
+    if narrator_role is not None and not narrator_locked:
         narrator_current = current_voice(narrator_role)
         if not _voice_matches_script_language(
             script.provider, narrator_current, language_key
@@ -422,7 +426,10 @@ def differentiate_role_voices(
             and known_voice_gender in ("female", "male")
             and known_voice_gender != genders[role_id]
         )
-        needs_reassign[role_id] = (
+        locked = isinstance(script, RoleScriptV2) and bool(
+            script.entities.get(role_id) and script.entities[role_id].voice_locked
+        )
+        needs_reassign[role_id] = not locked and (
             not voice
             or not _voice_matches_script_language(script.provider, voice, language_key)
             or voice == narrator_voice
@@ -644,11 +651,20 @@ def _segment_from_item(item: Dict[str, Any], roles: Dict[str, Dict[str, str]], t
     pause = item.get("pause_after_ms")
     if not isinstance(pause, int) or isinstance(pause, bool) or not 0 <= pause <= 60000:
         pause = None
+    evidence_candidates = []
+    for evidence in item.get("evidence", []) if isinstance(item.get("evidence"), list) else []:
+        if not isinstance(evidence, dict):
+            continue
+        quote = evidence.get("quote")
+        kind = evidence.get("kind")
+        if isinstance(quote, str) and quote.strip() and isinstance(kind, str) and kind.strip():
+            evidence_candidates.append((quote.strip(), kind.strip()))
     return SegmentScript(
         role_id=role_id,
         text=text,
         tone=tone,
         pause_after_ms=pause,
+        evidence_candidates=tuple(evidence_candidates[:3]),
     )
 
 
@@ -743,6 +759,7 @@ You must follow these rules exactly:
 5. tone is optional and must not exceed 200 characters. Do not return pause_after_ms.
 6. Infer each non-narrator role's gender from titles, relationships, pronouns, and context, not merely from the spelling of a name. gender must be male, female, or unknown. Use unknown only when there is no reliable clue.
 7. Return one JSON object only. Do not return Markdown or explanations.
+8. For each spoken segment, include an optional evidence array of short verbatim source quotations supporting the speaker choice. Each item has quote and kind (explicit_speech_tag, dialogue_turn, coreference, character_memory). Do not invent evidence; omit it when uncertain. Do not return character offsets.
 
 Return format:
 {{
@@ -752,7 +769,7 @@ Return format:
   }},
   "segments": [
     {{"role_id": "narrator", "text": "verbatim source excerpt"}},
-    {{"role_id": "role_id", "text": "verbatim dialogue excerpt"}}
+    {{"role_id": "role_id", "text": "verbatim dialogue excerpt", "evidence": [{{"quote": "verbatim source clue", "kind": "explicit_speech_tag"}}]}}
   ]
 }}
 
@@ -773,6 +790,9 @@ Source text:
    称谓（先生/公子/夫人/姑娘/老爷）、亲属关系、代词（他/她）和上下文判断，不要只看名字用字：
    例如“贾宝玉”是 male，“林黛玉”是 female，“王夫人”是 female。只有完全没有任何线索时才用 unknown。
 7. 只返回一个 JSON 对象，不要 markdown，不要解释。
+8. 对有明确说话人的对白，可返回 evidence 数组，每项包含原文短引文 quote 和证据类型 kind
+   （explicit_speech_tag / dialogue_turn / coreference / character_memory）。找不到依据时省略，
+   不得编造引文；不要返回字符偏移。
 
 返回格式：
 {{
@@ -782,7 +802,7 @@ Source text:
   }},
   "segments": [
     {{"role_id": "narrator", "text": "原文片段"}},
-    {{"role_id": "角色ID", "text": "原文对白"}}
+    {{"role_id": "角色ID", "text": "原文对白", "evidence": [{{"quote": "原文中的说话人线索", "kind": "explicit_speech_tag"}}]}}
   ]
 }}
 
@@ -857,6 +877,7 @@ def _merge_adjacent_segments(segments: Iterable[SegmentScript]) -> Tuple[Segment
                 text=previous.text + segment.text,
                 tone=previous.tone,
                 pause_after_ms=None,
+                evidence_candidates=previous.evidence_candidates + segment.evidence_candidates,
             )
         else:
             merged.append(segment)
@@ -1060,6 +1081,12 @@ def split_chapters_with_deepseek(
 
 def role_script_to_dict(script: RoleScriptV1) -> Dict[str, Any]:
     """把领域模型转回 RoleScriptV1 JSON 对象。"""
+    from .models import RoleScriptV2
+
+    if isinstance(script, RoleScriptV2):
+        from .v2_io import role_script_v2_to_dict
+
+        return role_script_v2_to_dict(script)
     return {
         "schema_version": script.schema_version,
         "provider": script.provider,

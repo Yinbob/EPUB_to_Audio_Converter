@@ -1,8 +1,11 @@
 import logging
+import json
 import multiprocessing
 import os
 import hashlib
 import shutil
+import tempfile
+from dataclasses import replace
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -60,6 +63,23 @@ def _format_validation_report(report) -> str:
         for item in report.warnings:
             lines.append(f"  - [{item.code}] {item.path}: {item.message}")
     return "\n".join(lines)
+
+
+def _save_role_quality_report(output_dir: str, chapter_index: int, payload: dict) -> None:
+    """每章独立原子写入，避免 spawn worker 互相覆盖结果。"""
+    folder = os.path.join(output_dir, "role_quality_reports")
+    os.makedirs(folder, exist_ok=True)
+    target = os.path.join(folder, f"chapter_{chapter_index:06d}.json")
+    descriptor, temporary = tempfile.mkstemp(prefix=".quality-", suffix=".tmp", dir=folder)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as file_obj:
+            json.dump(payload, file_obj, ensure_ascii=False, indent=2)
+            file_obj.flush()
+            os.fsync(file_obj.fileno())
+        os.replace(temporary, target)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
 
 
 class AudiobookGenerator:
@@ -179,6 +199,18 @@ class AudiobookGenerator:
             from audiobook_generator.role_script.progress import role_segment_marker
 
             artifacts = []
+            accepted_units = []
+            quality_rows = []
+            quality_enabled = bool(getattr(self.config, "role_quality_enabled", False))
+            if quality_enabled:
+                from audiobook_generator.role_script.audio_pipeline import render_role_preview
+                from audiobook_generator.role_script.audio_quality import (
+                    QualityPolicy, choose_quality_attempt, evaluate_segment_audio,
+                    recommended_mimo_speed, request_mimo_instruction_patch,
+                )
+                policy = QualityPolicy(max_chinese_chars_per_second=float(
+                    getattr(self.config, "role_quality_max_rate", 4.3) or 4.3
+                ))
             for unit in plan.units:
                 marker = role_segment_marker(
                     unit.chapter_index,
@@ -190,22 +222,92 @@ class AudiobookGenerator:
                     # 外层 segment 进度必须优先于 Provider 内部分块标记。
                     logger.info(marker)
 
-                artifacts.append(
-                    tts_provider.synthesize_segment(
-                        unit.text,
-                        unit.profile,
-                        work_dir,
-                        report_progress,
-                    )
+                artifact = tts_provider.synthesize_segment(
+                    unit.text, unit.profile, work_dir, report_progress,
                 )
+                accepted_unit = unit
+                if quality_enabled:
+                    preview_path = os.path.join(work_dir, f"quality_{unit.segment_index:05d}_1.wav")
+                    render_role_preview(artifact, unit.profile, plan.provider, preview_path)
+                    first = evaluate_segment_audio(unit.text, preview_path, policy)
+                    row = {
+                        "unit_id": unit.unit_id,
+                        "source_sha256": hashlib.sha256(unit.text.encode("utf-8")).hexdigest(),
+                        "attempts": [first.to_dict()],
+                        "selected_attempt": 1,
+                        "action": None,
+                        "feedback_error": None,
+                        "retry_error": None,
+                    }
+                    if first.status == "failed" and plan.provider == "openai":
+                        params = dict(unit.profile.provider_params)
+                        current_speed = float(params.get("speed") or 1.0)
+                        params["speed"] = recommended_mimo_speed(current_speed, first, policy)
+                        try:
+                            action, prompt_patch = request_mimo_instruction_patch(
+                                unit.text, first,
+                                api_key=getattr(self.config, "role_quality_deepseek_api_key", None),
+                                base_url=getattr(self.config, "role_quality_deepseek_base_url", None),
+                                model=getattr(self.config, "role_quality_deepseek_model", None),
+                            )
+                        except Exception as exc:
+                            row["feedback_error"] = str(exc)
+                            logger.warning("第 %s 章第 %s 段 DeepSeek 提示诊断不可用：%s",
+                                           plan.chapter_index, unit.segment_index, exc)
+                            action, prompt_patch = "steady_delivery_fallback", (
+                                "请逐字朗读原文，放慢节奏并清晰吐字，不增删文字。"
+                            )
+                        params["instructions"] = "\n".join(filter(None, [
+                            params.get("instructions"), prompt_patch,
+                        ]))
+                        retry_profile = replace(unit.profile, provider_params=params)
+                        row["action"] = action
+                        try:
+                            retry_artifact = tts_provider.synthesize_segment(
+                                unit.text, retry_profile, work_dir, report_progress,
+                            )
+                            retry_path = os.path.join(work_dir, f"quality_{unit.segment_index:05d}_2.wav")
+                            render_role_preview(retry_artifact, retry_profile, plan.provider, retry_path)
+                            second = evaluate_segment_audio(unit.text, retry_path, policy)
+                            row["attempts"].append(second.to_dict())
+                            if choose_quality_attempt(first, second) == 2:
+                                artifact = retry_artifact
+                                accepted_unit = replace(unit, profile=retry_profile)
+                                row["selected_attempt"] = 2
+                        except Exception as exc:
+                            row["retry_error"] = str(exc)
+                            logger.warning("第 %s 章第 %s 段质量重试失败，保留首次音频：%s",
+                                           plan.chapter_index, unit.segment_index, exc)
+                    selected = row["attempts"][row["selected_attempt"] - 1]
+                    row["final_status"] = selected["status"]
+                    quality_rows.append(row)
+                    logger.info("角色音频质量 第 %s 章第 %s 段：%s，问题=%s，尝试=%s",
+                                plan.chapter_index, unit.segment_index, row["final_status"],
+                                selected["issues"], len(row["attempts"]))
+                    if row["final_status"] == "failed":
+                        logger.warning("第 %s 章第 %s 段仍未通过质量测评，需要人工复核",
+                                       plan.chapter_index, unit.segment_index)
+                artifacts.append(artifact)
+                accepted_units.append(accepted_unit)
 
             assemble_chapter_audio(
-                plan,
+                replace(plan, units=tuple(accepted_units)) if quality_enabled else plan,
                 artifacts,
                 output_file,
                 audio_tags,
                 work_dir,
             )
+            if quality_enabled:
+                _save_role_quality_report(output_dir, plan.chapter_index, {
+                    "metric_version": "audio-quality-v1",
+                    "provider": plan.provider,
+                    "chapter_index": plan.chapter_index,
+                    "max_chinese_chars_per_second": policy.max_chinese_chars_per_second,
+                    "segments": quality_rows,
+                    "passed": sum(row["final_status"] == "passed" for row in quality_rows),
+                    "failed": sum(row["final_status"] == "failed" for row in quality_rows),
+                    "incomplete": sum(row["final_status"] == "incomplete" for row in quality_rows),
+                })
             logger.info(
                 f"✅ Converted chapter {plan.chapter_index}: {plan.title}, "
                 f"output file: {output_file}"

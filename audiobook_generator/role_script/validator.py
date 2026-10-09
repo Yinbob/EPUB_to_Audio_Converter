@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Dict, Iterable, Optional, Sequence, Tuple
 
 from .errors import ValidationReport
-from .models import ChapterScript, RoleDefinition, RoleScriptV1, SegmentScript
+from .models import ChapterScript, RoleDefinition, RoleScriptV1, RoleScriptV2, SegmentScript
 from .normalization import (
     is_known_gender_value,
     normalize_coverage_text,
@@ -255,8 +255,8 @@ def validate_role_script(
 ) -> ValidationResult:
     """校验并返回规范化后的剧本。章节对齐只在提供 chapters 时执行。"""
     report = ValidationReport(schema_version=script.schema_version)
-    if script.schema_version != 1:
-        report.error("unsupported_schema_version", "$.schema_version", "仅支持 schema_version=1")
+    if script.schema_version not in (1, 2):
+        report.error("unsupported_schema_version", "$.schema_version", "仅支持 schema_version=1/2")
     if script.provider not in SUPPORTED_PROVIDERS:
         report.error("unsupported_provider", "$.provider", f"不支持的 provider：{script.provider}")
     if not _SHA256_PATTERN.fullmatch(script.book_sha256 or ""):
@@ -276,14 +276,10 @@ def validate_role_script(
 
     roles = _normalize_roles(script, report)
     normalized_chapters = _normalize_chapters(script, report)
-    normalized = RoleScriptV1(
-        schema_version=script.schema_version,
-        provider=script.provider,
-        book_sha256=script.book_sha256,
-        default_pause_after_ms=script.default_pause_after_ms,
-        roles=roles,
-        chapters=normalized_chapters,
-    )
+    normalized = replace(script, roles=roles, chapters=normalized_chapters)
+
+    if isinstance(normalized, RoleScriptV2):
+        _validate_v2(normalized, chapters, report)
 
     if chapters is not None:
         _validate_book_alignment(
@@ -299,3 +295,64 @@ def validate_role_script(
         )
 
     return ValidationResult(normalized if not report.errors else None, report)
+
+
+def _validate_v2(script: RoleScriptV2, chapters, report: ValidationReport) -> None:
+    """V2 的证据必须是原文引用，未知归属不得伪装成已确认角色。"""
+    import hashlib
+
+    chapter_texts = {index: text for index, (_title, text) in enumerate(chapters or (), 1)}
+    for chapter_index, digest in script.chapter_hashes.items():
+        if not isinstance(chapter_index, int) or not _SHA256_PATTERN.fullmatch(str(digest)):
+            report.error("invalid_chapter_hash", "$.chapter_hashes", "章节指纹必须是 SHA-256")
+        elif chapter_index in chapter_texts and hashlib.sha256(chapter_texts[chapter_index].encode()).hexdigest() != digest:
+            report.error("chapter_hash_mismatch", f"$.chapter_hashes.{chapter_index}", "章节正文指纹不匹配")
+    seen_ids = set()
+    for chapter_pos, chapter in enumerate(script.chapters):
+        source = chapter_texts.get(chapter.chapter_index)
+        previous_end = 0
+        for segment_pos, segment in enumerate(chapter.segments):
+            path = f"$.chapters[{chapter_pos}].segments[{segment_pos}]"
+            if not isinstance(segment.segment_id, str) or not segment.segment_id or segment.source_span is None or segment.speaker is None:
+                report.error("missing_v2_metadata", path, "V2 段落必须包含 ID、原文区间和归属状态")
+                continue
+            if segment.segment_id in seen_ids:
+                report.error("duplicate_segment_id", f"{path}.segment_id", "段落 ID 重复")
+            seen_ids.add(segment.segment_id)
+            span = segment.source_span
+            if span.chapter_index != chapter.chapter_index or span.start < 0 or span.end <= span.start:
+                report.error("invalid_segment_span", f"{path}.source_span", "段落区间无效")
+            elif source is not None and source[span.start:span.end] != segment.text:
+                report.error("segment_span_mismatch", f"{path}.source_span", "段落区间未指向其原文")
+            if segment_pos and span.start != previous_end:
+                report.error("segment_span_gap", f"{path}.source_span", "段落区间没有连续覆盖原文")
+            previous_end = span.end
+            speaker = segment.speaker
+            if speaker.status not in {"proposed", "confirmed", "needs_review", "unknown", "legacy_unassessed"}:
+                report.error("invalid_speaker_status", f"{path}.speaker.status", "归属状态无效")
+            if speaker.entity_id is not None and speaker.entity_id not in script.entities:
+                report.error("unknown_entity", f"{path}.speaker.entity_id", "人物 ID 不存在")
+            if speaker.status == "unknown" and speaker.entity_id is not None:
+                report.error("unknown_with_entity", f"{path}.speaker", "unknown 不得绑定人物")
+            if speaker.entity_id is not None and segment.role_id != speaker.entity_id:
+                report.error("role_entity_mismatch", f"{path}.role_id", "角色 ID 与人物 ID 不一致")
+            for evidence_pos, evidence in enumerate(speaker.evidence):
+                evidence_source = chapter_texts.get(evidence.span.chapter_index)
+                if evidence.span.start < 0 or evidence.span.end <= evidence.span.start:
+                    report.error("invalid_evidence_span", f"{path}.speaker.evidence[{evidence_pos}]", "证据区间无效")
+                elif evidence_source is not None and evidence_source[evidence.span.start:evidence.span.end] != evidence.quote:
+                    report.error("evidence_span_mismatch", f"{path}.speaker.evidence[{evidence_pos}]", "证据区间未指向所引原文")
+        if source is not None and chapter.segments and chapter.segments[0].source_span is not None and (
+            chapter.segments[0].source_span.start != 0 or previous_end != len(source)
+        ):
+            report.error("incomplete_source_spans", f"$.chapters[{chapter_pos}]", "段落区间未覆盖整章原文")
+    for entity_id, entity in script.entities.items():
+        for alias_pos, alias in enumerate(entity.aliases):
+            span = alias.source_span
+            if span is None:
+                continue
+            source = chapter_texts.get(span.chapter_index)
+            if span.start < 0 or span.end <= span.start:
+                report.error("invalid_alias_span", f"$.entities.{entity_id}.aliases[{alias_pos}]", "别名区间无效")
+            elif source is not None and source[span.start:span.end] != alias.text:
+                report.error("alias_span_mismatch", f"$.entities.{entity_id}.aliases[{alias_pos}]", "别名区间未指向原文")

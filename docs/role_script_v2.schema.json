@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://epub-to-audiobook.local/schema/role_script_v2.schema.json",
+  "title": "RoleScriptV2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "provider", "book_sha256", "default_pause_after_ms", "roles", "chapters", "entities"],
+  "properties": {
+    "schema_version": {"const": 2},
+    "provider": {"enum": ["openai", "minimax"]},
+    "book_sha256": {"$ref": "#/$defs/sha256"},
+    "default_pause_after_ms": {"type": "integer", "minimum": 0, "maximum": 60000},
+    "parser_fingerprint": {"type": "string"},
+    "chapter_hashes": {
+      "type": "object",
+      "patternProperties": {"^[1-9][0-9]*$": {"$ref": "#/$defs/sha256"}},
+      "additionalProperties": false
+    },
+    "registry_complete": {"type": "boolean"},
+    "roles": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"$ref": "#/$defs/role"}
+    },
+    "entities": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/entity"}
+    },
+    "chapters": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/chapter"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "span": {
+      "type": "object", "additionalProperties": false,
+      "required": ["chapter_index", "start", "end"],
+      "properties": {
+        "chapter_index": {"type": "integer", "minimum": 1},
+        "start": {"type": "integer", "minimum": 0},
+        "end": {"type": "integer", "minimum": 1}
+      }
+    },
+    "role": {
+      "type": "object", "additionalProperties": false,
+      "required": ["display_name", "provider_params"],
+      "properties": {
+        "display_name": {"type": "string", "minLength": 1, "maxLength": 64},
+        "gender": {"enum": ["male", "female", "unknown"]},
+        "provider_params": {
+          "type": "object",
+          "propertyNames": {"enum": ["voice", "instructions", "speed", "voice_id", "pitch", "volume"]},
+          "additionalProperties": {"type": ["string", "number"]}
+        }
+      }
+    },
+    "alias": {
+      "type": "object", "additionalProperties": false,
+      "required": ["text", "status"],
+      "properties": {
+        "text": {"type": "string", "minLength": 1},
+        "status": {"enum": ["proposed", "confirmed", "rejected"]},
+        "source_span": {"$ref": "#/$defs/span"},
+        "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1}
+      }
+    },
+    "entity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["canonical_name", "aliases"],
+      "properties": {
+        "canonical_name": {"type": "string", "minLength": 1},
+        "aliases": {"type": "array", "items": {"$ref": "#/$defs/alias"}},
+        "voice_profile_id": {"type": ["string", "null"]},
+        "voice_locked": {"type": "boolean"},
+        "gender": {"enum": ["male", "female", "unknown", null]}
+      }
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["span", "kind", "quote"],
+      "properties": {
+        "span": {"$ref": "#/$defs/span"},
+        "kind": {"type": "string", "minLength": 1},
+        "quote": {"type": "string", "minLength": 1},
+        "relation": {"type": "string"}
+      }
+    },
+    "speaker": {
+      "type": "object", "additionalProperties": false,
+      "required": ["entity_id", "status", "confidence", "evidence"],
+      "properties": {
+        "entity_id": {"type": ["string", "null"]},
+        "status": {"enum": ["proposed", "confirmed", "needs_review", "unknown", "legacy_unassessed"]},
+        "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "confidence_kind": {"enum": ["uncalibrated", "calibrated", "human"]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "model": {"type": ["string", "null"]}
+      }
+    },
+    "segment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role_id", "text", "segment_id", "source_span", "speaker"],
+      "properties": {
+        "role_id": {"type": "string", "minLength": 1, "maxLength": 64},
+        "text": {"type": "string", "minLength": 1},
+        "tone": {"type": "string", "minLength": 1, "maxLength": 200},
+        "pause_after_ms": {"type": "integer", "minimum": 0, "maximum": 60000},
+        "segment_id": {"type": "string", "minLength": 1},
+        "source_span": {"$ref": "#/$defs/span"},
+        "speaker": {"$ref": "#/$defs/speaker"}
+      }
+    },
+    "chapter": {
+      "type": "object", "additionalProperties": false,
+      "required": ["chapter_index", "title", "segments"],
+      "properties": {
+        "chapter_index": {"type": "integer", "minimum": 1},
+        "title": {"type": "string", "minLength": 1},
+        "segments": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/segment"}}
+      }
+    }
+  }
+}

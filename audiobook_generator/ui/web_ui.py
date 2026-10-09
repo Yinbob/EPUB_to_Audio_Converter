@@ -117,9 +117,17 @@ from audiobook_generator.role_script.deepseek_splitter import (
     write_role_script,
 )
 from audiobook_generator.role_script.loader import load_role_script
+from audiobook_generator.role_script.project_store import (
+    load_project, parser_fingerprint, project_path, save_project,
+)
+from audiobook_generator.role_script.review import (
+    confirm_segment_speaker, lock_entity_voice, merge_entities, pending_segments,
+)
+from audiobook_generator.role_script.v2_generation import generate_v2_for_book
 from audiobook_generator.role_script.models import (
     RoleDefinition,
     RoleScriptV1,
+    RoleScriptV2,
     VoiceProfile,
 )
 from audiobook_generator.role_script.validator import validate_role_script
@@ -700,7 +708,7 @@ def _load_uploaded_role_script(file_obj):
     path = _uploaded_file_path(file_obj)
     if not path:
         report = ValidationReport()
-        report.error("read_error", "$", "请先上传 RoleScriptV1 JSON 文件")
+        report.error("read_error", "$", "请先上传 RoleScript JSON 文件")
         return None, report
     return load_role_script(path)
 
@@ -1111,7 +1119,93 @@ def _role_script_summary(script: RoleScriptV1, heading: str = "自动拆分结�
             f"- 第 {chapter.chapter_index} 章《{chapter.title}》："
             f"{len(chapter.segments)} 段（{role_sequence}）"
         )
+    if isinstance(script, RoleScriptV2):
+        pending = sum(
+            1 for chapter in script.chapters for segment in chapter.segments
+            if segment.speaker and segment.speaker.status in {"needs_review", "unknown", "proposed"}
+        )
+        lines.append(f"- 全书人物表：{len(script.entities)} 个实体；待逐段核对：{pending} 段")
+        lines.append("- 自动归属分数尚未用标注集校准，请结合原文证据复核。")
     return "\n".join(lines)
+
+
+def load_role_review(file_obj):
+    """仅检查当前 V2 项目；不修改生成音频。"""
+    script, report = _load_uploaded_role_script(file_obj)
+    if not report.ok or not isinstance(script, RoleScriptV2):
+        return (gr.update(choices=[], value=None), gr.update(choices=[], value=None),
+                gr.update(choices=[], value=None), gr.update(choices=[], value=None),
+                "请先生成 RoleScriptV2 项目。")
+    pending = pending_segments(script)
+    segment_choices = [(f"第 {chapter} 章 · {excerpt}", segment_id)
+                       for segment_id, chapter, excerpt in pending]
+    entity_choices = [(f"{item.canonical_name} ({entity_id})", entity_id)
+                      for entity_id, item in script.entities.items() if entity_id in script.roles]
+    return (
+        gr.update(choices=segment_choices, value=segment_choices[0][1] if segment_choices else None),
+        gr.update(choices=entity_choices, value=None),
+        gr.update(choices=entity_choices, value=None),
+        gr.update(choices=entity_choices, value=None),
+        f"待复核 {len(pending)} 段。选择段落查看原文证据；确认归属后需重新点击「确认剧本与角色参数」。",
+    )
+
+
+def role_review_details(file_obj, segment_id):
+    script, report = _load_uploaded_role_script(file_obj)
+    if not report.ok or not isinstance(script, RoleScriptV2) or not segment_id:
+        return "请选择 V2 项目中的待复核段落。"
+    for chapter in script.chapters:
+        for segment in chapter.segments:
+            if segment.segment_id != segment_id:
+                continue
+            speaker = segment.speaker
+            evidence = "；".join(f"{item.kind}: {item.quote}" for item in speaker.evidence) if speaker else ""
+            return (f"第 {chapter.chapter_index} 章 · `{segment_id}`\n\n"
+                    f"原文：{segment.text}\n\n"
+                    f"当前人物：`{speaker.entity_id if speaker else 'unknown'}`；"
+                    f"状态：`{speaker.status if speaker else 'unknown'}`；"
+                    f"未校准分数：{speaker.confidence if speaker else '无'}\n\n"
+                    f"原文证据：{evidence or '无；请根据上下文人工判断'}")
+    return "找不到指定段落。"
+
+
+def apply_role_review(file_obj, operation, segment_id, entity_id, source_id, target_id):
+    path = _uploaded_file_path(file_obj)
+    project_root = os.path.abspath(os.path.join(get_output_dir(), ".role_projects"))
+    if not path or not os.path.abspath(path).startswith(project_root + os.sep):
+        return (gr.update(), gr.update(), "只能在自动生成的 V2 项目中保存人工复核。",
+                False, "", gr.update(value=_role_confirmation_probe(False, "", gate=True)))
+    script, report = _load_uploaded_role_script(path)
+    if not report.ok or not isinstance(script, RoleScriptV2):
+        return (gr.update(), gr.update(), "V2 项目读取失败。", False, "",
+                gr.update(value=_role_confirmation_probe(False, "", gate=True)))
+    try:
+        if operation == "confirm":
+            updated = confirm_segment_speaker(script, segment_id, entity_id)
+        elif operation == "merge":
+            updated = merge_entities(script, source_id, target_id)
+        elif operation == "lock":
+            updated = lock_entity_voice(script, entity_id)
+        else:
+            raise ValueError("未知复核操作")
+        result = validate_role_script(updated)
+        if not result.ok:
+            raise ValueError(_format_role_validation_report(result.report, "复核后校验"))
+        _forget_role_confirmation(path)
+        save_project(result.script, path)
+        queue = pending_segments(result.script)
+        choices = [(f"第 {chapter} 章 · {excerpt}", sid) for sid, chapter, excerpt in queue]
+        return (
+            gr.update(choices=choices, value=choices[0][1] if choices else None),
+            gr.update(value=_role_table_rows(result.script)),
+            f"✅ 已保存复核；剩余 {len(queue)} 段待复核。请重新确认剧本后生成。",
+            False, "", gr.update(value=_role_confirmation_probe(False, "", gate=True)),
+        )
+    except (ValueError, OSError) as exc:
+        signature = _recall_role_confirmation(path)
+        return (gr.update(), gr.update(), f"复核未保存：{exc}", bool(signature), signature,
+                gr.update(value=_role_confirmation_probe(bool(signature), signature,
+                                                         gate=not bool(signature))))
 
 
 def calibrate_role_pace(provider, role_script_file, role_table, preview_text,
@@ -1199,6 +1293,7 @@ def auto_split_role_script(
     deepseek_api_key,
     deepseek_base_url,
     deepseek_model,
+    fullbook_index_ack=False,
 ):
     """上传书籍后调用 DeepSeek 生成待人工确认的剧本。
 
@@ -1220,6 +1315,8 @@ def auto_split_role_script(
     if not role_mode or not auto_role_split:
         return empty
     try:
+        if not fullbook_index_ack:
+            raise ValueError("请先确认：建立全书人物表会把未选择章节也提交给当前 DeepSeek 服务，并增加调用量")
         chapters, start, end, book_sha256, _book_parser = _auto_split_chapters(
             provider,
             input_file,
@@ -1231,8 +1328,21 @@ def auto_split_role_script(
             remove_reference_numbers,
             search_and_replace_file,
         )
-        report = ValidationReport(schema_version=1)
-        result = split_chapters_with_deepseek(
+        report = ValidationReport(schema_version=2)
+        fingerprint = parser_fingerprint({
+            "title_mode": title_mode or "auto",
+            "new_line_mode": new_line_mode or "single",
+            "remove_endnotes": bool(remove_endnotes),
+            "remove_reference_numbers": bool(remove_reference_numbers),
+            "search_and_replace_sha256": (
+                _sha256_file_ui(_uploaded_file_path(search_and_replace_file))
+                if _uploaded_file_path(search_and_replace_file) else None
+            ),
+            "provider": _role_provider_id(provider),
+        })
+        script_path = project_path(get_output_dir(), book_sha256)
+        previous = load_project(script_path, book_sha256=book_sha256)
+        result = generate_v2_for_book(
             chapters,
             start,
             end,
@@ -1241,18 +1351,12 @@ def auto_split_role_script(
             deepseek_api_key,
             deepseek_base_url,
             deepseek_model,
+            parser_fingerprint=fingerprint,
+            previous=previous,
             progress=lambda message: logger.info("%s", message),
-            report=report,
         )
         result = _ensure_role_voice_diversity(result, report)
-        script_path = write_role_script(
-            result,
-            os.path.join(
-                get_output_dir(),
-                ".role_generated",
-                f"{book_sha256[:12]}-{start}-{end}.json",
-            ),
-        )
+        script_path = save_project(result, script_path)
         # 同一路径重新生成后，旧的“已确认”记录必须作废。
         _forget_role_confirmation(script_path)
         rows = _role_table_rows(result)
@@ -1282,7 +1386,7 @@ def auto_split_role_script(
         logger.warning("DeepSeek 自动拆分失败：%s", exc, exc_info=True)
         message = (
             "**❌ DeepSeek 自动拆分失败**\n\n"
-            f"{exc}\n\n可以关闭自动拆分后手动上传 RoleScriptV1 JSON，或修正配置后重试。"
+            f"{exc}\n\n可以关闭自动拆分后手动上传 RoleScript JSON，或修正配置后重试。"
         )
         return (
             gr.update(),
@@ -1379,8 +1483,13 @@ def manual_role_script_uploaded(
             gr.update(visible=False), False, False, "",
             gr.update(value=_role_confirmation_probe(False)),
         )
-    generated_root = os.path.abspath(os.path.join(get_output_dir(), ".role_generated"))
-    if uploaded_path and os.path.abspath(uploaded_path).startswith(generated_root + os.sep):
+    generated_roots = [
+        os.path.abspath(os.path.join(get_output_dir(), name))
+        for name in (".role_generated", ".role_projects")
+    ]
+    if uploaded_path and any(
+        os.path.abspath(uploaded_path).startswith(root + os.sep) for root in generated_roots
+    ):
         # 自动拆分写回文件时保持当前确认 State 不变。
         # gr.State 只接受原始值：这里必须把原值回传，不能返回 gr.update()，
         # 否则会把刚写入的 role_split_generated / role_confirmed_signature 冲掉。
@@ -1464,7 +1573,10 @@ def process_form(provider,
                  voxcpm_output_format,
                  role_mode, auto_role_split, role_script_file, role_table,
                  role_split_confirmed, role_split_generated, role_confirmed_signature,
-                 allow_role_text_override, allow_role_title_mismatch, allow_role_fallback):
+                 allow_role_text_override, allow_role_title_mismatch, allow_role_fallback,
+                 role_quality_enabled=False, role_quality_max_rate=4.3,
+                 role_quality_deepseek_api_key=None, role_quality_deepseek_base_url=None,
+                 role_quality_deepseek_model=None):
     if not input_file:
         gr.Warning("请先选择至少一个书籍文件")
         # 保持进度条现状，只关掉轮询
@@ -1560,6 +1672,11 @@ def process_form(provider,
         config.allow_role_text_override = bool(allow_role_text_override) if role_mode else False
         config.allow_role_title_mismatch = bool(allow_role_title_mismatch) if role_mode else False
         config.allow_role_fallback = bool(allow_role_fallback) if role_mode else False
+        config.role_quality_enabled = bool(role_quality_enabled) if role_mode else False
+        config.role_quality_max_rate = float(role_quality_max_rate or 4.3)
+        config.role_quality_deepseek_api_key = role_quality_deepseek_api_key if role_mode else None
+        config.role_quality_deepseek_base_url = role_quality_deepseek_base_url if role_mode else None
+        config.role_quality_deepseek_model = role_quality_deepseek_model if role_mode else None
         if role_script is not None:
             config.language = (
                 "en-US"
@@ -3906,12 +4023,16 @@ def host_ui(config):
                                         value=False, elem_classes="toggle",
                                         elem_id="auto_role_split_toggle",
                                     )
+                                    fullbook_index_ack = gr.Checkbox(
+                                        label="我已知晓：全书人物表会分析未选章节，并将正文发送给当前 DeepSeek 服务（会增加调用量）",
+                                        value=False, elem_classes="toggle",
+                                    )
                                     role_regenerate_btn = gr.Button(
                                         "生成 / 重新拆分剧本", elem_classes="btn-primary", elem_id="role_split_btn"
                                     )
                                     with gr.Accordion("上传或下载剧本 JSON", open=False, elem_classes="role-details"):
                                         role_script_file = gr.File(
-                                            label="RoleScriptV1 JSON（自动拆分或手动上传）",
+                                            label="RoleScript JSON（支持 V1/V2，自动拆分生成 V2）",
                                             file_types=[".json"], file_count="single", type="filepath", interactive=True,
                                         )
                                     gr.HTML('''
@@ -3932,6 +4053,18 @@ def host_ui(config):
                                         elem_id="role_parameter_table",
                                         show_fullscreen_button=True,
                                     )
+                                    with gr.Accordion("逐段证据与全书人物复核（V2）", open=False, elem_classes="role-details"):
+                                        role_review_load_btn = gr.Button("读取待复核段落", elem_classes="btn-ghost")
+                                        role_review_segment = gr.Dropdown(label="待复核段落", choices=[], interactive=True)
+                                        role_review_info = gr.Markdown("选择 V2 项目后点击读取。")
+                                        role_review_entity = gr.Dropdown(label="确认说话人／锁定此人物音色", choices=[], interactive=True)
+                                        with gr.Row(elem_classes="advanced-action-row"):
+                                            role_review_confirm_btn = gr.Button("确认此段说话人", elem_classes="btn-primary")
+                                            role_review_lock_btn = gr.Button("锁定该人物音色", elem_classes="btn-ghost")
+                                        with gr.Row(elem_classes="advanced-field-row"):
+                                            role_merge_source = gr.Dropdown(label="别名人物（并入后移除）", choices=[], interactive=True)
+                                            role_merge_target = gr.Dropdown(label="目标人物（保留其声音）", choices=[], interactive=True)
+                                        role_merge_btn = gr.Button("确认同一人物并合并", elem_classes="btn-ghost")
                                     role_split_confirmed = gr.State(False)
                                     role_split_generated = gr.State(False)
                                     role_confirmed_signature = gr.State("")
@@ -4040,6 +4173,20 @@ def host_ui(config):
                                                 value=False,
                                                 elem_classes="toggle",
                                             )
+                                    with gr.Accordion("生成音频质量测评（可选）", open=False, elem_classes="role-details"):
+                                        role_quality_enabled = gr.Checkbox(
+                                            label="逐段检测语速、可辨识度和音频完整性（MiMo 未通过时最多重试一次）",
+                                            value=False, elem_classes="toggle",
+                                        )
+                                        role_quality_max_rate = gr.Slider(
+                                            minimum=2.0, maximum=7.0, step=0.1, value=4.3,
+                                            label="中文语速上限（汉字/秒）",
+                                        )
+                                        gr.Markdown(
+                                            "测评结果保存到输出目录的 `role_quality_reports/`。可辨识度检测需安装本地 "
+                                            "FunASR/SenseVoice；不可用时明确标记为「未完整评测」。失败片段仅 MiMo 会将诊断发给 "
+                                            "DeepSeek 并重试一次；仍失败会保留最佳版本并标记人工复核。"
+                                        )
 
                             with gr.Group(elem_classes="advanced-section"):
                                 gr.HTML('''
@@ -4253,6 +4400,7 @@ def host_ui(config):
             deepseek_api_key,
             deepseek_base_url,
             deepseek_model,
+            fullbook_index_ack,
         ]
         _auto_split_outputs = [
             role_script_file,
@@ -4293,6 +4441,29 @@ def host_ui(config):
             outputs=[role_table, role_calibration_status],
             show_progress="full",
         )
+        role_review_load_btn.click(
+            fn=load_role_review, inputs=role_script_file,
+            outputs=[role_review_segment, role_review_entity, role_merge_source,
+                     role_merge_target, role_review_info], show_progress="hidden",
+        )
+        role_review_segment.change(
+            fn=role_review_details, inputs=[role_script_file, role_review_segment],
+            outputs=role_review_info, show_progress="hidden",
+        )
+        for review_button, operation in [
+            (role_review_confirm_btn, "confirm"),
+            (role_review_lock_btn, "lock"),
+            (role_merge_btn, "merge"),
+        ]:
+            review_button.click(
+                fn=lambda file_obj, segment_id, entity_id, source_id, target_id, op=operation:
+                    apply_role_review(file_obj, op, segment_id, entity_id, source_id, target_id),
+                inputs=[role_script_file, role_review_segment, role_review_entity,
+                        role_merge_source, role_merge_target],
+                outputs=[role_review_segment, role_table, role_review_info,
+                         role_split_confirmed, role_confirmed_signature, role_confirmation_probe_host],
+                show_progress="hidden",
+            )
         role_confirm_btn.click(
             fn=confirm_auto_role_script,
             inputs=[
@@ -4392,7 +4563,9 @@ def host_ui(config):
                     voxcpm_output_format,
                     role_mode, auto_role_split, role_script_file, role_table,
                     role_split_confirmed, role_split_generated, role_confirmed_signature,
-                    allow_role_text_override, allow_role_title_mismatch, allow_role_fallback],
+                    allow_role_text_override, allow_role_title_mismatch, allow_role_fallback,
+                    role_quality_enabled, role_quality_max_rate,
+                    deepseek_api_key, deepseek_base_url, deepseek_model],
             outputs=[progress_state, progress_timer])
         stop_btn.click(fn=terminate_generator, inputs=None, outputs=[progress_state, progress_timer])
 
