@@ -192,6 +192,27 @@ def handle_args():
     )
 
     parser.add_argument(
+        "--role_script",
+        default=None,
+        help="Path to a RoleScriptV1 JSON file. Enables multi-role segmented TTS for MiMo/MiniMax.",
+    )
+    parser.add_argument(
+        "--allow_role_text_override",
+        action="store_true",
+        help="Role mode: skip chapter text coverage checks (use only after manual proofing).",
+    )
+    parser.add_argument(
+        "--allow_role_title_mismatch",
+        action="store_true",
+        help="Role mode: allow script chapter titles to differ from parser titles.",
+    )
+    parser.add_argument(
+        "--allow_role_fallback",
+        action="store_true",
+        help="Role mode: fallback missing roles to narrator, then global defaults.",
+    )
+
+    parser.add_argument(
         "--voice_name",
         help="Various TTS providers has different voice names, look up for your provider settings.",
     )

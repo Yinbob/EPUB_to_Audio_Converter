@@ -146,19 +146,50 @@ def split_long_sentence(sentence: str, max_chars: int) -> List[str]:
     return parts
 
 
-def set_audio_tags(output_file, audio_tags):
+def set_audio_tags(output_file, audio_tags, output_format=None):
+    """按最终容器写标签；未传 output_format 时保持原有 MP3/ID3 行为。"""
+    fmt = (output_format or os.path.splitext(output_file)[1].lstrip(".")).lower()
+    # 这些名字必须在函数内显式绑定：下面各分支曾有局部 import，
+    # 会让整个函数把它们视为局部变量，导致 mp3 分支先读后赋值而 UnboundLocalError。
+    from mutagen.id3 import ID3, ID3NoHeaderError, TIT2, TPE1, TALB, TRCK
     try:
-        try:
-            tags = ID3(output_file)
-            logger.debug(f"tags: {tags}")
-        except ID3NoHeaderError:
-            logger.debug(f"handling ID3NoHeaderError: {output_file}")
-            tags = ID3()
-        tags.add(TIT2(encoding=3, text=audio_tags.title))
-        tags.add(TPE1(encoding=3, text=audio_tags.author))
-        tags.add(TALB(encoding=3, text=audio_tags.book_title))
-        tags.add(TRCK(encoding=3, text=str(audio_tags.idx)))
-        tags.save(output_file)
+        if fmt == "mp3":
+            try:
+                tags = ID3(output_file)
+                logger.debug(f"tags: {tags}")
+            except ID3NoHeaderError:
+                logger.debug(f"handling ID3NoHeaderError: {output_file}")
+                tags = ID3()
+            tags.add(TIT2(encoding=3, text=audio_tags.title))
+            tags.add(TPE1(encoding=3, text=audio_tags.author))
+            tags.add(TALB(encoding=3, text=audio_tags.book_title))
+            tags.add(TRCK(encoding=3, text=str(audio_tags.idx)))
+            tags.save(output_file)
+            return
+        if fmt == "wav":
+            from mutagen.wave import WAVE
+            audio = WAVE(output_file)
+            if audio.tags is None:
+                # WAVE 必须使用 mutagen 的 _WaveID3，它会写入 RIFF 的 id3 chunk。
+                # 直接赋普通 ID3 对象会在 save() 时覆盖整个 RIFF 头。
+                audio.add_tags()
+            tags = audio.tags
+            tags.add(TIT2(encoding=3, text=audio_tags.title))
+            tags.add(TPE1(encoding=3, text=audio_tags.author))
+            tags.add(TALB(encoding=3, text=audio_tags.book_title))
+            tags.add(TRCK(encoding=3, text=str(audio_tags.idx)))
+            audio.save()
+            return
+        if fmt == "flac":
+            from mutagen.flac import FLAC
+            audio = FLAC(output_file)
+            audio["title"] = [audio_tags.title]
+            audio["artist"] = [audio_tags.author]
+            audio["album"] = [audio_tags.book_title]
+            audio["tracknumber"] = [str(audio_tags.idx)]
+            audio.save()
+            return
+        raise ValueError(f"Unsupported audio tag format: {fmt}")
     except Exception as e:
         logger.error(f"Error while setting audio tags: {e}, {output_file}")
         raise e  # TODO: use this raise to catch unknown errors for now

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from audiobook_generator.config.general_config import GeneralConfig
 
@@ -13,6 +13,8 @@ TTS_VOXCPM = "voxcpm"
 
 class BaseTTSProvider:  # Base interface for TTS providers
     # Base provider interface
+    provider_id = None
+
     def __init__(self, config: GeneralConfig):
         self.config = config
         self.validate_config()
@@ -25,6 +27,43 @@ class BaseTTSProvider:  # Base interface for TTS providers
 
     def text_to_speech(self, *args, **kwargs):
         raise NotImplementedError
+
+    def synthesize_segment(self, text, profile, work_dir, progress):
+        """角色模式接口：合成单个 segment，返回实际格式的 AudioArtifact。"""
+        raise NotImplementedError
+
+    def text_to_speech_segments(self, units, output_file, tags):
+        """兼容门面：逐段合成后交由角色音频管线合并。"""
+        from audiobook_generator.role_script.audio_pipeline import assemble_chapter_audio
+        from audiobook_generator.role_script.models import ChapterSynthesisPlan
+
+        units = tuple(units)
+        if not units:
+            raise ValueError("角色模式没有可合成的 segment")
+        plan = ChapterSynthesisPlan(
+            chapter_index=units[0].chapter_index,
+            title=units[0].chapter_title,
+            units=units,
+            output_format=self.get_output_file_extension(),
+            provider=self.provider_id or self.__class__.__name__.lower(),
+        )
+        artifacts = []
+        for unit in units:
+            artifacts.append(
+                self.synthesize_segment(
+                    unit.text,
+                    unit.profile,
+                    output_file + ".segments",
+                    None,
+                )
+            )
+        return assemble_chapter_audio(
+            plan,
+            artifacts,
+            output_file,
+            tags,
+            output_file + ".segments",
+        )
 
     def estimate_cost(self, total_chars):
         raise NotImplementedError

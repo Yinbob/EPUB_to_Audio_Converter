@@ -36,6 +36,7 @@ test_output.mp3
 # API config (contains secrets)
 mimo_config.json
 qwen_config.json
+deepseek_config.json
 
 private_examples/
 
@@ -61,3 +62,6 @@ voices/*.tmp.*
 test.py
 
 logs/
+
+# 人工上传的 TTS 音色目录
+.tts_voice_catalog.json

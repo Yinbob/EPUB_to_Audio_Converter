@@ -14,10 +14,14 @@ Apple 风格 WebUI —— 全新设计的有声书生成工作台。
 from multiprocessing import Process, get_context
 from typing import Optional
 from pathlib import Path
+from dataclasses import asdict, replace
+import hashlib
 import os
 import json
 import logging
+import math
 import signal
+import tempfile
 import time
 import zipfile
 import shutil
@@ -42,6 +46,12 @@ from audiobook_generator.tts_providers.qwen_tts_provider import (
     get_qwen_supported_languages,
     get_qwen_supported_voices,
     get_qwen_supported_output_formats,
+)
+from audiobook_generator.tts_providers.voice_catalog import (
+    clear_user_voice_entries,
+    import_voice_catalog_document,
+    list_catalog_entries,
+    save_user_voice_entries,
 )
 from audiobook_generator.tts_providers.minimax_tts_provider import (
     get_minimax_supported_models,
@@ -89,7 +99,36 @@ from audiobook_generator.utils.minimax_config import (
 from audiobook_generator.utils.qwen_config import (
     load_qwen_config, save_qwen_config, mask_api_key as qwen_mask_api_key, test_qwen_connection
 )
+from audiobook_generator.utils.deepseek_config import (
+    DEFAULT_BASE_URL as DEEPSEEK_DEFAULT_BASE_URL,
+    DEFAULT_MODEL as DEEPSEEK_DEFAULT_MODEL,
+    load_deepseek_config,
+    save_deepseek_config,
+    mask_api_key as deepseek_mask_api_key,
+    test_deepseek_connection,
+)
+from audiobook_generator.book_parsers.base_book_parser import get_book_parser
+from audiobook_generator.core.audiobook_generator import ROLE_BREAK_STRINGS
+from audiobook_generator.role_script.deepseek_splitter import (
+    DeepSeekSplitError,
+    detect_role_script_language,
+    differentiate_role_voices,
+    split_chapters_with_deepseek,
+    write_role_script,
+)
+from audiobook_generator.role_script.loader import load_role_script
+from audiobook_generator.role_script.models import (
+    RoleDefinition,
+    RoleScriptV1,
+    VoiceProfile,
+)
+from audiobook_generator.role_script.validator import validate_role_script
+from audiobook_generator.role_script.errors import ValidationReport
+from audiobook_generator.tts_providers.base_tts_provider import get_tts_provider
 from main import main
+
+
+logger = logging.getLogger(__name__)
 
 # ── 设置持久化（与旧版共用 .webui_settings.json） ─────────────────
 _SETTINGS_PATH = os.path.join(
@@ -138,8 +177,6 @@ def _save_setting(key: str, value):
 
 
 # ── 管理员密码验证 ─────────────────────────────────────────────────
-import hashlib
-
 def _hash_password(password: str) -> str:
     """对密码进行 SHA256 哈希"""
     return hashlib.sha256(password.encode("utf-8")).hexdigest()
@@ -191,7 +228,21 @@ def _load_api_configs() -> dict:
     configs["qwen_api_key_masked"] = qwen_mask_api_key(qwen_api_key) if qwen_api_key else ""
     configs["qwen_base_url"] = qwen_config.get("base_url", "https://gpu.ncut.edu.cn/v1")
     configs["qwen_model"] = qwen_config.get("model", "qwen3-tts-12hz-1.7b-voicedesign")
-    
+
+    # DeepSeek 只用于多角色脚本拆分，与 TTS Provider 凭证独立。
+    deepseek_config = load_deepseek_config()
+    deepseek_api_key = str(deepseek_config.get("api_key") or "")
+    configs["deepseek_api_key"] = deepseek_api_key
+    configs["deepseek_api_key_masked"] = (
+        deepseek_mask_api_key(deepseek_api_key) if deepseek_api_key else ""
+    )
+    configs["deepseek_base_url"] = str(
+        deepseek_config.get("base_url") or DEEPSEEK_DEFAULT_BASE_URL
+    )
+    configs["deepseek_model"] = str(
+        deepseek_config.get("model") or DEEPSEEK_DEFAULT_MODEL
+    )
+
     return configs
 
 
@@ -240,6 +291,22 @@ def _test_qwen_api(api_key: str, base_url: str, model: str) -> str:
     if not api_key.strip():
         return "❌ 请先输入 API Key"
     success, msg = test_qwen_connection(api_key.strip(), base_url.strip(), model.strip())
+    return "✅ " + msg if success else "❌ " + msg
+
+
+def _save_deepseek_api_config(api_key: str, base_url: str, model: str) -> str:
+    """保存 DeepSeek 脚本拆分配置。"""
+    if not api_key.strip():
+        return "❌ API Key 不能为空"
+    save_deepseek_config(api_key.strip(), base_url.strip(), model.strip())
+    return "✅ DeepSeek 配置已保存"
+
+
+def _test_deepseek_api(api_key: str, base_url: str, model: str) -> str:
+    """测试 DeepSeek API 连接，返回测试结果消息。"""
+    if not api_key.strip():
+        return "❌ 请先输入 API Key"
+    success, msg = test_deepseek_connection(api_key.strip(), base_url.strip(), model.strip())
     return "✅ " + msg if success else "❌ " + msg
 
 
@@ -384,6 +451,1000 @@ def voxcpm_preview_voice(voice, model_name, device, voice_dir, cfg_value, infere
     return gr.update(value=path)
 
 
+# ── 多角色剧本 ───────────────────────────────────────────────────
+ROLE_TABLE_HEADERS = [
+    "role_id", "display_name", "voice", "voice_id", "speed",
+    "instructions", "pitch", "volume",
+]
+_ROLE_PROVIDER_TTS = {"Mimo": "openai", "MiniMax": "minimax"}
+_ROLE_FINAL_FORMATS = {"mp3", "wav", "flac"}
+_VOICE_CATALOG_PROVIDERS = ("自动识别", "MiMo", "MiniMax")
+_VOICE_CATALOG_LANGUAGES = ("自动识别", "英语", "中文", "粤语")
+_VOICE_CATALOG_FILE_TYPES = [".json", ".csv", ".tsv", ".txt", ".md", ".html", ".htm", ".docx", ".pdf"]
+
+
+def _uploaded_file_path(file_obj):
+    """兼容 Gradio 字符串、FileData、dict 和列表形式。"""
+    if isinstance(file_obj, (list, tuple)):
+        return _uploaded_file_path(file_obj[0]) if file_obj else None
+    if isinstance(file_obj, (str, os.PathLike)):
+        return os.fspath(file_obj)
+    if isinstance(file_obj, dict):
+        value = file_obj.get("path") or file_obj.get("name")
+        return os.fspath(value) if value else None
+    value = getattr(file_obj, "path", None) or getattr(file_obj, "name", None)
+    return os.fspath(value) if value else None
+
+
+def _role_provider_id(provider: str):
+    return _ROLE_PROVIDER_TTS.get(provider)
+
+
+def _selected_role_output_format(provider: str, openai_output_format, minimax_output_format):
+    if provider == "Mimo":
+        return openai_output_format
+    if provider == "MiniMax":
+        return minimax_output_format
+    return None
+
+
+def _format_role_validation_report(report, heading: str = "剧本校验") -> str:
+    if report is None:
+        return f"**{heading}**：尚未校验"
+    if report.ok and not report.warnings:
+        return f"**✅ {heading}通过**"
+    lines = []
+    if report.ok:
+        lines.append(f"**✅ {heading}通过**")
+    else:
+        lines.append(f"**❌ {heading}失败（{len(report.errors)} 个错误）**")
+    for item in report.errors:
+        lines.append(f"- `{item.code}` `{item.path}`：{item.message}")
+    for item in report.warnings:
+        lines.append(f"- ⚠️ `{item.code}` `{item.path}`：{item.message}")
+    return "\n".join(lines)
+
+
+def _voice_catalog_provider_choice(choice: str):
+    return {"MiMo": "openai", "MiniMax": "minimax"}.get(str(choice or "").strip())
+
+
+def _voice_catalog_language_choice(choice: str) -> str:
+    return {"英语": "en", "中文": "zh", "粤语": "yue"}.get(str(choice or "").strip(), "")
+
+
+def _voice_catalog_overview_markdown() -> str:
+    """展示用户目录摘要；用户目录为空时明确说明仍可用内置音色。"""
+    try:
+        uploaded = list_catalog_entries(include_builtin=False)
+    except Exception as exc:
+        return f"**音色目录读取失败**：{exc}"
+    if not uploaded:
+        return "**当前音色目录**：未导入官网文档，正在使用内置音色池。"
+
+    language_names = {"en": "英文", "zh": "中文", "yue": "粤语", "ja": "日语", "ko": "韩语", "unknown": "语言未识别"}
+    counts = {}
+    for entry in uploaded:
+        counts[entry.language or "unknown"] = counts.get(entry.language or "unknown", 0) + 1
+    count_text = "、".join(
+        f"{language_names.get(language, language)} {count}"
+        for language, count in sorted(counts.items())
+    )
+    english = [entry.voice_id for entry in uploaded if entry.language == "en"]
+    preview = "、".join(f"`{voice_id}`" for voice_id in english[:12]) or "无"
+    if len(english) > 12:
+        preview += f" 等 {len(english)} 个"
+    return (
+        f"**当前音色目录**：已导入 {len(uploaded)} 个用户音色（{count_text}）。\n\n"
+        f"- 用户英文音色：{preview}\n"
+        "- 重新拆分剧本后，DeepSeek 会优先从这些音色中分配角色。"
+    )
+
+
+def _voice_catalog_result_markdown(result, saved_entries) -> str:
+    lines = [
+        "**✅ 官网音色说明解析并保存成功**",
+        f"- 来源：`{result.source_name or '粘贴内容'}`",
+        f"- 解析有效音色：{len(result.entries)} 个；当前用户目录共 {len(saved_entries)} 个",
+    ]
+    language_names = {"en": "英文", "zh": "中文", "yue": "粤语", "ja": "日语", "ko": "韩语", "unknown": "语言未识别"}
+    counts = {}
+    for entry in result.entries:
+        counts[entry.language or "unknown"] = counts.get(entry.language or "unknown", 0) + 1
+    lines.append("- 本次语言分布：" + "、".join(
+        f"{language_names.get(language, language)} {count}"
+        for language, count in sorted(counts.items())
+    ))
+    unknown = [entry.voice_id for entry in result.entries if entry.language in ("", "unknown")]
+    if unknown:
+        lines.append(f"- ⚠️ 语言未识别：{'、'.join(f'`{voice}`' for voice in unknown[:10])}")
+    if result.warnings:
+        lines.append("- ⚠️ 解析提醒：")
+        lines.extend(f"  - {warning}" for warning in result.warnings[:8])
+    lines.append("\n" + _voice_catalog_overview_markdown())
+    lines.append("\n> 如已生成剧本，请点击「重新生成」让新音色参与角色分配。")
+    return "\n".join(lines)
+
+
+def import_voice_catalog_document_ui(file_obj, pasted_text, provider_choice, language_choice):
+    """手动上传或粘贴官网音色说明，解析后保存到用户音色目录。"""
+    file_path = _uploaded_file_path(file_obj)
+    pasted = str(pasted_text or "").strip()
+    if not file_path and not pasted:
+        message = "请上传官网音色说明文档，或粘贴音色说明内容。"
+        gr.Warning(message)
+        return f"**❌ {message}**", gr.update(), gr.update()
+
+    # 文件优先，避免上一次粘贴内容覆盖新上传的文档。
+    text = "" if file_path else pasted
+    provider = _voice_catalog_provider_choice(provider_choice)
+    default_language = _voice_catalog_language_choice(language_choice)
+    result = import_voice_catalog_document(
+        file_path,
+        text=text,
+        provider=provider,
+        default_language=default_language,
+    )
+    if result.errors:
+        message = "；".join(result.errors)
+        gr.Warning(message)
+        return f"**❌ 音色说明解析失败**\n\n{message}", gr.update(), gr.update()
+    try:
+        saved_entries = save_user_voice_entries(result.entries)
+    except Exception as exc:
+        logger.exception("保存人工音色目录失败")
+        gr.Warning(f"音色目录保存失败：{exc}")
+        return f"**❌ 音色目录保存失败**\n\n{exc}", gr.update(), gr.update()
+
+    gr.Info(f"已保存 {len(result.entries)} 个音色，请重新生成剧本以应用。")
+    return (
+        _voice_catalog_result_markdown(result, saved_entries),
+        gr.update(choices=get_openai_supported_voices()),
+        gr.update(choices=get_minimax_voice_choices()),
+    )
+
+
+def clear_voice_catalog_ui():
+    """清空用户导入项，保留内置音色池。"""
+    clear_user_voice_entries()
+    gr.Info("已清空用户导入的音色目录，恢复使用内置音色。")
+    return (
+        _voice_catalog_overview_markdown(),
+        gr.update(choices=get_openai_supported_voices()),
+        gr.update(choices=get_minimax_voice_choices()),
+    )
+
+
+def _role_confirmation_signature(script: RoleScriptV1) -> str:
+    """生成确认内容指纹，用于区分程序化 change 和用户真实编辑。"""
+    payload = json.dumps(
+        asdict(script),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+# 服务端人工确认记录：{剧本绝对路径: 已确认内容指纹}。
+# Gradio 的 gr.State 在部分事件链（自动拆分写回文件、表格 change 竞态）里会
+# 被旧快照覆盖，表现为“明明点过确认使用，开始生成却仍提示等待 DeepSeek”。
+# 这里在服务端再记一份，只要剧本文件没被重新生成、内容指纹一致就视为已确认。
+_ROLE_CONFIRMED_SCRIPTS = {}
+
+
+def _remember_role_confirmation(file_obj, signature: str) -> None:
+    """把人工确认结果落到服务端缓存，避免前端 State 被竞态覆盖。"""
+    path = _uploaded_file_path(file_obj)
+    if not path or not signature:
+        return
+    try:
+        key = os.path.abspath(path)
+    except (TypeError, ValueError):
+        return
+    _ROLE_CONFIRMED_SCRIPTS[key] = str(signature)
+
+
+def _forget_role_confirmation(file_obj) -> None:
+    """剧本被重新生成时清掉旧的确认记录（同一路径、内容已变）。"""
+    path = _uploaded_file_path(file_obj)
+    if not path:
+        return
+    try:
+        key = os.path.abspath(path)
+    except (TypeError, ValueError):
+        return
+    _ROLE_CONFIRMED_SCRIPTS.pop(key, None)
+
+
+def _recall_role_confirmation(file_obj) -> str:
+    """读取服务端人工确认记录；文件或内容变化时由调用方做指纹比对兜底。"""
+    path = _uploaded_file_path(file_obj)
+    if not path:
+        return ""
+    try:
+        key = os.path.abspath(path)
+    except (TypeError, ValueError):
+        return ""
+    return str(_ROLE_CONFIRMED_SCRIPTS.get(key, ""))
+
+
+def _role_confirmation_probe(confirmed: bool, signature: str = "", gate: bool = False) -> str:
+    """给前端“完成/开始生成”按钮提供可读的人工确认状态，不承载任何剧本内容。
+
+    gate 表示“当前存在一份尚未人工确认、但已经生成好的自动拆分剧本”，
+    前端据此在点击“完成”时提示先确认，而不是放行到一个随后必然失败的状态。
+    """
+    confirmed_value = "1" if confirmed else "0"
+    gate_value = "1" if (gate and not confirmed) else "0"
+    return (
+        f'<span id="role_confirmation_probe" data-confirmed="{confirmed_value}" '
+        f'data-signature="{signature}" data-gate="{gate_value}"></span>'
+    )
+
+
+def _ensure_role_voice_diversity(script: RoleScriptV1, report: ValidationReport) -> RoleScriptV1:
+    """兼容旧剧本：非旁白角色全部同音色时，自动分配性别适配的差异化音色。"""
+    upgraded, changed = differentiate_role_voices(script)
+    if not changed:
+        return script
+    report.warn(
+        "role_voice_differentiated",
+        "$.roles",
+        "检测到多个角色共用同一音色，已按角色性别/名称自动分配差异化音色；可在角色表中继续手动调整。",
+    )
+    return upgraded
+
+
+def _load_uploaded_role_script(file_obj):
+    path = _uploaded_file_path(file_obj)
+    if not path:
+        report = ValidationReport()
+        report.error("read_error", "$", "请先上传 RoleScriptV1 JSON 文件")
+        return None, report
+    return load_role_script(path)
+
+
+def _role_table_rows(script: RoleScriptV1):
+    rows = []
+    for role_id, role in script.roles.items():
+        params = role.provider_params
+        rows.append([
+            role_id,
+            role.display_name,
+            params.get("voice", ""),
+            params.get("voice_id", ""),
+            params.get("speed", ""),
+            params.get("instructions", ""),
+            params.get("pitch", ""),
+            params.get("volume", ""),
+        ])
+    return rows
+
+
+def _is_blank_cell(value) -> bool:
+    if value is None:
+        return True
+    if isinstance(value, float):
+        return math.isnan(value) or math.isinf(value)
+    if isinstance(value, str):
+        return not value.strip() or value.strip().lower() in {"nan", "none", "null"}
+    return False
+
+
+def _role_table_raw_rows(value):
+    if value is None:
+        return []
+    if hasattr(value, "values") and not isinstance(value, dict):
+        try:
+            return value.values.tolist()
+        except Exception:
+            pass
+    if hasattr(value, "to_dict") and not isinstance(value, dict):
+        try:
+            return value.to_dict(orient="records")
+        except Exception:
+            pass
+    if isinstance(value, dict):
+        data = value.get("data", value.get("value", []))
+        if hasattr(data, "values") and not isinstance(data, dict):
+            return data.values.tolist()
+        return data if isinstance(data, (list, tuple)) else []
+    if isinstance(value, (list, tuple)):
+        return list(value)
+    return []
+
+
+def _role_cell(row, index: int, header: str):
+    if isinstance(row, dict):
+        return row.get(header)
+    if isinstance(row, (list, tuple)) and index < len(row):
+        return row[index]
+    return None
+
+
+def _role_text(value, *, strip: bool = True):
+    if _is_blank_cell(value):
+        return None
+    text = str(value)
+    return text.strip() if strip else text
+
+
+def _role_number(value, field_name: str, row_number: int):
+    if _is_blank_cell(value):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"角色表第 {row_number} 行 {field_name} 不是有效数字：{value!r}") from exc
+
+
+def _apply_role_table(script: RoleScriptV1, table_value) -> RoleScriptV1:
+    """把 WebUI 角色表回写成新的不可变 RoleScriptV1。空表保留原角色定义。"""
+    raw_rows = _role_table_raw_rows(table_value)
+    if not raw_rows:
+        return script
+
+    # 表格通常由上传脚本生成；从原定义开始合并，避免局部编辑/分页数据误删未列出的角色。
+    roles = dict(script.roles)
+    seen_role_ids = set()
+    for row_number, row in enumerate(raw_rows, 1):
+        values = [_role_cell(row, index, header) for index, header in enumerate(ROLE_TABLE_HEADERS)]
+        if all(_is_blank_cell(value) for value in values):
+            continue
+
+        role_id = _role_text(values[0])
+        if not role_id:
+            raise ValueError(f"角色表第 {row_number} 行缺少 role_id")
+        if role_id in seen_role_ids:
+            raise ValueError(f"角色表第 {row_number} 行 role_id 重复：{role_id}")
+        seen_role_ids.add(role_id)
+
+        display_name = _role_text(values[1]) or role_id
+        params = {}
+        if script.provider == "openai":
+            voice = _role_text(values[2])
+            instructions = _role_text(values[5], strip=False)
+            speed = _role_number(values[4], "speed", row_number)
+            if voice is not None:
+                params["voice"] = voice
+            if instructions is not None:
+                params["instructions"] = instructions
+            if speed is not None:
+                params["speed"] = speed
+        elif script.provider == "minimax":
+            voice_id = _role_text(values[3])
+            speed = _role_number(values[4], "speed", row_number)
+            pitch = _role_number(values[6], "pitch", row_number)
+            volume = _role_number(values[7], "volume", row_number)
+            if voice_id is not None:
+                params["voice_id"] = voice_id
+            if speed is not None:
+                params["speed"] = speed
+            if pitch is not None:
+                params["pitch"] = pitch
+            if volume is not None:
+                params["volume"] = volume
+        else:
+            raise ValueError(f"角色表不支持 provider：{script.provider}")
+
+        original_role = script.roles.get(role_id)
+        roles[role_id] = RoleDefinition(
+            display_name=display_name,
+            provider_params=params,
+            gender=getattr(original_role, "gender", None),
+        )
+
+    if not roles:
+        raise ValueError("角色表没有有效角色行")
+    return replace(script, roles=roles)
+
+
+def _validate_uploaded_role_script(script, provider: str, output_format: str):
+    """上传阶段只做结构、参数和 Provider 校验；书指纹/标题/覆盖率由转换前统一校验。"""
+    report = ValidationReport(schema_version=script.schema_version if script else None)
+    provider_id = _role_provider_id(provider)
+    if provider_id is None:
+        report.error(
+            "provider_mismatch",
+            "$.provider",
+            "角色模式首版只支持 MiMo（openai）和 MiniMax",
+            tts_provider=provider,
+        )
+    elif script is not None and script.provider != provider_id:
+        report.error(
+            "provider_mismatch",
+            "$.provider",
+            f"剧本 provider={script.provider!r}，当前选择={provider_id!r}",
+            script_provider=script.provider,
+            tts_provider=provider_id,
+        )
+    if output_format not in _ROLE_FINAL_FORMATS:
+        report.error(
+            "unsupported_role_output_format",
+            "$.output_format",
+            "角色模式最终格式只支持 mp3/wav/flac",
+            actual=output_format,
+        )
+
+    normalized = script
+    if script is not None:
+        validation = validate_role_script(script)
+        report.errors.extend(validation.report.errors)
+        report.warnings.extend(validation.report.warnings)
+        normalized = validation.script
+    return normalized if report.ok else None, report
+
+
+def role_script_upload_changed(file_obj, provider, openai_output_format, minimax_output_format):
+    """上传 JSON 后刷新参数表和校验摘要，不触发 Provider。"""
+    output_format = _selected_role_output_format(
+        provider, openai_output_format, minimax_output_format
+    )
+    script, load_report = _load_uploaded_role_script(file_obj)
+    if not load_report.ok or script is None:
+        return [], _format_role_validation_report(load_report), gr.update(choices=[], value=None)
+
+    script = _ensure_role_voice_diversity(script, load_report)
+    rows = _role_table_rows(script)
+    _, report = _validate_uploaded_role_script(script, provider, output_format)
+    report.warnings = list(load_report.warnings) + list(report.warnings)
+    choices = [f"{role_id} — {role.display_name}" for role_id, role in script.roles.items()]
+    return rows, _format_role_validation_report(report), gr.update(
+        choices=choices, value=choices[0] if choices else None
+    )
+
+
+def role_table_changed(
+    file_obj,
+    provider,
+    openai_output_format,
+    minimax_output_format,
+    role_split_confirmed,
+    role_confirmed_signature,
+    table_value,
+):
+    """角色表编辑后刷新校验摘要；内容未变时保留人工确认。"""
+    output_format = _selected_role_output_format(
+        provider, openai_output_format, minimax_output_format
+    )
+    script, load_report = _load_uploaded_role_script(file_obj)
+    if not load_report.ok or script is None:
+        return (
+            _format_role_validation_report(load_report),
+            gr.update(choices=[], value=None),
+            False,
+            "",
+            gr.update(value=_role_confirmation_probe(False)),
+        )
+    try:
+        edited = _apply_role_table(script, table_value)
+    except ValueError as exc:
+        report = ValidationReport(schema_version=script.schema_version)
+        report.error("invalid_role_table", "$.roles", str(exc))
+        return (
+            _format_role_validation_report(report),
+            gr.update(choices=[], value=None),
+            False,
+            "",
+            gr.update(value=_role_confirmation_probe(False)),
+        )
+
+    diversity_report = ValidationReport(schema_version=script.schema_version)
+    edited = _ensure_role_voice_diversity(edited, diversity_report)
+    normalized, report = _validate_uploaded_role_script(edited, provider, output_format)
+    report.warnings = list(diversity_report.warnings) + list(report.warnings)
+    effective_script = normalized or edited
+    new_signature = _role_confirmation_signature(effective_script)
+    confirmed_signature = str(role_confirmed_signature or "")
+    # 程序化 / 无内容变化的 change 事件也带 role_split_confirmed=False 的旧快照；
+    # 只要内容指纹仍与已确认指纹一致，就不能把人工确认打回未确认状态。
+    still_confirmed = bool(confirmed_signature) and new_signature == confirmed_signature
+    choices = [
+        f"{role_id} — {role.display_name}"
+        for role_id, role in effective_script.roles.items()
+    ]
+    return (
+        _format_role_validation_report(report),
+        gr.update(choices=choices, value=choices[0] if choices else None),
+        still_confirmed,
+        new_signature if still_confirmed else "",
+        gr.update(
+            value=_role_confirmation_probe(
+                still_confirmed, new_signature if still_confirmed else "", gate=True
+            )
+        ),
+    )
+
+
+def preview_role_segment(provider, role_script_file, role_table, role_choice, preview_text,
+                         openai_model, mimo_voice, mimo_speed, mimo_instructions,
+                         mimo_stream, openai_output_format, minimax_model,
+                         minimax_voice, minimax_output_format):
+    """单角色试听；失败只告警，不进入转换批次。"""
+    if running_process and running_process.is_alive():
+        gr.Warning("当前有转换任务正在运行，请先停止或等待完成后再试听。")
+        return gr.update()
+    if not preview_text or not preview_text.strip():
+        gr.Warning("请输入试听文本")
+        return gr.update()
+
+    output_format = _selected_role_output_format(
+        provider, openai_output_format, minimax_output_format
+    )
+    script, load_report = _load_uploaded_role_script(role_script_file)
+    if not load_report.ok or script is None:
+        gr.Warning(_format_role_validation_report(load_report, "试听前校验").replace("**", ""))
+        return gr.update()
+    try:
+        script = _apply_role_table(script, role_table)
+    except ValueError as exc:
+        gr.Warning(f"角色表无效：{exc}")
+        return gr.update()
+
+    diversity_report = ValidationReport(schema_version=script.schema_version)
+    script = _ensure_role_voice_diversity(script, diversity_report)
+    normalized, report = _validate_uploaded_role_script(script, provider, output_format)
+    report.warnings = list(diversity_report.warnings) + list(report.warnings)
+    if normalized is None:
+        gr.Warning(_format_role_validation_report(report, "试听前校验").replace("**", ""))
+        return gr.update()
+
+    role_id = str(role_choice or "").split(" — ", 1)[0].strip()
+    role = normalized.roles.get(role_id)
+    if role is None:
+        gr.Warning("请选择有效的试听角色")
+        return gr.update()
+
+    config = GeneralConfig(None)
+    config.language = (
+        "en-US" if detect_role_script_language(normalized) == "en" else "zh-CN"
+    )
+    if provider == "Mimo":
+        config.tts = "openai"
+        config.model_name = openai_model
+        config.voice_name = mimo_voice
+        config.instructions = mimo_instructions
+        config.speed = mimo_speed
+        config.stream = bool(mimo_stream)
+        config.output_format = openai_output_format
+    elif provider == "MiniMax":
+        config.tts = "minimax"
+        config.model_name = minimax_model
+        config.voice_name = get_minimax_voice_id_from_choice(minimax_voice)
+        config.output_format = minimax_output_format
+    else:
+        gr.Warning("角色试听只支持 MiMo 和 MiniMax")
+        return gr.update()
+
+    preview_root = os.path.join(get_output_dir(), ".role_preview")
+    os.makedirs(preview_root, exist_ok=True)
+    work_dir = tempfile.mkdtemp(prefix="role-preview-", dir=preview_root)
+    try:
+        tts_provider = get_tts_provider(config)
+        profile = VoiceProfile(
+            role_id=role_id,
+            display_name=role.display_name,
+            provider_params=dict(role.provider_params),
+        )
+        artifact = tts_provider.synthesize_segment(preview_text.strip(), profile, work_dir, None)
+        from audiobook_generator.role_script.audio_pipeline import render_role_preview
+        artifact = render_role_preview(
+            artifact, profile, config.tts, os.path.join(work_dir, "preview_processed.wav")
+        )
+        safe_role_id = "".join(ch if ch.isalnum() or ch in "._-" else "_" for ch in role_id)
+        suffix = (artifact.format or output_format or "wav").lower()
+        digest = artifact.sha256 or hashlib.sha256(preview_text.encode("utf-8")).hexdigest()
+        destination = os.path.join(preview_root, f"{safe_role_id}-{digest[:12]}.{suffix}")
+        shutil.copy2(artifact.path, destination)
+    except Exception as exc:
+        logger.warning("角色试听失败：%s", exc, exc_info=True)
+        gr.Warning(f"角色试听失败：{exc}")
+        return gr.update()
+    finally:
+        shutil.rmtree(work_dir, ignore_errors=True)
+
+    gr.Info("试听音频已就绪")
+    return gr.update(value=destination)
+
+
+
+# ── DeepSeek 自动角色拆分 ─────────────────────────────────────────
+def _sha256_file_ui(path: str) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as file_obj:
+        for chunk in iter(lambda: file_obj.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _auto_split_chapters(provider, input_file, chapter_start, chapter_end,
+                         title_mode, new_line_mode, remove_endnotes,
+                         remove_reference_numbers, search_and_replace_file):
+    """按转换链路相同的 parser 配置读取书稿，供 DeepSeek 和最终转换共用。"""
+    file_path = _uploaded_file_path(input_file)
+    if not file_path:
+        raise ValueError("请先上传书籍文件")
+    provider_id = _role_provider_id(provider)
+    if provider_id not in ROLE_BREAK_STRINGS:
+        raise ValueError("自动角色拆分只支持 MiMo（openai）和 MiniMax")
+
+    config = GeneralConfig(None)
+    config.input_file = file_path
+    config.title_mode = title_mode or "auto"
+    config.newline_mode = new_line_mode or "single"
+    config.remove_endnotes = bool(remove_endnotes)
+    config.remove_reference_numbers = bool(remove_reference_numbers)
+    config.search_and_replace_file = _uploaded_file_path(search_and_replace_file)
+    book_parser = get_book_parser(config)
+    chapters = [
+        (title, text)
+        for title, text in book_parser.get_chapters(ROLE_BREAK_STRINGS[provider_id])
+        if text.strip()
+    ]
+    if not chapters:
+        raise ValueError("书籍解析后没有可转换章节")
+
+    start = int(chapter_start or 1)
+    end = len(chapters) if chapter_end in (None, -1) else int(chapter_end)
+    if start < 1 or end < 1 or start > end or end > len(chapters):
+        raise ValueError(
+            f"章节范围无效：{start}..{end}，书籍共 {len(chapters)} 章"
+        )
+    return chapters, start, end, _sha256_file_ui(file_path), book_parser
+
+
+def _role_script_summary(script: RoleScriptV1, heading: str = "自动拆分结果") -> str:
+    lines = [
+        f"**{heading}**",
+        f"- 角色数：{len(script.roles)}；章节数：{len(script.chapters)}",
+        "- 角色：" + "、".join(
+            f"`{role_id}`（{role.display_name}）"
+            for role_id, role in script.roles.items()
+        ),
+    ]
+    for chapter in script.chapters:
+        role_sequence = " → ".join(
+            f"{segment.role_id}" for segment in chapter.segments
+        )
+        lines.append(
+            f"- 第 {chapter.chapter_index} 章《{chapter.title}》："
+            f"{len(chapter.segments)} 段（{role_sequence}）"
+        )
+    return "\n".join(lines)
+
+
+def calibrate_role_pace(provider, role_script_file, role_table, preview_text,
+                        openai_model, mimo_voice, mimo_speed, mimo_instructions, mimo_stream):
+    """同文试听、以旁白为基准测量倍率；全部成功后才回填，失败保留原表。"""
+    from audiobook_generator.role_script.pace_calibration import calibrated_speeds
+
+    unchanged = gr.update()
+    if provider != "Mimo":
+        return unchanged, "语速校准仅适用于 MiMo；MiniMax 可直接在角色表中调整 speed。"
+    if running_process and running_process.is_alive():
+        return unchanged, "请等待当前转换结束或停止后，再校准语速。"
+    text = str(preview_text or "").strip()
+    if len(text) < 20 or len(text) > 400:
+        return unchanged, "请在试听文本中输入 20～400 字的完整句子；过短的文本难以测准语速。"
+    work_dir = None
+    try:
+        script, report = _load_uploaded_role_script(role_script_file)
+        if script is None or not report.ok:
+            raise ValueError("请先生成或上传有效剧本")
+        script = _apply_role_table(script, role_table)
+        script, report = _validate_uploaded_role_script(script, provider, "wav")
+        if script is None:
+            raise ValueError(_format_role_validation_report(report).replace("**", ""))
+        baseline = "narrator" if "narrator" in script.roles else next(iter(script.roles))
+        config = GeneralConfig(None)
+        config.tts, config.model_name = "openai", openai_model
+        config.voice_name, config.speed = mimo_voice, mimo_speed
+        config.instructions, config.stream = mimo_instructions, bool(mimo_stream)
+        config.output_format = "wav"
+        config.language = "en-US" if detect_role_script_language(script) == "en" else "zh-CN"
+        provider_instance = get_tts_provider(config)
+        root = os.path.join(get_output_dir(), ".role_preview")
+        os.makedirs(root, exist_ok=True)
+        work_dir = tempfile.mkdtemp(prefix="pace-calibration-", dir=root)
+        durations = {}
+        for role_id, role in script.roles.items():
+            profile = VoiceProfile(role_id, role.display_name, dict(role.provider_params))
+            artifact = provider_instance.synthesize_segment(text, profile, work_dir, None)
+            durations[role_id] = artifact.duration_ms
+        baseline_speed = float(script.roles[baseline].provider_params.get("speed", 1.0))
+        speeds, limited = calibrated_speeds(durations, baseline, baseline_speed)
+        rows = _role_table_rows(script)
+        for row in rows:
+            row[4] = speeds[row[0]]
+        lines = [
+            f"**已按{script.roles[baseline].display_name}的节奏校准。下一步：试听各角色，再确认剧本。**",
+            "",
+            "| 角色 | 原始试听时长 | 建议倍率 |", "| --- | --- | --- |",
+        ]
+        for role_id, role in script.roles.items():
+            name = role.display_name.replace("|", "／").replace("\n", " ")
+            lines.append(f"| {name} | {durations[role_id] / 1000:.2f} 秒 | {speeds[role_id]:.3f} |")
+        lines.extend(["", "校准是同文时长估算，情绪和停顿仍可能影响正式对白；可继续手动微调 speed。"])
+        if limited:
+            lines.append("部分倍率已限制在 0.25～4.0，请重点试听：" + "、".join(limited))
+        return gr.update(value=rows), "\n".join(lines)
+    except Exception as exc:
+        logger.warning("角色语速校准失败：%s", exc, exc_info=True)
+        return unchanged, f"语速校准失败：{exc}。原有参数已保留，可调整后重试。"
+    finally:
+        if work_dir:
+            shutil.rmtree(work_dir, ignore_errors=True)
+
+
+def split_role_script_now(*args):
+    """显式拆分按钮不受“上传后自动拆分”开关限制。"""
+    values = list(args)
+    values[2] = True
+    return auto_split_role_script(*values)
+
+
+def auto_split_role_script(
+    input_file,
+    role_mode,
+    auto_role_split,
+    provider,
+    chapter_start,
+    chapter_end,
+    title_mode,
+    new_line_mode,
+    remove_endnotes,
+    remove_reference_numbers,
+    search_and_replace_file,
+    deepseek_api_key,
+    deepseek_base_url,
+    deepseek_model,
+):
+    """上传书籍后调用 DeepSeek 生成待人工确认的剧本。
+
+    函数只生成文件和校验摘要，不会启动 TTS。返回值中的确认状态始终为未确认，
+    必须由用户点击「确认剧本与角色参数」后才能进入转换。
+    """
+    empty = (
+        gr.update(),
+        gr.update(value=[]),
+        gr.update(value="**尚未自动拆分**"),
+        gr.update(choices=[], value=None),
+        gr.update(value=""),
+        gr.update(visible=False),
+        False,
+        False,
+        "",
+        gr.update(value=_role_confirmation_probe(False)),
+    )
+    if not role_mode or not auto_role_split:
+        return empty
+    try:
+        chapters, start, end, book_sha256, _book_parser = _auto_split_chapters(
+            provider,
+            input_file,
+            chapter_start,
+            chapter_end,
+            title_mode,
+            new_line_mode,
+            remove_endnotes,
+            remove_reference_numbers,
+            search_and_replace_file,
+        )
+        report = ValidationReport(schema_version=1)
+        result = split_chapters_with_deepseek(
+            chapters,
+            start,
+            end,
+            _role_provider_id(provider),
+            book_sha256,
+            deepseek_api_key,
+            deepseek_base_url,
+            deepseek_model,
+            progress=lambda message: logger.info("%s", message),
+            report=report,
+        )
+        result = _ensure_role_voice_diversity(result, report)
+        script_path = write_role_script(
+            result,
+            os.path.join(
+                get_output_dir(),
+                ".role_generated",
+                f"{book_sha256[:12]}-{start}-{end}.json",
+            ),
+        )
+        # 同一路径重新生成后，旧的“已确认”记录必须作废。
+        _forget_role_confirmation(script_path)
+        rows = _role_table_rows(result)
+        choices = [
+            f"{role_id} — {role.display_name}"
+            for role_id, role in result.roles.items()
+        ]
+        validation_text = _format_role_validation_report(report, "DeepSeek 剧本校验")
+        summary = _role_script_summary(result)
+        summary += (
+            "\n\n**请人工核对角色划分和逐章段数，确认前不会开始生成。**"
+            f"\n\n{validation_text}"
+        )
+        return (
+            gr.update(value=str(script_path)),
+            gr.update(value=rows),
+            gr.update(value=validation_text),
+            gr.update(choices=choices, value=choices[0] if choices else None),
+            gr.update(value=summary),
+            gr.update(visible=True),
+            False,
+            True,
+            "",
+            gr.update(value=_role_confirmation_probe(False, "", gate=True)),
+        )
+    except Exception as exc:
+        logger.warning("DeepSeek 自动拆分失败：%s", exc, exc_info=True)
+        message = (
+            "**❌ DeepSeek 自动拆分失败**\n\n"
+            f"{exc}\n\n可以关闭自动拆分后手动上传 RoleScriptV1 JSON，或修正配置后重试。"
+        )
+        return (
+            gr.update(),
+            gr.update(value=[]),
+            gr.update(value=message),
+            gr.update(choices=[], value=None),
+            gr.update(value=message),
+            gr.update(visible=True),
+            False,
+            False,
+            "",
+            gr.update(value=_role_confirmation_probe(False)),
+        )
+
+
+def confirm_auto_role_script(
+    role_script_file,
+    role_table,
+    provider,
+    openai_output_format,
+    minimax_output_format,
+):
+    """人工确认自动拆分结果；校验失败时保持未确认状态。"""
+    script, load_report = _load_uploaded_role_script(role_script_file)
+    if not load_report.ok or script is None:
+        return (
+            False,
+            _format_role_validation_report(load_report, "确认前校验"),
+            gr.update(),
+            "",
+            gr.update(value=_role_confirmation_probe(False, "", gate=True)),
+        )
+    try:
+        script = _apply_role_table(script, role_table)
+    except ValueError as exc:
+        report = ValidationReport(schema_version=script.schema_version)
+        report.error("invalid_role_table", "$.roles", str(exc))
+        return (
+            False,
+            _format_role_validation_report(report, "确认前校验"),
+            gr.update(),
+            "",
+            gr.update(value=_role_confirmation_probe(False, "", gate=True)),
+        )
+    diversity_report = ValidationReport(schema_version=script.schema_version)
+    script = _ensure_role_voice_diversity(script, diversity_report)
+    normalized, report = _validate_uploaded_role_script(
+        script,
+        provider,
+        _selected_role_output_format(provider, openai_output_format, minimax_output_format),
+    )
+    report.warnings = list(diversity_report.warnings) + list(report.warnings)
+    if normalized is None:
+        return (
+            False,
+            _format_role_validation_report(report, "确认前校验"),
+            gr.update(),
+            "",
+            gr.update(value=_role_confirmation_probe(False, "", gate=True)),
+        )
+    summary = _role_script_summary(normalized, "已确认使用的剧本")
+    summary += "\n\n✅ 已确认。下一步：点击「返回生成页」，再点击「开始生成」。"
+    summary += "\n\n" + _format_role_validation_report(report, "剧本校验")
+    signature = _role_confirmation_signature(normalized)
+    # 服务端记一份确认结果：后续 start 事件即便拿到被竞态覆盖的旧 State，
+    # 也能凭“路径 + 内容指纹”识别为已确认。
+    _remember_role_confirmation(role_script_file, signature)
+    return (
+        True,
+        gr.update(value=summary),
+        gr.update(value="✅ 已确认当前角色参数。"),
+        signature,
+        gr.update(value=_role_confirmation_probe(True, signature)),
+    )
+
+
+def manual_role_script_uploaded(
+    role_script_file,
+    provider,
+    openai_output_format,
+    minimax_output_format,
+    role_split_confirmed=False,
+    role_split_generated=False,
+    role_confirmed_signature="",
+):
+    """手动上传剧本等同于人工确认，自动拆分面板显示摘要。"""
+    # 自动拆分会把生成文件写回同一个 gr.File。这里的 change 事件也会随
+    # 程序化更新触发，但自动拆分不是人工确认，必须保持确认按钮流程。
+    uploaded_path = _uploaded_file_path(role_script_file)
+    if not uploaded_path:
+        return (
+            gr.update(value=[]), "先生成剧本，或上传已有剧本。",
+            gr.update(choices=[], value=None), gr.update(value=""),
+            gr.update(visible=False), False, False, "",
+            gr.update(value=_role_confirmation_probe(False)),
+        )
+    generated_root = os.path.abspath(os.path.join(get_output_dir(), ".role_generated"))
+    if uploaded_path and os.path.abspath(uploaded_path).startswith(generated_root + os.sep):
+        # 自动拆分写回文件时保持当前确认 State 不变。
+        # gr.State 只接受原始值：这里必须把原值回传，不能返回 gr.update()，
+        # 否则会把刚写入的 role_split_generated / role_confirmed_signature 冲掉。
+        # 部分事件链会带着被旧快照覆盖的空 State 触发（表现为“已确认却又未确认”），
+        # 这时用服务端确认记录兜底。
+        recalled = _recall_role_confirmation(role_script_file)
+        resolved_signature = str(role_confirmed_signature or "") or recalled
+        resolved_confirmed = bool(role_split_confirmed) or bool(recalled)
+        return (
+            gr.update(),
+            gr.update(),
+            gr.update(),
+            gr.update(),
+            gr.update(),
+            resolved_confirmed,
+            bool(role_split_generated),
+            resolved_signature,
+            gr.update(
+                value=_role_confirmation_probe(resolved_confirmed, resolved_signature)
+            ),
+        )
+
+    script, load_report = _load_uploaded_role_script(role_script_file)
+    if not load_report.ok or script is None:
+        return (
+            gr.update(value=[]),
+            _format_role_validation_report(load_report, "角色剧本校验"),
+            gr.update(choices=[], value=None),
+            gr.update(value=_format_role_validation_report(load_report, "角色剧本校验")),
+            gr.update(visible=True),
+            False,
+            False,
+            "",
+            gr.update(value=_role_confirmation_probe(False)),
+        )
+    script = _ensure_role_voice_diversity(script, load_report)
+    normalized, report = _validate_uploaded_role_script(
+        script,
+        provider,
+        _selected_role_output_format(provider, openai_output_format, minimax_output_format),
+    )
+    report.warnings = list(load_report.warnings) + list(report.warnings)
+    rows = _role_table_rows(normalized or script)
+    choices = [f"{role_id} — {role.display_name}" for role_id, role in (normalized or script).roles.items()]
+    validation = _format_role_validation_report(report, "角色剧本校验")
+    summary = _role_script_summary(normalized or script, "手动上传的剧本")
+    summary += "\n\n✅ 已作为人工确认剧本使用。\n\n" + validation
+    confirmed = normalized is not None
+    signature = _role_confirmation_signature(normalized) if confirmed else ""
+    if confirmed:
+        _remember_role_confirmation(role_script_file, signature)
+    return (
+        gr.update(value=rows),
+        gr.update(value=validation),
+        gr.update(choices=choices, value=choices[0] if choices else None),
+        gr.update(value=summary),
+        gr.update(visible=True),
+        confirmed,
+        False,
+        signature,
+        gr.update(value=_role_confirmation_probe(confirmed, signature)),
+    )
+
+
 # ── 转换核心 ──────────────────────────────────────────────────────
 def process_form(provider,
                  input_file, output_dir, worker_count, log_level, output_text, preview,
@@ -400,14 +1461,73 @@ def process_form(provider,
                  voxcpm_regenerate_voice, voxcpm_reference_audio, voxcpm_reference_text, voxcpm_auto_transcribe,
                  voxcpm_device, voxcpm_denoise, voxcpm_normalize, voxcpm_cfg_value,
                  voxcpm_inference_timesteps, voxcpm_speed, voxcpm_chunk_chars, voxcpm_optimize,
-                 voxcpm_output_format):
+                 voxcpm_output_format,
+                 role_mode, auto_role_split, role_script_file, role_table,
+                 role_split_confirmed, role_split_generated, role_confirmed_signature,
+                 allow_role_text_override, allow_role_title_mismatch, allow_role_fallback):
     if not input_file:
         gr.Warning("请先选择至少一个书籍文件")
         # 保持进度条现状，只关掉轮询
         return gr.update(), gr.Timer(active=False)
-    gr.Info("🚀 有声书生成已开始！请在日志页查看实时进度。")
     if not isinstance(input_file, list):
         input_file = [input_file]
+
+    role_script = None
+    if role_mode:
+        if len(input_file) != 1:
+            gr.Warning("角色模式首版只支持单本书，请只选择一个书籍文件")
+            return gr.update(), gr.Timer(active=False)
+        # 人工确认以“内容指纹”为准：确认按钮会写入 role_confirmed_signature，
+        # 服务端再记一份（role_split_confirmed 布尔在 Gradio 事件竞态里可能被旧快照覆盖，
+        # 只信布尔会出现“已确认却仍提示等待 DeepSeek”的假阴性）。
+        confirmed_signature = str(role_confirmed_signature or "") or _recall_role_confirmation(
+            role_script_file
+        )
+        if not role_split_confirmed and not confirmed_signature:
+            if auto_role_split and role_split_generated:
+                gr.Warning("自动拆分结果尚未人工确认，请先在高级设置中核对并点击「确认剧本与角色参数」")
+            elif auto_role_split:
+                gr.Warning("请先等待 DeepSeek 自动拆分完成，并在高级设置中人工确认")
+            else:
+                gr.Warning("请先手动上传剧本并在高级设置中完成人工确认")
+            return gr.update(), gr.Timer(active=False)
+        selected_output_format = _selected_role_output_format(
+            provider, openai_output_format, minimax_output_format
+        )
+        uploaded_script, load_report = _load_uploaded_role_script(role_script_file)
+        if not load_report.ok or uploaded_script is None:
+            gr.Warning(_format_role_validation_report(load_report, "角色剧本校验").replace("**", ""))
+            return gr.update(), gr.Timer(active=False)
+        try:
+            uploaded_script = _apply_role_table(uploaded_script, role_table)
+        except ValueError as exc:
+            gr.Warning(f"角色参数表无效：{exc}")
+            return gr.update(), gr.Timer(active=False)
+        diversity_report = ValidationReport(schema_version=uploaded_script.schema_version)
+        uploaded_script = _ensure_role_voice_diversity(uploaded_script, diversity_report)
+        role_script, validation_report = _validate_uploaded_role_script(
+            uploaded_script, provider, selected_output_format
+        )
+        if role_script is None:
+            gr.Warning(
+                _format_role_validation_report(validation_report, "角色剧本校验").replace("**", "")
+            )
+            return gr.update(), gr.Timer(active=False)
+        validation_report.warnings = list(diversity_report.warnings) + list(
+            validation_report.warnings
+        )
+        current_signature = _role_confirmation_signature(role_script)
+        if confirmed_signature and current_signature != confirmed_signature:
+            gr.Warning("剧本内容已修改，请回到高级设置重新点击「确认剧本与角色参数」")
+            return gr.update(), gr.Timer(active=False)
+
+    # WebUI 里“开始生成”必须执行真实合成。预解析是普通模式的历史持久化开关，
+    # 若角色模式仍透传 preview=True，核心层会只校验剧本后直接返回，表现为“立即完成但没有音频”。
+    effective_preview = bool(preview) and not bool(role_mode)
+    if role_mode and preview:
+        gr.Warning("角色模式已忽略“预解析模式”，本次将执行真实语音合成。")
+
+    gr.Info("🚀 有声书生成已开始！请在日志页查看实时进度。")
 
     configs = []
     for single_file in input_file:
@@ -422,7 +1542,7 @@ def process_form(provider,
         else:
             config.output_folder = output_dir
 
-        config.preview = preview
+        config.preview = effective_preview
         config.output_text = output_text
         config.log = log_level
         config.worker_count = worker_count
@@ -436,6 +1556,16 @@ def process_form(provider,
         config.search_and_replace_file = (search_and_replace_file.name
                                           if hasattr(search_and_replace_file, 'name')
                                           else search_and_replace_file)
+        config.role_script = role_script
+        config.allow_role_text_override = bool(allow_role_text_override) if role_mode else False
+        config.allow_role_title_mismatch = bool(allow_role_title_mismatch) if role_mode else False
+        config.allow_role_fallback = bool(allow_role_fallback) if role_mode else False
+        if role_script is not None:
+            config.language = (
+                "en-US"
+                if detect_role_script_language(role_script) == "en"
+                else "zh-CN"
+            )
 
         if provider == "Mimo":
             config.tts = "openai"
@@ -950,12 +2080,271 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + """
     if (payload) applyProgress(payload);
   }
 
+  var roleVerificationObserver = null;
+
+  function roleVerificationReady(panel) {
+    if (!panel) return false;
+    // 不能检查 getClientRects()：核验面板位于高级设置弹窗内，自动拆分完成时
+    // 弹窗可能仍是 display:none，祖先不可见会让面板的 rects 全部为 0，
+    // 结果永远无法触发弹窗。这里只看面板自身的 Gradio 可见性。
+    var style = window.getComputedStyle(panel);
+    return style.display !== 'none' && style.visibility !== 'hidden';
+  }
+
+  function roleVerificationKey(panel) {
+    // 同一份结果在自动弹出前后可能呈现不同缩进/换行，必须压缩全部空白，
+    // 否则“已关闭指纹”与 observer 重新计算的指纹不一致，会反复自动弹窗。
+    return ((panel && panel.innerText) || '')
+      .replace(/\\s+/g, ' ')
+      .trim()
+      .slice(0, 600);
+  }
+
+  function revealRoleVerification() {
+    syncRoleGate();
+    var panel = $('#role_verification_panel');
+    if (!panel) return;
+
+    // 面板隐藏时清空标记，下一次自动拆分完成后仍会再次弹出。
+    if (!roleVerificationReady(panel)) {
+      delete panel.dataset.ataAutoOpenedKey;
+      return;
+    }
+
+    // 以核验摘要文本作为一次拆分结果的身份，避免用户手动关闭弹窗后，
+    // 页面其它 DOM 更新又把它强行弹回来；重新生成后摘要变化则自动再弹出。
+    var key = roleVerificationKey(panel);
+    if (!key || panel.dataset.ataAutoOpenedKey === key) return;
+    // 用户主动关闭同一份核验结果后，页面其它 DOM 更新不应把它再次弹回来；
+    // 重新生成会得到新的摘要 key，因此仍能正常自动弹出。
+    if (document.body.dataset.ataRoleVerificationDismissed === key) return;
+    panel.dataset.ataAutoOpenedKey = key;
+
+    var modal = $('#advanced_modal');
+    if (!modal) return;
+    // 自动核验弹窗也必须记录底层页面位置，否则用户从弹窗底部点“完成”
+    // 时 closeAdvancedModal() 会回退到默认的 0，看起来像页面突然跳到顶部。
+    if (!document.body.classList.contains('modal-open')) {
+      openAdvancedModal();
+    }
+    modal.classList.add('show');
+    document.body.classList.add('modal-open');
+
+    // 等 Gradio / 浏览器完成一次布局后再在弹窗内部滚动，避免引发布局抖动。
+    window.setTimeout(function () {
+      var scroller = modal.querySelector('.modal-scroll');
+      if (!scroller) return;
+      var reviewTarget = roleGateActive() ? $('#role_parameter_table') : panel;
+      var panelRect = (reviewTarget || panel).getBoundingClientRect();
+      var scrollerRect = scroller.getBoundingClientRect();
+      var targetTop = scroller.scrollTop + panelRect.top - scrollerRect.top - 16;
+      scroller.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+    }, 180);
+  }
+
+  function bindRoleVerification() {
+    if (roleVerificationObserver === null) {
+      roleVerificationObserver = new MutationObserver(revealRoleVerification);
+      roleVerificationObserver.observe(document.body, {
+        subtree: true, childList: true, attributes: true,
+        attributeFilter: ['style', 'class']
+      });
+    }
+    revealRoleVerification();
+  }
+
+  function currentPageScroll() {
+    return window.scrollY || document.documentElement.scrollTop || 0;
+  }
+
+  // 经典“固定 body”滚动锁：弹窗打开期间把 body 钉在打开时的偏移上。
+  // 这样 Gradio 的任何重排/焦点切换都无法偷偷把底层页面顶回页首，
+  // 关闭时再按记录值原样还原（历史实现只靠 overflow:hidden，
+  // 布局变化后仍会出现“点完成整页回到顶部”）。
+  function lockPageScroll() {
+    var y = currentPageScroll();
+    document.body.dataset.ataModalScrollY = String(y);
+    document.body.dataset.ataUserScrolled = '0';
+    document.body.style.position = 'fixed';
+    document.body.style.top = (-y) + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  }
+
+  function unlockPageScroll() {
+    var y = Number(document.body.dataset.ataModalScrollY || '0');
+    if (!isFinite(y) || y < 0) y = 0;
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    return y;
+  }
+
+  function openAdvancedModal(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    var modal = $('#advanced_modal');
+    if (!modal) return;
+    // 自动核验可能重复调用这里；弹窗已打开时不能再次覆盖快照，
+    // 否则会把记录值覆盖成“锁定后”的偏移（恒为 0），关闭时跳回页首。
+    var alreadyLocked = document.body.classList.contains('modal-open');
+    if (!alreadyLocked) {
+      lockPageScroll();
+    }
+    modal.classList.add('show');
+    modal.style.setProperty('background-color', 'transparent', 'important');
+    modal.style.setProperty('--block-background-fill', 'transparent', 'important');
+    modal.style.setProperty('--group-background-fill', 'transparent', 'important');
+    document.body.classList.add('modal-open');
+    syncRoleGate();
+  }
+
+  // 只有“存在尚未人工确认、但已生成好的自动拆分剧本”时才拦一下“完成”按钮：
+  // 直接放行会掉进一个随后必然失败的状态（点开始生成才提示未确认）。
+  // 右上角 ✕ 仍然可以强制关闭，避免剧本校验始终不通过时把用户困在弹窗里。
+  function roleGateActive() {
+    var probe = document.getElementById('role_confirmation_probe');
+    if (!probe) return false;
+    if (probe.getAttribute('data-gate') !== '1') return false;
+    return probe.getAttribute('data-confirmed') !== '1';
+  }
+
+  // 自动拆分结果未确认时直接禁用“完成”按钮：既给出明确的视觉反馈，
+  // 也避免点击后仅看到提示却仍停留在原状态（并连带触发布局回弹）。
+  function syncRoleGate() {
+    var doneBtn = document.querySelector('#advanced_modal .modal-done');
+    if (!doneBtn) return;
+    if (roleGateActive()) {
+      if (!doneBtn.disabled) doneBtn.disabled = true;
+      if (doneBtn.getAttribute('aria-disabled') !== 'true') doneBtn.setAttribute('aria-disabled', 'true');
+      if (!doneBtn.classList.contains('is-gated')) doneBtn.classList.add('is-gated');
+      doneBtn.title = '自动拆分结果尚未人工确认，请先点击「确认剧本与角色参数」';
+    } else {
+      if (doneBtn.disabled) doneBtn.disabled = false;
+      if (doneBtn.hasAttribute('aria-disabled')) doneBtn.removeAttribute('aria-disabled');
+      if (doneBtn.classList.contains('is-gated')) doneBtn.classList.remove('is-gated');
+      doneBtn.removeAttribute('title');
+    }
+    var hint = document.getElementById('role_workflow_hint');
+    var probe = document.getElementById('role_confirmation_probe');
+    var message = roleGateActive()
+      ? '下一步：调整音色并试听，再点击「确认剧本与角色参数」。'
+      : (probe && probe.getAttribute('data-confirmed') === '1'
+        ? '已确认。下一步：返回生成页，点击「开始生成」。'
+        : '下一步：先生成剧本，或上传已有剧本。');
+    // observer 也监听子节点；仅在内容变化时写 DOM，防止自触发死循环。
+    if (hint && hint.textContent !== message) hint.textContent = message;
+    var gateHint = document.getElementById('role_gate_hint');
+    if (gateHint) {
+      var gateMessage = roleGateActive() ? '请先在第 3 步确认剧本与角色参数。' : '';
+      if (gateHint.textContent !== gateMessage) gateHint.textContent = gateMessage;
+      var display = gateMessage ? 'block' : 'none';
+      if (gateHint.style.display !== display) gateHint.style.display = display;
+    }
+  }
+
+  function showRoleGateHint() {
+    var hint = document.getElementById('role_gate_hint');
+    if (!hint) return;
+    hint.textContent = '自动拆分结果尚未人工确认：请先核对下方角色表并点击「确认剧本与角色参数」，再点“完成”。';
+    hint.style.display = 'block';
+    var modal = $('#advanced_modal');
+    var panel = document.getElementById('role_verification_panel');
+    if (modal && panel) {
+      var scroller = modal.querySelector('.modal-scroll');
+      if (scroller) {
+        var panelRect = panel.getBoundingClientRect();
+        var scrollerRect = scroller.getBoundingClientRect();
+        var targetTop = scroller.scrollTop + panelRect.top - scrollerRect.top - 16;
+        scroller.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+      }
+    }
+  }
+
+  function closeAdvancedModal(event) {
+    var forceClose = !!(event && event.currentTarget &&
+      event.currentTarget.classList &&
+      event.currentTarget.classList.contains('modal-close-btn'));
+    if (!forceClose && roleGateActive()) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      showRoleGateHint();
+      return;
+    }
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    var modal = $('#advanced_modal');
+    if (!modal) return;
+    var gateHint = document.getElementById('role_gate_hint');
+    if (gateHint) gateHint.style.display = 'none';
+    var verificationPanel = $('#role_verification_panel');
+    if (verificationPanel) {
+      var verificationKey = roleVerificationKey(verificationPanel);
+      if (verificationKey) {
+        document.body.dataset.ataRoleVerificationDismissed = verificationKey;
+      }
+    }
+    modal.classList.remove('show');
+    document.body.classList.remove('modal-open');
+    var savedScroll = unlockPageScroll();
+    var restoreScroll = function () {
+      if (document.body.classList.contains('modal-open')) return;
+      // 用户已经主动滚动时不再强行拉回，避免和用户操作打架。
+      if (document.body.dataset.ataUserScrolled === '1') return;
+      var top = Math.max(0, savedScroll);
+      if (Math.abs(currentPageScroll() - top) <= 2) return;
+      window.scrollTo({ top: top, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = top;
+      document.body.scrollTop = top;
+    };
+    // Gradio 关闭弹窗后会重建/重排部分组件（表格、Markdown、日志），
+    // 单次还原会被后续布局回跳覆盖；在 1s 内多点补几次，且一旦用户开始
+    // 滚动就立刻让位。
+    window.requestAnimationFrame(restoreScroll);
+    [60, 140, 280, 480, 800, 1100].forEach(function (delay) {
+      window.setTimeout(restoreScroll, delay);
+    });
+  }
+
+  window.openAdvancedModal = openAdvancedModal;
+  window.closeAdvancedModal = closeAdvancedModal;
+
   function bindInteractions() {
     if (document.body.dataset.ataInteractions === '1') return;
     document.body.dataset.ataInteractions = '1';
 
+    // 用户在页面（弹窗之外）主动滚动后，关闭弹窗的“还原页面位置”就让位，
+    // 避免和用户操作抢滚动。注意：弹窗内部的滚动 / 输入框打字都不算，
+    // 否则一次正常的弹窗内操作会导致关闭时页面停在顶部。
+    ['wheel', 'touchstart'].forEach(function (evt) {
+      window.addEventListener(evt, function (event) {
+        if (document.body.classList.contains('modal-open')) return;
+        var modal = document.getElementById('advanced_modal');
+        if (modal && event.target && modal.contains(event.target)) return;
+        document.body.dataset.ataUserScrolled = '1';
+      }, { passive: true });
+    });
+
     // 按钮：点击水波纹
     document.addEventListener('pointerdown', function (event) {
+      // 多角色模式是核心入口，单独做一次回弹 + 光晕反馈，和普通开关拉开层级。
+      var roleSwitch = event.target && event.target.closest && event.target.closest('.advanced-switch');
+      if (roleSwitch) {
+        roleSwitch.classList.remove('is-switching');
+        void roleSwitch.offsetWidth;
+        roleSwitch.classList.add('is-switching');
+        window.setTimeout(function () { roleSwitch.classList.remove('is-switching'); }, 560);
+      }
+
       var btn = event.target && event.target.closest && event.target.closest(
         '.btn-primary, .btn-ghost, .btn-mini, .btn-danger, .tab-nav button, .engine-tab');
       if (!btn || btn.disabled) return;
@@ -983,7 +2372,9 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + """
 
   function boot() {
     bindProgress();
+    bindRoleVerification();
     bindInteractions();
+    syncRoleGate();
   }
 
   // 供「开始生成」按钮的 js= 调用：平滑滚动到进度条
@@ -1129,6 +2520,51 @@ html, body {
 /* 注意：这里不能加 overflow: hidden——日志页的 xterm 终端在卡片内，
    被裁剪后会显得"日志显示不全"。圆角由伪元素的 border-radius: inherit 保证。 */
 .app-card { position: relative; }
+/* gradio_log 内部把终端高度写成 calc(100% - 10px)，没有扣掉上方文件信息行，
+   终端会向下溢出，再被组件自己的 overflow:hidden 裁掉最后一行。
+   这里不要继续估算信息行高度：外层改成纵向 flex，让终端自动占满剩余空间。
+
+   日志框按视口放大，但内部不能再叠加 64px/18px 两层底部留白：它们会参与
+   xterm 的高度测量，结果屏幕比 viewport 高一行，最后几行刚好被裁掉，同时
+   终端下方还会留下大片看起来“被挡住”的空带。底部安全距离统一交给卡片
+   padding 和 margin，日志框自身只保留 64px 的滚动余量。
+   高度再放宽一档：矮屏至少 1600px，随视口按 200vh 生长，高屏封顶 3000px；
+   配合卡片底部安全区，长日志滚到底也不会被裁掉最后几行。 */
+#run_log {
+  display: flex !important;
+  flex-direction: column !important;
+  height: clamp(1600px, 200vh, 3000px) !important;
+  min-height: 1600px !important;
+  padding-bottom: 64px !important;
+  box-sizing: border-box !important;
+  /* 不能让组件根节点裁切 xterm：gradio_log 的内部高度会随字体/版本变化。 */
+  overflow: visible !important;
+}
+.run-log-card {
+  padding-bottom: 96px !important;
+  margin-bottom: 128px !important;
+  overflow: visible !important;
+}
+#run_log > div:not(.wrap) {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+#run_log > div:not(.wrap) > span { flex: 0 0 auto !important; }
+#run_log > div:not(.wrap) > div:last-child {
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+#run_log .xterm,
+#run_log .xterm-viewport { height: 100% !important; }
+#run_log .xterm-viewport { padding-bottom: 0 !important; scrollbar-gutter: stable; }
 /* 卡片内容要盖在玻璃层之上 */
 .app-card > * { position: relative; z-index: 1; }
 /* Gradio 的 ul.options 虽然用 fixed + 超高 z-index，但仍受所在包装层的堆叠上下文约束。
@@ -1207,6 +2643,10 @@ ul.options::-webkit-scrollbar-thumb:hover { background: var(--ata-scroll-thumb-h
   color: var(--apple-text) !important;
 }
 .hero p { color: var(--apple-text-2); font-size: clamp(0.92rem, 2.6vw, 1.05rem); margin: 0 auto; max-width: 560px; line-height: 1.5; }
+/* 日志页的主动作是读终端：压缩说明区，把节省出的高度让给日志滚动区。 */
+.hero.logs-hero { padding: 4px 8px 10px; }
+.hero.logs-hero h1 { font-size: clamp(1.65rem, 3vw, 2rem) !important; margin-bottom: 6px !important; }
+.hero.logs-hero p { font-size: 0.94rem; line-height: 1.35; }
 
 /* ── 输入控件统一 ── */
 input, textarea, select {
@@ -1674,39 +3114,64 @@ body.modal-open::before {
 #advanced_modal .toggle-grid, #advanced_modal .wrap,
 #advanced_modal .component-wrapper, #advanced_modal .contain {
   background: transparent !important; border: none !important; box-shadow: none !important;
-  overflow: hidden !important; }
+}
+/* .modal-scroll 是纵向 flex 容器；Gradio 顶层块若允许收缩，会被压成几像素高，
+   随后 overflow:hidden 把整块内容裁掉。保留自然高度，让滚动发生在 .modal-scroll。 */
+#advanced_modal .modal-scroll > * {
+  flex: 0 0 auto !important;
+  min-height: auto !important;
+  overflow: visible !important;
+}
 #advanced_modal .styler { display: flex !important; align-items: center !important;
   justify-content: center !important; width: 100% !important; overflow: visible !important;
   max-height: 100% !important; min-height: 0 !important; }
-#advanced_modal .modal-box, #advanced_modal .modal-box .styler {
-  background: var(--apple-surface) !important; border: none !important;
+/* modal-box 只负责尺寸、圆角与玻璃壳；滚动交给显式的 .modal-scroll 子层。
+   这样滚动内容不会带动 ::before 玻璃背景，弹窗底部不会再露出未模糊的白色区域。 */
+#advanced_modal .modal-box {
+  position: relative !important; background: transparent !important; border: none !important;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 24px 80px rgba(0,0,0,0.28) !important;
-  border-radius: 22px !important; padding: 24px !important;
+  border-radius: 22px !important; padding: 0 !important;
   width: min(760px, 94vw) !important; max-width: 94vw !important;
-  max-height: 80vh !important; overflow-y: auto !important;
-  overflow-x: hidden !important;
-  overscroll-behavior: contain !important;
-  -webkit-overflow-scrolling: touch !important;
+  max-height: 80vh !important; overflow: hidden !important;
+  animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1);
+  display: flex !important; flex-direction: column !important;
 }
-/* modal-box 内层 wrapper：使用充足的底部 padding 避免最后一个元素被滚动视口裁切 */
-#advanced_modal .modal-box .styler { box-shadow: none !important; background: transparent !important;
-  overflow: visible !important; max-height: none !important; min-height: 0 !important;
-  padding: 4px 0 36px 0 !important; display: flex !important; flex-direction: column !important;
-  align-items: stretch !important; width: 100% !important; gap: 0 !important; }
-#advanced_modal .modal-box { background: var(--apple-surface) !important; animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1);
-  display: block !important; }
-/* 弹窗自身是滚动容器：原生滚动条的方块轨道会盖住右上/右下圆角，看起来右侧是直角。
-   把轨道改透明、上下各内缩一个圆角半径，滑块画成胶囊并限制在轨道内 → 四角恢复圆角。 */
-#advanced_modal .modal-box { scrollbar-width: thin;
-  scrollbar-color: var(--ata-scroll-thumb) transparent; }
-#advanced_modal .modal-box::-webkit-scrollbar { width: 8px; height: 8px; }
-#advanced_modal .modal-box::-webkit-scrollbar-track,
-#advanced_modal .modal-box::-webkit-scrollbar-corner { background: transparent; }
-#advanced_modal .modal-box::-webkit-scrollbar-track { margin-block: 22px; }
-#advanced_modal .modal-box::-webkit-scrollbar-thumb { border-radius: 999px;
+#advanced_modal .modal-scroll {
+  flex: 1 1 auto; width: 100%; min-height: 0; max-height: 80vh;
+  box-sizing: border-box; padding: 24px;
+  overflow-y: auto !important; overflow-x: hidden !important;
+  overscroll-behavior: contain !important; -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin; scrollbar-color: var(--ata-scroll-thumb) transparent;
+}
+#advanced_modal .modal-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+#advanced_modal .modal-scroll::-webkit-scrollbar-track,
+#advanced_modal .modal-scroll::-webkit-scrollbar-corner { background: transparent; }
+#advanced_modal .modal-scroll::-webkit-scrollbar-track { margin-block: 22px; }
+#advanced_modal .modal-scroll::-webkit-scrollbar-thumb { border-radius: 999px;
   background: var(--ata-scroll-thumb); }
-#advanced_modal .modal-box::-webkit-scrollbar-thumb:hover { background: var(--ata-scroll-thumb-hover); }
-@keyframes modalIn { from { opacity:0; transform: translateY(14px) scale(0.97); } to { opacity:1; transform:none; } }
+#advanced_modal .modal-scroll::-webkit-scrollbar-thumb:hover { background: var(--ata-scroll-thumb-hover); }
+/* Gradio 的 visible=False 分组第一次切成可见时，内部 Markdown 容器可能仍保留
+   初始的 0 高度；核验提示和确认按钮都在这个分组里，必须强制按内容撑开。 */
+#advanced_modal #role_verification_panel,
+#advanced_modal #role_verification_panel > .styler,
+#advanced_modal #role_verification_panel .block.hide-container {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+#advanced_modal #role_verification_panel {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  flex-direction: column !important;
+}
+#advanced_modal #role_verification_panel > .styler {
+  display: block !important;
+  width: 100% !important;
+}
+/* 只做透明度动画：不能在弹窗或祖先上引入 transform，否则 Gradio 的 fixed
+   下拉选项面板会把弹窗当成 containing block，展开位置会跑到页面顶部。 */
+@keyframes modalIn { from { opacity:0; } to { opacity:1; } }
 #advanced_modal .modal-header { display:flex !important; align-items:center !important; justify-content:space-between !important; margin-bottom:4px; }
 #advanced_modal .modal-title { font-size: clamp(1.05rem, 3vw, 1.25rem); font-weight:700; margin:0; color: var(--apple-text); }
 #advanced_modal .modal-desc { color: var(--apple-text-2); font-size:0.9rem; margin:0 0 14px; }
@@ -1715,7 +3180,298 @@ body.modal-open::before {
   background: var(--apple-surface-2) !important; border:none !important; color: var(--apple-text) !important; }
 /* 完成按钮底部预留安全边距，避免被视口下沿裁切 */
 #advanced_modal .modal-done { width: 100%; margin-top: 14px; margin-bottom: 8px; }
+/* 自动拆分结果未人工确认时，“完成”按钮置灰禁用，避免误退出后必须回头重做。 */
+#advanced_modal .modal-done[disabled],
+#advanced_modal .modal-done.is-gated {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  filter: saturate(0.6);
+}
+/* 人工确认状态载体：Gradio 的 display:none 会整个组件不渲染，所以用 1px 视觉隐藏。 */
+#role_confirmation_probe_host {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
 #advanced_modal .modal-trigger { width:100%; }
+
+/* ── 高级设置：分区卡片与固定操作栏 ── */
+#advanced_modal .modal-header-wrap,
+#advanced_modal .modal-footer-wrap { flex: 0 0 auto !important; padding: 0 !important; margin: 0 !important; }
+#advanced_modal .modal-header-wrap .html-container,
+#advanced_modal .modal-footer-wrap .html-container,
+#advanced_modal .advanced-section .html-container { padding: 0 !important; }
+#advanced_modal .modal-header {
+  display: flex !important; align-items: flex-start !important; justify-content: space-between !important;
+  gap: 16px; padding: 20px 24px 16px; margin: 0;
+  border-bottom: 1px solid var(--apple-border-soft);
+  background: var(--ata-glass-modal);
+}
+#advanced_modal .modal-title { font-size: clamp(1.05rem, 3vw, 1.25rem); font-weight: 700; margin: 0; color: var(--apple-text); }
+#advanced_modal .modal-subtitle { margin: 3px 0 0; color: var(--apple-text-3); font-size: 0.8rem; line-height: 1.45; }
+#advanced_modal .modal-close-btn {
+  width: 34px !important; height: 34px !important; min-width: 34px !important;
+  border-radius: 50% !important; padding: 0 !important; font-size: 1.05rem;
+  background: var(--apple-surface-2) !important; border: 1px solid var(--apple-border-soft) !important;
+  color: var(--apple-text) !important; cursor: pointer;
+}
+#advanced_modal .modal-scroll { max-height: none !important; padding: 18px 24px 16px; }
+#advanced_modal .advanced-section {
+  background: var(--ata-glass-soft) !important;
+  border: 1px solid var(--apple-border-soft) !important;
+  border-radius: 18px !important;
+  padding: 18px !important;
+  margin: 0 0 14px !important;
+  box-shadow: inset 0 1px 0 var(--ata-glass-edge), 0 8px 28px rgba(0,0,0,0.035) !important;
+  overflow: visible !important;
+}
+#advanced_modal .advanced-section .styler { gap: 12px !important; }
+#advanced_modal .advanced-section .styler,
+#advanced_modal .advanced-section .gr-group {
+  align-items: stretch !important; justify-content: flex-start !important;
+  min-width: 0 !important; max-width: 100% !important; width: 100% !important;
+  height: auto !important; max-height: none !important;
+}
+#advanced_modal .advanced-section-head { display: flex; align-items: flex-start; gap: 12px; margin: 0 0 14px; }
+#advanced_modal .advanced-section-badge {
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--apple-blue) 0%, var(--apple-indigo) 100%);
+  color: #fff; font-size: 0.8rem; font-weight: 700;
+  box-shadow: 0 5px 14px rgba(94,92,230,0.25);
+}
+#advanced_modal .advanced-section-copy { min-width: 0; }
+#advanced_modal .advanced-section-copy h3 { margin: 0; font-size: 1rem; line-height: 1.25; }
+#advanced_modal .advanced-section-copy p { margin: 4px 0 0; color: var(--apple-text-3); font-size: 0.82rem; line-height: 1.5; }
+#advanced_modal .advanced-subsection-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  margin: 17px 0 10px; padding-top: 15px; border-top: 1px solid var(--apple-border-soft);
+}
+#advanced_modal .advanced-subsection-head h4 { margin: 0; font-size: 0.9rem; line-height: 1.3; }
+#advanced_modal .advanced-subsection-head p { margin: 3px 0 0; color: var(--apple-text-3); font-size: 0.79rem; line-height: 1.45; }
+#advanced_modal .advanced-pill {
+  flex: 0 0 auto; display: inline-flex; align-items: center; min-height: 24px; padding: 3px 9px;
+  border-radius: 999px; background: var(--apple-blue-soft); color: var(--apple-blue);
+  font-size: 0.72rem; font-weight: 650; white-space: nowrap;
+}
+#advanced_modal .advanced-pill-success { background: var(--ata-ready-bg); color: var(--ata-ready-title); }
+#advanced_modal .advanced-pill-warn { background: var(--ata-warn-bg); color: var(--apple-amber); }
+#advanced_modal .advanced-verification-head {
+  margin: 14px 0 10px; padding: 14px 16px; border: 1px solid var(--ata-ready-border);
+  border-radius: 14px; background: var(--ata-ready-bg);
+}
+#advanced_modal .advanced-verification-head h4 { margin: 7px 0 0; color: var(--ata-ready-title); font-size: 0.92rem; }
+#advanced_modal .advanced-verification-head p { margin: 3px 0 0; color: var(--ata-ready-text); font-size: 0.79rem; line-height: 1.45; }
+/* 字段行统一成两列等宽网格：Gradio Row 的 flex + scale 会让两列宽窄不一、
+   有 info 文案的控件比隔壁高半行，label 高低不齐。网格 + 顶部对齐后，左侧 label
+   与右侧 label 始终同一水平线，输入框也等宽。 */
+#advanced_modal .advanced-field-row {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: start !important;
+  gap: 12px 14px !important;
+  margin-top: 2px !important;
+}
+#advanced_modal .advanced-field-row > * { min-width: 0 !important; max-width: 100% !important; }
+#advanced_modal .advanced-field-row .form,
+#advanced_modal .advanced-field-row .block { min-width: 0 !important; max-width: 100% !important; }
+#advanced_modal .advanced-field-row input,
+#advanced_modal .advanced-field-row textarea,
+#advanced_modal .advanced-field-row .wrap { max-width: 100% !important; }
+/* 操作按钮做成等宽、右对齐的按钮组：按钮不再一大一小、也不左右乱贴 */
+#advanced_modal .advanced-action-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: stretch !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  margin-top: 8px !important;
+}
+#advanced_modal .advanced-action-row button {
+  flex: 0 1 172px !important;
+  min-width: 148px !important;
+  min-height: 40px !important;
+  white-space: nowrap;
+}
+/* 试听行：下拉占左列，按钮与输入控件底边对齐（不是与整行顶部对齐） */
+#advanced_modal .advanced-preview-row { align-items: end !important; }
+#advanced_modal .role-step-head { justify-content: flex-start; gap: 10px; margin-top: 24px; }
+#advanced_modal .role-step-number {
+  flex: 0 0 auto; width: 26px; height: 26px; display: inline-flex;
+  align-items: center; justify-content: center; border-radius: 50%;
+  background-color: var(--apple-blue-soft); color: var(--apple-blue); font-weight: 600;
+}
+#advanced_modal .role-workflow-hint {
+  color: var(--apple-text); font-size: 0.86rem; line-height: 1.6;
+  padding: 10px 0; margin: 0; border-bottom: 1px solid var(--apple-border-soft);
+}
+#advanced_modal .role-details { background-color: transparent !important; margin: 8px 0 !important; }
+#advanced_modal .role-details > .label-wrap { color: var(--apple-text-2); }
+#advanced_modal #role_parameter_table { min-width: 0 !important; width: 100% !important; }
+#advanced_modal #role_parameter_table .table-wrap { overflow-x: auto !important; }
+#advanced_modal #role_parameter_table table { min-width: 1040px; }
+#advanced_modal #role_config_panel,
+#advanced_modal #role_config_panel > .styler,
+#advanced_modal #role_verification_panel {
+  min-width: 0 !important; width: 100% !important; max-width: 100% !important;
+  align-items: stretch !important;
+}
+#advanced_modal #role_config_panel > .styler > * {
+  min-width: 0 !important; max-width: 100% !important; width: 100%;
+}
+#advanced_modal #role_split_btn { margin: 4px 0 8px; }
+#advanced_modal .role-summary { max-height: 240px; overflow-y: auto !important; }
+#advanced_modal .role-details button:focus-visible,
+#advanced_modal #role_confirm_btn:focus-visible,
+#advanced_modal #role_split_btn:focus-visible {
+  outline: 2px solid var(--apple-blue) !important; outline-offset: 3px;
+}
+#advanced_modal .advanced-preview-row button { align-self: end !important; }
+/* 「显示 DeepSeek API Key」只是辅助开关，收成内联小胶囊，不再占一整行 */
+#advanced_modal .toggle.advanced-compact-toggle {
+  width: fit-content !important;
+  max-width: 100% !important;
+  padding: 6px 12px !important;
+  margin: -6px 0 4px !important;
+  border-radius: 999px !important;
+  background: var(--ata-glass-soft) !important;
+}
+#advanced_modal .toggle.advanced-compact-toggle label { font-size: 0.8rem !important; }
+#advanced_modal .toggle.advanced-compact-toggle label::before {
+  width: 30px !important; height: 18px !important; margin-right: 9px !important;
+}
+#advanced_modal .toggle.advanced-compact-toggle label::after {
+  width: 13px !important; height: 13px !important; left: 2.5px !important;
+}
+#advanced_modal .toggle.advanced-compact-toggle label:has(input:checked)::after {
+  transform: translate(12px, -50%) !important;
+}
+#advanced_modal .advanced-note { margin: 0 0 2px; }
+#advanced_modal .advanced-toggle-grid { margin-top: 2px; }
+#advanced_modal .modal-footer {
+  display: flex !important; align-items: center !important; justify-content: space-between !important;
+  gap: 14px; padding: 14px 24px 18px; margin: 0;
+  border-top: 1px solid var(--apple-border-soft); background: var(--ata-glass-modal);
+}
+#advanced_modal .modal-footer-copy { flex: 1 1 auto; min-width: 0; }
+#advanced_modal .modal-footer-hint { margin: 0; color: var(--apple-text-3); font-size: 0.8rem; }
+#advanced_modal .modal-footer-gate {
+  margin: 6px 0 0; color: var(--apple-amber); font-size: 0.79rem; line-height: 1.45; font-weight: 600;
+}
+#advanced_modal .modal-footer .modal-done { flex: 0 0 176px; width: 176px; margin: 0 !important; }
+
+/* 多角色模式：独立于普通开关的主功能入口，使用蓝色强调、左侧标线和点击回弹。 */
+#advanced_modal .toggle.advanced-switch {
+  position: relative !important;
+  overflow: hidden !important;
+  padding: 16px 18px 16px 20px !important;
+  border: 1px solid rgba(0, 113, 227, 0.24) !important;
+  border-radius: 16px !important;
+  background-color: var(--apple-surface-2) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34), 0 7px 20px rgba(0, 113, 227, 0.07) !important;
+  text-align: left !important;
+  transform-origin: center center;
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.24s ease, background-color 0.24s ease, box-shadow 0.24s ease !important;
+}
+#advanced_modal .toggle.advanced-switch::before {
+  content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px;
+  border-radius: 0 8px 8px 0; background-color: var(--apple-blue);
+  opacity: 0.48; transition: opacity 0.24s ease, box-shadow 0.24s ease;
+}
+#advanced_modal .toggle.advanced-switch::after {
+  content: ''; position: absolute; right: -34px; top: -50px; width: 132px; height: 132px;
+  border-radius: 50%; pointer-events: none; opacity: 0.5;
+  background: radial-gradient(circle, rgba(94, 92, 230, 0.2), transparent 68%);
+  transition: opacity 0.24s ease, transform 0.24s ease;
+}
+#advanced_modal .toggle.advanced-switch:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0, 113, 227, 0.48) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 10px 26px rgba(0, 113, 227, 0.13) !important;
+}
+#advanced_modal .toggle.advanced-switch label {
+  position: relative; z-index: 1; justify-content: flex-start !important;
+  width: 100% !important; font-weight: 650 !important; letter-spacing: -0.008em;
+}
+#advanced_modal .toggle.advanced-switch label::before {
+  width: 48px !important; height: 26px !important; margin-right: 13px !important;
+  background-color: rgba(120, 120, 128, 0.26) !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.07) !important;
+}
+#advanced_modal .toggle.advanced-switch label::after {
+  left: 4px !important; width: 20px !important; height: 20px !important;
+  background: #fff !important;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
+  transition: transform 0.36s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+#advanced_modal .toggle.advanced-switch label:has(input:checked)::before {
+  background-color: var(--apple-blue) !important;
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+}
+#advanced_modal .toggle.advanced-switch label:has(input:checked)::after {
+  transform: translate(22px, -50%) !important;
+}
+#advanced_modal .toggle.advanced-switch:has(input:checked) {
+  border-color: rgba(0, 113, 227, 0.52) !important;
+  background-color: var(--apple-blue-soft) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 10px 28px rgba(0, 113, 227, 0.16) !important;
+}
+#advanced_modal .toggle.advanced-switch:has(input:checked)::before {
+  opacity: 1; box-shadow: 0 0 12px rgba(0, 113, 227, 0.55);
+}
+#advanced_modal .toggle.advanced-switch:has(input:checked)::after { opacity: 0.9; }
+#advanced_modal .toggle.advanced-switch.is-switching {
+  animation: advancedSwitchPress 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#advanced_modal .toggle.advanced-switch.is-switching::after {
+  animation: advancedSwitchGlow 0.52s ease-out;
+}
+@keyframes advancedSwitchPress {
+  0% { transform: scale(1); }
+  28% { transform: scale(0.975); }
+  58% { transform: scale(1.012); }
+  100% { transform: scale(1); }
+}
+@keyframes advancedSwitchGlow {
+  0% { opacity: 0.35; transform: scale(0.72); }
+  65% { opacity: 0.95; transform: scale(1.08); }
+  100% { opacity: 0.7; transform: scale(1); }
+}
+:root:root .dark #advanced_modal .toggle.advanced-switch,
+:root:root.dark #advanced_modal .toggle.advanced-switch {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+}
+:root:root .dark #advanced_modal .toggle.advanced-switch:has(input:checked),
+:root:root.dark #advanced_modal .toggle.advanced-switch:has(input:checked) {
+  background-color: rgba(64, 156, 255, 0.23) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 28px rgba(0, 0, 0, 0.32) !important;
+}
+@media (max-width: 560px) {
+  #advanced_modal .modal-header { padding: 16px 16px 13px; }
+  #advanced_modal .modal-scroll { padding: 14px 14px 12px; }
+  #advanced_modal .advanced-section { padding: 15px !important; border-radius: 16px !important; }
+  #advanced_modal .advanced-field-row {
+    grid-template-columns: 1fr !important;
+    align-items: stretch !important;
+  }
+  #advanced_modal .advanced-action-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  #advanced_modal .advanced-action-row button { flex: 1 1 auto !important; width: 100% !important; }
+  #advanced_modal .modal-footer { padding: 12px 14px 14px; }
+  #advanced_modal .modal-footer-hint { display: none; }
+  #advanced_modal .modal-footer .modal-done { flex: 1 1 auto; width: 100%; }
+}
 
 /* 大屏：放宽内容列宽，避免超宽屏拉伸 */
 @media (min-width: 1200px) {
@@ -1847,7 +3603,7 @@ def host_ui(config):
                         chapter_start = gr.Slider(minimum=1, maximum=100, step=1, label="起始章节页码", value=1, interactive=True)
                         chapter_end = gr.Slider(minimum=-1, maximum=100, step=1, label="结束章节页码", value=-1, info="-1 代表处理至最后一章", interactive=True)
                     gr.HTML('<div class="section-divider"></div>')
-                    gr.HTML('<button class="btn-ghost modal-trigger" onclick="var m=document.querySelector(\'#advanced_modal\');m.classList.add(\'show\');m.style.setProperty(\'background-color\',\'transparent\',\'important\');m.style.setProperty(\'--block-background-fill\',\'transparent\',\'important\');m.style.setProperty(\'--group-background-fill\',\'transparent\',\'important\');document.body.classList.add(\'modal-open\')" style="width:100%;padding:12px;border-radius:14px;font-size:1rem;cursor:pointer;">⚙\u00a0\u00a0高级设置</button>')
+                    gr.HTML('<button type="button" class="btn-ghost modal-trigger" onclick="openAdvancedModal(event)" style="width:100%;padding:12px;border-radius:14px;font-size:1rem;cursor:pointer;">⚙\u00a0\u00a0高级设置</button>')
 
                 # —— Step 2 引擎 ——
                 with gr.Group(elem_classes="app-card"):
@@ -2078,24 +3834,253 @@ def host_ui(config):
                 # —— 高级设置弹窗（纯客户端控制；默认 display:none，JS 切换 .show） ——
                 with gr.Group(elem_classes="modal-overlay", elem_id="advanced_modal") as advanced_modal:
                     with gr.Column(elem_classes="modal-box"):
-                        gr.HTML('<div class="modal-header"><p class="modal-title">高级设置</p><button class="modal-close-btn" onclick="document.querySelector(\'#advanced_modal\').classList.remove(\'show\');document.body.classList.remove(\'modal-open\')">✕</button></div>')
-                        gr.HTML('<p class="modal-desc">生成开关、解析模式、文本替换等进阶选项。</p>')
-                        gr.HTML('<p class="card-sub-title">生成选项</p>')
-                        with gr.Group(elem_classes="toggle-grid"):
-                            output_text = gr.Checkbox(label="同步导出章节纯文本", value=saved["output_text"], elem_classes="toggle")
-                            preview = gr.Checkbox(label="预解析模式（不消耗额度）", value=saved["preview"], elem_classes="toggle")
-                            remove_endnotes = gr.Checkbox(label="剔除书末尾注", value=saved["remove_endnotes"], elem_classes="toggle")
-                            remove_reference_numbers = gr.Checkbox(label="清理数字文献引用", value=saved["remove_reference_numbers"], elem_classes="toggle")
-                        with gr.Row():
-                            worker_count = gr.Slider(minimum=1, maximum=8, step=1, label="并行线程数", value=1, info="多线程加速，依配置微调")
-                            log_level = gr.Dropdown(["INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"], label="日志级别", value="INFO")
-                        gr.HTML('<div class="section-divider"></div>')
-                        gr.HTML('<p class="card-sub-title">解析设置</p>')
-                        with gr.Row():
-                            title_mode = gr.Dropdown(["auto", "tag_text", "first_few"], label="章节标题匹配模式", value="auto", interactive=True)
-                            new_line_mode = gr.Dropdown(["single", "double", "none"], label="段落换行检测模式", value="double", interactive=True)
-                        search_and_replace_file = gr.File(label="文本替换规则文件 (.txt，可选)", file_types=[".txt"], file_count="single", interactive=True, elem_classes="rules-file-upload")
-                        gr.HTML('<button class="btn-primary modal-done" onclick="document.querySelector(\'#advanced_modal\').classList.remove(\'show\');document.body.classList.remove(\'modal-open\')" style="width:100%;margin-top:14px;padding:12px;border-radius:14px;font-size:1rem;cursor:pointer;">完成</button>')
+                        gr.HTML('''
+<div class="modal-header">
+  <div>
+    <p class="modal-title">高级设置</p>
+    <p class="modal-subtitle">集中配置多角色剧本、生成行为和章节解析。</p>
+  </div>
+  <button type="button" class="modal-close-btn" aria-label="关闭高级设置" onclick="closeAdvancedModal(event)">✕</button>
+</div>''', elem_classes="modal-header-wrap")
+                        with gr.Column(elem_classes="modal-scroll"):
+                            gr.HTML('<p class="modal-desc">修改会在点击“开始生成”时随表单一并生效。</p>')
+
+                            with gr.Group(elem_classes="advanced-section"):
+                                gr.HTML('''
+<div class="advanced-section-head">
+  <span class="advanced-section-badge">1</span>
+  <div class="advanced-section-copy">
+    <h3>多角色剧本</h3>
+    <p>为旁白和不同人物分配音色。支持 MiMo / MiniMax，每次处理一本书。</p>
+  </div>
+</div>''')
+                                role_mode = gr.Checkbox(
+                                    label="启用多角色分段模式（MiMo / MiniMax，单本书）",
+                                    value=False,
+                                    elem_classes="toggle advanced-switch",
+                                    elem_id="role_mode_toggle",
+                                )
+                                with gr.Group(visible=False, elem_id="role_config_panel") as role_config_panel:
+                                    gr.HTML('<p id="role_workflow_hint" class="role-workflow-hint" role="status" aria-live="polite">下一步：先生成剧本，或上传已有剧本。</p>')
+                                    gr.HTML('''
+<div class="advanced-subsection-head role-step-head">
+  <span class="role-step-number">1</span>
+  <div><h4>准备剧本</h4><p>先在生成页上传一本书并选择 MiMo 或 MiniMax，再生成剧本。已有剧本可直接上传。</p></div>
+</div>''')
+                                    with gr.Accordion("DeepSeek 连接配置（首次使用）", open=False, elem_classes="role-details"):
+                                        gr.Markdown("自动拆分需要 DeepSeek API Key；已保存配置会自动读取。")
+                                        deepseek_api_key = gr.Textbox(
+                                            label="DeepSeek API Key",
+                                            placeholder="请输入 DeepSeek API Key",
+                                            type="password",
+                                        )
+                                        deepseek_show_key = gr.Checkbox(
+                                            label="显示 DeepSeek API Key",
+                                            value=False,
+                                            elem_classes="toggle advanced-compact-toggle",
+                                        )
+                                        deepseek_api_key_display = gr.HTML("")
+                                        with gr.Row(elem_classes="advanced-field-row"):
+                                            deepseek_base_url = gr.Textbox(
+                                                label="DeepSeek Base URL",
+                                                value=DEEPSEEK_DEFAULT_BASE_URL,
+                                                placeholder="https://api.deepseek.com",
+                                                scale=1,
+                                            )
+                                            deepseek_model = gr.Textbox(
+                                                label="DeepSeek Model",
+                                                value=DEEPSEEK_DEFAULT_MODEL,
+                                                placeholder="deepseek-chat",
+                                                scale=1,
+                                            )
+                                        with gr.Row(elem_classes="advanced-action-row"):
+                                            deepseek_test_btn = gr.Button(
+                                                "🔍 测试 DeepSeek 连接", elem_classes="btn-ghost"
+                                            )
+                                            deepseek_save_btn = gr.Button(
+                                                "💾 保存 DeepSeek 配置", elem_classes="btn-primary"
+                                            )
+                                        deepseek_msg = gr.HTML("")
+                                    auto_role_split = gr.Checkbox(
+                                        label="上传书籍后自动调用 DeepSeek 拆分角色",
+                                        value=False, elem_classes="toggle",
+                                        elem_id="auto_role_split_toggle",
+                                    )
+                                    role_regenerate_btn = gr.Button(
+                                        "生成 / 重新拆分剧本", elem_classes="btn-primary", elem_id="role_split_btn"
+                                    )
+                                    with gr.Accordion("上传或下载剧本 JSON", open=False, elem_classes="role-details"):
+                                        role_script_file = gr.File(
+                                            label="RoleScriptV1 JSON（自动拆分或手动上传）",
+                                            file_types=[".json"], file_count="single", type="filepath", interactive=True,
+                                        )
+                                    gr.HTML('''
+<div class="advanced-subsection-head role-step-head">
+  <span class="role-step-number">2</span>
+  <div><h4>调整角色并试听</h4><p>MiMo 编辑 voice，MiniMax 编辑 voice_id。speed 是倍率：小于 1 更慢，大于 1 更快；不修改角色 ID。</p></div>
+</div>''')
+                                    role_validation_summary = gr.Markdown("**请上传或自动生成剧本 JSON 后校验**")
+                                    role_table = gr.Dataframe(
+                                        headers=ROLE_TABLE_HEADERS,
+                                        datatype=["str", "str", "str", "str", "number", "str", "number", "number"],
+                                        value=[],
+                                        label="角色参数表（可编辑音色、语速、instructions 等）",
+                                        interactive=True,
+                                        wrap=False,
+                                        max_height=300,
+                                        column_widths=[120, 100, 100, 170, 90, 280, 80, 80],
+                                        elem_id="role_parameter_table",
+                                        show_fullscreen_button=True,
+                                    )
+                                    role_split_confirmed = gr.State(False)
+                                    role_split_generated = gr.State(False)
+                                    role_confirmed_signature = gr.State("")
+                                    # 只作为前端读取的人工确认状态载体（不承载剧本内容），
+                                    # 供 closeAdvancedModal 判断能否放行“完成”。
+                                    # 不能使用 visible=False：Gradio 前端不会渲染该组件，
+                                    # MutationObserver / closeAdvancedModal 都读不到
+                                    # #role_confirmation_probe，门禁会恒为“已确认”。
+                                    # 这里保持可见，用 CSS 做 1px 视觉隐藏。
+                                    role_confirmation_probe_host = gr.HTML(
+                                        "", elem_id="role_confirmation_probe_host"
+                                    )
+
+                                    with gr.Row(elem_classes="advanced-field-row advanced-preview-row"):
+                                        role_preview_role = gr.Dropdown(
+                                            choices=[],
+                                            label="试听角色",
+                                            interactive=True,
+                                            allow_custom_value=False,
+                                        )
+                                        role_preview_btn = gr.Button(
+                                            "🎧 试听该角色", elem_classes="btn-ghost"
+                                        )
+                                    role_preview_text = gr.Textbox(
+                                        label="试听文本",
+                                        value="傍晚的风轻轻吹过窗边，远处的灯光逐渐亮起。我们停下脚步，认真听完了这个温暖而平静的故事。",
+                                        lines=2,
+                                        interactive=True,
+                                    )
+                                    role_preview_audio = gr.Audio(
+                                        label="角色试听", type="filepath", interactive=False
+                                    )
+
+                                    with gr.Accordion("MiMo 音色间语速校准", open=False, elem_classes="role-details"):
+                                        gr.Markdown("先把旁白 speed 调到合适的节奏，再校准。将为每个角色调用一次 MiMo，用上方同一段试听文本（20～400 字）测量时长并回填倍率；没有旁白时以首个角色为基准。校准后再试听确认。")
+                                        role_calibrate_btn = gr.Button("以旁白为基准校准语速", elem_classes="btn-ghost")
+                                        role_calibration_status = gr.Markdown("尚未校准；可先试听，音色间快慢明显时再使用。")
+                                    gr.HTML('''
+<div class="advanced-subsection-head role-step-head">
+  <span class="role-step-number">3</span>
+  <div><h4>确认剧本并返回生成</h4><p>核对角色分配和章节摘要，确认当前参数后，返回生成页点击「开始生成」。修改参数后需要重新确认。</p></div>
+</div>''')
+                                    with gr.Group(
+                                        visible=False, elem_id="role_verification_panel"
+                                    ) as role_verification_panel:
+                                        gr.HTML('''
+<div class="advanced-verification-head">
+  <h4>剧本摘要</h4>
+  <p>检查下方摘要；音色和语速在上一步调整。</p>
+</div>''')
+                                        role_verification_summary = gr.Markdown("", elem_classes="role-summary")
+                                        with gr.Row(elem_classes="advanced-action-row"):
+                                            role_confirm_btn = gr.Button(
+                                                "确认剧本与角色参数", elem_classes="btn-primary", elem_id="role_confirm_btn"
+                                            )
+
+                                    with gr.Accordion("补充音色目录（可选）", open=False, elem_classes="role-details"):
+                                        gr.Markdown("内置音色可直接使用。需要补充官网音色时，在此导入文档，再重新拆分剧本。")
+                                        voice_catalog_file = gr.File(
+                                            label="上传 TTS 官网音色说明文档",
+                                            file_types=_VOICE_CATALOG_FILE_TYPES,
+                                            file_count="single",
+                                            type="filepath",
+                                            interactive=True,
+                                        )
+                                        voice_catalog_text = gr.TextArea(
+                                            label="或直接粘贴官网音色说明",
+                                            placeholder="支持 JSON、CSV、Markdown/文本表格，以及 voice_id | 名称 | 语言 | 性别 | 说明；文件优先于粘贴内容。",
+                                            lines=5,
+                                            interactive=True,
+                                        )
+                                        with gr.Row(elem_classes="advanced-field-row"):
+                                            voice_catalog_provider = gr.Dropdown(
+                                                choices=list(_VOICE_CATALOG_PROVIDERS),
+                                                value="自动识别",
+                                                label="文档对应的 TTS Provider",
+                                                interactive=True,
+                                            )
+                                            voice_catalog_language = gr.Dropdown(
+                                                choices=list(_VOICE_CATALOG_LANGUAGES),
+                                                value="自动识别",
+                                                label="文档默认语言",
+                                                interactive=True,
+                                            )
+                                        with gr.Row(elem_classes="advanced-action-row"):
+                                            voice_catalog_clear_btn = gr.Button(
+                                                "🧹 清空用户音色目录", elem_classes="btn-ghost"
+                                            )
+                                            voice_catalog_import_btn = gr.Button(
+                                                "📥 解析并保存音色目录", elem_classes="btn-primary"
+                                            )
+                                        voice_catalog_status = gr.Markdown(
+                                            _voice_catalog_overview_markdown(),
+                                            elem_id="voice_catalog_status",
+                                        )
+                                    with gr.Accordion("剧本匹配与容错（可选）", open=False, elem_classes="role-details"):
+                                        with gr.Group(elem_classes="toggle-grid advanced-toggle-grid"):
+                                            allow_role_text_override = gr.Checkbox(
+                                                label="允许剧本文本覆盖书籍正文", value=False, elem_classes="toggle"
+                                            )
+                                            allow_role_title_mismatch = gr.Checkbox(
+                                                label="允许章节标题不匹配", value=False, elem_classes="toggle"
+                                            )
+                                            allow_role_fallback = gr.Checkbox(
+                                                label="允许缺失角色回退到 narrator / 全局配置",
+                                                value=False,
+                                                elem_classes="toggle",
+                                            )
+
+                            with gr.Group(elem_classes="advanced-section"):
+                                gr.HTML('''
+<div class="advanced-section-head">
+  <span class="advanced-section-badge">2</span>
+  <div class="advanced-section-copy">
+    <h3>生成选项</h3>
+    <p>控制导出内容、预解析、并行度和日志详细程度。</p>
+  </div>
+</div>''')
+                                with gr.Group(elem_classes="toggle-grid advanced-toggle-grid"):
+                                    output_text = gr.Checkbox(label="同步导出章节纯文本", value=saved["output_text"], elem_classes="toggle")
+                                    preview = gr.Checkbox(label="预解析模式（不消耗额度）", value=saved["preview"], elem_classes="toggle")
+                                    remove_endnotes = gr.Checkbox(label="剔除书末尾注", value=saved["remove_endnotes"], elem_classes="toggle")
+                                    remove_reference_numbers = gr.Checkbox(label="清理数字文献引用", value=saved["remove_reference_numbers"], elem_classes="toggle")
+                                with gr.Row(elem_classes="advanced-field-row"):
+                                    worker_count = gr.Slider(minimum=1, maximum=8, step=1, label="并行线程数", value=1, info="多线程加速，依配置微调")
+                                    log_level = gr.Dropdown(["INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"], label="日志级别", value="INFO")
+
+                            with gr.Group(elem_classes="advanced-section"):
+                                gr.HTML('''
+<div class="advanced-section-head">
+  <span class="advanced-section-badge">3</span>
+  <div class="advanced-section-copy">
+    <h3>解析设置</h3>
+    <p>调整章节标题匹配、段落换行检测和文本替换规则。</p>
+  </div>
+</div>''')
+                                with gr.Row(elem_classes="advanced-field-row"):
+                                    title_mode = gr.Dropdown(["auto", "tag_text", "first_few"], label="章节标题匹配模式", value="auto", interactive=True)
+                                    new_line_mode = gr.Dropdown(["single", "double", "none"], label="段落换行检测模式", value="double", interactive=True)
+                                search_and_replace_file = gr.File(label="文本替换规则文件 (.txt，可选)", file_types=[".txt"], file_count="single", interactive=True, elem_classes="rules-file-upload")
+
+                        gr.HTML('''
+<div class="modal-footer">
+  <div class="modal-footer-copy">
+    <p class="modal-footer-hint">返回生成页后，点击「开始生成」应用当前设置。</p>
+    <p class="modal-footer-gate" id="role_gate_hint" role="alert" style="display:none;"></p>
+  </div>
+  <button type="button" class="btn-primary modal-done" onclick="closeAdvancedModal(event)">返回生成页</button>
+</div>''', elem_classes="modal-footer-wrap")
 
                 # —— CTA ——
                 with gr.Row(elem_classes="row-cta"):
@@ -2134,16 +4119,20 @@ def host_ui(config):
 
             # ════════════ 日志页 ════════════
             with gr.Tab("日志", id="tab_logs"):
-                gr.HTML('<div class="hero"><h1>运行日志</h1><p>实时查看转换进度与详细信息。</p></div>')
-                with gr.Group(elem_classes="app-card"):
+                gr.HTML('<div class="hero logs-hero"><h1>运行日志</h1><p>实时查看转换进度与详细信息。</p></div>')
+                with gr.Group(elem_classes="app-card run-log-card"):
                     global webui_log_file
                     # 固定成绝对路径：进度解析与日志组件都用同一份文件，不受工作目录变化影响
                     webui_log_file = generate_unique_log_path("EtA_WebUI").resolve()
                     webui_log_file.touch()
                     # tail 默认只有 100：页面在生成中途打开/刷新时只能看到最后 100 行，
-                    # 看起来就像"日志不全"。这里放宽到 800 行，并同步加大终端回滚缓冲。
-                    Log(str(webui_log_file), dark=False, xterm_font_size=12,
-                        tail=800, xterm_scrollback=2000)
+                    # 看起来就像"日志不全"。这里放宽到 2000 行，并同步加大终端回滚缓冲。
+                    # height 同时包含顶部文件信息行；默认 240px 会让 xterm 底部被裁切。
+                    # CSS 会把可视高度限制在 1600~3000px（优先 200vh），并回收
+                    # xterm 内层多余留白，让终端在当前视口内尽可能大且不裁底。
+                    Log(str(webui_log_file), dark=False, height=2800, xterm_font_size=12,
+                        elem_id="run_log",
+                        tail=3000, xterm_scrollback=8000)
 
             # ════════════ 设置页 ════════════
             with gr.Tab("⚙️ 设置", id="tab_settings"):
@@ -2201,7 +4190,7 @@ def host_ui(config):
                                 qwen_test_btn = gr.Button("🔍 测试连接", elem_classes="btn-ghost")
                                 qwen_save_btn = gr.Button("💾 保存配置", elem_classes="btn-primary")
                             qwen_msg = gr.HTML("")
-                
+
                 # 修改密码区域
                 with gr.Group(visible=False, elem_classes="app-card") as password_card:
                     gr.HTML('<p class="card-title"><span class="card-num">🔒</span>修改密码</p>')
@@ -2225,6 +4214,155 @@ def host_ui(config):
             _tab.select(fn=lambda n=_id: n,
                         inputs=None, outputs=provider_state, show_progress="hidden",
                         js=_js)
+
+        role_mode.change(
+            fn=lambda enabled: gr.update(visible=bool(enabled)),
+            inputs=role_mode,
+            outputs=role_config_panel,
+            show_progress="hidden",
+        )
+        voice_catalog_import_btn.click(
+            fn=import_voice_catalog_document_ui,
+            inputs=[
+                voice_catalog_file,
+                voice_catalog_text,
+                voice_catalog_provider,
+                voice_catalog_language,
+            ],
+            outputs=[voice_catalog_status, voices, minimax_voice],
+            show_progress="hidden",
+        )
+        voice_catalog_clear_btn.click(
+            fn=clear_voice_catalog_ui,
+            inputs=None,
+            outputs=[voice_catalog_status, voices, minimax_voice],
+            show_progress="hidden",
+        )
+        _auto_split_inputs = [
+            input_file,
+            role_mode,
+            auto_role_split,
+            provider_state,
+            chapter_start,
+            chapter_end,
+            title_mode,
+            new_line_mode,
+            remove_endnotes,
+            remove_reference_numbers,
+            search_and_replace_file,
+            deepseek_api_key,
+            deepseek_base_url,
+            deepseek_model,
+        ]
+        _auto_split_outputs = [
+            role_script_file,
+            role_table,
+            role_validation_summary,
+            role_preview_role,
+            role_verification_summary,
+            role_verification_panel,
+            role_split_confirmed,
+            role_split_generated,
+            role_confirmed_signature,
+            role_confirmation_probe_host,
+        ]
+        # 书籍上传后才触发；关闭角色模式时不会创建 Provider，也不会调用 DeepSeek。
+        input_file.change(
+            fn=auto_split_role_script,
+            inputs=_auto_split_inputs,
+            outputs=_auto_split_outputs,
+            show_progress="full",
+        )
+        # 允许先上传书再开启角色模式，或直接点击“重新生成”。
+        role_mode.change(
+            fn=auto_split_role_script,
+            inputs=_auto_split_inputs,
+            outputs=_auto_split_outputs,
+            show_progress="full",
+        )
+        role_regenerate_btn.click(
+            fn=split_role_script_now,
+            inputs=_auto_split_inputs,
+            outputs=_auto_split_outputs,
+            show_progress="full",
+        )
+        role_calibrate_btn.click(
+            fn=calibrate_role_pace,
+            inputs=[provider_state, role_script_file, role_table, role_preview_text,
+                    model, voices, speed, instructions, enable_stream],
+            outputs=[role_table, role_calibration_status],
+            show_progress="full",
+        )
+        role_confirm_btn.click(
+            fn=confirm_auto_role_script,
+            inputs=[
+                role_script_file,
+                role_table,
+                provider_state,
+                openai_output_format,
+                minimax_output_format,
+            ],
+            outputs=[
+                role_split_confirmed,
+                role_verification_summary,
+                role_validation_summary,
+                role_confirmed_signature,
+                role_confirmation_probe_host,
+            ],
+            show_progress="hidden",
+        )
+        role_script_file.change(
+            fn=manual_role_script_uploaded,
+            inputs=[
+                role_script_file,
+                provider_state,
+                openai_output_format,
+                minimax_output_format,
+                role_split_confirmed,
+                role_split_generated,
+                role_confirmed_signature,
+            ],
+            outputs=[
+                role_table,
+                role_validation_summary,
+                role_preview_role,
+                role_verification_summary,
+                role_verification_panel,
+                role_split_confirmed,
+                role_split_generated,
+                role_confirmed_signature,
+                role_confirmation_probe_host,
+            ],
+            show_progress="hidden",
+        )
+        role_table.change(
+            fn=role_table_changed,
+            inputs=[
+                role_script_file,
+                provider_state,
+                openai_output_format,
+                minimax_output_format,
+                role_split_confirmed,
+                role_confirmed_signature,
+                role_table,
+            ],
+            outputs=[
+                role_validation_summary,
+                role_preview_role,
+                role_split_confirmed,
+                role_confirmed_signature,
+                role_confirmation_probe_host,
+            ],
+            show_progress="hidden",
+        )
+        role_preview_btn.click(
+            fn=preview_role_segment,
+            inputs=[provider_state, role_script_file, role_table, role_preview_role, role_preview_text,
+                    model, voices, speed, instructions, enable_stream, openai_output_format,
+                    minimax_model, minimax_voice, minimax_output_format],
+            outputs=[role_preview_audio],
+            show_progress="hidden",
+        )
 
         voxcpm_preview_btn.click(
             fn=voxcpm_preview_voice,
@@ -2251,7 +4389,10 @@ def host_ui(config):
                     voxcpm_regenerate_voice, voxcpm_reference_audio, voxcpm_reference_text, voxcpm_auto_transcribe,
                     voxcpm_device, voxcpm_denoise, voxcpm_normalize, voxcpm_cfg_value,
                     voxcpm_inference_timesteps, voxcpm_speed, voxcpm_chunk_chars, voxcpm_optimize,
-                    voxcpm_output_format],
+                    voxcpm_output_format,
+                    role_mode, auto_role_split, role_script_file, role_table,
+                    role_split_confirmed, role_split_generated, role_confirmed_signature,
+                    allow_role_text_override, allow_role_title_mismatch, allow_role_fallback],
             outputs=[progress_state, progress_timer])
         stop_btn.click(fn=terminate_generator, inputs=None, outputs=[progress_state, progress_timer])
 
@@ -2396,6 +4537,31 @@ def host_ui(config):
             outputs=qwen_msg,
             show_progress="hidden"
         )
+
+        # DeepSeek API Key 显示/隐藏（只用于多角色脚本自动拆分）
+        def toggle_deepseek_key(show, api_key):
+            if show:
+                return api_key, ""
+            return "", deepseek_mask_api_key(api_key) if api_key else ""
+
+        deepseek_show_key.change(
+            fn=toggle_deepseek_key,
+            inputs=[deepseek_show_key, deepseek_api_key],
+            outputs=[deepseek_api_key, deepseek_api_key_display],
+            show_progress="hidden"
+        )
+        deepseek_save_btn.click(
+            fn=_save_deepseek_api_config,
+            inputs=[deepseek_api_key, deepseek_base_url, deepseek_model],
+            outputs=deepseek_msg,
+            show_progress="hidden"
+        )
+        deepseek_test_btn.click(
+            fn=_test_deepseek_api,
+            inputs=[deepseek_api_key, deepseek_base_url, deepseek_model],
+            outputs=deepseek_msg,
+            show_progress="hidden"
+        )
         
         # 修改密码
         def handle_change_password(old_pwd, new_pwd, confirm_pwd):
@@ -2427,6 +4593,10 @@ def host_ui(config):
                 configs["qwen_api_key_masked"],
                 configs["qwen_base_url"],
                 configs["qwen_model"],
+                configs["deepseek_api_key"],
+                configs["deepseek_api_key_masked"],
+                configs["deepseek_base_url"],
+                configs["deepseek_model"],
             )
         
         # 初始化配置（隐藏 API Key）
@@ -2435,7 +4605,9 @@ def host_ui(config):
             inputs=None,
             outputs=[mimo_api_key, mimo_api_key_display, mimo_base_url,
                     minimax_api_key, minimax_api_key_display,
-                    qwen_api_key, qwen_api_key_display, qwen_base_url, qwen_model],
+                    qwen_api_key, qwen_api_key_display, qwen_base_url, qwen_model,
+                    deepseek_api_key, deepseek_api_key_display,
+                    deepseek_base_url, deepseek_model],
             show_progress="hidden"
         )
 

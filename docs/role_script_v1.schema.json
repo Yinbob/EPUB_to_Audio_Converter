@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://epub-to-audiobook.local/schema/role_script_v1.schema.json",
+  "title": "RoleScriptV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "provider",
+    "book_sha256",
+    "default_pause_after_ms",
+    "roles",
+    "chapters"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "provider": {
+      "enum": ["openai", "minimax"],
+      "description": "openai 在本项目中表示 MiMo。"
+    },
+    "book_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "default_pause_after_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 60000
+    },
+    "roles": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[^\\s/\\\\]{1,64}$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/RoleDefinition"
+      }
+    },
+    "chapters": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/ChapterScript"
+      }
+    }
+  },
+  "$defs": {
+    "RoleDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["display_name", "provider_params"],
+      "properties": {
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "gender": {
+          "enum": ["male", "female", "unknown"],
+          "description": "仅用于本地选择性别适配音色，不会传入 TTS Provider。"
+        },
+        "provider_params": {
+          "type": "object",
+          "propertyNames": {
+            "enum": ["voice", "instructions", "speed", "voice_id", "pitch", "volume"]
+          },
+          "additionalProperties": {
+            "type": ["string", "number"]
+          }
+        }
+      }
+    },
+    "ChapterScript": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["chapter_index", "title", "segments"],
+      "properties": {
+        "chapter_index": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "segments": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/SegmentScript"
+          }
+        }
+      }
+    },
+    "SegmentScript": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role_id", "text"],
+      "properties": {
+        "role_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tone": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "pause_after_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 60000
+        }
+      }
+    }
+  }
+}

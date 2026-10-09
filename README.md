@@ -21,6 +21,25 @@ python3 main.py <input_file> <output_folder> [options]
 
 > 服务器（Miniconda / GPU）部署见 [Linux 服务器部署（Miniconda）](#linux-服务器部署miniconda)。
 
+多角色分段 TTS（MiMo / MiniMax）的完整说明、JSON 规范和 CLI/WebUI 操作见 [多角色分段 TTS MVP](docs/multi_role_tts_mvp.md)。
+
+### 自动更新 TTS 英文音色（可选）
+
+WebUI 不会静默爬取官网。需要从 MiMo 公共文档或 MiniMax 官方接口更新英文音色时，
+在项目根目录显式运行：
+
+```bash
+python3 fetch_english_voices.py --provider all --dry-run
+python3 fetch_english_voices.py --provider mimo
+python3 fetch_english_voices.py --provider minimax
+python3 fetch_english_voices.py --provider all --replace
+```
+
+MiMo 不需要额外凭证；MiniMax 需要 `MINIMAX_API_KEY` 或根目录 `minimax_config.json`。
+脚本会合并写入 `.tts_voice_catalog.json`，失败或空结果不会覆盖已有目录；
+`--replace` 只替换本次成功 Provider 的英文条目。详细说明见
+[多角色分段 TTS MVP](docs/multi_role_tts_mvp.md#16-独立脚本自动获取英文音色可选)。
+
 
 ## Recent Updates
 

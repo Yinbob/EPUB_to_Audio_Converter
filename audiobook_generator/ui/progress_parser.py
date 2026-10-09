@@ -5,7 +5,8 @@
 - `Converting chapters from X to Y` / `Chapters count: N` → 章节总数
 - `✅ Converted chapter X` → 已完成章节数
 - `chapter-3_标题_chunk_2_of_16` → 章内块级进度（Chatterbox 等按块生成的引擎，
-  单章耗时很长，靠它让进度条在章内也能往前走）
+   单章耗时很长，靠它让进度条在章内也能往前走）
+- `role_chapter_3_segment_2_of_16` → 多角色模式下优先展示的段级进度
 - `🎉 全部处理完毕` → 整个批次结束
 """
 
@@ -20,6 +21,8 @@ _COUNT_PATTERN = re.compile(r"Chapters count: (\d+)", re.MULTILINE)
 _DONE_PATTERN = re.compile(r"✅ Converted chapter (\d+)", re.MULTILINE)
 # 块级进度：chapter-<章节号>_<标题>_chunk_<当前块>_of_<总块数>
 _CHUNK_PATTERN = re.compile(r"chapter-(\d+)_.+?_chunk_(\d+)_of_(\d+)")
+# 角色段进度：role_chapter_<章>_segment_<当前段>_of_<总段数>
+_ROLE_SEGMENT_PATTERN = re.compile(r"role_chapter_(\d+)_segment_(\d+)_of_(\d+)")
 # 批次结束标记
 _FINISHED_MARKER = "全部处理完毕"
 
@@ -63,22 +66,25 @@ def parse_progress(log_content: str) -> dict:
     completed_indices = {int(x) for x in _DONE_PATTERN.findall(segment)}
     completed = len(completed_indices)
 
-    # 章内块级进度插值
+    # 章内进度插值：角色 segment 标记必须优先于 Provider 内部的 chunk 标记。
     extra = ""
-    chunk_fraction = 0.0
+    progress_fraction = 0.0
+    role_match = _ROLE_SEGMENT_PATTERN.findall(segment)
     chunk_match = _CHUNK_PATTERN.findall(segment)
-    if chunk_match:
-        chapter_idx, current_chunk, total_chunks = (int(x) for x in chunk_match[-1])
+    progress_match = role_match[-1] if role_match else (chunk_match[-1] if chunk_match else None)
+    if progress_match:
+        chapter_idx, current_step, total_steps = (int(x) for x in progress_match)
         # 只在该章还没完成时参与插值，避免与「Converted chapter」重复计数
         # （worker_count>1 时章节完成顺序不固定，因此按章节号判断）
-        if total_chunks > 0 and chapter_idx not in completed_indices:
-            # 当前块刚打印「处理 …」还没结束，因此已完成块数按 current_chunk - 1 计
-            chunk_fraction = max(0, current_chunk - 1) / total_chunks
-            extra = f"第 {chapter_idx} 章 {current_chunk}/{total_chunks} 块"
+        if total_steps > 0 and chapter_idx not in completed_indices:
+            # 当前步骤刚打印还没结束，因此已完成数量按 current_step - 1 计
+            progress_fraction = max(0, current_step - 1) / total_steps
+            label = "段" if role_match else "块"
+            extra = f"第 {chapter_idx} 章 {current_step}/{total_steps} {label}"
 
     pct = 0
     if total_chapters > 0:
-        pct = min(100, int((completed + chunk_fraction) / total_chapters * 100))
+        pct = min(100, int((completed + progress_fraction) / total_chapters * 100))
 
     return {
         "book": current_book,

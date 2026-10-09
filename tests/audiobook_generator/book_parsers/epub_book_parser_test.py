@@ -3,14 +3,14 @@ from unittest.mock import MagicMock
 
 from audiobook_generator.book_parsers.base_book_parser import get_book_parser
 from audiobook_generator.book_parsers.epub_book_parser import EpubBookParser
-from tests.test_utils import get_azure_config
+from tests.test_utils import get_openai_config
 
 
 class TestGetBookParser(unittest.TestCase):
 
     def test_get_epub_book_parser(self):
         # Create a config object with the path to an actual EPUB file
-        config = get_azure_config()
+        config = get_openai_config()
 
         # Call get_book_parser and assert the correct parser is returned
         parser = get_book_parser(config)

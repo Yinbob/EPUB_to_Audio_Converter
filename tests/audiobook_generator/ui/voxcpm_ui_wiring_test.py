@@ -3,7 +3,7 @@
 锁住三条容易回归的点：
 1. 「🔊 VoxCPM」标签页存在且引擎标签为 6 列布局；
 2. 「开始生成」的 process_form 输入里接入了全部 18 个 VoxCPM 参数组件
-   （顺序与 process_form 签名一致，尾部 18 个）；
+   （顺序与 process_form 签名一致，排在新增的 6 个角色模式参数之前）；
 3. 「试听当前预设音色」按钮接线到 voxcpm_preview_voice 且输出到试听 Audio。
 
 与 progress_wiring_test 一样，需要 venv_chatterbox 解释器运行
@@ -42,6 +42,9 @@ VOXCPM_LABELS = [
     "启用 torch.compile 优化",
     "输出格式",
 ]
+
+# Phase 5 在 VoxCPM 参数之后追加了 role_mode、剧本文件、角色表、3 个 override 开关。
+ROLE_PARAM_COUNT = 6
 
 
 def _label_matches(props: dict, label: str) -> bool:
@@ -91,8 +94,10 @@ class TestVoxCPMUiWiring(unittest.TestCase):
         inputs = deps[0].get("inputs") or []
         self.assertGreaterEqual(len(inputs), len(VOXCPM_LABELS),
                                 "process_form 输入数量不足")
-        # VoxCPM 的 18 个参数按签名顺序排在输入尾部
-        voxcpm_ids = set(inputs[-len(VOXCPM_LABELS):])
+        # VoxCPM 的 18 个参数按签名顺序排列，后面只允许追加角色模式参数。
+        start = -(ROLE_PARAM_COUNT + len(VOXCPM_LABELS))
+        end = -ROLE_PARAM_COUNT if ROLE_PARAM_COUNT else None
+        voxcpm_ids = set(inputs[start:end])
         comps = self._components()
         for label in VOXCPM_LABELS:
             matches = [c for c in comps if _label_matches(c.get("props", {}) or {}, label)]

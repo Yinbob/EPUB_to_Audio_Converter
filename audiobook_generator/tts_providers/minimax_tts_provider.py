@@ -1,17 +1,29 @@
 import asyncio
+import io
 import json
 import logging
 import os
 import ssl
+from pydub import AudioSegment
 import websockets
 from audiobook_generator.config.general_config import GeneralConfig
 from audiobook_generator.tts_providers.base_tts_provider import BaseTTSProvider
+from audiobook_generator.tts_providers.voice_catalog import list_provider_voices
+from audiobook_generator.tts_providers.segment_synthesis import (
+    atomic_export_audio,
+    atomic_write_bytes,
+    emit_role_progress,
+    segment_cache_key,
+)
+from audiobook_generator.utils.utils import split_text
 from audiobook_generator.utils.minimax_config import get_minimax_credentials
 
 logger = logging.getLogger(__name__)
 
 
 class MiniMaxTTSProvider(BaseTTSProvider):
+    provider_id = "minimax"
+
     def __init__(self, config: GeneralConfig):
         super().__init__(config)
         
@@ -56,8 +68,22 @@ class MiniMaxTTSProvider(BaseTTSProvider):
             logger.error(traceback.format_exc())
             raise e
 
-    async def _generate_audio(self, text: str) -> bytes:
+    async def _generate_audio(
+        self,
+        text: str,
+        *,
+        voice_setting=None,
+        output_format=None,
+    ) -> bytes:
         """异步生成音频数据"""
+        voice_setting = voice_setting or {
+            "voice_id": self.voice_id,
+            "speed": self.speed,
+            "vol": 1,
+            "pitch": 0,
+            "english_normalization": False,
+        }
+        output_format = output_format or self.output_format
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
@@ -77,17 +103,11 @@ class MiniMaxTTSProvider(BaseTTSProvider):
                 start_msg = {
                     "event": "task_start",
                     "model": self.model,
-                    "voice_setting": {
-                        "voice_id": self.voice_id,
-                        "speed": self.speed,
-                        "vol": 1,
-                        "pitch": 0,
-                        "english_normalization": False
-                    },
+                    "voice_setting": voice_setting,
                     "audio_setting": {
                         "sample_rate": self.sample_rate,
                         "bitrate": self.bitrate,
-                        "format": self.output_format,
+                        "format": output_format,
                         "channel": self.channel
                     }
                 }
@@ -130,6 +150,86 @@ class MiniMaxTTSProvider(BaseTTSProvider):
             logger.error(f"MiniMax WebSocket 通信异常: {e}")
             raise
 
+    def synthesize_segment(self, text, profile, work_dir, progress=None):
+        """按角色参数合成单个 segment；tone 仅记录，不发送给 MiniMax API。"""
+        from audiobook_generator.role_script.audio_pipeline import build_audio_artifact
+
+        params = dict(profile.provider_params)
+        voice_id = str(params.get("voice_id") or self.voice_id)
+        speed = float(params["speed"]) if params.get("speed") is not None else 1.0
+        pitch = float(params["pitch"]) if params.get("pitch") is not None else 0.0
+        volume = float(params["volume"]) if params.get("volume") is not None else 1.0
+        voice_setting = {
+            "voice_id": voice_id,
+            "speed": speed,
+            "vol": volume,
+            "pitch": pitch,
+            "english_normalization": False,
+        }
+        tone = getattr(profile, "tone", None)
+        if tone:
+            logger.info("MiniMax 角色 %s 的 tone=%s 仅用于校对，不发送 API", profile.role_id, tone)
+
+        cache_key = segment_cache_key(
+            provider="minimax",
+            model=self.model,
+            provider_params=params,
+            tone=tone,
+            text=text,
+            request_options={
+                "sample_rate": self.sample_rate,
+                "bitrate": self.bitrate,
+                "channel": self.channel,
+                "output_format": self.output_format,
+            },
+        )
+        cache_dir = os.path.join(work_dir, "segment_cache")
+        os.makedirs(cache_dir, exist_ok=True)
+        cache_file = os.path.join(cache_dir, f"{cache_key}.{self.output_format}")
+        if os.path.isfile(cache_file):
+            logger.info("角色 segment 缓存命中：%s", cache_file)
+            return build_audio_artifact(cache_file, cache_key=cache_key)
+
+        chunks = split_text(text, 1800, self.config.language or "zh-CN") or [text]
+        last_error = None
+        for attempt in range(1, 3):
+            try:
+                generated = []
+                for index, chunk in enumerate(chunks, 1):
+                    emit_role_progress(
+                        progress,
+                        f"role_segment_chunk_{index}_of_{len(chunks)}",
+                    )
+                    generated.append(
+                        asyncio.run(
+                            self._generate_audio(
+                                chunk,
+                                voice_setting=voice_setting,
+                                output_format=self.output_format,
+                            )
+                        )
+                    )
+                if not all(generated):
+                    raise RuntimeError("MiniMax 未返回完整音频数据")
+                if len(generated) == 1:
+                    atomic_write_bytes(cache_file, generated[0])
+                else:
+                    combined = AudioSegment.empty()
+                    for audio_bytes in generated:
+                        combined += AudioSegment.from_file(
+                            io.BytesIO(audio_bytes), format=self.output_format
+                        )
+                    atomic_export_audio(
+                        combined, cache_file, format=self.output_format
+                    )
+                return build_audio_artifact(cache_file, cache_key=cache_key)
+            except Exception as exc:
+                last_error = exc
+                logger.warning(
+                    "MiniMax 角色 segment 合成失败（第 %d/2 次）：%s", attempt, exc
+                )
+        raise RuntimeError(f"MiniMax 角色 segment 合成失败：{last_error}")
+
     def get_break_string(self):
         return " @BRK#"
 
@@ -164,8 +264,8 @@ def get_minimax_supported_output_formats():
 
 
 def get_minimax_supported_voices():
-    """返回支持的音色列表: [(voice_id, voice_name), ...]"""
-    return [
+    """返回官方推荐音色，并合并用户人工上传官网文档得到的音色。"""
+    voices = [
         # 中文 (普通话) - 基础音色
         ("male-qn-qingse", "青涩青年音色"),
         ("male-qn-jingying", "精英青年音色"),
@@ -253,6 +353,17 @@ def get_minimax_supported_voices():
         ("English_Diligent_Man", "Diligent Man"),
         ("English_Gentle-voiced_man", "Gentle-voiced man"),
     ]
+    known_ids = {voice_id for voice_id, _ in voices}
+    try:
+        imported = [
+            (entry.voice_id, entry.display_name or entry.voice_id)
+            for entry in list_provider_voices("minimax")
+            if entry.voice_id not in known_ids
+        ]
+    except Exception as exc:
+        logger.warning("读取人工 MiniMax 音色目录失败：%s", exc)
+        imported = []
+    return voices + imported
 
 
 def get_minimax_voice_choices():

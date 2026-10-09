@@ -169,12 +169,41 @@ class TestProgressWiring(unittest.TestCase):
         logs = [c for c in self.config["components"] if c.get("type") == "log"]
         self.assertTrue(logs, "没找到日志组件")
         props = logs[0].get("props", {})
-        self.assertGreaterEqual(props.get("tail", 0), 500, f"日志起始读取行数太小：{props.get('tail')}")
-        self.assertGreaterEqual(props.get("xterm_scrollback", 0), 1000)
+        self.assertGreaterEqual(props.get("tail", 0), 3000, f"日志起始读取行数太小：{props.get('tail')}")
+        self.assertGreaterEqual(props.get("xterm_scrollback", 0), 8000)
+        self.assertGreaterEqual(props.get("height", 0), 2800,
+                                f"日志终端高度太小，底部会被容器裁切：{props.get('height')}")
+        self.assertEqual(props.get("elem_id"), "run_log")
 
         css = self.web_ui.CUSTOM_CSS
         self.assertNotIn(".app-card { position: relative; overflow: hidden; }", css,
                          "卡片不能裁剪内容：日志页的终端会被切掉")
+        self.assertIn("#run_log > div:not(.wrap) > div:last-child", css,
+                      "没有修正 gradio_log 内部高度，终端最后一行仍会被裁切")
+        self.assertIn("height: clamp(1600px, 200vh, 3000px) !important", css,
+                      "日志终端没有按视口自适应放大")
+        self.assertIn("min-height: 1600px !important", css)
+        self.assertIn(".run-log-card", css)
+        self.assertIn("padding-bottom: 96px !important", css,
+                      "日志卡片底部没有安全区，最后几行仍可能被页脚压住")
+        self.assertIn("display: flex !important;", css)
+        self.assertIn("flex: 1 1 auto !important;", css)
+        self.assertIn("padding-bottom: 64px !important", css,
+                      "日志滚动区底部没有安全距离，最后几行仍可能被裁掉")
+        self.assertIn("padding-bottom: 0 !important", css,
+                      "xterm 内层仍有多余底部内边距，会参与高度测量并裁掉最后一行")
+        self.assertIn("box-sizing: border-box !important", css)
+        self.assertIn(".hero.logs-hero", css,
+                      "日志页标题区没有压缩，放大后的终端底部会落到视口外")
+        html_values = "\n".join(
+            str(c.get("props", {}).get("value", ""))
+            for c in self.config["components"] if c.get("type") == "html"
+        )
+        self.assertIn("hero logs-hero", html_values)
+        self.assertIn("#run_log > div:not(.wrap) > div:last-child {", css)
+        self.assertIn("overflow: visible !important;", css,
+                      "日志卡片或终端包装层仍可能裁切最后几行")
+        self.assertIn(".run-log-card {", css)
 
     def test_ambient_background_layer_is_wired_in(self):
         """氛围背景层（光晕 + 鼠标交互）要同时挂在 head 与样式里"""
@@ -220,26 +249,51 @@ class TestProgressWiring(unittest.TestCase):
     def test_advanced_modal_scrollbar_keeps_rounded_corners(self):
         """弹窗自带的滚动条不能把右上/右下圆角盖成直角。"""
         css = self.web_ui.CUSTOM_CSS
-        self.assertIn("#advanced_modal .modal-box::-webkit-scrollbar", css,
+        self.assertIn("#advanced_modal .modal-scroll::-webkit-scrollbar", css,
                       "缺少弹窗滚动条样式，原生方块轨道会盖住圆角")
         for token in ("scrollbar-width: thin",
                       "scrollbar-color: var(--ata-scroll-thumb) transparent",
-                      "#advanced_modal .modal-box::-webkit-scrollbar-track",
-                      "#advanced_modal .modal-box::-webkit-scrollbar-corner",
+                      "#advanced_modal .modal-scroll::-webkit-scrollbar-track",
+                      "#advanced_modal .modal-scroll::-webkit-scrollbar-corner",
                       "margin-block: 22px",
-                      "#advanced_modal .modal-box::-webkit-scrollbar-thumb"):
+                      "#advanced_modal .modal-scroll::-webkit-scrollbar-thumb"):
             self.assertIn(token, css, f"弹窗滚动条样式缺少：{token}")
         # 轨道必须透明且滑块是圆角，否则四角依然会露出方块轨道
-        track_start = css.index("#advanced_modal .modal-box::-webkit-scrollbar-track")
+        track_start = css.index("#advanced_modal .modal-scroll::-webkit-scrollbar-track")
         track_body = css[track_start:css.index("}", track_start)]
         self.assertIn("background: transparent", track_body)
-        thumb_start = css.index("#advanced_modal .modal-box::-webkit-scrollbar-thumb")
+        thumb_start = css.index("#advanced_modal .modal-scroll::-webkit-scrollbar-thumb")
         thumb_body = css[thumb_start:css.index("}", thumb_start)]
         self.assertIn("border-radius: 999px", thumb_body)
         # 下拉选项面板（选项多时会滚动）有同样的「圆角 + 内滚动」结构，必须一起修
         self.assertIn("ul.options::-webkit-scrollbar", css)
         self.assertIn("ul.options::-webkit-scrollbar-track", css)
         self.assertIn("ul.options::-webkit-scrollbar-thumb", css)
+
+    def test_modal_glass_shell_does_not_create_fixed_containing_block(self):
+        """弹窗滚动不能把玻璃壳滚走，也不能破坏 Gradio fixed 下拉定位。"""
+        css = self.web_ui.CUSTOM_CSS
+        box_start = css.index("#advanced_modal .modal-box {")
+        box_body = css[box_start:css.index("}", box_start)]
+        self.assertIn("position: relative", box_body)
+        self.assertIn("overflow: hidden", box_body)
+        self.assertNotIn("transform", box_body)
+        self.assertNotIn("backdrop-filter", box_body)
+        self.assertNotIn("filter:", box_body)
+        self.assertNotIn("contain:", box_body)
+
+        modal_start = css.index("#advanced_modal {")
+        modal_body = css[modal_start:css.index("}", modal_start)]
+        for prop in ("transform", "filter", "backdrop-filter", "contain"):
+            self.assertNotIn(prop, modal_body)
+
+        keyframe_start = css.index("@keyframes modalIn")
+        keyframe_body = css[keyframe_start:css.index("}", keyframe_start)]
+        self.assertNotIn("transform", keyframe_body)
+
+        scroll_start = css.index("#advanced_modal .modal-scroll {")
+        scroll_body = css[scroll_start:css.index("}", scroll_start)]
+        self.assertIn("overflow-y: auto", scroll_body)
 
     def test_hero_title_uses_token_gradient_and_has_solid_fallback(self):
         """大标题的渐变文字不能再写成 background 简写（Gradio 会把带 var() 的渐变丢成空值）"""

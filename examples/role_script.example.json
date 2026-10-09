@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "provider": "openai",
+  "book_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "default_pause_after_ms": 250,
+  "roles": {
+    "narrator": {
+      "display_name": "旁白",
+      "gender": "unknown",
+      "provider_params": {
+        "voice": "冰糖",
+        "instructions": "用沉稳、清晰的中文有声书旁白语气朗读。",
+        "speed": 1.0
+      }
+    },
+    "lin_daiyu": {
+      "display_name": "林黛玉",
+      "gender": "female",
+      "provider_params": {
+        "voice": "茉莉",
+        "instructions": "声音年轻、克制、略带敏感，不要夸张表演。",
+        "speed": 0.95
+      }
+    }
+  },
+  "chapters": [
+    {
+      "chapter_index": 1,
+      "title": "示例章节",
+      "segments": [
+        {
+          "role_id": "narrator",
+          "text": "这是用于说明结构的示例文本，不是可直接转换的正式剧本。",
+          "tone": "平静",
+          "pause_after_ms": 250
+        },
+        {
+          "role_id": "lin_daiyu",
+          "text": "这一段展示角色切换和显式的零毫秒停顿。",
+          "tone": "克制",
+          "pause_after_ms": 0
+        }
+      ]
+    }
+  ]
+}

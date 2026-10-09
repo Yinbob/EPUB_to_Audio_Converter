@@ -19,6 +19,8 @@ CHAPTER_RANGE = "2026-09-17 14:29:02,000 - audiobook_generator.py:110 - run - IN
 CONVERTED_1 = "2026-09-17 14:29:30,000 - [Worker-1] - audiobook_generator.py:76 - INFO - ✅ Converted chapter 2: 第二章, output file: out.mp3\n"
 CHUNK_2_OF_4 = ("2026-09-17 14:29:40,000 - [Worker-1] - chatterbox_tts_provider.py:277 - text_to_speech"
                 " - INFO - 处理 chapter-2_第二章_chunk_2_of_4, 长度=460\n")
+ROLE_SEGMENT_2_OF_4 = ("2026-09-17 14:29:40,000 - [Worker-1] - audiobook_generator.py:140"
+                       " - INFO - role_chapter_2_segment_2_of_4\n")
 FINISHED = "2026-09-17 14:35:00,000 - 🎉 全部处理完毕！共 1 本书\n"
 
 
@@ -73,6 +75,23 @@ class TestParseProgress(unittest.TestCase):
         self.assertEqual(state["done"], 1)
         self.assertEqual(state["extra"], "")
         self.assertEqual(state["pct"], 33)
+
+    def test_role_segment_progress_is_reported_and_prioritized(self):
+        state = parse_progress(
+            BOOK_START + CHAPTERS_COUNT + CHAPTER_RANGE
+            + ROLE_SEGMENT_2_OF_4
+            + CHUNK_2_OF_4.replace("chapter-2", "role-dependent")
+        )
+        self.assertEqual(state["extra"], "第 2 章 2/4 段")
+        self.assertEqual(state["pct"], 8)  # (0 + 1/4) / 3
+
+        # role marker 在 chunk marker 之后也必须优先，因为 provider 内部分块不会改变外层段进度。
+        state_with_chunk = parse_progress(
+            BOOK_START + CHAPTERS_COUNT + CHAPTER_RANGE
+            + CHUNK_2_OF_4
+            + ROLE_SEGMENT_2_OF_4
+        )
+        self.assertEqual(state_with_chunk["extra"], "第 2 章 2/4 段")
 
     def test_batch_scope_is_limited_to_current_book(self):
         log = (

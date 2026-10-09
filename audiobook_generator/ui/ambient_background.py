@@ -228,6 +228,35 @@ body.modal-open #ata-bg { opacity: 0.45; }
   pointer-events: none;
 }
 #advanced_modal .modal-box > * { position: relative; z-index: 1; }
+/* 滚动职责与玻璃壳分离：.modal-box 只负责圆形玻璃和裁剪，内层 .modal-scroll 负责滚动。
+   这样 ::before(inset:0) 始终覆盖整个弹窗可视区域，滚到底部也不会露出未模糊内容。 */
+#advanced_modal .modal-box {
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  max-height: 80vh !important;
+}
+#advanced_modal .modal-box > .modal-scroll {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  max-height: 80vh !important;
+  padding: 24px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  box-sizing: border-box !important;
+}
+/* 滚动条移到真正滚动的内层，轨道透明并给圆角留出上下间距。 */
+#advanced_modal .modal-box > .modal-scroll { scrollbar-width: thin; scrollbar-color: var(--ata-scroll-thumb) transparent; }
+#advanced_modal .modal-box > .modal-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+#advanced_modal .modal-box > .modal-scroll::-webkit-scrollbar-track,
+#advanced_modal .modal-box > .modal-scroll::-webkit-scrollbar-corner { background: transparent; }
+#advanced_modal .modal-box > .modal-scroll::-webkit-scrollbar-track { margin-block: 22px; }
+#advanced_modal .modal-box > .modal-scroll::-webkit-scrollbar-thumb { border-radius: 999px; background: var(--ata-scroll-thumb); }
+#advanced_modal .modal-box > .modal-scroll::-webkit-scrollbar-thumb:hover { background: var(--ata-scroll-thumb-hover); }
 #advanced_modal input, #advanced_modal textarea, #advanced_modal select {
   background: var(--ata-glass-soft-2) !important;
 }

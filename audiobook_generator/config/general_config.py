@@ -11,6 +11,13 @@ class GeneralConfig:
         self.worker_count = getattr(args, 'worker_count', None)
         self.use_pydub_merge = getattr(args, 'use_pydub_merge', None)
 
+        # Multi-role script mode. CLI stores a path; WebUI stores a parsed,
+        # pickle-safe RoleScriptV1 instance.
+        self.role_script = getattr(args, 'role_script', None)
+        self.allow_role_text_override = getattr(args, 'allow_role_text_override', False)
+        self.allow_role_title_mismatch = getattr(args, 'allow_role_title_mismatch', False)
+        self.allow_role_fallback = getattr(args, 'allow_role_fallback', False)
+
         # Book parser specific arguments
         self.title_mode = getattr(args, 'title_mode', None)
         self.newline_mode = getattr(args, 'newline_mode', None)
