@@ -3,6 +3,7 @@
 import os
 import tempfile
 import unittest
+from contextlib import nullcontext
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -262,6 +263,50 @@ class TestChunkHelpers(unittest.TestCase):
         provider._check_chunk_duration("测试文本" * 20, wav, 48000)  # 只告警不报错
 
 
+class TestDenoiserLoading(unittest.TestCase):
+    def test_denoise_setting_controls_loading_and_model_cache(self):
+        from audiobook_generator.tts_providers import voxcpm_tts_provider as mod
+
+        loader = MagicMock()
+        first, second = MagicMock(denoiser=None), MagicMock(denoiser=None)
+        denoiser = object()
+        loader.from_pretrained.side_effect = [first, second]
+        with patch.object(mod, "_import_voxcpm", return_value=loader), patch.object(
+            mod, "_normalize_device", return_value="cuda"
+        ), patch.object(mod, "_low_memory_model_init", side_effect=lambda: nullcontext(False)), patch.object(
+            mod, "_read_process_memory_gb", return_value=(None, None)
+        ), patch.object(mod, "_voxcpm_model", None), patch.object(mod, "_voxcpm_model_key", None), patch.object(
+            mod, "_load_voxcpm_denoiser", return_value=denoiser
+        ) as denoiser_loader:
+            self.assertIs(mod._load_voxcpm_model(denoise=False), first)
+            self.assertIs(mod._load_voxcpm_model(denoise=False), first)
+            self.assertIs(mod._load_voxcpm_model(denoise=True), second)
+            self.assertIs(mod._load_voxcpm_model(denoise=True), second)
+        self.assertEqual(loader.from_pretrained.call_count, 2)
+        self.assertTrue(all(c.kwargs["load_denoiser"] is False for c in loader.from_pretrained.call_args_list))
+        denoiser_loader.assert_called_once()
+        self.assertIsNone(first.denoiser)
+        self.assertIs(second.denoiser, denoiser)
+
+    def test_provider_passes_enabled_denoise_to_loader_and_generation(self):
+        config = get_voxcpm_config()
+        config.voxcpm_denoise = True
+        model = _FakeVoxCPMModel()
+        provider = VoxCPMTTSProvider(config)
+        with tempfile.TemporaryDirectory() as folder, patch(
+            "audiobook_generator.tts_providers.voxcpm_tts_provider._load_voxcpm_model", return_value=model
+        ) as loader, patch(
+            "audiobook_generator.tts_providers.voxcpm_tts_provider.ensure_preset_audio", return_value="preset.wav"
+        ), patch("audiobook_generator.tts_providers.voxcpm_tts_provider.merge_audio_segments"), patch(
+            "audiobook_generator.tts_providers.voxcpm_tts_provider.set_audio_tags"
+        ):
+            provider.text_to_speech("测试降噪开关。", os.path.join(folder, "test.mp3"),
+                                    AudioTags(title="测试", author="作者", book_title="书", idx=1))
+        self.assertIs(loader.call_args.kwargs["denoise"], True)
+        self.assertTrue(model.calls)
+        self.assertTrue(all(c["denoise"] is True for c in model.calls))
+
+
 class TestTextToSpeechFlow(unittest.TestCase):
     def _run(self, provider, text="这是第一章的内容。" * 40):
         fake_model = _FakeVoxCPMModel()
@@ -439,6 +484,24 @@ class TestLowMemoryInit(unittest.TestCase):
             )
         self.assertIs(model, fake_model)
         self.assertEqual(seen["dtype"], self.mod.torch.bfloat16)
+        self.assertEqual(self.mod.torch.get_default_dtype(), original)
+
+    def test_denoiser_loads_after_default_dtype_is_restored(self):
+        original = self.mod.torch.get_default_dtype()
+        model = MagicMock()
+        seen = []
+
+        def denoiser():
+            seen.append(self.mod.torch.get_default_dtype())
+            return object()
+
+        factory = MagicMock()
+        factory.from_pretrained.return_value = model
+        with patch.object(self.mod, "_import_voxcpm", return_value=factory), patch.object(
+            self.mod, "_load_voxcpm_denoiser", side_effect=denoiser
+        ):
+            self.mod._load_voxcpm_model(device="cuda", cache=False, denoise=True)
+        self.assertEqual(seen, [original])
         self.assertEqual(self.mod.torch.get_default_dtype(), original)
 
     def test_read_process_memory_gb_never_raises(self):

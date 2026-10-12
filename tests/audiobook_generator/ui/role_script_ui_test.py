@@ -228,6 +228,35 @@ class TestRoleScriptUiHelpers(unittest.TestCase):
         self.assertIn("configs", captured, "服务端确认记录未放行转换")
         warning.assert_not_called()
 
+    def test_provider_switch_reports_support_without_changing_role_data(self):
+        for provider in ("Edge", "Qwen", "Chatterbox", "VoxCPM"):
+            with self.subTest(provider=provider):
+                selected, message, button = web_ui.role_provider_changed(provider)
+                self.assertEqual(selected, provider)
+                self.assertIn("不支持多角色模式", message)
+                self.assertIn("保留", message)
+                self.assertFalse(button["interactive"])
+        for provider in ("Mimo", "MiniMax"):
+            selected, message, button = web_ui.role_provider_changed(provider)
+            self.assertEqual(selected, provider)
+            self.assertIn("剧本必须与所选引擎一致", message)
+            self.assertTrue(button["interactive"])
+
+    def test_unsupported_engine_blocks_before_confirmation_or_script_loading(self):
+        values = {name: None for name in inspect.signature(web_ui.process_form).parameters}
+        values.update(input_file=["book.epub"], role_mode=True)
+        for provider in ("Edge", "Qwen", "Chatterbox", "VoxCPM"):
+            for confirmed in (False, True):
+                with self.subTest(provider=provider, confirmed=confirmed):
+                    values.update(provider=provider, role_split_confirmed=confirmed)
+                    with patch.object(web_ui.gr, "Warning") as warning, patch.object(
+                        web_ui, "_load_uploaded_role_script"
+                    ) as load_script, patch.object(web_ui, "launch_batch") as launch:
+                        web_ui.process_form(**values)
+                    self.assertIn("不支持多角色模式", warning.call_args[0][0])
+                    load_script.assert_not_called()
+                    launch.assert_not_called()
+
     def test_process_form_still_blocks_unconfirmed_script(self):
         values = {name: None for name in inspect.signature(web_ui.process_form).parameters}
         values.update({

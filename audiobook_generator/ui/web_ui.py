@@ -68,28 +68,16 @@ from audiobook_generator.tts_providers.chatterbox_tts_provider import (
     get_chatterbox_speed_range,
 )
 from audiobook_generator.tts_providers.voxcpm_tts_provider import (
-    DEFAULT_VOXCPM_CFG_VALUE,
-    DEFAULT_VOXCPM_CHUNK_CHARS,
-    DEFAULT_VOXCPM_INFERENCE_TIMESTEPS,
-    DEFAULT_VOXCPM_MODEL,
-    DEFAULT_VOXCPM_OUTPUT_FORMAT,
-    DEFAULT_VOXCPM_SPEED,
-    VOXCPM_MODES,
-    get_voxcpm_speed_range,
-    get_voxcpm_supported_devices,
-    get_voxcpm_supported_output_formats,
     preview_voxcpm_preset_audio,
 )
 from audiobook_generator.utils.voxcpm_voices import (
-    VOXCPM_DEFAULT_VOICE_VALUE,
-    get_default_voxcpm_voice_dir,
-    get_voxcpm_voice_choices,
     resolve_voxcpm_voice,
 )
 from audiobook_generator.utils.log_handler import generate_unique_log_path
 from audiobook_generator.ui.ambient_background import AMBIENT_CSS, AMBIENT_LAYER_HTML
 from audiobook_generator.ui.progress_parser import decide_progress_state, parse_progress
 from audiobook_generator.ui.theme import THEME_CSS, THEME_HEAD_HTML, THEME_TOKENS_CSS
+from audiobook_generator.ui.voxcpm_panel import build_voxcpm_panel
 from audiobook_generator.utils.mimo_config import (
     load_mimo_config, save_mimo_config, mask_api_key as mimo_mask_api_key, test_mimo_connection
 )
@@ -456,7 +444,7 @@ def voxcpm_preview_voice(voice, model_name, device, voice_dir, cfg_value, infere
     finally:
         _voxcpm_preview_busy = False
     gr.Info("试听音频已就绪")
-    return gr.update(value=path)
+    return gr.update(value=path, visible=True)
 
 
 # ── 多角色剧本 ───────────────────────────────────────────────────
@@ -486,6 +474,17 @@ def _uploaded_file_path(file_obj):
 
 def _role_provider_id(provider: str):
     return _ROLE_PROVIDER_TTS.get(provider)
+
+
+def role_provider_changed(provider: str):
+    """切换引擎只更新兼容性提示，保留剧本与多角色开关，避免静默改成单音色。"""
+    supported = _role_provider_id(provider) is not None
+    message = (
+        "当前引擎支持多角色模式；剧本必须与所选引擎一致。"
+        if supported else
+        f"⚠️ {provider} 不支持多角色模式。请切回 MiMo / MiniMax，或关闭多角色模式后生成。已有剧本和角色设置会保留。"
+    )
+    return provider, message, gr.update(interactive=supported)
 
 
 def _selected_role_output_format(provider: str, openai_output_format, minimax_output_format):
@@ -1586,6 +1585,9 @@ def process_form(provider,
 
     role_script = None
     if role_mode:
+        if _role_provider_id(provider) is None:
+            gr.Warning(f"{provider} 不支持多角色模式，请切回 MiMo / MiniMax，或在高级设置中关闭多角色模式")
+            return gr.update(), gr.Timer(active=False)
         if len(input_file) != 1:
             gr.Warning("角色模式首版只支持单本书，请只选择一个书籍文件")
             return gr.update(), gr.Timer(active=False)
@@ -1734,11 +1736,13 @@ def process_form(provider,
             config.voxcpm_voice_dir = voxcpm_voice_dir
             config.voxcpm_voice_description = voxcpm_voice_description
             config.voxcpm_regenerate_voice = voxcpm_regenerate_voice
-            config.voxcpm_reference_audio = (voxcpm_reference_audio.name
-                                             if hasattr(voxcpm_reference_audio, 'name')
-                                             else voxcpm_reference_audio)
-            config.voxcpm_reference_text = voxcpm_reference_text
-            config.voxcpm_auto_transcribe = voxcpm_auto_transcribe
+            # 隐藏的克隆参数保留在界面里，但只在对应模式提交，避免切回预设时仍用旧录音。
+            config.voxcpm_reference_audio = (
+                voxcpm_reference_audio.name if hasattr(voxcpm_reference_audio, 'name')
+                else voxcpm_reference_audio
+            ) if voxcpm_mode in ("clone", "hifi") else None
+            config.voxcpm_reference_text = voxcpm_reference_text if voxcpm_mode == "hifi" else None
+            config.voxcpm_auto_transcribe = bool(voxcpm_auto_transcribe) if voxcpm_mode == "hifi" else False
             config.voxcpm_denoise = voxcpm_denoise
             config.voxcpm_normalize = voxcpm_normalize
             config.voxcpm_cfg_value = voxcpm_cfg_value
@@ -2648,30 +2652,19 @@ html, body {
 /* 注意：这里不能加 overflow: hidden——日志页的 xterm 终端在卡片内，
    被裁剪后会显得"日志显示不全"。圆角由伪元素的 border-radius: inherit 保证。 */
 .app-card { position: relative; }
-/* gradio_log 内部把终端高度写成 calc(100% - 10px)，没有扣掉上方文件信息行，
-   终端会向下溢出，再被组件自己的 overflow:hidden 裁掉最后一行。
-   这里不要继续估算信息行高度：外层改成纵向 flex，让终端自动占满剩余空间。
-
-   日志框按视口放大，但内部不能再叠加 64px/18px 两层底部留白：它们会参与
-   xterm 的高度测量，结果屏幕比 viewport 高一行，最后几行刚好被裁掉，同时
-   终端下方还会留下大片看起来“被挡住”的空带。底部安全距离统一交给卡片
-   padding 和 margin，日志框自身只保留 64px 的滚动余量。
-   高度再放宽一档：矮屏至少 1600px，随视口按 200vh 生长，高屏封顶 3000px；
-   配合卡片底部安全区，长日志滚到底也不会被裁掉最后几行。 */
+/* 日志框限制在当前视口内；文件信息行占自然高度，终端填满剩余空间。
+   历史日志由 xterm 的 viewport 内部滚动，不能靠加高组件展示回滚缓冲。 */
 #run_log {
   display: flex !important;
   flex-direction: column !important;
-  height: clamp(1600px, 200vh, 3000px) !important;
-  min-height: 1600px !important;
-  padding-bottom: 64px !important;
+  height: clamp(240px, calc(100dvh - 300px), 640px) !important;
+  min-height: 0 !important;
+  padding-bottom: 0 !important;
   box-sizing: border-box !important;
-  /* 不能让组件根节点裁切 xterm：gradio_log 的内部高度会随字体/版本变化。 */
-  overflow: visible !important;
+  overflow: hidden !important;
 }
 .run-log-card {
-  padding-bottom: 96px !important;
-  margin-bottom: 128px !important;
-  overflow: visible !important;
+  margin-bottom: 0 !important;
 }
 #run_log > div:not(.wrap) {
   flex: 1 1 auto !important;
@@ -2682,7 +2675,7 @@ html, body {
 }
 #run_log > div:not(.wrap) > span { flex: 0 0 auto !important; }
 #run_log > div:not(.wrap) > div:last-child {
-  flex: 1 1 auto !important;
+  flex: 1 1 0 !important;
   height: auto !important;
   min-height: 0 !important;
   margin-bottom: 0 !important;
@@ -2692,7 +2685,13 @@ html, body {
 }
 #run_log .xterm,
 #run_log .xterm-viewport { height: 100% !important; }
-#run_log .xterm-viewport { padding-bottom: 0 !important; scrollbar-gutter: stable; }
+#run_log .xterm-viewport {
+  padding-bottom: 0 !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  scrollbar-color: var(--ata-scroll-thumb) transparent;
+}
 /* 卡片内容要盖在玻璃层之上 */
 .app-card > * { position: relative; z-index: 1; }
 /* Gradio 的 ul.options 虽然用 fixed + 超高 z-index，但仍受所在包装层的堆叠上下文约束。
@@ -3113,6 +3112,38 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
   border-color: transparent !important; box-shadow: 0 4px 12px rgba(0,113,227,0.32) !important; }
 
 /* ── 资源库空态 / 就绪 ── */
+/* VoxCPM：常用选项优先，二级设置保持原生可展开交互。 */
+#voxcpm_mode label {
+  min-height: 44px;
+  padding: 10px 14px !important;
+  border-radius: var(--radius-sm) !important;
+  background-color: var(--ata-glass-soft) !important;
+  border-color: var(--apple-border-soft) !important;
+  color: var(--apple-text) !important;
+}
+#voxcpm_mode label:has(input:checked) {
+  background-color: var(--apple-blue-soft) !important;
+  border-color: var(--apple-blue) !important;
+}
+#voxcpm_mode label:focus-within {
+  outline: 2px solid var(--apple-blue);
+  outline-offset: 2px;
+}
+.voxcpm-audition { align-items: center !important; }
+.voxcpm-audition button { white-space: nowrap !important; }
+.voxcpm-settings-tabs :is(.tab-nav, .tab-container) > button {
+  min-height: 44px;
+  padding: 10px 12px !important;
+}
+@media (max-width: 520px) {
+  /* 同步调整 Gradio 隐藏的测量按钮，避免三类设置被挤进省略菜单。 */
+  .voxcpm-settings-tabs :is(.tab-nav, .tab-container) > button {
+    font-size: 0.8125rem !important;
+    padding: 10px 3px !important;
+  }
+}
+#voxcpm_advanced, #voxcpm_style_section { overflow: visible !important; }
+
 .lib-empty { padding: 36px 20px; text-align: center; color: var(--apple-text-3);
   background: var(--ata-empty); border-radius: 16px; border: 1px dashed var(--apple-border); min-height: 180px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -3128,6 +3159,36 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
 .custom-download-zone a { color: var(--apple-blue) !important; font-weight: 600 !important; }
 
 /* ── 资源库：操作区排版 ── */
+/* 批次面板是 fixed，但仍被祖先层叠上下文约束。必须提升整条祖先链，
+   只提升卡片的一层子元素无法越过下一张卡片或 Tabs 的边框。
+   仅在该菜单展开时生效，关闭后恢复原层级；不创建 fixed 包含块。 */
+.gradio-container .tabs:has(#library_folder_picker ul.options:not([inert])),
+#library_tab:has(#library_folder_picker ul.options:not([inert])),
+#library_tab *:has(#library_folder_picker ul.options:not([inert])) {
+  position: relative;
+  z-index: 120 !important;
+  overflow: visible !important;
+}
+#library_folder_picker ul.options {
+  z-index: 121 !important;
+  min-width: 0 !important;
+  max-width: calc(100vw - 32px) !important;
+  background-color: var(--apple-surface) !important;
+  color: var(--apple-text) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain;
+}
+/* 保留 Gradio 按视口计算的 top / bottom / max-height，长名称在菜单内换行。 */
+#library_folder_picker ul.options .item,
+#library_folder_picker ul.options .inner-item {
+  min-width: 0;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  text-overflow: clip;
+  line-height: 1.5;
+}
 /* Gradio 卡片内组件默认只有 1px 间隙：开关、主按钮、下载区会贴在一起，这里统一留白 */
 .lib-card .styler { gap: 12px !important; }
 .lib-card .section-divider { margin: 0; }
@@ -3455,7 +3516,17 @@ body.modal-open::before {
 #advanced_modal #role_config_panel > .styler > * {
   min-width: 0 !important; max-width: 100% !important; width: 100%;
 }
+/* Gradio 会把开关包在 overflow-x:auto / overflow-y:hidden 的 .form 中，
+   按压反馈与外阴影会被裁切；只释放这个包装层，不影响表格和弹窗滚动。 */
+#advanced_modal .form:has(> #role_mode_toggle) {
+  overflow: visible !important;
+  background: transparent !important;
+}
 #advanced_modal #role_split_btn { margin: 4px 0 8px; }
+#advanced_modal #role_split_btn:disabled {
+  opacity: 0.5 !important; cursor: not-allowed !important;
+  transform: none !important; box-shadow: none !important;
+}
 #advanced_modal .role-summary { max-height: 240px; overflow-y: auto !important; }
 #advanced_modal .role-details button:focus-visible,
 #advanced_modal #role_confirm_btn:focus-visible,
@@ -3565,8 +3636,7 @@ body.modal-open::before {
 }
 @keyframes advancedSwitchPress {
   0% { transform: scale(1); }
-  28% { transform: scale(0.975); }
-  58% { transform: scale(1.012); }
+  35% { transform: scale(0.985); }
   100% { transform: scale(1); }
 }
 @keyframes advancedSwitchGlow {
@@ -3840,124 +3910,27 @@ def host_ui(config):
                                 )
                         # ── VoxCPM ──
                         with gr.Tab("🔊 VoxCPM", id="VoxCPM") as voxcpm_tab:
-                            gr.HTML('<p class="card-desc">本地多模态 TTS 模型（VoxCPM2，48kHz / 30 语言）。支持「描述生成 / 声音克隆 / 极致克隆」三种模式；首次使用需安装 <code>pip install voxcpm</code> 并固定 gradio 5.50.0（见 README）。</p>')
-                            with gr.Row():
-                                voxcpm_model = gr.Textbox(
-                                    value=DEFAULT_VOXCPM_MODEL,
-                                    label="模型",
-                                    interactive=True,
-                                    info="HuggingFace 模型 ID（openbmb/VoxCPM2）或本地模型目录",
-                                )
-                                voxcpm_device = gr.Dropdown(
-                                    get_voxcpm_supported_devices(),
-                                    value="auto",
-                                    label="运行设备",
-                                    interactive=True,
-                                    allow_custom_value=True,
-                                    info="多卡可填 cuda:0 / cuda:1；与其他项目共用 GPU 时建议用 CUDA_VISIBLE_DEVICES 隔离",
-                                )
-                            voxcpm_mode = gr.Dropdown(
-                                [(label, key) for key, label in VOXCPM_MODES.items()],
-                                value="design",
-                                label="合成模式",
-                                interactive=True,
-                                info="design 描述生成音色；clone 参考音频克隆；hifi 极致克隆（参考音频+转写）",
-                            )
-                            with gr.Row():
-                                voxcpm_voice = gr.Dropdown(
-                                    get_voxcpm_voice_choices(),
-                                    value=VOXCPM_DEFAULT_VOICE_VALUE,
-                                    label="音色",
-                                    interactive=True,
-                                    allow_custom_value=True,
-                                    info="内置预设首次使用会自动生成并缓存；可手动放入 wav 到音色库目录自动并入下拉",
-                                )
-                                voxcpm_voice_dir = gr.Textbox(
-                                    value=get_default_voxcpm_voice_dir(),
-                                    label="音色库目录",
-                                    interactive=True,
-                                )
-                            with gr.Row():
-                                voxcpm_preview_btn = gr.Button("🎧 试听当前预设音色", elem_classes="btn-ghost", scale=1)
-                                voxcpm_preview_audio = gr.Audio(label="试听", type="filepath", interactive=False, scale=2)
-                            voxcpm_regenerate_voice = gr.Checkbox(
-                                label="重新生成预设音色（忽略已有缓存，需重新生成参考音频）",
-                                value=False,
-                                elem_classes="toggle",
-                            )
-                            voxcpm_voice_description = gr.TextArea(
-                                label="声音描述（design / clone 模式可选）",
-                                lines=2,
-                                placeholder="例如：成熟稳重的男声，中低音，语速适中。留空则使用所选预设的描述。",
-                                interactive=True,
-                            )
-                            with gr.Row():
-                                voxcpm_reference_audio = gr.File(
-                                    label="参考音频（clone / hifi 模式，可选）",
-                                    file_count="single",
-                                    file_types=["audio"],
-                                )
-                                voxcpm_reference_text = gr.Textbox(
-                                    label="参考音频转写文本（hifi 模式）",
-                                    lines=2,
-                                    placeholder="手填优先；预设音色会自动带试听文本；留空并开启自动转写时用 SenseVoice 识别",
-                                    interactive=True,
-                                )
-                            voxcpm_auto_transcribe = gr.Checkbox(
-                                label="自动转写参考音频（hifi 模式，首次需下载 SenseVoice 模型，固定 CPU 运行）",
-                                value=False,
-                                elem_classes="toggle",
-                            )
-                            with gr.Row():
-                                voxcpm_output_format = gr.Dropdown(
-                                    get_voxcpm_supported_output_formats(),
-                                    value=DEFAULT_VOXCPM_OUTPUT_FORMAT,
-                                    label="输出格式",
-                                    interactive=True,
-                                )
-                                voxcpm_speed_min, voxcpm_speed_max = get_voxcpm_speed_range()
-                                voxcpm_speed = gr.Slider(
-                                    minimum=voxcpm_speed_min, maximum=voxcpm_speed_max, step=0.05,
-                                    label="语速",
-                                    value=DEFAULT_VOXCPM_SPEED,
-                                    info="1.0 为模型原生语速，越小越慢，越大越快",
-                                )
-                            with gr.Row():
-                                voxcpm_cfg_value = gr.Slider(
-                                    minimum=0.5, maximum=8.0, step=0.1,
-                                    label="CFG 引导",
-                                    value=DEFAULT_VOXCPM_CFG_VALUE,
-                                    info="越高越贴合描述/参考音色，越低越自由（官方推荐 2.0）",
-                                )
-                                voxcpm_inference_timesteps = gr.Slider(
-                                    minimum=1, maximum=50, step=1,
-                                    label="推理步数",
-                                    value=DEFAULT_VOXCPM_INFERENCE_TIMESTEPS,
-                                    info="越高质量越好但越慢；官方基准使用 10 步",
-                                )
-                            with gr.Row():
-                                voxcpm_chunk_chars = gr.Slider(
-                                    minimum=50, maximum=1200, step=50,
-                                    label="分块字数",
-                                    value=DEFAULT_VOXCPM_CHUNK_CHARS,
-                                    info="VoxCPM 长文本会语速漂移/爆音/OOM，按句分块逐块合成（默认 400 字）",
-                                )
-                                voxcpm_denoise = gr.Checkbox(
-                                    label="降噪参考音频（需额外下载 ZipEnhancer，可能改变音色）",
-                                    value=False,
-                                    elem_classes="toggle",
-                                )
-                            with gr.Row():
-                                voxcpm_normalize = gr.Checkbox(
-                                    label="文本规范化（展开数字/日期等）",
-                                    value=True,
-                                    elem_classes="toggle",
-                                )
-                                voxcpm_optimize = gr.Checkbox(
-                                    label="启用 torch.compile 优化（CUDA Graphs 不支持多线程并发，GPU 场景请保持 worker_count=1）",
-                                    value=True,
-                                    elem_classes="toggle",
-                                )
+                            voxcpm_panel = build_voxcpm_panel()
+                            voxcpm_model = voxcpm_panel.model
+                            voxcpm_mode = voxcpm_panel.mode
+                            voxcpm_voice = voxcpm_panel.voice
+                            voxcpm_voice_dir = voxcpm_panel.voice_dir
+                            voxcpm_regenerate_voice = voxcpm_panel.regenerate_voice
+                            voxcpm_voice_description = voxcpm_panel.voice_description
+                            voxcpm_reference_audio = voxcpm_panel.reference_audio
+                            voxcpm_reference_text = voxcpm_panel.reference_text
+                            voxcpm_auto_transcribe = voxcpm_panel.auto_transcribe
+                            voxcpm_device = voxcpm_panel.device
+                            voxcpm_denoise = voxcpm_panel.denoise
+                            voxcpm_normalize = voxcpm_panel.normalize
+                            voxcpm_cfg_value = voxcpm_panel.cfg_value
+                            voxcpm_inference_timesteps = voxcpm_panel.inference_timesteps
+                            voxcpm_speed = voxcpm_panel.speed
+                            voxcpm_chunk_chars = voxcpm_panel.chunk_chars
+                            voxcpm_optimize = voxcpm_panel.optimize
+                            voxcpm_output_format = voxcpm_panel.output_format
+                            voxcpm_preview_btn = voxcpm_panel.preview_btn
+                            voxcpm_preview_audio = voxcpm_panel.preview_audio
 
                 # —— 高级设置弹窗（纯客户端控制；默认 display:none，JS 切换 .show） ——
                 with gr.Group(elem_classes="modal-overlay", elem_id="advanced_modal") as advanced_modal:
@@ -3987,6 +3960,10 @@ def host_ui(config):
                                     value=False,
                                     elem_classes="toggle advanced-switch",
                                     elem_id="role_mode_toggle",
+                                )
+                                role_provider_hint = gr.Markdown(
+                                    "当前引擎支持多角色模式；剧本必须与所选引擎一致。",
+                                    elem_id="role_provider_hint",
                                 )
                                 with gr.Group(visible=False, elem_id="role_config_panel") as role_config_panel:
                                     gr.HTML('<p id="role_workflow_hint" class="role-workflow-hint" role="status" aria-live="polite">下一步：先生成剧本，或上传已有剧本。</p>')
@@ -4246,7 +4223,7 @@ def host_ui(config):
                     start_btn = gr.Button("🚀 开始生成有声书", elem_classes="btn-primary pulse", variant="primary")
 
             # ════════════ 资源库页 ════════════
-            with gr.Tab("资源库", id="tab_library"):
+            with gr.Tab("资源库", id="tab_library", elem_id="library_tab"):
                 gr.HTML('<div class="hero"><h1>资源库</h1><p>管理已生成的音频文件：批量下载、打包导出、一键清理。</p></div>')
                 with gr.Row(elem_classes="row-stack"):
                     with gr.Column(scale=3):
@@ -4254,7 +4231,7 @@ def host_ui(config):
                             gr.HTML('<p class="card-title">选择导出批次</p>')
                             with gr.Row(elem_classes="lib-row"):
                                 folder_dropdown = gr.Dropdown(choices=get_folders_list(), label="批次", show_label=False,
-                                                              interactive=True, scale=1)
+                                                              interactive=True, scale=1, elem_id="library_folder_picker")
                                 refresh_btn = gr.Button("🔄 刷新", elem_classes="btn-mini", scale=0, min_width=0)
                                 delete_folder_btn = gr.Button("🗑️ 删除批次", elem_classes="btn-danger", scale=0, min_width=0)
                         with gr.Group(elem_classes="app-card lib-card"):
@@ -4284,11 +4261,9 @@ def host_ui(config):
                     webui_log_file = generate_unique_log_path("EtA_WebUI").resolve()
                     webui_log_file.touch()
                     # tail 默认只有 100：页面在生成中途打开/刷新时只能看到最后 100 行，
-                    # 看起来就像"日志不全"。这里放宽到 2000 行，并同步加大终端回滚缓冲。
-                    # height 同时包含顶部文件信息行；默认 240px 会让 xterm 底部被裁切。
-                    # CSS 会把可视高度限制在 1600~3000px（优先 200vh），并回收
-                    # xterm 内层多余留白，让终端在当前视口内尽可能大且不裁底。
-                    Log(str(webui_log_file), dark=False, height=2800, xterm_font_size=12,
+                    # 看起来就像"日志不全"。保留 3000 行读取窗口和 8000 行终端回滚缓冲。
+                    # CSS 按视口限制可视高度，历史日志在终端内部滚动查看。
+                    Log(str(webui_log_file), dark=False, height=480, xterm_font_size=12,
                         elem_id="run_log",
                         tail=3000, xterm_scrollback=8000)
 
@@ -4369,9 +4344,10 @@ def host_ui(config):
                             (voxcpm_tab, "VoxCPM")]:
             _id = _PROVIDER_IDS[_display]
             _js = f"() => {{ const el = document.getElementById('engine_badge_name'); if (el) el.textContent = '{_display}'; }}"
-            _tab.select(fn=lambda n=_id: n,
-                        inputs=None, outputs=provider_state, show_progress="hidden",
-                        js=_js)
+            _tab.select(fn=lambda n=_id: role_provider_changed(n),
+                        inputs=None,
+                        outputs=[provider_state, role_provider_hint, role_regenerate_btn],
+                        show_progress="hidden", js=_js)
 
         role_mode.change(
             fn=lambda enabled: gr.update(visible=bool(enabled)),

@@ -11,6 +11,7 @@
 """
 
 import os
+import inspect
 import sys
 import unittest
 from types import SimpleNamespace
@@ -28,24 +29,20 @@ VOXCPM_LABELS = [
     "音色",
     "音色库目录",
     "重新生成预设音色",
-    "声音描述（design / clone 模式可选）",
-    "参考音频（clone / hifi 模式，可选）",
-    "参考音频转写文本（hifi 模式）",
+    "声音描述",
+    "参考音频",
+    "参考音频原文",
     "自动转写参考音频",
     "运行设备",
-    "降噪参考音频",
+    "参考音频降噪",
     "文本规范化",
-    "CFG 引导",
+    "音色贴合度（CFG）",
     "推理步数",
     "语速",
     "分块字数",
-    "启用 torch.compile 优化",
+    "推理加速（torch.compile）",
     "输出格式",
 ]
-
-# Phase 5 在 VoxCPM 参数之后追加了 role_mode、剧本文件、角色表、3 个 override 开关。
-ROLE_PARAM_COUNT = 6
-
 
 def _label_matches(props: dict, label: str) -> bool:
     actual = str(props.get("label") or "")
@@ -94,10 +91,9 @@ class TestVoxCPMUiWiring(unittest.TestCase):
         inputs = deps[0].get("inputs") or []
         self.assertGreaterEqual(len(inputs), len(VOXCPM_LABELS),
                                 "process_form 输入数量不足")
-        # VoxCPM 的 18 个参数按签名顺序排列，后面只允许追加角色模式参数。
-        start = -(ROLE_PARAM_COUNT + len(VOXCPM_LABELS))
-        end = -ROLE_PARAM_COUNT if ROLE_PARAM_COUNT else None
-        voxcpm_ids = set(inputs[start:end])
+        # 通过实际签名定位，后面新增角色参数时仍能验证 VoxCPM 的接线。
+        parameters = list(inspect.signature(self.web_ui.process_form).parameters)
+        voxcpm_ids = {inputs[i] for i, name in enumerate(parameters) if name.startswith("voxcpm_")}
         comps = self._components()
         for label in VOXCPM_LABELS:
             matches = [c for c in comps if _label_matches(c.get("props", {}) or {}, label)]

@@ -1,14 +1,5 @@
 import sys
 import os
-import warnings
-
-# Gradio 5 的轮询使用旧状态码常量，只过滤这条兼容性提醒，保留其他警告。
-warnings.filterwarnings(
-    "ignore",
-    message=".*HTTP_422_UNPROCESSABLE_ENTITY.*deprecated.*",
-    category=DeprecationWarning,
-    module=r"gradio\.routes",
-)
 
 # ═══════════════════════════════════════════════════════════════
 # 自动检测 & 切换到 Chatterbox 虚拟环境
@@ -42,6 +33,11 @@ if os.path.exists(_venv_python) and sys.executable != _venv_python:
 # ═══════════════════════════════════════════════════════════════
 
 import argparse
+
+from audiobook_generator.utils.gradio_compat import configure_gradio_status_compat
+
+# 在最终解释器中、导入 Gradio 前设置，自动切换虚拟环境后也会执行。
+configure_gradio_status_compat()
 
 from audiobook_generator.config.ui_config import UiConfig
 from audiobook_generator.ui.web_ui import host_ui

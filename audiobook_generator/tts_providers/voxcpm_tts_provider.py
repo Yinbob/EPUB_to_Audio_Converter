@@ -264,7 +264,15 @@ def _voxcpm_accepts_seed(model) -> bool:
         return False
 
 
-def _load_voxcpm_model(model_name=None, device="auto", optimize=True, cache=True):
+def _load_voxcpm_denoiser():
+    """按需加载降噪，独立于 TTS 的 bfloat16 低内存构造窗口。"""
+    from voxcpm.zipenhancer import ZipEnhancer
+
+    logger.info("正在加载参考音频降噪模型 ZipEnhancer（首次使用会下载）")
+    return ZipEnhancer()
+
+
+def _load_voxcpm_model(model_name=None, device="auto", optimize=True, cache=True, denoise=False):
     """加载 VoxCPM 模型。
 
     cache=True 时进程内复用（转换 worker）；cache=False 供 WebUI 试听等临时
@@ -274,7 +282,7 @@ def _load_voxcpm_model(model_name=None, device="auto", optimize=True, cache=True
 
     model_name = model_name or DEFAULT_VOXCPM_MODEL
     normalized_device = _normalize_device(device)
-    key = (model_name, normalized_device, bool(optimize))
+    key = (model_name, normalized_device, bool(optimize), bool(denoise))
 
     if cache and _voxcpm_model is not None and _voxcpm_model_key == key:
         return _voxcpm_model
@@ -297,10 +305,13 @@ def _load_voxcpm_model(model_name=None, device="auto", optimize=True, cache=True
         rss_before, _ = _read_process_memory_gb()
         model = VoxCPM.from_pretrained(
             model_name,
-            load_denoiser=False,  # denoise=True 时才需要 ZipEnhancer，默认不加载省显存
+            load_denoiser=False,  # 降噪模型在下方独立加载，避免被 bfloat16 默认 dtype 影响
             optimize=optimize,
             device=normalized_device,
         )
+
+    if denoise:
+        model.denoiser = _load_voxcpm_denoiser()
 
     if cache:
         _voxcpm_model = model
@@ -674,7 +685,9 @@ class VoxCPMTTSProvider(BaseTTSProvider):
             f"VoxCPM TTS 开始处理 | 模型: {self.model_name} | 模式: {self.mode} | "
             f"文本长度: {len(text)}"
         )
-        model = _load_voxcpm_model(self.model_name, self.device_raw, self.optimize, cache=True)
+        model = _load_voxcpm_model(
+            self.model_name, self.device_raw, self.optimize, cache=True, denoise=self.denoise
+        )
         sample_rate = getattr(model.tts_model, "sample_rate", VOXCPM_SAMPLE_RATE)
 
         reference_audio, prompt_text = self._ensure_reference_audio(model)

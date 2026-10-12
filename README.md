@@ -915,7 +915,7 @@ python3 main.py input.epub output_dir --tts voxcpm \
 | `--voxcpm_chunk_chars` | `400` | 长文本分块字数（VoxCPM 长文本会语速漂移/OOM） |
 | `--voxcpm_speed` | `1.0` | 语速 0.5~2.0（ffmpeg atempo，保持音调） |
 | `--voxcpm_normalize / --no-voxcpm_normalize` | 开 | 文本规范化（展开数字/日期） |
-| `--voxcpm_denoise` | 关 | 参考音频降噪（需下载 ZipEnhancer，可能改变音色） |
+| `--voxcpm_denoise` | CLI 关 / WebUI 开 | 参考音频降噪（需下载 ZipEnhancer，可能改变音色） |
 | `--voxcpm_optimize / --no-voxcpm_optimize` | 开 | torch.compile（CUDA Graphs，不支持多线程并发） |
 | `--voxcpm_seed` | 空 | 固定 seed（design 默认使用预设 seed） |
 
@@ -932,11 +932,17 @@ python3 main.py input.epub output_dir --tts voxcpm \
 
 ### 7️⃣ WebUI 可用选项（VoxCPM 标签页）
 
+常用页面只保留合成模式、音色试听、语速与输出格式。切换到「声音克隆」后显示参考音频；
+「精细克隆」对应 hifi 模式，额外显示原文与自动转写。可选的声音描述在「声音风格」中。
+「更多设置」默认收起，分为「音频处理」「生成质量」「模型音色」三个二级页，原有参数仍全部可用。
+WebUI **默认开启参考音频降噪**，模型加载会同步启用 ZipEnhancer；首次生成需从 ModelScope 下载降噪模型。
+它处理用于克隆的参考音频，不是生成后对输出音频做降噪。可在「更多设置 → 音频处理」关闭。
+
 | 选项 | 说明 |
 |------|------|
 | **模型** | HF 模型 ID（默认 `openbmb/VoxCPM2`）或本地目录 |
 | **运行设备** | auto / cpu / cuda / cuda:N |
-| **合成模式** | 描述生成 / 声音克隆 / 极致克隆 |
+| **合成模式** | 预设与描述 / 声音克隆 / 精细克隆（hifi） |
 | **音色** | 6 个内置预设 + `voices/` 里的自定义音频，预设首个使用自动生成缓存 |
 | **试听当前预设音色** | 生成/返回预设参考音频（缓存命中不加载模型） |
 | **重新生成预设音色** | 忽略已有缓存，重新生成参考音频 |
