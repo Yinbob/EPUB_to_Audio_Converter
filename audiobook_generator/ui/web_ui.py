@@ -2083,6 +2083,18 @@ def refresh_batches():
     return gr.update(choices=get_folders_list(), value=None), gr.update(choices=[], value=[])
 
 
+def refresh_library_on_open(folder_name, selected_files):
+    """进入资源库时重新扫描磁盘，保留仍存在的批次与文件勾选。"""
+    folders = get_folders_list()
+    selected_folder = folder_name if folder_name in folders else (folders[0] if folders else None)
+    files = get_files_in_folder(selected_folder) if selected_folder else []
+    if selected_folder == folder_name:
+        selected = [name for name in (selected_files or []) if name in files]
+    else:
+        selected = files
+    return gr.update(choices=folders, value=selected_folder), gr.update(choices=files, value=selected)
+
+
 def load_files_for_folder(folder_name):
     files = get_files_in_folder(folder_name)
     return gr.update(choices=files, value=files)
@@ -4212,7 +4224,7 @@ def host_ui(config):
                     start_btn = gr.Button("🚀 开始生成有声书", elem_classes="btn-primary pulse", variant="primary")
 
             # ════════════ 资源库页 ════════════
-            with gr.Tab("资源库", id="tab_library", elem_id="library_tab"):
+            with gr.Tab("资源库", id="tab_library", elem_id="library_tab") as library_tab:
                 gr.HTML('<div class="hero"><h1>资源库</h1><p>管理已生成的音频文件：批量下载、打包导出、一键清理。</p></div>')
                 with gr.Row(elem_classes="row-stack"):
                     with gr.Column(scale=3):
@@ -4551,8 +4563,13 @@ def host_ui(config):
         ui.load(fn=get_progress_info, inputs=None, outputs=[progress_state, progress_timer], show_progress="hidden")
 
         # 资源库
+        library_tab.select(
+            fn=refresh_library_on_open, inputs=[folder_dropdown, file_selector],
+            outputs=[folder_dropdown, file_selector], show_progress="hidden", queue=False,
+        )
         refresh_btn.click(fn=refresh_batches, inputs=None, outputs=[folder_dropdown, file_selector], show_progress="hidden")
-        folder_dropdown.change(fn=load_files_for_folder, inputs=folder_dropdown, outputs=file_selector, show_progress="hidden")
+        # 仅用户切换批次时默认全选，避免自动刷新回写下拉框时覆盖保留的勾选。
+        folder_dropdown.input(fn=load_files_for_folder, inputs=folder_dropdown, outputs=file_selector, show_progress="hidden")
         select_all_btn.click(fn=lambda f: gr.update(value=get_files_in_folder(f)), inputs=folder_dropdown, outputs=file_selector, show_progress="hidden")
         deselect_all_btn.click(fn=lambda: gr.update(value=[]), inputs=None, outputs=file_selector, show_progress="hidden")
         delete_btn.click(fn=delete_selected_files, inputs=[folder_dropdown, file_selector],
