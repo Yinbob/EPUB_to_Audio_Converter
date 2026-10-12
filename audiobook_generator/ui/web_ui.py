@@ -76,6 +76,7 @@ from audiobook_generator.utils.voxcpm_voices import (
 from audiobook_generator.utils.log_handler import generate_unique_log_path
 from audiobook_generator.ui.ambient_background import AMBIENT_CSS, AMBIENT_LAYER_HTML
 from audiobook_generator.ui.progress_parser import decide_progress_state, parse_progress
+from audiobook_generator.ui.log_layout import LOG_LAYOUT_HEAD_HTML
 from audiobook_generator.ui.theme import THEME_CSS, THEME_HEAD_HTML, THEME_TOKENS_CSS
 from audiobook_generator.ui.voxcpm_panel import build_voxcpm_panel
 from audiobook_generator.utils.mimo_config import (
@@ -2094,7 +2095,7 @@ def load_files_for_folder(folder_name):
 #    这样 shimmer / 宽度过渡等动画可以连续播放，不会出现"一闪一闪"；
 # 2) 指针交互：卡片跟随鼠标的高光、按钮点击水波纹；
 # 3) 供按钮 js= 调用：点击「开始生成」后平滑滚动到顶部进度条。
-HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + """
+HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + LOG_LAYOUT_HEAD_HTML + """
 <script>
 (function () {
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -2468,18 +2469,10 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + """
 
     // 按钮：点击水波纹
     document.addEventListener('pointerdown', function (event) {
-      // 多角色模式是核心入口，单独做一次回弹 + 光晕反馈，和普通开关拉开层级。
-      var roleSwitch = event.target && event.target.closest && event.target.closest('.advanced-switch');
-      if (roleSwitch) {
-        roleSwitch.classList.remove('is-switching');
-        void roleSwitch.offsetWidth;
-        roleSwitch.classList.add('is-switching');
-        window.setTimeout(function () { roleSwitch.classList.remove('is-switching'); }, 560);
-      }
-
       var btn = event.target && event.target.closest && event.target.closest(
         '.btn-primary, .btn-ghost, .btn-mini, .btn-danger, .tab-nav button, .engine-tab');
-      if (!btn || btn.disabled) return;
+      // 剧本生成使用 CSS 按压反馈，避免叠加水波纹与异步表单更新。
+      if (!btn || btn.disabled || btn.id === 'role_split_btn') return;
       var rect = btn.getBoundingClientRect();
       var ink = document.createElement('span');
       ink.className = 'ata-ripple';
@@ -3522,7 +3515,13 @@ body.modal-open::before {
   overflow: visible !important;
   background: transparent !important;
 }
-#advanced_modal #role_split_btn { margin: 4px 0 8px; }
+#advanced_modal #role_split_btn {
+  margin: 4px 0 8px;
+  transform: scale(1);
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1) !important;
+}
+#advanced_modal #role_split_btn:hover { transform: scale(1); }
+#advanced_modal #role_split_btn:active:not(:disabled) { transform: scale(0.985); }
 #advanced_modal #role_split_btn:disabled {
   opacity: 0.5 !important; cursor: not-allowed !important;
   transform: none !important; box-shadow: none !important;
@@ -3567,7 +3566,7 @@ body.modal-open::before {
 }
 #advanced_modal .modal-footer .modal-done { flex: 0 0 176px; width: 176px; margin: 0 !important; }
 
-/* 多角色模式：独立于普通开关的主功能入口，使用蓝色强调、左侧标线和点击回弹。 */
+/* 多角色模式：按压与释放由 CSS transition 衔接，快速重复点击不重启动画。 */
 #advanced_modal .toggle.advanced-switch {
   position: relative !important;
   overflow: hidden !important;
@@ -3578,25 +3577,27 @@ body.modal-open::before {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34), 0 7px 20px rgba(0, 113, 227, 0.07) !important;
   text-align: left !important;
   transform-origin: center center;
-  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
-              border-color 0.24s ease, background-color 0.24s ease, box-shadow 0.24s ease !important;
+  transform: scale(1);
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1) !important;
 }
 #advanced_modal .toggle.advanced-switch::before {
   content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px;
   border-radius: 0 8px 8px 0; background-color: var(--apple-blue);
-  opacity: 0.48; transition: opacity 0.24s ease, box-shadow 0.24s ease;
+  opacity: 0.48; transition: opacity 160ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 #advanced_modal .toggle.advanced-switch::after {
   content: ''; position: absolute; right: -34px; top: -50px; width: 132px; height: 132px;
   border-radius: 50%; pointer-events: none; opacity: 0.5;
   background: radial-gradient(circle, rgba(94, 92, 230, 0.2), transparent 68%);
-  transition: opacity 0.24s ease, transform 0.24s ease;
+  transition: opacity 160ms cubic-bezier(0.23, 1, 0.32, 1);
 }
+@media (hover: hover) and (pointer: fine) {
 #advanced_modal .toggle.advanced-switch:hover {
-  transform: translateY(-1px);
   border-color: rgba(0, 113, 227, 0.48) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 10px 26px rgba(0, 113, 227, 0.13) !important;
 }
+}
+#advanced_modal .toggle.advanced-switch:active { transform: scale(0.985) !important; }
 #advanced_modal .toggle.advanced-switch label {
   position: relative; z-index: 1; justify-content: flex-start !important;
   width: 100% !important; font-weight: 650 !important; letter-spacing: -0.008em;
@@ -3610,7 +3611,7 @@ body.modal-open::before {
   left: 4px !important; width: 20px !important; height: 20px !important;
   background: #fff !important;
   box-shadow: 0 2px 7px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
-  transition: transform 0.36s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1) !important;
 }
 #advanced_modal .toggle.advanced-switch label:has(input:checked)::before {
   background-color: var(--apple-blue) !important;
@@ -3628,21 +3629,9 @@ body.modal-open::before {
   opacity: 1; box-shadow: 0 0 12px rgba(0, 113, 227, 0.55);
 }
 #advanced_modal .toggle.advanced-switch:has(input:checked)::after { opacity: 0.9; }
-#advanced_modal .toggle.advanced-switch.is-switching {
-  animation: advancedSwitchPress 0.52s cubic-bezier(0.22, 1, 0.36, 1);
-}
-#advanced_modal .toggle.advanced-switch.is-switching::after {
-  animation: advancedSwitchGlow 0.52s ease-out;
-}
-@keyframes advancedSwitchPress {
-  0% { transform: scale(1); }
-  35% { transform: scale(0.985); }
-  100% { transform: scale(1); }
-}
-@keyframes advancedSwitchGlow {
-  0% { opacity: 0.35; transform: scale(0.72); }
-  65% { opacity: 0.95; transform: scale(1.08); }
-  100% { opacity: 0.7; transform: scale(1); }
+@media (prefers-reduced-motion: reduce) {
+  #advanced_modal .toggle.advanced-switch:active,
+  #advanced_modal #role_split_btn:active:not(:disabled) { transform: none !important; }
 }
 :root:root .dark #advanced_modal .toggle.advanced-switch,
 :root:root.dark #advanced_modal .toggle.advanced-switch {

@@ -769,10 +769,9 @@ class TestRoleScriptUiWiring(unittest.TestCase):
             "#advanced_modal .modal-footer",
             "#advanced_modal .modal-footer .modal-done",
             "#advanced_modal .toggle.advanced-switch",
-            "#advanced_modal .toggle.advanced-switch.is-switching",
+            "#advanced_modal .toggle.advanced-switch:active",
             ":root:root.dark #advanced_modal .toggle.advanced-switch",
-            "advancedSwitchPress",
-            "advancedSwitchGlow",
+            "#advanced_modal #role_split_btn:active:not(:disabled)",
         ):
             self.assertIn(selector, css)
 
