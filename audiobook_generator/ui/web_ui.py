@@ -1638,8 +1638,10 @@ def process_form(provider,
     effective_preview = bool(preview) and not bool(role_mode)
     if role_mode and preview:
         gr.Warning("角色模式已忽略“预解析模式”，本次将执行真实语音合成。")
+    elif effective_preview:
+        gr.Warning("已开启预解析模式：本次只解析章节，不生成音频。需要音频请在高级设置中关闭此选项。")
 
-    gr.Info("🚀 有声书生成已开始！请在日志页查看实时进度。")
+    gr.Info("📋 预解析已开始，请查看日志。" if effective_preview else "🚀 有声书生成已开始！请在日志页查看实时进度。")
 
     configs = []
     for single_file in input_file:
@@ -1788,17 +1790,26 @@ def _batch_worker(config_list, log_file_path):
         pass
     batch_logger = _get_batch_logger(log_file_path)
     total = len(config_list)
+    failed = 0
     for idx, cfg in enumerate(config_list):
         book_name = Path(cfg.input_file).stem
         batch_logger.info("=" * 60)
         batch_logger.info(f"📚 [{idx + 1}/{total}] 开始转换: {book_name}")
         batch_logger.info("=" * 60)
         try:
-            main(cfg, log_file_path)
-            batch_logger.info(f"✅ [{idx + 1}/{total}] 完成: {book_name}")
+            if main(cfg, log_file_path) is not True:
+                raise RuntimeError("转换未成功完成，请查看前面的章节错误日志")
+            if cfg.preview:
+                batch_logger.info(f"📋 [{idx + 1}/{total}] 预解析完成（未生成音频）: {book_name}")
+            else:
+                batch_logger.info(f"✅ [{idx + 1}/{total}] 完成: {book_name}")
         except Exception as e:
+            failed += 1
             batch_logger.error(f"❌ [{idx + 1}/{total}] 失败: {book_name} — {e}")
-    batch_logger.info(f"🎉 全部处理完毕！共 {total} 本书")
+    if failed:
+        batch_logger.error(f"❌ 批次处理失败：{failed}/{total} 本书失败，请查看日志")
+    else:
+        batch_logger.info(f"🎉 全部处理完毕！共 {total} 本书")
 
 
 def launch_batch(configs):
@@ -4199,7 +4210,7 @@ def host_ui(config):
 </div>''')
                                 with gr.Group(elem_classes="toggle-grid advanced-toggle-grid"):
                                     output_text = gr.Checkbox(label="同步导出章节纯文本", value=saved["output_text"], elem_classes="toggle")
-                                    preview = gr.Checkbox(label="预解析模式（不消耗额度）", value=saved["preview"], elem_classes="toggle")
+                                    preview = gr.Checkbox(label="仅预解析（不生成音频）", value=saved["preview"], elem_classes="toggle")
                                     remove_endnotes = gr.Checkbox(label="剔除书末尾注", value=saved["remove_endnotes"], elem_classes="toggle")
                                     remove_reference_numbers = gr.Checkbox(label="清理数字文献引用", value=saved["remove_reference_numbers"], elem_classes="toggle")
                                 with gr.Row(elem_classes="advanced-field-row"):

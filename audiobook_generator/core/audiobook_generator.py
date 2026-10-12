@@ -128,6 +128,10 @@ class AudiobookGenerator:
             )
             tts_provider.text_to_speech(text, output_file, audio_tags)
 
+            # Provider 返回不代表已经写出音频，避免空结果被误报为成功。
+            if not os.path.isfile(output_file) or os.path.getsize(output_file) == 0:
+                raise RuntimeError(f"第 {idx} 章未生成有效音频文件：{output_file}")
+
             logger.info(f"✅ Converted chapter {idx}: {title}, output file: {output_file}")
 
             return True
@@ -472,7 +476,7 @@ class AudiobookGenerator:
                             f"  - 第 {plan.chapter_index} 章 {plan.title}: "
                             f"{plan.segment_count} 段"
                         )
-                    return
+                    return True
 
                 from audiobook_generator.role_script.audio_pipeline import require_ffmpeg_tools
 
@@ -536,12 +540,19 @@ class AudiobookGenerator:
                 for idx, title in failed_chapters:
                     logger.warning(f"  - Chapter {idx}: {title}")
                 logger.info(f"Conversion completed with {len(failed_chapters)} failed chapters. Check your output directory: {self.config.output_folder} and log file: {self.config.log_file} for more details.")
+                return False
+            elif self.config.preview:
+                logger.info("预解析完成（未生成音频）。请关闭预解析模式后重新生成。")
+                return True
             else:
                 logger.info(f"All chapters converted successfully. Check your output directory: {self.config.output_folder}")
+                return True
 
         except KeyboardInterrupt:
             logger.info("Audiobook generation process interrupted by user (Ctrl+C).")
+            return False
         except Exception as e:
             logger.exception(f"Error during audiobook generation: {e}")
+            return False
         finally:
             logger.debug("AudiobookGenerator.run() method finished.")

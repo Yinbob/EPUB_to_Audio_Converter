@@ -95,6 +95,8 @@ def parse_progress(log_content: str) -> dict:
         # 只在"当前这本书"的日志片段里找结束标记：日志文件是整个 UI 会话共用的，
         # 若用全文件搜索，上一批的"全部处理完毕"会让下一次生成的进度条一直停在已完成。
         "finished": _FINISHED_MARKER in segment,
+        "preview": "预解析完成（未生成音频）" in segment,
+        "failed": "批次处理失败" in segment,
         "has_markers": bool(current_book) or total_chapters > 0,
     }
 
@@ -141,11 +143,18 @@ def decide_progress_state(state: dict, run_alive: bool, batch_started: bool = Fa
                 "detail": "", "book": "", "active": True}
 
     if state["finished"] and total > 0:
+        if state.get("preview"):
+            return {"mode": MODE_FINISHED, "status": "📋 预解析完成（未生成音频）", "pct": 100,
+                    "detail": "关闭高级设置中的仅预解析选项后可生成音频", "book": book, "active": False}
         return {"mode": MODE_FINISHED, "status": "✅ 全部完成", "pct": 100,
                 "detail": f"章节 {total}/{total}", "book": book, "active": False}
 
     # 批次已结束但日志里没有结束标记 → 中断/失败
     if not run_alive:
+        if state.get("failed"):
+            return {"mode": MODE_FAILED, "status": "⚠️ 批次存在转换失败，详见日志",
+                    "pct": state["pct"], "detail": _detail(total, done, extra),
+                    "book": book, "active": False}
         if state["has_markers"]:
             status = "⏹ 已停止（可再次点击开始）" if manually_stopped else "⚠️ 生成已中断，详见日志"
             return {"mode": MODE_INTERRUPTED, "status": status,
