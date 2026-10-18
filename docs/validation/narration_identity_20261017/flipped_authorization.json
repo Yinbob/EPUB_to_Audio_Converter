@@ -1,0 +1,15 @@
+{
+  "authorization_date": "2026-10-17",
+  "user_reply": "允许，仅这两章用于本次叙述归属验证",
+  "chapter_indices": [
+    5,
+    6
+  ],
+  "book_sha256": "e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011",
+  "source_characters": 27254,
+  "max_text_requests": 20,
+  "service": "project-configured DeepSeek text API",
+  "tts_requests_authorized": 0,
+  "existing_projects_may_be_modified": false,
+  "audio_upload_authorized": false
+}

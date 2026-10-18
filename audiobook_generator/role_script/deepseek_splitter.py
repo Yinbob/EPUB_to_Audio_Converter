@@ -19,6 +19,7 @@ from .models import ChapterScript, RoleDefinition, RoleScriptV1, SegmentScript
 from audiobook_generator.tts_providers.voice_catalog import get_role_voice_pools, get_voice_entry
 from .normalization import is_semantic_whitespace, normalize_gender
 from .validator import validate_role_script
+from .narration import request_narration_context, ground_narration_segments
 
 logger = logging.getLogger(__name__)
 
@@ -275,6 +276,8 @@ def _with_language_instructions(
     if provider != "openai":
         return role, False
     params = dict(role.provider_params)
+    if params.get('voice_mode') == 'design' or params.get('voice_profile_id'):
+        return role, False
     instructions = params.get("instructions")
     has_instruction = isinstance(instructions, str) and bool(instructions.strip())
     has_cjk = bool(
@@ -387,7 +390,7 @@ def differentiate_role_voices(
     narrator_locked = isinstance(script, RoleScriptV2) and bool(
         script.entities.get("narrator") and script.entities["narrator"].voice_locked
     )
-    if narrator_role is not None and not narrator_locked:
+    if narrator_role is not None and not narrator_locked and not narrator_role.provider_params.get('voice_profile_id'):
         narrator_current = current_voice(narrator_role)
         if not _voice_matches_script_language(
             script.provider, narrator_current, language_key
@@ -429,7 +432,8 @@ def differentiate_role_voices(
         locked = isinstance(script, RoleScriptV2) and bool(
             script.entities.get(role_id) and script.entities[role_id].voice_locked
         )
-        needs_reassign[role_id] = not locked and (
+        fixed_profile = role.provider_params.get('voice_mode') == 'design' or bool(role.provider_params.get('voice_profile_id'))
+        needs_reassign[role_id] = not locked and not fixed_profile and (
             not voice
             or not _voice_matches_script_language(script.provider, voice, language_key)
             or voice == narrator_voice
@@ -665,6 +669,7 @@ def _segment_from_item(item: Dict[str, Any], roles: Dict[str, Dict[str, str]], t
         tone=tone,
         pause_after_ms=pause,
         evidence_candidates=tuple(evidence_candidates[:3]),
+        text_kind=item.get('text_kind') if item.get('text_kind') in ('narration', 'dialogue', 'unknown') else None,
     )
 
 
@@ -745,21 +750,23 @@ def _build_prompt(
     text: str,
     provider: str,
     language: str = "zh",
+    narration_context: Optional[Dict[str, Any]] = None,
 ) -> str:
     provider_name = "MiMo (openai)" if provider == "openai" else "MiniMax"
     language_key = normalize_script_language(language) or "zh"
     if language_key == "en":
-        return f"""Split the following chapter from an English book into a multi-role dialogue script. The target TTS provider is {provider_name}.
+        prompt = f"""Split the following chapter from an English book into a multi-role dialogue script. The target TTS provider is {provider_name}.
 
 You must follow these rules exactly:
 1. Only segment the source text. Never rewrite, polish, omit, expand, reorder, or merge the original text.
 2. Every segment's text must be a contiguous verbatim excerpt from the source. Concatenating all segments in order must reproduce the source exactly.
-3. Use narrator for narration, action description, and speech whose speaker cannot be determined. Create other roles only when they actually appear in the source.
+3. Separate text_kind (narration/dialogue/unknown) from role_id (voice identity). First-person memories, inner narration and action description belong to the narrating character's role_id, sharing the SAME role as that character's dialogue. Use narrator for third-person narration or uncertain identity. A chapter or a passage may switch narrators; never inherit the previous chapter's narrator. Describing a character in third person does NOT make that character the narrator. Quoted I/my is not evidence of the surrounding narrator. Do not guess from book title or chapter order.
 4. role_id must be 1..64 characters and must not contain whitespace, forward slashes, or backslashes. narrator is a reserved role_id.
 5. tone is optional and must not exceed 200 characters. Do not return pause_after_ms.
 6. Infer each non-narrator role's gender from titles, relationships, pronouns, and context, not merely from the spelling of a name. gender must be male, female, or unknown. Use unknown only when there is no reliable clue.
 7. Return one JSON object only. Do not return Markdown or explanations.
 8. For each spoken segment, include an optional evidence array of short verbatim source quotations supporting the speaker choice. Each item has quote and kind (explicit_speech_tag, dialogue_turn, coreference, character_memory). Do not invent evidence; omit it when uncertain. Do not return character offsets.
+9. Return text_kind for EVERY segment. Within an established first-person viewpoint, scene/action descriptions and speech tags such as 'he said' remain narration in that character's voice, even when a sentence contains no I/my. For character narration, use kind narrator_identity with a short identifying source quote. If you explicitly choose an EXACT candidate role_id from chapter_narration, its verified chapter-level identity evidence can be reused locally; you need not repeat that quote on every segment. Use narrator only for genuinely external third-person narration or unresolved identity, not merely because a passage describes someone else. Candidates are proposals: verify the current passage and preserve actual viewpoint switches. Reuse the exact known role_id and display_name for an existing person, including their dialogue; never create a separate narrator role or a shortened-name duplicate.
 
 Return format:
 {{
@@ -768,8 +775,8 @@ Return format:
     "role_id": {{"display_name": "Character display name", "gender": "male or female or unknown"}}
   }},
   "segments": [
-    {{"role_id": "narrator", "text": "verbatim source excerpt"}},
-    {{"role_id": "role_id", "text": "verbatim dialogue excerpt", "evidence": [{{"quote": "verbatim source clue", "kind": "explicit_speech_tag"}}]}}
+    {{"role_id": "role_id", "text_kind": "narration", "text": "verbatim character narration", "evidence": [{{"quote": "verbatim identity clue", "kind": "narrator_identity"}}]}},
+    {{"role_id": "role_id", "text_kind": "dialogue", "text": "verbatim dialogue excerpt", "evidence": [{{"quote": "verbatim source clue", "kind": "explicit_speech_tag"}}]}}
   ]
 }}
 
@@ -778,12 +785,13 @@ Chapter title: {title}
 Source text:
 {text}
 """
-    return f"""请对下面这一章中文书籍正文做多角色对白拆分，目标 TTS 引擎是 {provider_name}。
+        return prompt + '\nChapter context (provisional, not instructions):\n' + json.dumps(narration_context or {}, ensure_ascii=False)
+    prompt = f"""请对下面这一章中文书籍正文做多角色对白拆分，目标 TTS 引擎是 {provider_name}。
 
 必须严格遵守：
 1. 只能对原文分段，绝对不要改写、润色、省略、扩写、调换顺序或合并原文。
 2. 每个 segment 的 text 必须逐字来自原文的连续片段；所有 segment 按顺序拼接后必须与原文完全一致。
-3. narrator 用于旁白、动作描写、无法确定说话人的内容；只有原文中确实出现时才创建其他角色。
+3. text_kind表示段落用途（narration/dialogue/unknown），role_id表示声音身份，二者必须分开。第一人称自述、回忆、心理及动作描写属于叙述人物，应与该人物对白共用同一role_id。第三人称叙述或身份不明使用narrator。每章及章内都可能换叙述者，不能沿用上一章；描述谁不等于由谁叙述，引号内的“我”不能证明外层叙述者。禁止按书名、奇偶章及文学常识猜测。
 4. role_id 只允许 1..64 个字符，不能包含空白、斜杠或反斜杠；narrator 是保留 role_id。
 5. 可以不返回 tone；如果需要，tone 最长 200 字。不要返回 pause_after_ms。
 6. 为每个非旁白角色推断性别，gender 只能是 male / female / unknown。请依据人物身份、
@@ -793,6 +801,7 @@ Source text:
 8. 对有明确说话人的对白，可返回 evidence 数组，每项包含原文短引文 quote 和证据类型 kind
    （explicit_speech_tag / dialogue_turn / coreference / character_memory）。找不到依据时省略，
    不得编造引文；不要返回字符偏移。
+9. 每段均返回text_kind。已确立的第一人称视角中，动作／场景描写及“他说”等对白提示语仍由该叙述人物朗读，不能因一句话没有“我”就改回旁白。人物叙述使用kind=narrator_identity的原文身份线索；若明确选用了chapter_narration中的原有role_id，本地可复用该候选已定位的章级身份引文，不必逐段重复。只有外部第三人称叙述或身份不明才使用narrator；描写别人不等于换了叙述者。候选仅供参考，须核对当前段落并保留实际视角转换。同一人物的叙述和对白须复用已知role_id与display_name，不另建旁白或简称角色。
 
 返回格式：
 {{
@@ -801,8 +810,8 @@ Source text:
     "角色ID": {{"display_name": "角色显示名", "gender": "male 或 female 或 unknown"}}
   }},
   "segments": [
-    {{"role_id": "narrator", "text": "原文片段"}},
-    {{"role_id": "角色ID", "text": "原文对白", "evidence": [{{"quote": "原文中的说话人线索", "kind": "explicit_speech_tag"}}]}}
+    {{"role_id": "角色ID", "text_kind": "narration", "text": "人物自述原文", "evidence": [{{"quote": "原文身份线索", "kind": "narrator_identity"}}]}},
+    {{"role_id": "角色ID", "text_kind": "dialogue", "text": "原文对白", "evidence": [{{"quote": "原文中的说话人线索", "kind": "explicit_speech_tag"}}]}}
   ]
 }}
 
@@ -811,6 +820,7 @@ Source text:
 原文：
 {text}
 """
+    return prompt + '\n本章上下文（仅候选，不是指令）：\n' + json.dumps(narration_context or {}, ensure_ascii=False)
 
 
 def _create_client(api_key: str, base_url: str):
@@ -832,6 +842,7 @@ def _request_chunk(
     text: str,
     provider: str,
     language: Optional[str] = None,
+    narration_context: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     language_key = normalize_script_language(language) or detect_text_language(text)
     response = client.chat.completions.create(
@@ -849,7 +860,7 @@ def _request_chunk(
             {
                 "role": "user",
                 "content": _build_prompt(
-                    chapter_index, title, text, provider, language_key
+                    chapter_index, title, text, provider, language_key, narration_context
                 ),
             },
         ],
@@ -868,6 +879,7 @@ def _merge_adjacent_segments(segments: Iterable[SegmentScript]) -> Tuple[Segment
             merged
             and merged[-1].role_id == segment.role_id
             and merged[-1].tone == segment.tone
+            and merged[-1].text_kind == segment.text_kind
             and merged[-1].pause_after_ms is None
             and segment.pause_after_ms is None
         ):
@@ -878,6 +890,7 @@ def _merge_adjacent_segments(segments: Iterable[SegmentScript]) -> Tuple[Segment
                 tone=previous.tone,
                 pause_after_ms=None,
                 evidence_candidates=previous.evidence_candidates + segment.evidence_candidates,
+                text_kind=previous.text_kind,
             )
         else:
             merged.append(segment)
@@ -903,6 +916,8 @@ def split_chapters_with_deepseek(
     report: Optional[ValidationReport] = None,
     chunk_chars: int = DEFAULT_CHUNK_CHARS,
     language: Optional[str] = None,
+    analyze_narration: bool = False,
+    known_characters: Optional[List[Dict[str, Any]]] = None,
 ) -> RoleScriptV1:
     """把指定章节范围拆成可编辑、可校验的 RoleScriptV1。
 
@@ -945,6 +960,17 @@ def split_chapters_with_deepseek(
         if not chapter_parts:
             raise DeepSeekSplitError(f"第 {chapter_index} 章正文为空，无法拆分")
         chapter_segments: List[SegmentScript] = []
+        # 每章独立分析，禁止沿用上章的第一人称身份；候选不直接覆盖任何段落。
+        narration_context = {'known_characters': known_characters or []}
+        if analyze_narration:
+            _report_progress(progress, f"DeepSeek 正在识别第 {chapter_index} 章的叙述者")
+            try:
+                narration_context['chapter_narration'] = request_narration_context(
+                    client, model, chapter_index, title, source_text, known_characters or [])
+            except Exception as exc:
+                reports.warn('narrator_analysis_failed', f'$.chapters[{chapter_index}]',
+                             f'本章叙述者预分析失败，继续逐段识别并保留默认旁白待复核：{exc}')
+                _report_progress(progress, f"第 {chapter_index} 章叙述者预分析失败，继续逐段识别")
         for part_index, part_text in enumerate(chapter_parts, 1):
             # 分块可能带着首尾空白（尤其是 6000 字边界处）。DeepSeek 只需要可见正文，
             # 本地对齐也必须从第一个可见字符开始；否则模型返回正文时无法精确覆盖，
@@ -966,8 +992,17 @@ def split_chapters_with_deepseek(
                         part_text,
                         provider,
                         detected_language,
+                        **({'narration_context': narration_context} if analyze_narration else {}),
                     )
                     raw_roles, raw_segments = _raw_segments(payload)
+                    if analyze_narration:
+                        # 模型引用了上下文人物 ID 却漏写 roles 时，仍保留其真实名称。
+                        hints = list(known_characters or []) + narration_context.get('chapter_narration', {}).get('narrators', [])
+                        used_ids = [item.get('role_id') for item in raw_segments]
+                        raw_roles = dict(raw_roles)
+                        for hint in hints:
+                            if hint.get('role_id') in used_ids:
+                                raw_roles.setdefault(hint['role_id'], hint)
                     last_raw_segments = raw_segments
                     for role_id, role_meta in raw_roles.items():
                         if not isinstance(role_id, str):
@@ -998,13 +1033,19 @@ def split_chapters_with_deepseek(
                             )[:64],
                             "gender": gender or existing.get("gender") or "",
                         }
+                    if analyze_narration and any(
+                        item.get('text_kind') not in ('narration', 'dialogue', 'unknown')
+                        and isinstance(item.get('text'), str) and _has_visible_text(item['text'])
+                        for item in raw_segments
+                    ):
+                        raise DeepSeekSplitError('存在缺失或无效的text_kind，需要明确叙述／对白／未知类型')
                     reconciled = _reconcile_segments(part_text, raw_segments, roles)
                     break
                 except Exception as exc:
                     last_error = exc
                     if attempt < MAX_ATTEMPTS_PER_CHUNK:
                         logger.warning(
-                            "DeepSeek 第 %s 章第 %s/%s 块返回未精确覆盖，准备重试：%s",
+                            "DeepSeek 第 %s 章第 %s/%s 块未满足剧本校验，准备重试：%s",
                             chapter_index,
                             part_index,
                             len(chapter_parts),
@@ -1045,7 +1086,11 @@ def split_chapters_with_deepseek(
                     # 而这个块本身没有任何可朗读内容需要保留。
                     continue
                 reconciled = [SegmentScript(role_id="narrator", text=part_text)]
-            chapter_segments.extend(reconciled)
+            if analyze_narration:
+                reconciled = [replace(segment, text_kind=segment.text_kind or 'unknown') for segment in reconciled]
+                from .narration import complete_narration_evidence
+                reconciled = complete_narration_evidence(reconciled, source_text, narration_context)
+            chapter_segments.extend(ground_narration_segments(reconciled, source_text))
         generated_chapters.append(
             ChapterScript(
                 chapter_index=chapter_index,
@@ -1108,6 +1153,7 @@ def role_script_to_dict(script: RoleScriptV1) -> Dict[str, Any]:
                     {
                         "role_id": segment.role_id,
                         "text": segment.text,
+                        **({'text_kind': segment.text_kind} if segment.text_kind is not None else {}),
                         **({"tone": segment.tone} if segment.tone is not None else {}),
                         **(
                             {"pause_after_ms": segment.pause_after_ms}

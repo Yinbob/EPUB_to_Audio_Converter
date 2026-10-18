@@ -1,0 +1,39 @@
+{
+  "kind": "single_boundary_requested_gain40_preview",
+  "manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/annotation/transition_preview_gain40_v1/manifest.json",
+  "manifest_sha256": "766922f616c5ee4717abb2a98c045032022a37200853b5ea9cfb8c4ef5ba8bc0",
+  "human_feedback": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/annotation/transition_preview_v1/human_feedback_gain40_request_20261016.json",
+  "human_feedback_sha256": "37a409c09832cfde2997a51cc786e122e268d97f101ae1e0ca7f644f64c53785",
+  "baseline_matches_previous_preview_pcm": true,
+  "sample_rate": 24000,
+  "samples": 464640,
+  "duration_seconds": 19.36,
+  "operation": {
+    "kind": "nonzero_onset_gain",
+    "added_samples": 0,
+    "start_sample": 226080,
+    "end_sample": 235680,
+    "initial_gain": 0.4,
+    "final_gain": 1.0,
+    "onset_kind": "low_energy_estimate_not_phoneme_alignment"
+  },
+  "outside_operation_pcm_unchanged": true,
+  "asr_error_rate": 0.0,
+  "asr_model_fingerprint": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6",
+  "additional_tts_requests": 0,
+  "automatically_applied": false,
+  "new_candidate_human_preference": null,
+  "full_suite": {
+    "ran": 457,
+    "skipped": 30,
+    "seconds": 13.587,
+    "status": "OK",
+    "log": "/private/tmp/audio_quality_regression_final_v11.log"
+  },
+  "new_tests": 1,
+  "limitations": [
+    "One previously reviewed boundary, not an independent evaluation.",
+    "40% means waveform amplitude, not a perceived loudness percentage.",
+    "ASR equality does not establish first-word audibility or naturalness."
+  ]
+}

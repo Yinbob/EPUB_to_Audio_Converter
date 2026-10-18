@@ -1,0 +1,47 @@
+{
+  "version": "listening-player-actual-v51",
+  "export": {
+    "trials": 36,
+    "output": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_listener_pilot_player_20261017",
+    "human_review_required": true,
+    "requests_sent": 0,
+    "distribution_note": "只分发 public 目录；答案文件留给实验者，不与材料一起发给听众。"
+  },
+  "public_page": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_listener_pilot_player_20261017/public/index.html",
+  "page_sha256": "21bc08c2dc087ba1befc3e8a2eea28093cb54db2f82beddb004840a72ebc21cb",
+  "verified_public_files": 25,
+  "same_trial_ids_answers_sources_and_audio": true,
+  "old_pack_unchanged": true,
+  "empty_real_responses": true,
+  "synthetic_event_test_passed": true,
+  "real_browser_verified": false,
+  "independent_static_review": "未发现必须修复的代码/数据泄露/CSV互操作问题；不涵盖实际浏览器",
+  "visual_review_disposition": "recapture",
+  "screenshots_available": false,
+  "contrast": {
+    "minimum_declared_text_ratio": 4.96,
+    "disabled_opacity_removed": true,
+    "detector_false_positive": "dark #b8b8c0 paired with light-only #ffffff",
+    "actual_dark_secondary_ratios": [
+      7.95,
+      9.17
+    ],
+    "exception_scope": "low-contrast only in listening_player.html"
+  },
+  "tests": {
+    "full_run": 604,
+    "full_passed": 574,
+    "skipped": 30,
+    "failures": 0,
+    "errors": 0,
+    "full_log": "/tmp/listening_player_v51_full.log",
+    "full_seconds": 19.121,
+    "final_targeted": 21,
+    "final_targeted_log": "/tmp/listening_player_v51_final_targeted.log"
+  },
+  "whole_material_human_review_pending": true,
+  "listener_results_available": false,
+  "new_tts_requests": 0,
+  "new_llm_requests": 0,
+  "overall_project_complete": false
+}

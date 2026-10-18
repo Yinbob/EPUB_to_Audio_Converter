@@ -4,6 +4,19 @@ from main import handle_args
 
 
 class TestHandleArgs(unittest.TestCase):
+    @patch('sys.argv',['program','input_file.epub','output_folder','--tts','openai','--audio_core_tail_repeat_mode','auto'])
+    def test_tail_repeat_mode(self):
+        self.assertEqual(handle_args().audio_core_tail_repeat_mode,'auto')
+
+    @patch('sys.argv', ['program', 'input_file.epub', 'output_folder', '--tts', 'openai', '--audio_core_transition_boundaries', 'a|b', '--audio_core_transition_source_group', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'])
+    def test_audio_core_reviewed_transition_boundaries(self):
+        config = handle_args()
+        self.assertEqual(config.audio_core_transition_boundaries, ['a|b'])
+        self.assertEqual(config.audio_core_transition_source_group, 'a' * 64)
+
+    @patch('sys.argv', ['program', 'input_file.epub', 'output_folder', '--tts', 'openai', '--audio_core_max_repair_characters', '0'])
+    def test_audio_core_repair_character_limit(self):
+        self.assertEqual(handle_args().audio_core_max_repair_characters, 0)
 
     @patch('sys.argv', ['program', 'input_file.epub', 'output_folder', '--tts', 'openai'])
     def test_openai_args(self):

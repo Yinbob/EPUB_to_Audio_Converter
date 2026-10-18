@@ -1,0 +1,57 @@
+{
+  "version": "casting_exact_scene_v26",
+  "execution": "completed_engineering_and_real_bank_offline",
+  "exact_search": {
+    "limit": 4096,
+    "scope": "硬约束后的组合；只保证当前代理目标",
+    "random_changed": false,
+    "large_search_optimality": "not_proven"
+  },
+  "listening": {
+    "new_input": "每条件有序 report_paths；单 report_path 继续支持",
+    "all_roles_required": true,
+    "cross_scene_reference_provenance": true,
+    "quality_and_pcm_gate_preserved": true,
+    "public_answers_hidden": true,
+    "synthetic_fixture_trials": 16,
+    "synthetic_fixture_conditions": 2,
+    "synthetic_fixture_roles": 3,
+    "real_listener_results": null
+  },
+  "real_bank_verification": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_exact_20261016/offline_validation.json",
+  "real_bank_verification_sha256": "7279eae737a0b03f6388c64bc692162017e26dd2c0fed7babfd54ad1690e0dd5",
+  "real_input_hashes": {
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/role_script.confirmed.json": "738c0c1926fd66e5a279da8ee5d435028f1bef81efda00e4f599e6ee2b6fdb25",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/source_chapters.json": "1b7c00f6f0a1ada8864e42346945125e985bffbaab155af07f58e27985f225aa",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_confirmed_20261016/fit_penalties.confirmed.json": "b6580e78352fc8f7b22824a0db9b4efa1f82e60315ce520c841db9ae9b9a50ee",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_confirmed_20261016/offline_validation.json": "6c25c96c060cb6bccfb5140946b649d3516dd26090f9c9170dc74f55df76ec85",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/voice_bank.en.mia_chloe.json": "efc122113c3a08c325c1e92e815eeb153b03b00bd4da3a6a075d0a0fc6082117",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/human_review.fit_confirmed.json": "ac9adb072caef5d52f78aa363d670d22f490af8517d5895d625307de967e912f"
+  },
+  "old_interaction_objective": 1.630143880644932,
+  "new_interaction_objective": 1.580143880644932,
+  "planned_unique_requests": 22,
+  "planned_input_characters": 2151,
+  "tests": {
+    "ran": 519,
+    "skipped": 30,
+    "seconds": 15.458,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_exact_scene_regression_v26.log",
+    "log_sha256": "d6798792e801b150047988f77a6135270a2c8626842c7c202c37873c1d67ffaf"
+  },
+  "new_test_methods": 8,
+  "new_tts_requests": 0,
+  "new_audio_generated": false,
+  "human_participants": 0,
+  "remaining": [
+    "实际英语对白合成、音频质量和三秒参考检验",
+    "人工试听和独立听众辨识实验",
+    "E06T 与英文数字人工核验",
+    "真实边界阳性与独立来源划分"
+  ],
+  "source_code_sha256": {
+    "audiobook_generator/audio_core/casting.py": "5ea88f170b2b2aecefee5a68bc3ebc114bf7f329eb1b2a812441d16ecfc2ec74",
+    "audiobook_generator/audio_core/listening.py": "a88feed622c2c421c9fe1abf1a9a32827e3d6bbf41e951d74f2f0fbecfe2346e"
+  }
+}

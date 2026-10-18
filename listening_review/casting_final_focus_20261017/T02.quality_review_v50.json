@@ -1,0 +1,20 @@
+{
+  "version": "audio-quality-human-review-v1",
+  "source_report_sha256": "0a56d88927b00267ffede1da38e6486d712fb0e534e8585782a23a82f2bcd4c0",
+  "source_audio_sha256": "e3b2f70386567d95636ae0d6fba39d6b566b6161536f995e343929aa056d03b1",
+  "reviewer": "project_user",
+  "reviewed_at": "2026-10-17T16:05:03.784814+08:00",
+  "human_acceptance": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_final_focus_20261017/human_acceptance_v50.json",
+    "sha256": "051abe4f13e511ead6f62de8677504bd318c885b539d4461aecd6b80cb4df78b"
+  },
+  "decisions": [
+    {
+      "scope": "boundary",
+      "index": 0,
+      "issue_sha256": "1fbc50c7091b74fbbad536de28f1f53c4b1d5f6cab29c0cd0ae603773c7d28f7",
+      "resolution": "false_positive",
+      "reason": "T01、T02均完整，接缝正常"
+    }
+  ]
+}

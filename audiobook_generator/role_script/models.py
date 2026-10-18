@@ -27,6 +27,8 @@ class SegmentScript:
     speaker: Optional[SpeakerDecision] = None
     # 自动拆分时的临时引文候选；写入 V2 前必须解析为带坐标的 evidence。
     evidence_candidates: Tuple[Tuple[str, str], ...] = ()
+    # 段落用途与声音身份分开：人物自述仍是 narration，但 role_id 指向该人物。
+    text_kind: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -120,6 +122,8 @@ class SynthesisUnit:
     tone: Optional[str] = None
     pause_after_ms: int = 0
     is_fallback: bool = False
+    source_span: Optional[SourceSpan] = None
+    segment_id: Optional[str] = None
 
 
 @dataclass(frozen=True)

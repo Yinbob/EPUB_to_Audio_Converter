@@ -1,0 +1,22 @@
+{
+  "schema_version": "flipped-casting-preview-preflight-v39",
+  "source_sha256": "e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011",
+  "bryce_A_reference_loaded": true,
+  "bryce_profile_unchanged_from_accepted_probe": true,
+  "narrator_locked": true,
+  "other_roles_human_fit": "pending",
+  "full_chapter_planned_chunks": 104,
+  "preview_planned_requests": 15,
+  "preview_characters": 617,
+  "all_preview_text_in_authorized_chapter": true,
+  "preview_request_signatures_present_in_full_plan": 15,
+  "shared_book_cache_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011",
+  "potential_full_chapter_new_requests_if_profiles_unchanged": 89,
+  "potential_reuse_is_preflight_not_actual_cache_hit": true,
+  "full_chapter_started": false,
+  "actual_tts_requests": 0,
+  "actual_llm_requests": 0,
+  "external_transfer_status": "MiMo_book_text_transfer_rejected_pending_explicit_user_approval",
+  "auto_review_reason": "Prior explicit egress consent named DeepSeek, not MiMo; no MiMo book text request executed",
+  "original_machine_quality_unchanged": true
+}

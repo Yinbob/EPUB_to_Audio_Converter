@@ -14,6 +14,7 @@ from .models import (
 from .normalization import normalize_coverage_text
 from .project_store import chapter_hashes
 from .validator import validate_role_script
+from .narration import ground_narration_segments
 
 ProgressCallback = Optional[Callable[[str], None]]
 
@@ -83,15 +84,20 @@ def _request_character_chunk(client: Any, model: str, chapter_index: int, text: 
 def build_book_registry(
     chapters: Sequence[tuple[str, str]], *, api_key: str, base_url: str,
     model: str, previous: Optional[RoleScriptV2] = None,
-    progress: ProgressCallback = None,
+    progress: ProgressCallback = None, chapter_start: int = 1, chapter_end: Optional[int] = None,
 ) -> dict[str, CharacterEntity]:
-    """扫描整本书；请求失败即失败，不将不完整索引标成全书索引。"""
+    """只扫描明确指定的章节；保留原书章号与证据区间。"""
+    chapter_end = len(chapters) if chapter_end is None else chapter_end
+    if (type(chapter_start) is not int or type(chapter_end) is not int
+            or not 1 <= chapter_start <= chapter_end <= len(chapters)):
+        raise ValueError("人物索引章节范围无效")
     if not api_key or not api_key.strip():
         raise ValueError("全书人物索引需要 DeepSeek API Key")
     client = splitter._create_client(api_key, base_url)
     entities = dict(previous.entities) if previous else {}
     entities.setdefault("narrator", CharacterEntity("旁白", voice_profile_id="voice_narrator", voice_locked=True))
-    for chapter_index, (_title, text) in enumerate(chapters, 1):
+    for chapter_index in range(chapter_start, chapter_end + 1):
+        _title, text = chapters[chapter_index - 1]
         cursor = 0
         for part in splitter._split_text_chunks(text):
             part_start = cursor
@@ -99,7 +105,7 @@ def build_book_registry(
             if not splitter._has_visible_text(part):
                 continue
             if progress:
-                progress(f"正在建立全书人物表：第 {chapter_index}/{len(chapters)} 章")
+                progress(f"正在建立人物表：第 {chapter_index} 章（范围 {chapter_start}～{chapter_end}）")
             for raw in _request_character_chunk(client, model, chapter_index, part, entities):
                 name = raw.get("name")
                 if not isinstance(name, str) or not name.strip() or name not in part:
@@ -153,7 +159,8 @@ def _exact_segments(source: str, segments: Sequence[SegmentScript], chapter_inde
 def _segment_evidence(segment: SegmentScript, span: SourceSpan, source: str) -> tuple[EvidenceSpan, ...]:
     found = []
     for quote, kind in segment.evidence_candidates:
-        match = _unique_span(source, quote, span.chapter_index, near=span.start)
+        match = _unique_span(source, quote, span.chapter_index,
+                             near=None if kind == 'narrator_identity' else span.start)
         if match is not None:
             found.append(EvidenceSpan(match, kind, quote))
     return tuple(found)
@@ -162,7 +169,7 @@ def _segment_evidence(segment: SegmentScript, span: SourceSpan, source: str) -> 
 def upgrade_generated_script(
     generated: RoleScriptV1, chapters: Sequence[tuple[str, str]],
     entities: dict[str, CharacterEntity], *, parser_fingerprint: str,
-    model: str, previous: Optional[RoleScriptV2] = None,
+    model: str, previous: Optional[RoleScriptV2] = None, registry_complete: bool = True,
 ) -> RoleScriptV2:
     """将已对齐的 V1 提议转为含稳定实体 ID、原文区间与证据的 V2。"""
     roles = dict(previous.roles) if previous else {}
@@ -187,15 +194,20 @@ def upgrade_generated_script(
     for chapter in generated.chapters:
         source = chapters[chapter.chapter_index - 1][1]
         segments = []
-        for offset, (segment, span) in enumerate(_exact_segments(source, chapter.segments, chapter.chapter_index), 1):
+        grounded_segments = ground_narration_segments(chapter.segments, source)
+        for offset, (segment, span) in enumerate(_exact_segments(source, grounded_segments, chapter.chapter_index), 1):
             entity_id = mapping[segment.role_id]
             evidence = _segment_evidence(segment, span, source)
             quoted_unknown = segment.role_id == "narrator" and (
                 "“" in segment.text or '"' in segment.text or "「" in segment.text
             )
-            status = "unknown" if quoted_unknown else ("proposed" if entity_id != "narrator" else "confirmed")
-            speaker_id = None if quoted_unknown else entity_id
-            raw_score = (0.82 if evidence else 0.55) if entity_id != "narrator" else (0.0 if quoted_unknown else 0.95)
+            narration_unknown = segment.text_kind in ('narration', 'unknown') and entity_id == 'narrator'
+            if narration_unknown:
+                status, speaker_id, raw_score = 'needs_review', 'narrator', 0.0
+            else:
+                status = 'unknown' if quoted_unknown else ('proposed' if entity_id != 'narrator' else 'confirmed')
+                speaker_id = None if quoted_unknown else entity_id
+                raw_score = (0.82 if evidence else 0.55) if entity_id != 'narrator' else (0.0 if quoted_unknown else 0.95)
             updated = replace(
                 segment,
                 role_id=entity_id,
@@ -206,7 +218,8 @@ def upgrade_generated_script(
             )
             # 原文区间和文字未变时保留人工确认；章节重拆不应撤销用户校对。
             for old in previous_chapters.get(chapter.chapter_index, ChapterScript(chapter.chapter_index, chapter.title)).segments:
-                if old.source_span == span and old.text == updated.text and old.speaker and old.speaker.status == "confirmed":
+                if (old.source_span == span and old.text == updated.text and old.speaker
+                        and old.speaker.status == 'confirmed' and old.speaker.confidence_kind == 'human'):
                     updated = replace(updated, role_id=old.role_id, speaker=old.speaker)
                     break
             segments.append(updated)
@@ -220,7 +233,7 @@ def upgrade_generated_script(
         default_pause_after_ms=generated.default_pause_after_ms, roles=roles,
         chapters=tuple(selected[index] for index in sorted(selected)), entities=entities,
         parser_fingerprint=parser_fingerprint, chapter_hashes=chapter_hashes(chapters),
-        registry_complete=True,
+        registry_complete=registry_complete,
     )
     validation = validate_role_script(
         result, chapters=chapters, expected_book_sha256=generated.book_sha256,
@@ -236,14 +249,21 @@ def generate_v2_for_book(
     chapters: Sequence[tuple[str, str]], chapter_start: int, chapter_end: int,
     provider: str, book_sha256: str, api_key: str, base_url: str, model: str,
     *, parser_fingerprint: str, previous: Optional[RoleScriptV2] = None,
-    progress: ProgressCallback = None,
+    progress: ProgressCallback = None, index_full_book: bool = True,
 ) -> RoleScriptV2:
-    """全书索引先于选定章节拆分，成功后返回可原子保存的完整项目。"""
+    """按明确范围索引、拆分并复用声音；局部索引不标为完整全书索引。"""
+    if type(index_full_book) is not bool:
+        raise ValueError("index_full_book 必须为布尔值")
+    if (type(chapter_start) is not int or type(chapter_end) is not int
+            or not 1 <= chapter_start <= chapter_end <= len(chapters)):
+        raise ValueError("章节范围无效")
+    registry_complete = index_full_book or (chapter_start == 1 and chapter_end == len(chapters))
     current_hashes = chapter_hashes(chapters)
     compatible = bool(previous and previous.parser_fingerprint == parser_fingerprint
                       and previous.chapter_hashes == current_hashes)
     if compatible and previous.registry_complete:
         entities = dict(previous.entities)
+        registry_complete = True
         if progress:
             progress("已复用全书人物索引")
     else:
@@ -256,10 +276,15 @@ def generate_v2_for_book(
             }
             baseline = replace(previous, entities=cleaned, chapters=(), chapter_hashes={})
         entities = build_book_registry(chapters, api_key=api_key, base_url=base_url,
-                                       model=model, previous=baseline, progress=progress)
+                                       model=model, previous=baseline, progress=progress,
+                                       chapter_start=1 if index_full_book else chapter_start,
+                                       chapter_end=len(chapters) if index_full_book else chapter_end)
     generated = splitter.split_chapters_with_deepseek(
         list(chapters), chapter_start, chapter_end, provider, book_sha256,
-        api_key, base_url, model, progress=progress,
+        api_key, base_url, model, progress=progress, analyze_narration=True,
+        known_characters=[{'role_id': entity_id, 'display_name': entity.canonical_name,
+                           'aliases': [alias.text for alias in entity.aliases if alias.status == 'confirmed']}
+                          for entity_id, entity in list(entities.items())[-30:] if entity_id != 'narrator'],
     )
     if previous and previous.provider != provider:
         previous = replace(previous, roles={}, entities={
@@ -270,5 +295,5 @@ def generate_v2_for_book(
         previous = replace(previous, chapters=(), chapter_hashes={})
     return upgrade_generated_script(
         generated, chapters, entities, parser_fingerprint=parser_fingerprint,
-        model=model, previous=previous,
+        model=model, previous=previous, registry_complete=registry_complete,
     )

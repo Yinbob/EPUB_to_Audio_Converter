@@ -1,0 +1,39 @@
+{
+  "legacy_relocated_reports_accepted": 2,
+  "legacy_reports": [
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/reevaluated/chapter_01/quality.json",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/reevaluated/chapter_02/quality.json"
+  ],
+  "legacy_annotation_export": {
+    "rows": 6,
+    "boundaries": 2,
+    "reviewed_boundaries": 0
+  },
+  "rereevaluated_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/source_binding_v23/chapter_01/quality.json",
+  "rereevaluated_report_sha256": "4c695e33927c69456b9ab265402b57cc7be43c4d4cbcaf2b6bd841f581154fcd",
+  "explicit_pcm_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/reports/d67844c3ff2a4675ba92dacf8ef18713/chapter_000001/chapter.wav",
+  "explicit_pcm_sha256": "1a480c76415fcacfad2d6d0e6507a1dd8a9f6f1dedfee663d13312c02502432b",
+  "final_verification": {
+    "encoding": "passed",
+    "content": "passed"
+  },
+  "new_annotation_export_pcm_equal": true,
+  "listening_changed_reference_rejected": true,
+  "annotations_changed_reference_rejected": true,
+  "additional_tts_requests": 0,
+  "human_records_unchanged": true,
+  "original_reports_and_audio_unchanged": true,
+  "protected_sha256": {
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/reevaluated/chapter_01/quality.json": "6b88fb64dfb46b4996f1cc07913b307bc4aac194190f92b2a8ee47fc70d0de22",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/reevaluated/chapter_02/quality.json": "d1c3fe61b397bedb280d8bfc883b502f2d24e56b5783adb824c4dcda281ddcb9",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/reports/d67844c3ff2a4675ba92dacf8ef18713/chapter_000001/quality.json": "514a8bc1c65f6500d0b22a7bf582aa875a3eb992253fe5af531cb91e524daafc",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/reports/d67844c3ff2a4675ba92dacf8ef18713/chapter_000002/quality.json": "4a6311ebc4a2928639311b4c83638d66f93c4f02319158bb95701782827609c0",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/chapter_01.wav": "46a39a0ccc59e6303574416d7e64717f966077f7f575bb06ca78db3705d5acaf",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/chapter_02.wav": "c388a490f49461652d132c3810c1d9f6e5ce48d16a7bc975d87c2f4b81d93fec",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/english_numbers_20261016/annotation.csv": "97535e1e1b898ff277acbe1674b4685ba779179623e42358540a99d1de358ca0",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_e06r_tail_preview_20261016/human_review.json": "a7eb82cc646d6539874d250d52ca62743e85053b5e0591d1a9fd3c355750f26d"
+  },
+  "quality_status": "incomplete",
+  "human_review": "pending",
+  "scope": "Source reuse only; no new quality validation, listener study or model training."
+}

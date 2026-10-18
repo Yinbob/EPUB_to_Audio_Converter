@@ -1,0 +1,46 @@
+{
+  "version": "flipped-cmon-repair-validation-v48",
+  "manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/assembly_manifest.json",
+  "manifest_sha256": "cad0a3720c2ff8a6f6c63f1ed0db8719530435029811f97971f3728bca2dd059",
+  "quality_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/quality.json",
+  "quality_report_sha256": "95ac9675e18f65a70d6950fd29b997cbf72858593b95c1d877056e7bddf0a7e0",
+  "standard_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/833889352480474a859cd06200d0ed5e/chapter_000005/quality.json",
+  "standard_report_sha256": "c490845e432e2425fc1755930bfec74f9c7195cf11c66d9c5c03adb43aee63a7",
+  "source_text_characters": 14311,
+  "source_spans_unchanged": true,
+  "chunks_unchanged": 99,
+  "chunks_changed": 1,
+  "boundary_pairs_unchanged": 97,
+  "boundaries_rechecked": [
+    33,
+    34
+  ],
+  "new_requests": 1,
+  "new_characters": 10,
+  "audio_reference_uploaded": false,
+  "sdk_retries": 0,
+  "prior_accepted_edits_unchanged": [
+    18,
+    39,
+    76
+  ],
+  "source_audio_unchanged": true,
+  "pcm_layout_verified": true,
+  "decoded_pcm_equal": true,
+  "standard_preview_count": 200,
+  "html_targets_verified": 4,
+  "contexts": {
+    "before": {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/audio/R034_before_context.wav",
+      "audio_sha256": "f593ae34421026785d8e6efe29524450f8de4ac7de94bf653b386336acff7547",
+      "target_at_seconds": 3.5
+    },
+    "after": {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/audio/R034_after_context.wav",
+      "audio_sha256": "2e48c346d50744b2dc9a9f61002f4c98b04f4f0571a7be202eed032dd7c66380",
+      "target_at_seconds": 3.5
+    }
+  },
+  "human_review_status": "pending_R034_and_joins",
+  "overall_project_complete": false
+}

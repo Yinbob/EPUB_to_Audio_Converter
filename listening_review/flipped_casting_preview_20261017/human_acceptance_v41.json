@@ -1,0 +1,42 @@
+{
+  "version": "flipped-preview-human-acceptance-v41",
+  "date": "2026-10-17",
+  "source": "explicit_user_reply",
+  "scene_reply": "P01/P02均正常，角色合适",
+  "classmates_reply": "C1–C3均正常、一致且可区分",
+  "heard_scenes": [
+    {
+      "sample_id": "P01",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P01_matched.wav",
+      "audio_sha256": "c4d57380ee9385c667e786bbc4ba513b48157b8d8999204c4e9df7839cd0b7b1"
+    },
+    {
+      "sample_id": "P02",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P02_matched.wav",
+      "audio_sha256": "f2084f818d267e96b5a4271a10871bdfc989b6ae789ef13f233aa4d713b672d7"
+    }
+  ],
+  "heard_classmates": [
+    {
+      "sample_id": "C1",
+      "audio_sha256": "edbd0b7cf4f684e91e88a90d51ddac96d36c2b76ccde21900e67cf6988cc5337"
+    },
+    {
+      "sample_id": "C2",
+      "audio_sha256": "0385511a1eeb1131a8b301ecd3818b119dd6ef3400831fdd6b5729325eb28590"
+    },
+    {
+      "sample_id": "C3",
+      "audio_sha256": "cf9d24163649049a4805803c4d2d6cc97695509e1d21760b940e88193c1d566c"
+    }
+  ],
+  "scene_content_accepted": true,
+  "role_fit_accepted": true,
+  "bryce_matches_A": true,
+  "scene_stitching_and_loudness_accepted": true,
+  "classmates_content_and_consistency_accepted": true,
+  "classmates_distinguishable_from_bryce": true,
+  "original_raw_loudness_not_judged": true,
+  "scope": "these_preview_audio_only_not_unheard_whole_chapter",
+  "machine_reports_unchanged": true
+}

@@ -1,0 +1,48 @@
+{
+  "version": "review-queue-actual-v53",
+  "queue": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/consolidated_review_v53.final.json",
+    "sha256": "a50bd2f363bd0f38f676046bf076f3bdf8e31c46e51961f0ed0f438a13640bc2"
+  },
+  "summary": {
+    "machine_issue_occurrences": 133,
+    "unique_machine_issues": 133,
+    "exact_duplicate_occurrences": 0,
+    "consolidated_windows": 48,
+    "priority_counts": {
+      "asr_substitution_screening": 81,
+      "uncalibrated_consistency_screening": 2,
+      "content_insertion_deletion_or_unresolved": 50
+    },
+    "optional_overlapping_window_seconds": 1629.1999999999998,
+    "planned_listening_seconds": 973.04
+  },
+  "nonrepeating_chronological_passes": 9,
+  "all_issues_preserved_exactly_once": true,
+  "quality_status_unchanged": "incomplete",
+  "source_report_unchanged": true,
+  "source_audio_unchanged": true,
+  "tests": {
+    "run": 609,
+    "passed": 579,
+    "skipped": 30,
+    "failures": 0,
+    "errors": 0,
+    "logs": [
+      {
+        "path": "/tmp/review_queue_v53_full_release.log",
+        "sha256": "9ef742adeb87bece8655ccd8491d0c42caf65517d1a3a5ad5b2b53a201f8d38e"
+      },
+      {
+        "path": "/tmp/review_queue_v53_targeted_final.log",
+        "sha256": "190636b2a130389454c465a3d356214b0e8a3be9269e4a176ab4a43fc65bac22"
+      }
+    ]
+  },
+  "initial_overlapping_plan_preserved": "consolidated_review_v53.json",
+  "initial_float_assertion_failure_log": "/tmp/review_queue_v53_targeted_release.log",
+  "new_tts_requests": 0,
+  "new_llm_requests": 0,
+  "human_answers_prefilled": false,
+  "overall_project_complete": false
+}

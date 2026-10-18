@@ -1,0 +1,37 @@
+{
+  "schema_version": "hybrid-lock-validation-v36",
+  "date": "2026-10-17",
+  "problem": "apply_hybrid trusted editable manifest lock state and allowed replacing V2 source-locked fields",
+  "before": {
+    "test_log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261017/hybrid_v36_lock_before.log",
+    "reproduced_overrides": [
+      "lock flag",
+      "voice",
+      "speed",
+      "instructions",
+      "language"
+    ]
+  },
+  "after": {
+    "source_lock_checked_again": true,
+    "all_existing_source_fields_preserved": true,
+    "non_boolean_flags_rejected": true,
+    "locked_design_description_profile_and_version_preserved": true,
+    "actual_v33_script_reapplication_equal": true
+  },
+  "regression": {
+    "run": 560,
+    "passed": 530,
+    "skipped": 30,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 16.921,
+    "log_sha256": "d7a737a052690c62ba24ab7ecbf12ed942f04aac707f4a16d04df913863a7b22"
+  },
+  "changed_sources": {
+    "audiobook_generator/audio_core/hybrid_casting.py": "07234f52cc6f0952ace73d5958977f547aea02a8ab5ea3bc5755d96ce3288e1a",
+    "tests/audiobook_generator/audio_core/hybrid_casting_test.py": "5f65683e14a68794fec82674b9fed5d9abd4419369c2f0a28ceeb507c86a6b27"
+  },
+  "online_requests_for_this_fix": 0,
+  "human_labels_changed": false
+}

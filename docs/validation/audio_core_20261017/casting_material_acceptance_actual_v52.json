@@ -1,0 +1,26 @@
+{
+  "version": "casting-material-acceptance-actual-v52",
+  "acceptance": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_common_gain_20261016/human_acceptance_v52.json",
+    "sha256": "265d4f86b02ac80585be15c45c2befd3a2f2a55d7ebf8a1da96e639b432401d5"
+  },
+  "chapters": 9,
+  "total_seconds": 253.44,
+  "listener_trials": 36,
+  "released_material_records": [
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_listener_pilot_20261017/material_quality_release_v52.json",
+      "sha256": "7cd51d9c5eb24b93ad0fd3485c10646e6415cb04df519df868bfd4be594d38a8"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_listener_pilot_player_20261017/material_quality_release_v52.json",
+      "sha256": "f47ad5a31a6865c98085bdd7a3cff01a3ae2ae688dfa16ba97954417e15bf21f"
+    }
+  ],
+  "original_pending_template_unchanged": true,
+  "source_reports_unchanged": true,
+  "participants": 0,
+  "new_tts_requests": 0,
+  "new_llm_requests": 0,
+  "overall_project_complete": false
+}

@@ -1,0 +1,15 @@
+{
+  "origin": "direct_user_reply_current_chat",
+  "verbatim": {
+    "joins": "F01两段声音音量不一致，后一个音色的音量大一些；F02无问题；F03两种音色有点相似，难以辨认区别",
+    "consistency": "差异可接受，无明显异常"
+  },
+  "review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focused_human_review.json",
+  "review_sha256": "e5ab3d08bf198264929f90f7b726b1e6aefbf70b1244eb4c5c65753d9ea99373",
+  "prior_review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focused_human_review.before_feedback_v29.json",
+  "scope": "three joins and one same-source consistency comparison",
+  "formal_listener_results": false,
+  "machine_reports_modified": false,
+  "csv_labels_inferred": false,
+  "requests_sent": 0
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "mimo-dean-human-review-v37",
+  "date": "2026-10-17",
+  "source": "explicit_user_reply",
+  "user_reply": "内容正常，但不适合Bryce",
+  "samples": [
+    {
+      "sample_id": "D01",
+      "voice": "Dean",
+      "audio_sha256": "29f77da5a34f09e996a1b91a002ef1819c62fd939d701a537f22923335d61ff9",
+      "content_complete": true,
+      "same_voice_consistent": null,
+      "bryce_voice_suitable": false,
+      "notes": "内容正常包括D02所问词尾；一致性未另行明确，保持空值。"
+    },
+    {
+      "sample_id": "D02",
+      "voice": "Dean",
+      "audio_sha256": "ea2f5b016402c43a7fa3759d5961b25d4bc06c864f7efb19253501ddde74b667",
+      "content_complete": true,
+      "same_voice_consistent": null,
+      "bryce_voice_suitable": false,
+      "notes": "内容正常包括D02所问词尾；一致性未另行明确，保持空值。"
+    }
+  ],
+  "machine_report_unchanged": true,
+  "added_to_voice_bank": false,
+  "production_reference_created": false
+}

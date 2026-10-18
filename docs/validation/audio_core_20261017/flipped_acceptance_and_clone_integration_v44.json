@@ -1,0 +1,40 @@
+{
+  "version": "flipped-acceptance-and-clone-integration-v44",
+  "source_sha256": {
+    "audiobook_generator/tts_providers/mimo_reference.py": "1bee2a559cf5eb5a3d92900c3b22942fa7cea47ed00982636f73f75602b83678",
+    "audiobook_generator/tts_providers/mimo_voice.py": "bbdb205b33e761b8bd5974da5af49289fc40edd3312e94a0555c14e0f2025ee0",
+    "audiobook_generator/tts_providers/openai_tts_provider.py": "4966fd932050013e44c8c605ae9cca6795eca323bb7bb66dae5d1f94dd95f0c1",
+    "audiobook_generator/role_script/validator.py": "8e8e3dedbe00875360d8916fb985f3997655e16a720247bc7cd78a56b554b50e",
+    "audiobook_generator/audio_core/pipeline.py": "0978f07d71215a0e4797ab94c6356b2621686b9eb86d23f333cbd3cff07da736",
+    "audiobook_generator/audio_core/__main__.py": "24ae4ee1b70f8cbcdf94d2a803fdd83cd65b38b404ed4615212f9c3fecbc2bc2",
+    "audiobook_generator/audio_core/hybrid_casting.py": "6eb8cee2f0aa499d8fb8c074ea7ee8a88af4cfb614d447c17cdb907bf5e96030",
+    "audiobook_generator/audio_core/hybrid_scenes.py": "da187be5b0544f26cb64290a4afe971cd0cf404e086c2d7282ac71ce1d9fd674",
+    "tests/audiobook_generator/audio_core/mimo_clone_test.py": "c45a7a2a128967e60195d0e1d38075ab2071f95d79910f5ce4c824a0c3ac2281"
+  },
+  "clone_acceptance": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_r001_clone_20261017/human_acceptance_v44.json",
+  "clone_acceptance_sha256": "9f6c3a4802142a61e588a891a48acdb305c2336a0f3637c59b0c0a9c66dc5c1d",
+  "repair_acceptance": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/human_acceptance_v44.json",
+  "repair_acceptance_sha256": "d2cd914399dc1509ecaa212e52f390a43fc09438a6d66ad8b7addcbe973accf9",
+  "accepted_local_revision": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_chapter_pilot_20261017/accepted_local_revision_v44/manifest.json",
+  "revision_duration_seconds": 918.06,
+  "new_tts_requests": 0,
+  "new_audio_uploads": 0,
+  "verified_review_audio_links": 16,
+  "full_tests": {
+    "run": 580,
+    "passed": 550,
+    "skipped": 30,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 16.951,
+    "log": "/tmp/flipped_v44_final_tests.log"
+  },
+  "proposed_expansion_plan": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_chapter_pilot_20261017/bryce_clone_chapter_v44/plan.json",
+  "proposed_expansion_plan_sha256": "1de8849f70d8ea672b583df5a6879bf07888b05b47e07ae4aad22a273776c6e3",
+  "proposed_max_new_requests": 67,
+  "proposed_new_text_characters": 12925,
+  "expansion_consent_missing_blocks_before_credentials_or_run": true,
+  "whole_chapter_voice_replaced": false,
+  "unreviewed_whole_chapter_ranges_accepted": false,
+  "overall_goal_complete": false
+}

@@ -1,0 +1,208 @@
+﻿sample_id,sample_type,chapter,role_ids,same_speaker,audio_path,full_context_path,boundary_at_seconds,source_text,expected_tts_text,review_status,cutoff,gap,click,overlap,timbre_drift,pitch_drift,rate_drift,omission,repetition,misreading,labels_json,reviewer,reviewed_at,notes,scope_kind,parent_chunk_id
+C000001_001,chunk,1,alex,,audio/C000001_001.wav,audio/chapter_000001_full.wav,,"The path beside the river is covered with water, so we should cross the old bridge before sunset.
+","The path beside the river is covered with water, so we should cross the old bridge before sunset.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000001_002,chunk,1,blair,,audio/C000001_002.wav,audio/chapter_000001_full.wav,,"I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+","I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000001_003,chunk,1,alex,,audio/C000001_003.wav,audio/chapter_000001_full.wav,,"Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+","Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000001_004,chunk,1,casey,,audio/C000001_004.wav,audio/chapter_000001_full.wav,,I will bring the small key from the boat and meet you at the gate beside the stone wall.,I will bring the small key from the boat and meet you at the gate beside the stone wall.,pending,,,,,,,,,,,,,,,parent_chunk,
+B000001_001,boundary,1,alex → blair,false,audio/B000001_001.wav,audio/chapter_000001_full.wav,2.0,"The path beside the river is covered with water, so we should cross the old bridge before sunset.
+ ｜ I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+","The path beside the river is covered with water, so we should cross the old bridge before sunset.
+ ｜ I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000001_002,boundary,1,blair → alex,false,audio/B000001_002.wav,audio/chapter_000001_full.wav,2.0,"I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+ ｜ Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+","I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+ ｜ Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000001_003,boundary,1,alex → casey,false,audio/B000001_003.wav,audio/chapter_000001_full.wav,2.0,"Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+ ｜ I will bring the small key from the boat and meet you at the gate beside the stone wall.","Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+ ｜ I will bring the small key from the boat and meet you at the gate beside the stone wall.",pending,,,,,,,,,,,,,,,original_boundary,
+C000002_001,chunk,2,blair,,audio/C000002_001.wav,audio/chapter_000002_full.wav,,"The front gate is closed, but there is a narrow opening between the garden shed and the wall.
+","The front gate is closed, but there is a narrow opening between the garden shed and the wall.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000002_002,chunk,2,casey,,audio/C000002_002.wav,audio/chapter_000002_full.wav,,"That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+","That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000002_003,chunk,2,blair,,audio/C000002_003.wav,audio/chapter_000002_full.wav,,"We should leave the lantern here for a moment, because the glass might break if we climb with it.
+","We should leave the lantern here for a moment, because the glass might break if we climb with it.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000002_004,chunk,2,alex,,audio/C000002_004.wav,audio/chapter_000002_full.wav,,"I can hold the bag while you climb over, and then pass it through the opening near the ground.","I can hold the bag while you climb over, and then pass it through the opening near the ground.",pending,,,,,,,,,,,,,,,parent_chunk,
+B000002_001,boundary,2,blair → casey,false,audio/B000002_001.wav,audio/chapter_000002_full.wav,2.0,"The front gate is closed, but there is a narrow opening between the garden shed and the wall.
+ ｜ That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+","The front gate is closed, but there is a narrow opening between the garden shed and the wall.
+ ｜ That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000002_002,boundary,2,casey → blair,false,audio/B000002_002.wav,audio/chapter_000002_full.wav,2.0,"That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+ ｜ We should leave the lantern here for a moment, because the glass might break if we climb with it.
+","That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+ ｜ We should leave the lantern here for a moment, because the glass might break if we climb with it.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000002_003,boundary,2,blair → alex,false,audio/B000002_003.wav,audio/chapter_000002_full.wav,2.0,"We should leave the lantern here for a moment, because the glass might break if we climb with it.
+ ｜ I can hold the bag while you climb over, and then pass it through the opening near the ground.","We should leave the lantern here for a moment, because the glass might break if we climb with it.
+ ｜ I can hold the bag while you climb over, and then pass it through the opening near the ground.",pending,,,,,,,,,,,,,,,original_boundary,
+C000003_001,chunk,3,alex,,audio/C000003_001.wav,audio/chapter_000003_full.wav,,"There is a folded letter under the empty cup, but the writing is too faint to read in this light.
+","There is a folded letter under the empty cup, but the writing is too faint to read in this light.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000003_002,chunk,3,blair,,audio/C000003_002.wav,audio/chapter_000003_full.wav,,"Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+","Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000003_003,chunk,3,alex,,audio/C000003_003.wav,audio/chapter_000003_full.wav,,"The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+","The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000003_004,chunk,3,blair,,audio/C000003_004.wav,audio/chapter_000003_full.wav,,"Then we should close the door quietly and leave the letter here, exactly where we found it beside the cup.","Then we should close the door quietly and leave the letter here, exactly where we found it beside the cup.",pending,,,,,,,,,,,,,,,parent_chunk,
+B000003_001,boundary,3,alex → blair,false,audio/B000003_001.wav,audio/chapter_000003_full.wav,2.0,"There is a folded letter under the empty cup, but the writing is too faint to read in this light.
+ ｜ Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+","There is a folded letter under the empty cup, but the writing is too faint to read in this light.
+ ｜ Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000003_002,boundary,3,blair → alex,false,audio/B000003_002.wav,audio/chapter_000003_full.wav,2.0,"Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+ ｜ The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+","Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+ ｜ The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000003_003,boundary,3,alex → blair,false,audio/B000003_003.wav,audio/chapter_000003_full.wav,2.0,"The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+ ｜ Then we should close the door quietly and leave the letter here, exactly where we found it beside the cup.","The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+ ｜ Then we should close the door quietly and leave the letter here, exactly where we found it beside the cup.",pending,,,,,,,,,,,,,,,original_boundary,
+C000004_001,chunk,4,alex,,audio/C000004_001.wav,audio/chapter_000004_full.wav,,"The path beside the river is covered with water, so we should cross the old bridge before sunset.
+","The path beside the river is covered with water, so we should cross the old bridge before sunset.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000004_002,chunk,4,blair,,audio/C000004_002.wav,audio/chapter_000004_full.wav,,"I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+","I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000004_003,chunk,4,alex,,audio/C000004_003.wav,audio/chapter_000004_full.wav,,"Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+","Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000004_004,chunk,4,casey,,audio/C000004_004.wav,audio/chapter_000004_full.wav,,I will bring the small key from the boat and meet you at the gate beside the stone wall.,I will bring the small key from the boat and meet you at the gate beside the stone wall.,pending,,,,,,,,,,,,,,,parent_chunk,
+B000004_001,boundary,4,alex → blair,false,audio/B000004_001.wav,audio/chapter_000004_full.wav,2.0,"The path beside the river is covered with water, so we should cross the old bridge before sunset.
+ ｜ I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+","The path beside the river is covered with water, so we should cross the old bridge before sunset.
+ ｜ I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000004_002,boundary,4,blair → alex,false,audio/B000004_002.wav,audio/chapter_000004_full.wav,2.0,"I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+ ｜ Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+","I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+ ｜ Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000004_003,boundary,4,alex → casey,false,audio/B000004_003.wav,audio/chapter_000004_full.wav,2.0,"Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+ ｜ I will bring the small key from the boat and meet you at the gate beside the stone wall.","Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+ ｜ I will bring the small key from the boat and meet you at the gate beside the stone wall.",pending,,,,,,,,,,,,,,,original_boundary,
+C000005_001,chunk,5,blair,,audio/C000005_001.wav,audio/chapter_000005_full.wav,,"The front gate is closed, but there is a narrow opening between the garden shed and the wall.
+","The front gate is closed, but there is a narrow opening between the garden shed and the wall.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000005_002,chunk,5,casey,,audio/C000005_002.wav,audio/chapter_000005_full.wav,,"That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+","That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000005_003,chunk,5,blair,,audio/C000005_003.wav,audio/chapter_000005_full.wav,,"We should leave the lantern here for a moment, because the glass might break if we climb with it.
+","We should leave the lantern here for a moment, because the glass might break if we climb with it.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000005_004,chunk,5,alex,,audio/C000005_004.wav,audio/chapter_000005_full.wav,,"I can hold the bag while you climb over, and then pass it through the opening near the ground.","I can hold the bag while you climb over, and then pass it through the opening near the ground.",pending,,,,,,,,,,,,,,,parent_chunk,
+B000005_001,boundary,5,blair → casey,false,audio/B000005_001.wav,audio/chapter_000005_full.wav,2.0,"The front gate is closed, but there is a narrow opening between the garden shed and the wall.
+ ｜ That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+","The front gate is closed, but there is a narrow opening between the garden shed and the wall.
+ ｜ That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000005_002,boundary,5,casey → blair,false,audio/B000005_002.wav,audio/chapter_000005_full.wav,2.0,"That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+ ｜ We should leave the lantern here for a moment, because the glass might break if we climb with it.
+","That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+ ｜ We should leave the lantern here for a moment, because the glass might break if we climb with it.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000005_003,boundary,5,blair → alex,false,audio/B000005_003.wav,audio/chapter_000005_full.wav,2.0,"We should leave the lantern here for a moment, because the glass might break if we climb with it.
+ ｜ I can hold the bag while you climb over, and then pass it through the opening near the ground.","We should leave the lantern here for a moment, because the glass might break if we climb with it.
+ ｜ I can hold the bag while you climb over, and then pass it through the opening near the ground.",pending,,,,,,,,,,,,,,,original_boundary,
+C000006_001,chunk,6,alex,,audio/C000006_001.wav,audio/chapter_000006_full.wav,,"There is a folded letter under the empty cup, but the writing is too faint to read in this light.
+","There is a folded letter under the empty cup, but the writing is too faint to read in this light.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000006_002,chunk,6,blair,,audio/C000006_002.wav,audio/chapter_000006_full.wav,,"Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+","Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000006_003,chunk,6,alex,,audio/C000006_003.wav,audio/chapter_000006_full.wav,,"The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+","The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000006_004,chunk,6,blair,,audio/C000006_004.wav,audio/chapter_000006_full.wav,,"Then we should close the door quietly and leave the letter here, exactly where we found it beside the cup.","Then we should close the door quietly and leave the letter here, exactly where we found it beside the cup.",pending,,,,,,,,,,,,,,,parent_chunk,
+B000006_001,boundary,6,alex → blair,false,audio/B000006_001.wav,audio/chapter_000006_full.wav,2.0,"There is a folded letter under the empty cup, but the writing is too faint to read in this light.
+ ｜ Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+","There is a folded letter under the empty cup, but the writing is too faint to read in this light.
+ ｜ Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000006_002,boundary,6,blair → alex,false,audio/B000006_002.wav,audio/chapter_000006_full.wav,2.0,"Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+ ｜ The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+","Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+ ｜ The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000006_003,boundary,6,alex → blair,false,audio/B000006_003.wav,audio/chapter_000006_full.wav,2.0,"The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+ ｜ Then we should close the door quietly and leave the letter here, exactly where we found it beside the cup.","The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+ ｜ Then we should close the door quietly and leave the letter here, exactly where we found it beside the cup.",pending,,,,,,,,,,,,,,,original_boundary,
+C000007_001,chunk,7,alex,,audio/C000007_001.wav,audio/chapter_000007_full.wav,,"The path beside the river is covered with water, so we should cross the old bridge before sunset.
+","The path beside the river is covered with water, so we should cross the old bridge before sunset.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000007_002,chunk,7,blair,,audio/C000007_002.wav,audio/chapter_000007_full.wav,,"I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+","I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000007_003,chunk,7,alex,,audio/C000007_003.wav,audio/chapter_000007_full.wav,,"Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+","Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000007_004,chunk,7,casey,,audio/C000007_004.wav,audio/chapter_000007_full.wav,,I will bring the small key from the boat and meet you at the gate beside the stone wall.,I will bring the small key from the boat and meet you at the gate beside the stone wall.,pending,,,,,,,,,,,,,,,parent_chunk,
+B000007_001,boundary,7,alex → blair,false,audio/B000007_001.wav,audio/chapter_000007_full.wav,2.0,"The path beside the river is covered with water, so we should cross the old bridge before sunset.
+ ｜ I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+","The path beside the river is covered with water, so we should cross the old bridge before sunset.
+ ｜ I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000007_002,boundary,7,blair → alex,false,audio/B000007_002.wav,audio/chapter_000007_full.wav,2.0,"I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+ ｜ Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+","I checked the map this morning, and the wooden steps on the far side should lead us to the house.
+ ｜ Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000007_003,boundary,7,alex → casey,false,audio/B000007_003.wav,audio/chapter_000007_full.wav,2.0,"Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+ ｜ I will bring the small key from the boat and meet you at the gate beside the stone wall.","Then keep the lantern inside your bag until we reach the trees, where the light will be harder to see.
+ ｜ I will bring the small key from the boat and meet you at the gate beside the stone wall.",pending,,,,,,,,,,,,,,,original_boundary,
+C000008_001,chunk,8,blair,,audio/C000008_001.wav,audio/chapter_000008_full.wav,,"The front gate is closed, but there is a narrow opening between the garden shed and the wall.
+","The front gate is closed, but there is a narrow opening between the garden shed and the wall.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000008_002,chunk,8,casey,,audio/C000008_002.wav,audio/chapter_000008_full.wav,,"That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+","That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000008_003,chunk,8,blair,,audio/C000008_003.wav,audio/chapter_000008_full.wav,,"We should leave the lantern here for a moment, because the glass might break if we climb with it.
+","We should leave the lantern here for a moment, because the glass might break if we climb with it.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000008_004,chunk,8,alex,,audio/C000008_004.wav,audio/chapter_000008_full.wav,,"I can hold the bag while you climb over, and then pass it through the opening near the ground.","I can hold the bag while you climb over, and then pass it through the opening near the ground.",pending,,,,,,,,,,,,,,,parent_chunk,
+B000008_001,boundary,8,blair → casey,false,audio/B000008_001.wav,audio/chapter_000008_full.wav,2.0,"The front gate is closed, but there is a narrow opening between the garden shed and the wall.
+ ｜ That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+","The front gate is closed, but there is a narrow opening between the garden shed and the wall.
+ ｜ That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000008_002,boundary,8,casey → blair,false,audio/B000008_002.wav,audio/chapter_000008_full.wav,2.0,"That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+ ｜ We should leave the lantern here for a moment, because the glass might break if we climb with it.
+","That opening leads to the kitchen door, and the key should turn easily if you lift the handle first.
+ ｜ We should leave the lantern here for a moment, because the glass might break if we climb with it.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000008_003,boundary,8,blair → alex,false,audio/B000008_003.wav,audio/chapter_000008_full.wav,2.0,"We should leave the lantern here for a moment, because the glass might break if we climb with it.
+ ｜ I can hold the bag while you climb over, and then pass it through the opening near the ground.","We should leave the lantern here for a moment, because the glass might break if we climb with it.
+ ｜ I can hold the bag while you climb over, and then pass it through the opening near the ground.",pending,,,,,,,,,,,,,,,original_boundary,
+C000009_001,chunk,9,alex,,audio/C000009_001.wav,audio/chapter_000009_full.wav,,"There is a folded letter under the empty cup, but the writing is too faint to read in this light.
+","There is a folded letter under the empty cup, but the writing is too faint to read in this light.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000009_002,chunk,9,blair,,audio/C000009_002.wav,audio/chapter_000009_full.wav,,"Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+","Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000009_003,chunk,9,alex,,audio/C000009_003.wav,audio/chapter_000009_full.wav,,"The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+","The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+",pending,,,,,,,,,,,,,,,parent_chunk,
+C000009_004,chunk,9,blair,,audio/C000009_004.wav,audio/chapter_000009_full.wav,,"Then we should close the door quietly and leave the letter here, exactly where we found it beside the cup.","Then we should close the door quietly and leave the letter here, exactly where we found it beside the cup.",pending,,,,,,,,,,,,,,,parent_chunk,
+B000009_001,boundary,9,alex → blair,false,audio/B000009_001.wav,audio/chapter_000009_full.wav,2.0,"There is a folded letter under the empty cup, but the writing is too faint to read in this light.
+ ｜ Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+","There is a folded letter under the empty cup, but the writing is too faint to read in this light.
+ ｜ Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000009_002,boundary,9,blair → alex,false,audio/B000009_002.wav,audio/chapter_000009_full.wav,2.0,"Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+ ｜ The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+","Bring it closer to the window and keep the edges flat, so the paper does not tear along the fold.
+ ｜ The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+",pending,,,,,,,,,,,,,,,original_boundary,
+B000009_003,boundary,9,alex → blair,false,audio/B000009_003.wav,audio/chapter_000009_full.wav,2.0,"The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+ ｜ Then we should close the door quietly and leave the letter here, exactly where we found it beside the cup.","The first line mentions a room upstairs, and the last line asks us to wait until the morning.
+ ｜ Then we should close the door quietly and leave the letter here, exactly where we found it beside the cup.",pending,,,,,,,,,,,,,,,original_boundary,

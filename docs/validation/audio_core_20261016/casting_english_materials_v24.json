@@ -1,0 +1,59 @@
+{
+  "version": "casting_english_materials_v24",
+  "execution": "completed_offline_only",
+  "purpose": "准备选角先导正文及分配，检查真实已核验英语声音库上的分配与约束",
+  "summary": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/offline_validation.json",
+  "summary_sha256": "6ed1fd4e1e58b89b052687c1d7119de0e530b32570a8a7eb71f8dcc4341b2d2c",
+  "review_readme": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/README.md",
+  "artifact_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/artifact_hashes.json",
+  "artifact_manifest_sha256": "8c74ecbd937534bde2c041bd26f659830cd23755997262b4d24b3f05f48863fc",
+  "checks": {
+    "source_spans_and_hashes": true,
+    "three_conditions_fixed_nonvoice_variables": true,
+    "roles_proposed_not_confirmed": true,
+    "human_answers_and_fit_table_blank": true,
+    "all_review_links_resolve": true,
+    "verified_bank_unchanged": true,
+    "client_constructor_disabled_during_preparation": true
+  },
+  "text_word_counts_not_measured_audio_durations": [
+    18,
+    20,
+    20,
+    19,
+    18,
+    19,
+    19,
+    19,
+    20,
+    20,
+    18,
+    20
+  ],
+  "observed_result": "互动图与 seed=42 随机分配相同；全局互换两种声音，共享角色关系和公共代理值相同；未展示策略优势。",
+  "participant_count": 0,
+  "new_tts_requests": 0,
+  "audio_generated": false,
+  "synthetic_lock_check_not_user_lock": true,
+  "new_training_data": false,
+  "production_code_changed": false,
+  "full_test_suite_rerun": false,
+  "latest_existing_full_regression": {
+    "ran": 507,
+    "skipped": 30,
+    "status": "OK",
+    "log": "reevaluation_source_regression_v23.log"
+  },
+  "source_code_sha256": {
+    "audiobook_generator/audio_core/casting.py": "97a1823dc0e90bcff8b5d6480822044538848751c717a185a7d212f00987c73a",
+    "audiobook_generator/role_script/planner.py": "28008f7ca27b7e2a143d45ac2a70f75a370a449315a5782f8930b0698f6b6496"
+  },
+  "pending": [
+    "正文与角色归属人工审查",
+    "人工声音适配表",
+    "E06T 人工试听确认；Milo 仍未入库",
+    "英文数字先导人工核验",
+    "更多独立来源、质量合格音频和听众辨识实验",
+    "真实边界阳性与独立划分；不得用本材料训练或证明质量检出效果"
+  ]
+}

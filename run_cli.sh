@@ -1,6 +1,7 @@
 #!/bin/bash
 # CLI 有声书转换入口。
-# 若存在 venv_chatterbox/，main.py 会自动切换到该环境以支持 Chatterbox。
+# 启用统一音频检查时优先使用 venv_audio_quality/；本地引擎沿用 venv_chatterbox/。
+# 已激活环境时尊重当前解释器。
 # 用法:
 #   ./run_cli.sh input.epub output_dir --tts edge
 #   ./run_cli.sh input.epub output_dir --tts chatterbox --chatterbox_device cuda

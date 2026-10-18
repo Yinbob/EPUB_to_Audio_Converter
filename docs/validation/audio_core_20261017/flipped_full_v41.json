@@ -1,0 +1,19 @@
+{
+  "review_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/review_manifest.json",
+  "review_manifest_sha256": "44195749077b4c77550159af21a08752f7125e77910b60ef88ebf88b6d98f110",
+  "duration_seconds": 931.94,
+  "chunks": 100,
+  "boundaries": 99,
+  "flagged_chunks": 92,
+  "flagged_boundaries": 81,
+  "new_requests": 86,
+  "new_characters": 13691,
+  "source_coverage_verified": true,
+  "pcm_layout_verified": true,
+  "human_review_status": "pending",
+  "speaker_unavailable_due_to_short_current_or_reference": 39,
+  "total_chapter_requests_including_previews": 100,
+  "total_chapter_tts_characters": 14307,
+  "focused_review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/focused_review.html",
+  "speaker_readiness": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/speaker_readiness.json"
+}

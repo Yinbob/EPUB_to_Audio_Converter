@@ -1,0 +1,36 @@
+{
+  "schema_version": "flipped-bryce-human-acceptance-v39",
+  "date": "2026-10-17",
+  "source": "explicit_user_reply",
+  "user_reply": "A适合，A组三条一致且内容完整",
+  "quality_source": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_bryce_candidates_20261017/quality.json",
+  "quality_sha256": "d6e2a540ab4e571975cce8b9ba56a3934dec93132533035bea82713c3e5c1a32",
+  "accepted_candidate": "bryce_a",
+  "bound_book_role": "narrator",
+  "bound_identity": "Bryce narration and own dialogue in chapter 05",
+  "samples": [
+    {
+      "sample_id": "bryce_a_1",
+      "audio_sha256": "8d0cd3ea2cb6b37b4b83dd421196d5ea45f95f21cfb122b7a819e931d5b8b57f",
+      "content_complete": true,
+      "same_identity_consistent": true,
+      "bryce_suitable": true
+    },
+    {
+      "sample_id": "bryce_a_2",
+      "audio_sha256": "0acac62e6e8abbd5d1b5f7a2cfc1efbc828429a728d8db0bdde9d34838256e70",
+      "content_complete": true,
+      "same_identity_consistent": true,
+      "bryce_suitable": true
+    },
+    {
+      "sample_id": "bryce_a_3",
+      "audio_sha256": "9b5756f120091a2cf2ac2c38121394a27134f88289195734ba542cba1ba724c4",
+      "content_complete": true,
+      "same_identity_consistent": true,
+      "bryce_suitable": true
+    }
+  ],
+  "candidate_b_judged": false,
+  "machine_reports_unchanged": true
+}

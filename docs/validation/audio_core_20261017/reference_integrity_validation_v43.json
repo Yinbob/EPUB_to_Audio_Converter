@@ -1,0 +1,36 @@
+{
+  "version": "reference-integrity-validation-v43",
+  "source_sha256": {
+    "audiobook_generator/audio_core/quality.py": "729bc94dde71997c691e8a010c0a47edb7682fa6104c316887aa0499d45e9178",
+    "tests/audiobook_generator/audio_core/reference_integrity_test.py": "89a799ca6be87afa7adbd91ea31e641bdd597157173fd90e2a5aa555511d3725",
+    "docs/validation/audio_core_20261017/verify_reference_integrity_v43.py": "d542b35656ed7ddd5191e9f43ea2f5d95f9773b1959f20bd353c4c2378c6dc84"
+  },
+  "before_fix": {
+    "tests": 6,
+    "failures": 5,
+    "errors": 1,
+    "log": "/tmp/flipped_reference_integrity_before_v43.log"
+  },
+  "new_regressions": 7,
+  "full_tests": {
+    "run": 574,
+    "passed": 544,
+    "skipped": 30,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 18.275,
+    "log": "/tmp/flipped_v43_final_tests.log"
+  },
+  "actual_audio_evidence": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261017/reference_integrity_actual_v43.json",
+  "actual_audio_evidence_sha256": "79999e4238201c489fdfe1caa21cac1cb6c582489819191a1ce0e1159c746f94",
+  "new_tts_requests": 0,
+  "audio_files_changed": false,
+  "human_reviews_changed": false,
+  "pending": [
+    "local_repair_candidate_listening",
+    "clone_probe_listening",
+    "real_boundary_positive_labels_and_independent_splits",
+    "independent_listener_efficacy"
+  ],
+  "overall_objective_complete": false
+}

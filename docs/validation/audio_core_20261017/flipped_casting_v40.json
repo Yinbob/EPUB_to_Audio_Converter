@@ -1,0 +1,109 @@
+{
+  "review_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/review_manifest.json",
+  "sha256": "b87e79b5212ee2e85b8198eff7d94ff0ea98555e48f9f777925f5c9f5cf589a3",
+  "actual_requests": 14,
+  "actual_characters": 616,
+  "reused_before_recovery": 9,
+  "new_recovery_requests": 5,
+  "scene_duration_seconds": 39.36,
+  "full_tests": {
+    "run": 564,
+    "passed": 534,
+    "skipped": 30,
+    "failed": 0,
+    "errors": 0,
+    "seconds": 16.742
+  },
+  "human_review_pending": true,
+  "whole_chapter_generated": false,
+  "loudness": [
+    {
+      "sample_id": "P01_01_bryce_father",
+      "integrated_lufs": -15.5,
+      "true_peak_dbfs": -0.05,
+      "lra_lu": 0.3,
+      "gate_lufs": -26.03,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    },
+    {
+      "sample_id": "P01_02_narrator",
+      "integrated_lufs": -22.31,
+      "true_peak_dbfs": -2.85,
+      "lra_lu": 3.8,
+      "gate_lufs": -32.8,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    },
+    {
+      "sample_id": "P01_03_juli",
+      "integrated_lufs": -15.82,
+      "true_peak_dbfs": -2.02,
+      "lra_lu": 0.0,
+      "gate_lufs": -26.4,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    },
+    {
+      "sample_id": "P01_04_narrator",
+      "integrated_lufs": -23.76,
+      "true_peak_dbfs": -8.6,
+      "lra_lu": 0.0,
+      "gate_lufs": -34.21,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    },
+    {
+      "sample_id": "P01_05_juli",
+      "integrated_lufs": -14.34,
+      "true_peak_dbfs": -1.29,
+      "lra_lu": 0.5,
+      "gate_lufs": -25.89,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    },
+    {
+      "sample_id": "P02_01_bryce_mother",
+      "integrated_lufs": -19.89,
+      "true_peak_dbfs": -4.01,
+      "lra_lu": 0.0,
+      "gate_lufs": -30.13,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    },
+    {
+      "sample_id": "P02_02_juli",
+      "integrated_lufs": -14.03,
+      "true_peak_dbfs": 0.22,
+      "lra_lu": 1.3,
+      "gate_lufs": -25.0,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    },
+    {
+      "sample_id": "P02_03_narrator",
+      "integrated_lufs": -21.38,
+      "true_peak_dbfs": -6.42,
+      "lra_lu": 0.0,
+      "gate_lufs": -31.74,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    },
+    {
+      "sample_id": "P02_04_bryce_mother",
+      "integrated_lufs": -19.4,
+      "true_peak_dbfs": -1.95,
+      "lra_lu": 2.0,
+      "gate_lufs": -30.12,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    },
+    {
+      "sample_id": "P02_05_narrator",
+      "integrated_lufs": -24.09,
+      "true_peak_dbfs": -8.74,
+      "lra_lu": 0.2,
+      "gate_lufs": -34.98,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    },
+    {
+      "sample_id": "P02_06_juli",
+      "integrated_lufs": -14.79,
+      "true_peak_dbfs": -2.92,
+      "lra_lu": 0.0,
+      "gate_lufs": -26.49,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    }
+  ]
+}

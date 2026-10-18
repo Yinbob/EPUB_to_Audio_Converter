@@ -7,7 +7,7 @@ Apple 风格 WebUI —— 全新设计的有声书生成工作台。
 - TTS 引擎配置以卡片选择 + 浮层弹窗（Modal）形式呈现。
 - 苹果风视觉：留白、毛玻璃、SF 字体、克制动效、渐变高亮。
 
-功能与旧版单页式 UI 完全等价，当前为项目唯一的 WebUI。
+生成、配音与资源下载按步骤组织，当前为项目唯一的 WebUI。
 入口：main_ui.py
 """
 
@@ -15,13 +15,17 @@ from multiprocessing import Process, get_context
 from typing import Optional
 from pathlib import Path
 from dataclasses import asdict, replace
+from functools import wraps
 import hashlib
+import html
+import inspect
 import os
 import json
 import logging
 import math
 import signal
 import tempfile
+import threading
 import time
 import zipfile
 import shutil
@@ -76,6 +80,15 @@ from audiobook_generator.utils.voxcpm_voices import (
 from audiobook_generator.utils.log_handler import generate_unique_log_path
 from audiobook_generator.ui.ambient_background import AMBIENT_CSS, AMBIENT_LAYER_HTML
 from audiobook_generator.ui.progress_parser import decide_progress_state, parse_progress
+from audiobook_generator.ui.workflow import WORKFLOW_CSS, WORKFLOW_HEAD_HTML, workflow_steps_html
+from audiobook_generator.ui.role_studio import (
+    ROLE_STUDIO_CSS, ROLE_SPLIT_HEAD, split_result_status, render_split_status, iter_split_events,
+)
+from audiobook_generator.ui.chapters import (
+    CHAPTER_CSS, CHAPTER_HEAD_HTML, CHAPTER_OVERVIEW_HTML,
+    chapter_catalog, chapter_choices, range_payload,
+)
+from audiobook_generator.ui.library import selection_details, create_archive, selected_paths
 from audiobook_generator.ui.log_layout import LOG_LAYOUT_HEAD_HTML
 from audiobook_generator.ui.theme import THEME_CSS, THEME_HEAD_HTML, THEME_TOKENS_CSS
 from audiobook_generator.ui.voxcpm_panel import build_voxcpm_panel
@@ -110,7 +123,7 @@ from audiobook_generator.role_script.project_store import (
     load_project, parser_fingerprint, project_path, save_project,
 )
 from audiobook_generator.role_script.review import (
-    confirm_segment_speaker, lock_entity_voice, merge_entities, pending_segments,
+    assign_chapter_narrator, confirm_segment_speaker, lock_entity_voice, merge_entities, pending_segments,
 )
 from audiobook_generator.role_script.v2_generation import generate_v2_for_book
 from audiobook_generator.role_script.models import (
@@ -451,8 +464,10 @@ def voxcpm_preview_voice(voice, model_name, device, voice_dir, cfg_value, infere
 # ── 多角色剧本 ───────────────────────────────────────────────────
 ROLE_TABLE_HEADERS = [
     "role_id", "display_name", "voice", "voice_id", "speed",
-    "instructions", "pitch", "volume",
+    "instructions", "pitch", "volume", "声音档案（由声音设置填写）",
 ]
+from audiobook_generator.ui.role_voices import MIMO_PROFILE_FIELDS, make_voice_profile, role_voice_choices, saved_role_voice_key
+
 _ROLE_PROVIDER_TTS = {"Mimo": "openai", "MiniMax": "minimax"}
 _ROLE_FINAL_FORMATS = {"mp3", "wav", "flac"}
 _VOICE_CATALOG_PROVIDERS = ("自动识别", "MiMo", "MiniMax")
@@ -639,23 +654,121 @@ def _role_confirmation_signature(script: RoleScriptV1) -> str:
 # 被旧快照覆盖，表现为“明明点过确认使用，开始生成却仍提示等待 DeepSeek”。
 # 这里在服务端再记一份，只要剧本文件没被重新生成、内容指纹一致就视为已确认。
 _ROLE_CONFIRMED_SCRIPTS = {}
+_ROLE_PREVIEW_BINDINGS = {}
+
+
+_ROLE_SCRIPT_ORIGINS = {}
+_ROLE_SCRIPT_ALIASES = {}
+_ROLE_SPLITTING_PROJECTS = set()
+_ROLE_RECONFIRM_PROJECTS = set()
+_ROLE_SPLIT_LOCK = threading.RLock()
+
+
+def _role_project_operation(fn):
+    """本地校验至保存／启动是一个操作，不能被拆分入口穿插。
+
+    仅串行化短暂的本地操作；远端拆分请求期间不持有此锁。
+    """
+    @wraps(fn)
+    def guarded(*args, **kwargs):
+        with _ROLE_SPLIT_LOCK:
+            return fn(*args, **kwargs)
+    return guarded
+
+
+def _begin_role_split(input_file):
+    """按书籍指纹占用项目；在首帧反馈前作废旧确认，不读取或更改旧剧本。"""
+    files = input_file if isinstance(input_file, (list, tuple)) else [input_file]
+    if len(files) != 1:
+        return None
+    raw = _uploaded_file_path(files[0])
+    if not raw or not Path(raw).is_file():
+        return None  # 无效输入交给原有拆分校验报告。
+    key = str(project_path(get_output_dir(), _sha256_file_ui(raw)).resolve())
+    with _ROLE_SPLIT_LOCK:
+        if running_process and running_process.is_alive():
+            raise ValueError('请等待当前音频生成结束或停止后，再重新拆分剧本')
+        if key in _ROLE_SPLITTING_PROJECTS:
+            raise ValueError('这本书正在拆分，请等待当前拆分完成')
+        _ROLE_SPLITTING_PROJECTS.add(key)
+        _ROLE_RECONFIRM_PROJECTS.add(key)
+        _ROLE_CONFIRMED_SCRIPTS.pop(key, None)
+    return key
+
+
+def _end_role_split(key):
+    with _ROLE_SPLIT_LOCK:
+        _ROLE_SPLITTING_PROJECTS.discard(key)
+
+
+def _role_project_is_splitting(file_obj):
+    path = _role_script_path(file_obj)
+    if not path:
+        return False
+    with _ROLE_SPLIT_LOCK:
+        return str(Path(path).resolve()) in _ROLE_SPLITTING_PROJECTS
+
+
+def _role_project_needs_reconfirmation(file_obj):
+    path = _role_script_path(file_obj)
+    if not path:
+        return False
+    with _ROLE_SPLIT_LOCK:
+        return str(Path(path).resolve()) in _ROLE_RECONFIRM_PROJECTS
+
+
+def _guarded_split_events(values):
+    try:
+        key = _begin_role_split(values[0])
+    except (OSError, TypeError, ValueError) as exc:
+        yield {'state': 'failed', 'message': str(exc)}
+        return
+    yield from iter_split_events(auto_split_role_script, values,
+                                 on_finish=lambda: _end_role_split(key))
+
+
+def _register_role_script_origin(path):
+    """只登记本服务生成的项目，不能依据客户端提供的路径建立信任。"""
+    canonical = Path(path).resolve()
+    roots = [Path(get_output_dir()).resolve() / name for name in (".role_projects", ".role_generated")]
+    if not canonical.is_file() or not any(canonical.is_relative_to(root) for root in roots):
+        raise ValueError("自动剧本不在项目目录中")
+    _ROLE_SCRIPT_ORIGINS[_sha256_file_ui(str(canonical))] = str(canonical)
+
+
+def _role_script_path(file_obj):
+    """恢复已登记剧本的真实项目路径，兼容Gradio的传输缓存副本。"""
+    raw = _uploaded_file_path(file_obj)
+    if not raw or not Path(raw).is_file():
+        return raw
+    digest = _sha256_file_ui(raw)
+    alias = (os.path.abspath(raw), digest)
+    canonical = _ROLE_SCRIPT_ALIASES.get(alias) or _ROLE_SCRIPT_ORIGINS.get(digest)
+    if canonical and Path(canonical).is_file():
+        _ROLE_SCRIPT_ALIASES[alias] = canonical
+        return canonical
+    return raw
 
 
 def _remember_role_confirmation(file_obj, signature: str) -> None:
     """把人工确认结果落到服务端缓存，避免前端 State 被竞态覆盖。"""
-    path = _uploaded_file_path(file_obj)
+    path = _role_script_path(file_obj)
     if not path or not signature:
         return
     try:
         key = os.path.abspath(path)
     except (TypeError, ValueError):
         return
-    _ROLE_CONFIRMED_SCRIPTS[key] = str(signature)
+    with _ROLE_SPLIT_LOCK:
+        if str(Path(key).resolve()) in _ROLE_SPLITTING_PROJECTS:
+            return
+        _ROLE_CONFIRMED_SCRIPTS[key] = str(signature)
+        _ROLE_RECONFIRM_PROJECTS.discard(str(Path(key).resolve()))
 
 
 def _forget_role_confirmation(file_obj) -> None:
     """剧本被重新生成时清掉旧的确认记录（同一路径、内容已变）。"""
-    path = _uploaded_file_path(file_obj)
+    path = _role_script_path(file_obj)
     if not path:
         return
     try:
@@ -667,7 +780,9 @@ def _forget_role_confirmation(file_obj) -> None:
 
 def _recall_role_confirmation(file_obj) -> str:
     """读取服务端人工确认记录；文件或内容变化时由调用方做指纹比对兜底。"""
-    path = _uploaded_file_path(file_obj)
+    if _role_project_is_splitting(file_obj):
+        return ""
+    path = _role_script_path(file_obj)
     if not path:
         return ""
     try:
@@ -705,7 +820,7 @@ def _ensure_role_voice_diversity(script: RoleScriptV1, report: ValidationReport)
 
 
 def _load_uploaded_role_script(file_obj):
-    path = _uploaded_file_path(file_obj)
+    path = _role_script_path(file_obj)
     if not path:
         report = ValidationReport()
         report.error("read_error", "$", "请先上传 RoleScript JSON 文件")
@@ -722,10 +837,11 @@ def _role_table_rows(script: RoleScriptV1):
             role.display_name,
             params.get("voice", ""),
             params.get("voice_id", ""),
-            params.get("speed", ""),
+            params.get("speed", 1.0),
             params.get("instructions", ""),
-            params.get("pitch", ""),
-            params.get("volume", ""),
+            params.get("pitch", 0.0),
+            params.get("volume", 1.0),
+            json.dumps({k: v for k, v in params.items() if k in MIMO_PROFILE_FIELDS}, ensure_ascii=False),
         ])
     return rows
 
@@ -809,8 +925,19 @@ def _apply_role_table(script: RoleScriptV1, table_value) -> RoleScriptV1:
         seen_role_ids.add(role_id)
 
         display_name = _role_text(values[1]) or role_id
-        params = {}
+        original_role = script.roles.get(role_id)
+        params = dict(original_role.provider_params) if original_role else {}
         if script.provider == "openai":
+            profile = _role_text(values[8])
+            if profile:
+                settings = json.loads(profile)
+                if not isinstance(settings, dict) or set(settings) - MIMO_PROFILE_FIELDS:
+                    raise ValueError("声音档案包含未知字段")
+                for name in MIMO_PROFILE_FIELDS:
+                    params.pop(name, None)
+                params.update(settings)
+            for name in ("voice", "instructions", "speed"):
+                params.pop(name, None)
             voice = _role_text(values[2])
             instructions = _role_text(values[5], strip=False)
             speed = _role_number(values[4], "speed", row_number)
@@ -821,6 +948,8 @@ def _apply_role_table(script: RoleScriptV1, table_value) -> RoleScriptV1:
             if speed is not None:
                 params["speed"] = speed
         elif script.provider == "minimax":
+            for name in ("voice_id", "speed", "pitch", "volume"):
+                params.pop(name, None)
             voice_id = _role_text(values[3])
             speed = _role_number(values[4], "speed", row_number)
             pitch = _role_number(values[6], "pitch", row_number)
@@ -846,6 +975,78 @@ def _apply_role_table(script: RoleScriptV1, table_value) -> RoleScriptV1:
     if not roles:
         raise ValueError("角色表没有有效角色行")
     return replace(script, roles=roles)
+
+
+def load_role_voice_settings(file_obj, table, selected):
+    """从当前表格加载声音设置，不调用模型。"""
+    script, report = _load_uploaded_role_script(file_obj)
+    if not script or not report.ok or not selected:
+        return (gr.update(),) * 8
+    try:
+        script = _apply_role_table(script, table)
+        role_id = selected.split(" — ", 1)[0]
+        params = script.roles[role_id].provider_params
+        saved_voice = saved_role_voice_key(params)
+        return ("preset" if saved_voice else params.get("voice_mode", "preset"), saved_voice or params.get("voice") or "mimo_default",
+                params.get("voice_description", ""), params.get("reference_audio_path"),
+                params.get("voice_language") or detect_role_script_language(script),
+                params.get("speed", 1.0), params.get("instructions", ""),
+                "已载入当前角色。修改后点击「应用声音设置」，再试听与确认剧本。")
+    except (ValueError, KeyError) as exc:
+        return *((gr.update(),) * 7), f"声音设置读取失败：{exc}"
+
+
+def use_preview_as_role_reference(file_obj, table, selected, audio, language, pace, instructions):
+    """用户选用当前试听作为固定参考；本步只保存本地文件。"""
+    script, report = _load_uploaded_role_script(file_obj)
+    try:
+        if not script or not report.ok:
+            raise ValueError("请先生成角色剧本")
+        current = _apply_role_table(script, table)
+        current = _ensure_role_voice_diversity(current, ValidationReport(schema_version=current.schema_version))
+        role_id = str(selected or "").split(" — ", 1)[0]
+        path = _uploaded_file_path(audio)
+        expected = (role_id, _role_confirmation_signature(current),
+                    _sha256_file_ui(path) if path and Path(path).is_file() else None)
+        if not path or expected not in _ROLE_PREVIEW_BINDINGS.values():
+            raise ValueError("请先用当前角色和参数重新试听，再固定该试听音色")
+    except (ValueError, OSError) as exc:
+        return gr.update(), str(exc), gr.update(), gr.update()
+    rows, message = apply_role_voice_settings(file_obj, table, selected, "clone", None, None,
+                                             audio, language, pace, instructions)
+    if isinstance(rows, dict):
+        return rows, message, gr.update(), gr.update()
+    role_id = str(selected).split(" — ", 1)[0]
+    row = next(row for row in rows if row[0] == role_id)
+    params = json.loads(row[8])
+    return rows, message, "clone", params["reference_audio_path"]
+
+
+def apply_role_voice_settings(file_obj, table, selected, mode, voice, description,
+                              reference, language, pace, instructions):
+    """将界面声音档案回填角色表；上传的参考仅保存本地。"""
+    script, report = _load_uploaded_role_script(file_obj)
+    try:
+        if not script or not report.ok or script.provider != "openai":
+            raise ValueError("请先生成 MiMo 角色剧本")
+        role_id = str(selected or "").split(" — ", 1)[0]
+        script = _apply_role_table(script, table)
+        if role_id not in script.roles:
+            raise ValueError("请先选择要设置的角色")
+        params = make_voice_profile(role_id, mode, voice, description,
+                                    _uploaded_file_path(reference), language, pace, instructions,
+                                    get_output_dir())
+        roles = dict(script.roles)
+        roles[role_id] = replace(roles[role_id], provider_params=params)
+        updated = replace(script, roles=roles)
+        result = validate_role_script(updated)
+        if not result.ok:
+            raise ValueError(_format_role_validation_report(result.report, "声音设置校验"))
+        _forget_role_confirmation(file_obj)
+        return _role_table_rows(updated), "已应用声音设置。请试听后重新确认剧本；参考音将在试听或生成时发送至 MiMo。"
+    except (ValueError, OSError, TypeError) as exc:
+        gr.Warning(str(exc))
+        return gr.update(), f"未应用：{exc}"
 
 
 def _validate_uploaded_role_script(script, provider: str, output_format: str):
@@ -884,6 +1085,17 @@ def _validate_uploaded_role_script(script, provider: str, output_format: str):
     return normalized if report.ok else None, report
 
 
+def _role_choice_update(script, selected=None):
+    choices, names = [], {}
+    for role_id, role in script.roles.items():
+        name = ' '.join(str(role.display_name).split()) or role_id
+        names[name] = names.get(name, 0) + 1
+        label = name if names[name] == 1 else f'{name}（{names[name]}）'
+        choices.append((label, role_id))
+    current = str(selected or '').split(' — ', 1)[0]
+    return gr.update(choices=choices, value=current if current in script.roles else (choices[0][1] if choices else None))
+
+
 def role_script_upload_changed(file_obj, provider, openai_output_format, minimax_output_format):
     """上传 JSON 后刷新参数表和校验摘要，不触发 Provider。"""
     output_format = _selected_role_output_format(
@@ -897,10 +1109,7 @@ def role_script_upload_changed(file_obj, provider, openai_output_format, minimax
     rows = _role_table_rows(script)
     _, report = _validate_uploaded_role_script(script, provider, output_format)
     report.warnings = list(load_report.warnings) + list(report.warnings)
-    choices = [f"{role_id} — {role.display_name}" for role_id, role in script.roles.items()]
-    return rows, _format_role_validation_report(report), gr.update(
-        choices=choices, value=choices[0] if choices else None
-    )
+    return rows, _format_role_validation_report(report), _role_choice_update(script)
 
 
 def role_table_changed(
@@ -911,6 +1120,7 @@ def role_table_changed(
     role_split_confirmed,
     role_confirmed_signature,
     table_value,
+    selected_role=None,
 ):
     """角色表编辑后刷新校验摘要；内容未变时保留人工确认。"""
     output_format = _selected_role_output_format(
@@ -944,17 +1154,15 @@ def role_table_changed(
     report.warnings = list(diversity_report.warnings) + list(report.warnings)
     effective_script = normalized or edited
     new_signature = _role_confirmation_signature(effective_script)
-    confirmed_signature = str(role_confirmed_signature or "")
+    confirmed_signature = str(role_confirmed_signature or "") or _recall_role_confirmation(file_obj)
     # 程序化 / 无内容变化的 change 事件也带 role_split_confirmed=False 的旧快照；
     # 只要内容指纹仍与已确认指纹一致，就不能把人工确认打回未确认状态。
-    still_confirmed = bool(confirmed_signature) and new_signature == confirmed_signature
-    choices = [
-        f"{role_id} — {role.display_name}"
-        for role_id, role in effective_script.roles.items()
-    ]
+    still_confirmed = normalized is not None and bool(confirmed_signature) and new_signature == confirmed_signature
+    if not still_confirmed:
+        _forget_role_confirmation(file_obj)
     return (
         _format_role_validation_report(report),
-        gr.update(choices=choices, value=choices[0] if choices else None),
+        _role_choice_update(effective_script, selected_role),
         still_confirmed,
         new_signature if still_confirmed else "",
         gr.update(
@@ -1052,6 +1260,8 @@ def preview_role_segment(provider, role_script_file, role_table, role_choice, pr
     finally:
         shutil.rmtree(work_dir, ignore_errors=True)
 
+    _ROLE_PREVIEW_BINDINGS[os.path.abspath(destination)] = (
+        role_id, _role_confirmation_signature(normalized), _sha256_file_ui(destination))
     gr.Info("试听音频已就绪")
     return gr.update(value=destination)
 
@@ -1102,30 +1312,151 @@ def _auto_split_chapters(provider, input_file, chapter_start, chapter_end,
     return chapters, start, end, _sha256_file_ui(file_path), book_parser
 
 
+def _chapter_directory_source(input_file, provider, title_mode, new_line_mode,
+                              remove_endnotes, remove_reference_numbers, search_and_replace_file):
+    files = input_file if isinstance(input_file, (list, tuple)) else [input_file] if input_file else []
+    paths = [_uploaded_file_path(file_obj) for file_obj in files]
+    book_hashes = [_sha256_file_ui(path) for path in paths]
+    replacement = _uploaded_file_path(search_and_replace_file)
+    source = parser_fingerprint({
+        "books": book_hashes, "provider": provider, "title_mode": title_mode or "auto",
+        "newline_mode": new_line_mode or "double", "remove_endnotes": bool(remove_endnotes),
+        "remove_reference_numbers": bool(remove_reference_numbers),
+        "replacements": _sha256_file_ui(replacement) if replacement else None,
+    })
+    return source, paths, book_hashes
+
+
+def resolve_book_chapter_range(input_file, provider, title_mode, new_line_mode,
+                               remove_endnotes, remove_reference_numbers, search_and_replace_file,
+                               start, end, catalog_state, selection_source, first, last):
+    """执行入口读当前下拉值，拒绝换书/改设置期间的旧目录与旧控件快照。"""
+    if catalog_state is None:
+        return start, end  # 兼容既有非网页调用，仍由原生成链路校验。
+    source, _, _ = _chapter_directory_source(
+        input_file, provider, title_mode, new_line_mode,
+        remove_endnotes, remove_reference_numbers, search_and_replace_file)
+    if not catalog_state or source != catalog_state.get('source') or source != selection_source:
+        raise ValueError("章节目录正在更新，请等待当前书籍目录载入，再选择范围后开始")
+    if catalog_state.get('mode') == 'batch':
+        return int(start), int(end)
+    if catalog_state.get('mode') != 'single' or first is None or last is None:
+        raise ValueError("请先读取有效的章节目录并选择起止章节")
+    start, end = int(first), int(last)
+    if not 1 <= start <= end <= len(catalog_state['chapters']):
+        raise ValueError("章节范围正在更新，请等待选择完成后重试")
+    return start, end
+
+
+def read_book_chapters(input_file, provider, title_mode, new_line_mode,
+                       remove_endnotes, remove_reference_numbers, search_and_replace_file):
+    """上传时只在本地读取目录，章号与实际转换过滤空章后的章号一致。"""
+    files = input_file if isinstance(input_file, (list, tuple)) else [input_file] if input_file else []
+    catalog = []
+    context = {}
+    source = ""
+    loaded_book = ""
+    message = "上传书籍后，这里会显示章节目录。"
+    try:
+        if files:
+            source, paths, book_hashes = _chapter_directory_source(
+                files, provider, title_mode, new_line_mode, remove_endnotes,
+                remove_reference_numbers, search_and_replace_file)
+            context = {"source": source, "files": paths, "mode": "batch" if len(files) > 1 else "error", "chapters": []}
+    except (OSError, TypeError, ValueError) as exc:
+        message = f"目录读取失败：{exc}。请检查文件后重新读取目录。"
+    if len(files) > 1:
+        message = "已选择多本书。请按数字设置各本书共用的章节范围；保留一本书可按章节名称选择。"
+    elif files:
+        try:
+            config = GeneralConfig(None)
+            config.input_file = _uploaded_file_path(files[0])
+            config.title_mode = title_mode or "auto"
+            config.newline_mode = new_line_mode or "double"
+            config.remove_endnotes = bool(remove_endnotes)
+            config.remove_reference_numbers = bool(remove_reference_numbers)
+            config.search_and_replace_file = _uploaded_file_path(search_and_replace_file)
+            # 读取目录不创建 Provider，也不读取 API 凭证。
+            break_string = "   " if provider in ("Mimo", "Chatterbox", "VoxCPM") else " @BRK#"
+            parser = get_book_parser(config)
+            catalog = chapter_catalog([(title, text) for title, text in parser.get_chapters(break_string) if text.strip()])
+            if not catalog:
+                raise ValueError("书籍中没有可转换的章节")
+            if not source:
+                raise ValueError("书籍指纹读取失败")
+            context.update(mode="single", chapters=catalog)
+            loaded_book = book_hashes[0]
+        except Exception as exc:
+            logger.warning("读取书籍目录失败：%s", exc)
+            catalog = []
+            message = f"目录读取失败：{exc}。请检查文件或高级解析设置后，点击重新读取目录。"
+    choices = chapter_choices(catalog)
+    return (
+        context,
+        gr.update(choices=choices, value=1 if catalog else None, interactive=bool(catalog)),
+        gr.update(choices=choices, value=len(catalog) if catalog else None, interactive=bool(catalog)),
+        gr.update(value=1), gr.update(value=-1),
+        range_payload(catalog, message=message),
+        gr.update(visible=len(files) > 1),
+        gr.update(visible=len(files) <= 1),
+        source,
+        loaded_book,
+    )
+
+
+def select_book_chapter(start, end, catalog, endpoint, selection_source=None):
+    """范围反向时把另一端收拢到本章，保留用户刚选的端点。"""
+    if isinstance(catalog, dict):
+        if selection_source != catalog.get('source') or catalog.get('mode') != 'single':
+            return tuple(gr.skip() for _ in range(5))
+        catalog = catalog.get('chapters', [])
+    if not catalog:
+        return gr.update(), gr.update(), gr.update(), gr.update(), range_payload([])
+    start = int(start or 1)
+    end = int(end or len(catalog))
+    if not 1 <= start <= len(catalog) or not 1 <= end <= len(catalog):
+        raise gr.Error("章节目录已更新，请重新选择起止章节")
+    if start > end:
+        if endpoint == "start":
+            end = start
+        else:
+            start = end
+    return (gr.update(value=start), gr.update(value=end),
+            start, end, range_payload(catalog, start, end))
+
+
 def _role_script_summary(script: RoleScriptV1, heading: str = "自动拆分结果") -> str:
-    lines = [
-        f"**{heading}**",
-        f"- 角色数：{len(script.roles)}；章节数：{len(script.chapters)}",
-        "- 角色：" + "、".join(
-            f"`{role_id}`（{role.display_name}）"
-            for role_id, role in script.roles.items()
-        ),
-    ]
-    for chapter in script.chapters:
-        role_sequence = " → ".join(
-            f"{segment.role_id}" for segment in chapter.segments
-        )
-        lines.append(
-            f"- 第 {chapter.chapter_index} 章《{chapter.title}》："
-            f"{len(chapter.segments)} 段（{role_sequence}）"
-        )
+    def display(value, limit=64):
+        value = ' '.join(str(value).split())
+        value = value[:limit] + ('…' if len(value) > limit else '')
+        return html.escape(value).replace('|', '／').replace('`', '').replace('*', '').replace('_', ' ')
+    names = [display(role.display_name, 32) for role in script.roles.values()]
+    has_narration = any(segment.text_kind is not None for chapter in script.chapters for segment in chapter.segments)
+    lines = [f"**{display(heading)}**", "",
+             f"{len(script.roles)} 位角色 · {len(script.chapters)} 章 · "
+             f"{sum(len(chapter.segments) for chapter in script.chapters)} 段", "",
+             '人物：' + '、'.join(names[:12]) + ('等' if len(names) > 12 else ''), "",
+             '| 章节 | 段数 |', '| --- | ---: |']
+    if has_narration:
+        lines[-2:] = ['| 章节 | 段数 | 叙述声音 |', '| --- | ---: | --- |']
+    for chapter in script.chapters[:12]:
+        row = f'| {chapter.chapter_index} · {display(chapter.title)} | {len(chapter.segments)} |'
+        if has_narration:
+            narrators = list(dict.fromkeys(
+                ('默认旁白（请核对）' if segment.role_id == 'narrator' else
+                 display(script.roles[segment.role_id].display_name, 20))
+                for segment in chapter.segments if segment.text_kind == 'narration' and segment.role_id in script.roles))
+            row += ' ' + ('、'.join(narrators[:3]) + ('等' if len(narrators) > 3 else '') if narrators else '未识别／旧剧本') + ' |'
+        lines.append(row)
+    if len(script.chapters) > 12:
+        lines.extend(['', f'其余 {len(script.chapters) - 12} 章见可下载的完整剧本。'])
     if isinstance(script, RoleScriptV2):
         pending = sum(
             1 for chapter in script.chapters for segment in chapter.segments
             if segment.speaker and segment.speaker.status in {"needs_review", "unknown", "proposed"}
         )
-        lines.append(f"- 全书人物表：{len(script.entities)} 个实体；待逐段核对：{pending} 段")
-        lines.append("- 自动归属分数尚未用标注集校准，请结合原文证据复核。")
+        registry_scope = "全书人物索引已完成" if script.registry_complete else "仅已分析章节的人物索引；全书尚未分析完"
+        lines.extend(['', f'{registry_scope}；待核对 {pending} 段。可在下方查看原文归属。'])
     return "\n".join(lines)
 
 
@@ -1160,7 +1491,10 @@ def role_review_details(file_obj, segment_id):
                 continue
             speaker = segment.speaker
             evidence = "；".join(f"{item.kind}: {item.quote}" for item in speaker.evidence) if speaker else ""
+            kind = {'narration': '叙述（可由故事人物自述）', 'dialogue': '对白', 'unknown': '待判断'}.get(segment.text_kind, '旧剧本未区分')
+            name = script.roles[segment.role_id].display_name if segment.role_id in script.roles else segment.role_id
             return (f"第 {chapter.chapter_index} 章 · `{segment_id}`\n\n"
+                    f"段落类型：{kind}；朗读声音：{html.escape(name)}\n\n"
                     f"原文：{segment.text}\n\n"
                     f"当前人物：`{speaker.entity_id if speaker else 'unknown'}`；"
                     f"状态：`{speaker.status if speaker else 'unknown'}`；"
@@ -1169,17 +1503,69 @@ def role_review_details(file_obj, segment_id):
     return "找不到指定段落。"
 
 
-def apply_role_review(file_obj, operation, segment_id, entity_id, source_id, target_id):
-    path = _uploaded_file_path(file_obj)
-    project_root = os.path.abspath(os.path.join(get_output_dir(), ".role_projects"))
-    if not path or not os.path.abspath(path).startswith(project_root + os.sep):
-        return (gr.update(), gr.update(), "只能在自动生成的 V2 项目中保存人工复核。",
-                False, "", gr.update(value=_role_confirmation_probe(False, "", gate=True)))
+def _editable_role_project(file_obj, table=None):
+    if _role_project_is_splitting(file_obj):
+        raise ValueError('剧本正在重新拆分，请完成后再修改归属')
+    if running_process and running_process.is_alive():
+        raise ValueError('请等待当前生成结束或停止后，再修改归属')
+    path = _role_script_path(file_obj)
+    project_root = os.path.realpath(os.path.join(get_output_dir(), ".role_projects"))
+    if not path or not os.path.realpath(path).startswith(project_root + os.sep):
+        raise ValueError('只能在自动生成的 V2 项目中保存人工复核')
     script, report = _load_uploaded_role_script(path)
     if not report.ok or not isinstance(script, RoleScriptV2):
-        return (gr.update(), gr.update(), "V2 项目读取失败。", False, "",
-                gr.update(value=_role_confirmation_probe(False, "", gate=True)))
+        raise ValueError('V2 项目读取失败')
+    return path, _apply_role_table(script, table) if table is not None else script
+
+
+def load_narration_controls(file_obj, selected_chapter=None):
+    script, report = _load_uploaded_role_script(file_obj)
+    eligible = [c for c in script.chapters if any(s.text_kind == 'narration' for s in c.segments)] if report.ok and isinstance(script, RoleScriptV2) else []
+    if not eligible:
+        return (gr.update(choices=[], value=None, interactive=False),
+                gr.update(choices=[], value=None, interactive=False), gr.update(interactive=False),
+                '当前剧本未记录叙述段。重新拆分后可按章设置；旧剧本仍可使用逐段归属。')
+    chapter = next((c for c in eligible if c.chapter_index == selected_chapter), eligible[0])
+    narrators = {s.role_id for s in chapter.segments if s.text_kind == 'narration'}
+    entities = [(('默认旁白' if key == 'narrator' else role.display_name), key)
+                for key, role in script.roles.items() if key in script.entities]
+    return (gr.update(choices=[(f'{c.chapter_index} · {c.title}', c.chapter_index) for c in eligible],
+                      value=chapter.chapter_index, interactive=True),
+            gr.update(choices=entities, value=next(iter(narrators)) if len(narrators) == 1 else None, interactive=True),
+            gr.update(interactive=True),
+            f'本章有 {sum(s.text_kind == "narration" for s in chapter.segments)} 段叙述；当前使用 {len(narrators)} 种声音。修改后需重新确认剧本。')
+
+
+def refresh_role_summary(file_obj):
+    script, report = _load_uploaded_role_script(file_obj)
+    return _role_script_summary(script, '当前剧本') if script and report.ok else gr.skip()
+
+
+@_role_project_operation
+def apply_chapter_narration(file_obj, table, chapter_index, entity_id):
     try:
+        path, script = _editable_role_project(file_obj, table)
+        updated, count = assign_chapter_narrator(script, chapter_index, entity_id)
+        result = validate_role_script(updated)
+        if not result.ok:
+            raise ValueError(_format_role_validation_report(result.report, '归属校验'))
+        save_project(result.script, path)
+        _forget_role_confirmation(path)
+        _register_role_script_origin(path)
+        return (gr.update(value=_role_table_rows(result.script)),
+                f'已保存：第 {chapter_index} 章 {count} 段叙述使用「{script.roles[entity_id].display_name}」。请重新确认剧本后生成。',
+                False, '', gr.update(value=_role_confirmation_probe(False, '', gate=True)),
+                gr.update(value=_role_script_summary(result.script, '当前剧本')))
+    except (ValueError, OSError, TypeError) as exc:
+        signature = _recall_role_confirmation(file_obj)
+        return (gr.skip(), f'未修改：{exc}', bool(signature), signature,
+                gr.update(value=_role_confirmation_probe(bool(signature), signature, gate=not bool(signature))), gr.skip())
+
+
+@_role_project_operation
+def apply_role_review(file_obj, operation, segment_id, entity_id, source_id, target_id, table=None):
+    try:
+        path, script = _editable_role_project(file_obj, table)
         if operation == "confirm":
             updated = confirm_segment_speaker(script, segment_id, entity_id)
         elif operation == "merge":
@@ -1191,8 +1577,9 @@ def apply_role_review(file_obj, operation, segment_id, entity_id, source_id, tar
         result = validate_role_script(updated)
         if not result.ok:
             raise ValueError(_format_role_validation_report(result.report, "复核后校验"))
-        _forget_role_confirmation(path)
         save_project(result.script, path)
+        _forget_role_confirmation(path)
+        _register_role_script_origin(path)
         queue = pending_segments(result.script)
         choices = [(f"第 {chapter} 章 · {excerpt}", sid) for sid, chapter, excerpt in queue]
         return (
@@ -1201,8 +1588,8 @@ def apply_role_review(file_obj, operation, segment_id, entity_id, source_id, tar
             f"✅ 已保存复核；剩余 {len(queue)} 段待复核。请重新确认剧本后生成。",
             False, "", gr.update(value=_role_confirmation_probe(False, "", gate=True)),
         )
-    except (ValueError, OSError) as exc:
-        signature = _recall_role_confirmation(path)
+    except (ValueError, OSError, TypeError) as exc:
+        signature = _recall_role_confirmation(file_obj)
         return (gr.update(), gr.update(), f"复核未保存：{exc}", bool(signature), signature,
                 gr.update(value=_role_confirmation_probe(bool(signature), signature,
                                                          gate=not bool(signature))))
@@ -1294,6 +1681,9 @@ def auto_split_role_script(
     deepseek_base_url,
     deepseek_model,
     fullbook_index_ack=False,
+    chapter_catalog_state=None, chapter_selection_source=None,
+    chapter_from_name=None, chapter_to_name=None,
+    progress=gr.Progress(),
 ):
     """上传书籍后调用 DeepSeek 生成待人工确认的剧本。
 
@@ -1315,8 +1705,14 @@ def auto_split_role_script(
     if not role_mode or not auto_role_split:
         return empty
     try:
-        if not fullbook_index_ack:
-            raise ValueError("请先确认：建立全书人物表会把未选择章节也提交给当前 DeepSeek 服务，并增加调用量")
+        if progress:
+            progress(0, desc="正在读取书籍与所选章节…")
+        if isinstance(input_file, (list, tuple)) and len(input_file) > 1:
+            raise ValueError("角色拆分每次只支持一本书")
+        chapter_start, chapter_end = resolve_book_chapter_range(
+            input_file, provider, title_mode, new_line_mode, remove_endnotes,
+            remove_reference_numbers, search_and_replace_file, chapter_start, chapter_end,
+            chapter_catalog_state, chapter_selection_source, chapter_from_name, chapter_to_name)
         chapters, start, end, book_sha256, _book_parser = _auto_split_chapters(
             provider,
             input_file,
@@ -1353,28 +1749,24 @@ def auto_split_role_script(
             deepseek_model,
             parser_fingerprint=fingerprint,
             previous=previous,
-            progress=lambda message: logger.info("%s", message),
+            index_full_book=bool(fullbook_index_ack),
+            progress=lambda message: _split_progress(message, progress),
         )
         result = _ensure_role_voice_diversity(result, report)
         script_path = save_project(result, script_path)
+        _register_role_script_origin(script_path)
         # 同一路径重新生成后，旧的“已确认”记录必须作废。
         _forget_role_confirmation(script_path)
         rows = _role_table_rows(result)
-        choices = [
-            f"{role_id} — {role.display_name}"
-            for role_id, role in result.roles.items()
-        ]
         validation_text = _format_role_validation_report(report, "DeepSeek 剧本校验")
         summary = _role_script_summary(result)
-        summary += (
-            "\n\n**请人工核对角色划分和逐章段数，确认前不会开始生成。**"
-            f"\n\n{validation_text}"
-        )
+        if progress:
+            progress(1, desc="剧本已保存，请选择人物试听")
         return (
             gr.update(value=str(script_path)),
             gr.update(value=rows),
             gr.update(value=validation_text),
-            gr.update(choices=choices, value=choices[0] if choices else None),
+            _role_choice_update(result),
             gr.update(value=summary),
             gr.update(visible=True),
             False,
@@ -1402,6 +1794,65 @@ def auto_split_role_script(
         )
 
 
+def _split_progress(message, progress):
+    logger.info("%s", message)
+    if progress:
+        progress(None, desc=message)
+
+
+# 显式按钮沿用自动拆分的输入与 Progress 注入；不把进度对象当作界面字段。
+split_role_script_now.__signature__ = inspect.signature(auto_split_role_script)
+
+
+def _stream_role_script(values):
+    """界面专用流式反馈；同步入口仍供脚本和离线验证使用。"""
+    enabled = _role_provider_id(values[3]) is not None
+    if not values[1] or not values[2]:
+        yield (*auto_split_role_script(*values), render_split_status(), gr.update(interactive=enabled))
+        return
+    started = time.time() * 1000
+    for event in _guarded_split_events(values):
+        state = event['state']
+        if state == 'heartbeat':
+            yield tuple(gr.skip() for _ in range(12))
+        elif state in ('starting', 'running'):
+            updates = [gr.skip() for _ in range(10)]
+            if state == 'starting':
+                updates[6:10] = [False, False, '', gr.update(value=_role_confirmation_probe(False))]
+            yield (*updates, render_split_status(state, event['message'], started),
+                   gr.update(interactive=False))
+        elif state == 'result':
+            result = event['result']
+            generated = result[7]
+            detail = split_result_status(generated, result[2].get('value', ''))
+            yield (*result, render_split_status('done' if generated else 'failed', detail),
+                   gr.update(interactive=enabled))
+        else:
+            # 保护工作线程中的意外异常；常规失败由同步入口返回校验结果。
+            message = '拆分失败：' + event['message'] + '。请检查连接和章节后重试。'
+            updates = [gr.skip() for _ in range(10)]
+            updates[2] = gr.update(value=message)
+            updates[6:10] = [False, False, '', gr.update(value=_role_confirmation_probe(False))]
+            yield (*updates, render_split_status('failed', message), gr.update(interactive=enabled))
+
+
+def auto_split_role_script_ui(*args):
+    yield from _stream_role_script(list(args))
+
+
+def split_role_script_now_ui(*args):
+    values = list(args)
+    values[2] = True
+    yield from _stream_role_script(values)
+
+
+_split_ui_signature = inspect.signature(auto_split_role_script).replace(
+    parameters=[p for name, p in inspect.signature(auto_split_role_script).parameters.items() if name != 'progress'])
+auto_split_role_script_ui.__signature__ = _split_ui_signature
+split_role_script_now_ui.__signature__ = _split_ui_signature
+
+
+@_role_project_operation
 def confirm_auto_role_script(
     role_script_file,
     role_table,
@@ -1410,6 +1861,9 @@ def confirm_auto_role_script(
     minimax_output_format,
 ):
     """人工确认自动拆分结果；校验失败时保持未确认状态。"""
+    if _role_project_is_splitting(role_script_file):
+        return (False, '剧本正在重新拆分，请等待完成后再确认。', gr.update(), '',
+                gr.update(value=_role_confirmation_probe(False)))
     script, load_report = _load_uploaded_role_script(role_script_file)
     if not load_report.ok or script is None:
         return (
@@ -1448,8 +1902,17 @@ def confirm_auto_role_script(
             gr.update(value=_role_confirmation_probe(False, "", gate=True)),
         )
     summary = _role_script_summary(normalized, "已确认使用的剧本")
-    summary += "\n\n✅ 已确认。下一步：点击「返回生成页」，再点击「开始生成」。"
-    summary += "\n\n" + _format_role_validation_report(report, "剧本校验")
+    summary += "\n\n✅ 已确认。下一步：在页面下方点击「开始生成」。"
+    if isinstance(normalized, RoleScriptV2):
+        project_root = Path(get_output_dir()).resolve() / ".role_projects"
+        path = Path(_role_script_path(role_script_file)).resolve()
+        if path.is_relative_to(project_root):
+            try:
+                save_project(normalized, path)
+                _register_role_script_origin(path)
+            except OSError as exc:
+                return (False, f"角色设置保存失败：{exc}", gr.update(), "",
+                        gr.update(value=_role_confirmation_probe(False, "", gate=True)))
     signature = _role_confirmation_signature(normalized)
     # 服务端记一份确认结果：后续 start 事件即便拿到被竞态覆盖的旧 State，
     # 也能凭“路径 + 内容指纹”识别为已确认。
@@ -1461,6 +1924,19 @@ def confirm_auto_role_script(
         signature,
         gr.update(value=_role_confirmation_probe(True, signature)),
     )
+
+
+def confirm_auto_role_script_ui(role_script_file, role_table, provider, openai_output_format, minimax_output_format):
+    """先显示核对状态；成功标记仍只读取后台确认结果。"""
+    yield (*[gr.skip() for _ in range(5)], gr.update(interactive=False))
+    try:
+        result = confirm_auto_role_script(role_script_file, role_table, provider,
+                                          openai_output_format, minimax_output_format)
+    except Exception as exc:
+        logger.warning('角色确认失败：%s', exc, exc_info=True)
+        result = (False, gr.update(value=f'确认失败：{exc}。请检查后重试。'), gr.skip(), '',
+                  gr.update(value=_role_confirmation_probe(False)))
+    yield (*result, gr.update(interactive=True))
 
 
 def manual_role_script_uploaded(
@@ -1475,7 +1951,7 @@ def manual_role_script_uploaded(
     """手动上传剧本等同于人工确认，自动拆分面板显示摘要。"""
     # 自动拆分会把生成文件写回同一个 gr.File。这里的 change 事件也会随
     # 程序化更新触发，但自动拆分不是人工确认，必须保持确认按钮流程。
-    uploaded_path = _uploaded_file_path(role_script_file)
+    uploaded_path = _role_script_path(role_script_file)
     if not uploaded_path:
         return (
             gr.update(value=[]), "先生成剧本，或上传已有剧本。",
@@ -1484,11 +1960,11 @@ def manual_role_script_uploaded(
             gr.update(value=_role_confirmation_probe(False)),
         )
     generated_roots = [
-        os.path.abspath(os.path.join(get_output_dir(), name))
+        os.path.realpath(os.path.join(get_output_dir(), name))
         for name in (".role_generated", ".role_projects")
     ]
     if uploaded_path and any(
-        os.path.abspath(uploaded_path).startswith(root + os.sep) for root in generated_roots
+        os.path.realpath(uploaded_path).startswith(root + os.sep) for root in generated_roots
     ):
         # 自动拆分写回文件时保持当前确认 State 不变。
         # gr.State 只接受原始值：这里必须把原值回传，不能返回 gr.update()，
@@ -1533,10 +2009,9 @@ def manual_role_script_uploaded(
     )
     report.warnings = list(load_report.warnings) + list(report.warnings)
     rows = _role_table_rows(normalized or script)
-    choices = [f"{role_id} — {role.display_name}" for role_id, role in (normalized or script).roles.items()]
     validation = _format_role_validation_report(report, "角色剧本校验")
     summary = _role_script_summary(normalized or script, "手动上传的剧本")
-    summary += "\n\n✅ 已作为人工确认剧本使用。\n\n" + validation
+    summary += "\n\n已确认当前剧本。修改声音或归属后，请重新确认。"
     confirmed = normalized is not None
     signature = _role_confirmation_signature(normalized) if confirmed else ""
     if confirmed:
@@ -1544,7 +2019,7 @@ def manual_role_script_uploaded(
     return (
         gr.update(value=rows),
         gr.update(value=validation),
-        gr.update(choices=choices, value=choices[0] if choices else None),
+        _role_choice_update(normalized or script),
         gr.update(value=summary),
         gr.update(visible=True),
         confirmed,
@@ -1555,6 +2030,7 @@ def manual_role_script_uploaded(
 
 
 # ── 转换核心 ──────────────────────────────────────────────────────
+@_role_project_operation
 def process_form(provider,
                  input_file, output_dir, worker_count, log_level, output_text, preview,
                  search_and_replace_file, title_mode, new_line_mode, chapter_start, chapter_end,
@@ -1576,7 +2052,11 @@ def process_form(provider,
                  allow_role_text_override, allow_role_title_mismatch, allow_role_fallback,
                  role_quality_enabled=False, role_quality_max_rate=4.3,
                  role_quality_deepseek_api_key=None, role_quality_deepseek_base_url=None,
-                 role_quality_deepseek_model=None):
+                 role_quality_deepseek_model=None,
+                 audio_core_enabled=False, audio_core_repair=False,
+                 audio_core_settings_file=None, audio_core_casting_file=None,
+                 chapter_catalog_state=None, chapter_selection_source=None,
+                 chapter_from_name=None, chapter_to_name=None):
     if not input_file:
         gr.Warning("请先选择至少一个书籍文件")
         # 保持进度条现状，只关掉轮询
@@ -1584,13 +2064,33 @@ def process_form(provider,
     if not isinstance(input_file, list):
         input_file = [input_file]
 
+    try:
+        if chapter_catalog_state is not None:
+            chapter_start, chapter_end = resolve_book_chapter_range(
+                input_file, provider, title_mode, new_line_mode, remove_endnotes,
+                remove_reference_numbers, search_and_replace_file, chapter_start, chapter_end,
+                chapter_catalog_state, chapter_selection_source, chapter_from_name, chapter_to_name)
+    except (OSError, TypeError, ValueError) as exc:
+        gr.Warning(str(exc))
+        return gr.update(), gr.Timer(active=False)
+
+    if audio_core_enabled and _role_provider_id(provider) != "openai":
+        gr.Warning("统一质量核心首轮仅支持 MiMo，请切换引擎后使用")
+        return gr.update(), gr.Timer(active=False)
+
     role_script = None
     if role_mode:
         if _role_provider_id(provider) is None:
-            gr.Warning(f"{provider} 不支持多角色模式，请切回 MiMo / MiniMax，或在高级设置中关闭多角色模式")
+            gr.Warning(f"{provider} 不支持多角色模式，请切回 MiMo / MiniMax，或在「多角色配音」模块关闭多角色模式")
             return gr.update(), gr.Timer(active=False)
         if len(input_file) != 1:
             gr.Warning("角色模式首版只支持单本书，请只选择一个书籍文件")
+            return gr.update(), gr.Timer(active=False)
+        if _role_project_is_splitting(role_script_file):
+            gr.Warning("剧本正在重新拆分，请等待完成并确认后再开始生成")
+            return gr.update(), gr.Timer(active=False)
+        if _role_project_needs_reconfirmation(role_script_file):
+            gr.Warning("剧本已重新拆分或上次拆分失败，请核对当前剧本并重新确认后再开始生成")
             return gr.update(), gr.Timer(active=False)
         # 人工确认以“内容指纹”为准：确认按钮会写入 role_confirmed_signature，
         # 服务端再记一份（role_split_confirmed 布尔在 Gradio 事件竞态里可能被旧快照覆盖，
@@ -1600,11 +2100,11 @@ def process_form(provider,
         )
         if not role_split_confirmed and not confirmed_signature:
             if auto_role_split and role_split_generated:
-                gr.Warning("自动拆分结果尚未人工确认，请先在高级设置中核对并点击「确认剧本与角色参数」")
+                gr.Warning("自动拆分结果尚未人工确认，请先在「多角色配音」模块核对并点击「确认剧本与角色参数」")
             elif auto_role_split:
-                gr.Warning("请先等待 DeepSeek 自动拆分完成，并在高级设置中人工确认")
+                gr.Warning("请先等待 DeepSeek 自动拆分完成，并在「多角色配音」模块人工确认")
             else:
-                gr.Warning("请先手动上传剧本并在高级设置中完成人工确认")
+                gr.Warning("请先在「多角色配音」生成或导入剧本，试听后点击「确认剧本与角色参数」")
             return gr.update(), gr.Timer(active=False)
         selected_output_format = _selected_role_output_format(
             provider, openai_output_format, minimax_output_format
@@ -1633,7 +2133,7 @@ def process_form(provider,
         )
         current_signature = _role_confirmation_signature(role_script)
         if confirmed_signature and current_signature != confirmed_signature:
-            gr.Warning("剧本内容已修改，请回到高级设置重新点击「确认剧本与角色参数」")
+            gr.Warning("剧本内容已修改，请回到「多角色配音」模块重新点击「确认剧本与角色参数」")
             return gr.update(), gr.Timer(active=False)
 
     # WebUI 里“开始生成”必须执行真实合成。预解析是普通模式的历史持久化开关，
@@ -1663,6 +2163,18 @@ def process_form(provider,
         config.output_text = output_text
         config.log = log_level
         config.worker_count = worker_count
+        config.audio_core_enabled = bool(audio_core_enabled)
+        config.audio_core_repair = bool(audio_core_repair)
+        if config.audio_core_enabled:
+            from audiobook_generator.ui.audio_quality import apply_quality_settings, apply_local_quality_defaults
+            try:
+                apply_local_quality_defaults(config)
+                apply_quality_settings(config, _uploaded_file_path(audio_core_settings_file))
+                config.audio_core_casting = _uploaded_file_path(audio_core_casting_file)
+                config.worker_count = 1
+            except (ValueError, OSError, TypeError) as exc:
+                gr.Warning(f"质量配置无效：{exc}")
+                return gr.update(), gr.Timer(active=False)
         config.no_prompt = True
         config.title_mode = title_mode
         config.newline_mode = new_line_mode
@@ -1677,7 +2189,7 @@ def process_form(provider,
         config.allow_role_text_override = bool(allow_role_text_override) if role_mode else False
         config.allow_role_title_mismatch = bool(allow_role_title_mismatch) if role_mode else False
         config.allow_role_fallback = bool(allow_role_fallback) if role_mode else False
-        config.role_quality_enabled = bool(role_quality_enabled) if role_mode else False
+        config.role_quality_enabled = bool(role_quality_enabled) and not config.audio_core_enabled if role_mode else False
         config.role_quality_max_rate = float(role_quality_max_rate or 4.3)
         config.role_quality_deepseek_api_key = role_quality_deepseek_api_key if role_mode else None
         config.role_quality_deepseek_base_url = role_quality_deepseek_base_url if role_mode else None
@@ -1959,7 +2471,7 @@ def delete_entire_folder(folder_name):
     new_folders = get_folders_list()
     new_val = new_folders[0] if new_folders else None
     new_files = get_files_in_folder(new_val) if new_val else []
-    msg = f"批次 <b style='color:#ff3b30;'>{folder_name}</b> 已被整体删除"
+    msg = f"批次 <b style='color:var(--apple-red);'>{html.escape(folder_name)}</b> 已被整体删除"
     return (gr.update(choices=new_folders, value=new_val),
             gr.update(choices=new_files, value=new_files),
             gr.update(value=_placeholder_html(msg)), gr.update(value=None, visible=False))
@@ -2002,81 +2514,13 @@ def delete_selected_files(folder_name, selected_files):
             gr.update(visible=False))
 
 
-def generate_download(folder_name, selected_files, auto_delete):
-    if not folder_name or not selected_files:
-        return (gr.update(), gr.update(),
-                gr.update(value=_placeholder_html("请至少选择一个文件进行打包")), gr.update(visible=False))
-    if isinstance(selected_files, str):
-        selected_files = [selected_files]
-    folder_path = os.path.join(get_output_dir(), folder_name)
-
-    def _prompt(display_name, warning=""):
-        return f'''
-        <div class="lib-ready">
-            <div class="lib-ready-icon">✅</div>
-            <h3>资源组装完毕</h3>
-            <p>{display_name}<br><b>👇 点击下方文件名即可开始下载</b></p>
-            {warning}
-        </div>'''
-
-    temp_dir = os.path.join(get_output_dir(), ".temp_downloads")
-    os.makedirs(temp_dir, exist_ok=True)
-    timestamp = int(datetime.now().timestamp())
-    serve_file_path = None
-    display_name = ""
-
-    if len(selected_files) == 1:
-        file_name = selected_files[0]
-        abs_path = os.path.join(folder_path, file_name)
-        if os.path.isfile(abs_path):
-            temp_file_path = os.path.join(temp_dir, f"{timestamp}_{file_name}")
-            shutil.copy2(abs_path, temp_file_path)
-            serve_file_path = temp_file_path
-            display_name = f"待下载文件：<b>{file_name}</b>"
-    else:
-        zip_filename = f"{folder_name}_Export_{timestamp}.zip"
-        zip_filepath = os.path.join(temp_dir, zip_filename)
-        with zipfile.ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for file_name in selected_files:
-                abs_path = os.path.join(folder_path, file_name)
-                if os.path.isfile(abs_path):
-                    zipf.write(abs_path, arcname=file_name)
-        serve_file_path = zip_filepath
-        display_name = f"已将 <b style='font-size:1.1em;'>{len(selected_files)}</b> 个文件打包为 ZIP"
-
-    warning_html = ""
-    folder_update = gr.update()
-    checkbox_update = gr.update()
-
-    if auto_delete:
-        for file_name in selected_files:
-            abs_path = os.path.join(folder_path, file_name)
-            if os.path.isfile(abs_path):
-                try:
-                    os.remove(abs_path)
-                except Exception:
-                    pass
-        folder_deleted = False
-        if os.path.exists(folder_path) and not os.listdir(folder_path):
-            try:
-                os.rmdir(folder_path)
-                folder_deleted = True
-            except Exception:
-                pass
-        if folder_deleted:
-            new_folders = get_folders_list()
-            new_val = new_folders[0] if new_folders else None
-            new_files = get_files_in_folder(new_val) if new_val else []
-            folder_update = gr.update(choices=new_folders, value=new_val)
-            checkbox_update = gr.update(choices=new_files, value=new_files)
-            warning_html = '<div class="lib-warn">⚠️ 阅后即焚已触发：源文件及空文件夹已删除，请保存下方副本</div>'
-        else:
-            new_files = get_files_in_folder(folder_name)
-            checkbox_update = gr.update(choices=new_files, value=[])
-            warning_html = '<div class="lib-warn">⚠️ 源文件已自动删除，请及时保存下方副本</div>'
-
-    return (folder_update, checkbox_update, gr.update(value=_prompt(display_name, warning_html)),
-            gr.update(value=serve_file_path, visible=True))
+def generate_download(folder_name, selected_files, auto_delete=False):
+    try:
+        path, count = create_archive(get_output_dir(), folder_name, selected_files)
+    except (ValueError, OSError) as exc:
+        gr.Warning(str(exc))
+        return gr.update(), gr.update(), gr.update(value=_placeholder_html(html.escape(str(exc)))), gr.update(value=None, visible=False)
+    return (gr.update(), gr.update(), gr.update(value=f'<div class="lib-ready"><h3>ZIP 已准备好</h3><p>{count} 个文件 · 源文件保留<br>点击下方按钮保存到本地。</p></div>'), gr.update(value=path, visible=True))
 
 
 def refresh_batches():
@@ -2107,7 +2551,7 @@ def load_files_for_folder(folder_name):
 #    这样 shimmer / 宽度过渡等动画可以连续播放，不会出现"一闪一闪"；
 # 2) 指针交互：卡片跟随鼠标的高光、按钮点击水波纹；
 # 3) 供按钮 js= 调用：点击「开始生成」后平滑滚动到顶部进度条。
-HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + LOG_LAYOUT_HEAD_HTML + """
+HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + LOG_LAYOUT_HEAD_HTML + WORKFLOW_HEAD_HTML + CHAPTER_HEAD_HTML + ROLE_SPLIT_HEAD + """
 <script>
 (function () {
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -2164,6 +2608,7 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + LOG_LAYOUT_HEAD_HTML + """
     } else if (mode === 'finished' || mode === 'interrupted' || mode === 'failed') {
       if (!sawActive) return;
     }
+    box.dataset.mode = mode;
     box.classList.remove('idle', 'active', 'starting', 'running', 'done', 'warn');
     if (mode === 'idle') box.classList.add('idle');
     else if (mode === 'starting') box.classList.add('active', 'starting');
@@ -2265,26 +2710,8 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + LOG_LAYOUT_HEAD_HTML + """
     if (document.body.dataset.ataRoleVerificationDismissed === key) return;
     panel.dataset.ataAutoOpenedKey = key;
 
-    var modal = $('#advanced_modal');
-    if (!modal) return;
-    // 自动核验弹窗也必须记录底层页面位置，否则用户从弹窗底部点“完成”
-    // 时 closeAdvancedModal() 会回退到默认的 0，看起来像页面突然跳到顶部。
-    if (!document.body.classList.contains('modal-open')) {
-      openAdvancedModal();
-    }
-    modal.classList.add('show');
-    document.body.classList.add('modal-open');
-
-    // 等 Gradio / 浏览器完成一次布局后再在弹窗内部滚动，避免引发布局抖动。
-    window.setTimeout(function () {
-      var scroller = modal.querySelector('.modal-scroll');
-      if (!scroller) return;
-      var reviewTarget = roleGateActive() ? $('#role_parameter_table') : panel;
-      var panelRect = (reviewTarget || panel).getBoundingClientRect();
-      var scrollerRect = scroller.getBoundingClientRect();
-      var targetTop = scroller.scrollTop + panelRect.top - scrollerRect.top - 16;
-      scroller.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
-    }, 180);
+    // 结果留在独立模块内；不抢焦点，也不把用户带进高级设置。
+    panel.setAttribute('aria-live', 'polite');
   }
 
   function bindRoleVerification() {
@@ -2364,23 +2791,17 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + LOG_LAYOUT_HEAD_HTML + """
   function syncRoleGate() {
     var doneBtn = document.querySelector('#advanced_modal .modal-done');
     if (!doneBtn) return;
-    if (roleGateActive()) {
-      if (!doneBtn.disabled) doneBtn.disabled = true;
-      if (doneBtn.getAttribute('aria-disabled') !== 'true') doneBtn.setAttribute('aria-disabled', 'true');
-      if (!doneBtn.classList.contains('is-gated')) doneBtn.classList.add('is-gated');
-      doneBtn.title = '自动拆分结果尚未人工确认，请先点击「确认剧本与角色参数」';
-    } else {
-      if (doneBtn.disabled) doneBtn.disabled = false;
-      if (doneBtn.hasAttribute('aria-disabled')) doneBtn.removeAttribute('aria-disabled');
-      if (doneBtn.classList.contains('is-gated')) doneBtn.classList.remove('is-gated');
-      doneBtn.removeAttribute('title');
-    }
+    // 高级设置的关闭不再受独立配音模块的确认状态影响。
+    doneBtn.disabled = false;
+    doneBtn.removeAttribute('aria-disabled');
+    if (doneBtn.classList.contains('is-gated')) doneBtn.classList.remove('is-gated');
+    doneBtn.removeAttribute('title');
     var hint = document.getElementById('role_workflow_hint');
     var probe = document.getElementById('role_confirmation_probe');
     var message = roleGateActive()
       ? '下一步：调整音色并试听，再点击「确认剧本与角色参数」。'
       : (probe && probe.getAttribute('data-confirmed') === '1'
-        ? '已确认。下一步：返回生成页，点击「开始生成」。'
+        ? '已确认。下一步：在下方确认生成。'
         : '下一步：先生成剧本，或上传已有剧本。');
     // observer 也监听子节点；仅在内容变化时写 DOM，防止自触发死循环。
     if (hint && hint.textContent !== message) hint.textContent = message;
@@ -2415,14 +2836,6 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + LOG_LAYOUT_HEAD_HTML + """
     var forceClose = !!(event && event.currentTarget &&
       event.currentTarget.classList &&
       event.currentTarget.classList.contains('modal-close-btn'));
-    if (!forceClose && roleGateActive()) {
-      if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-      showRoleGateHint();
-      return;
-    }
     if (event) {
       event.preventDefault();
       event.stopPropagation();
@@ -2498,11 +2911,11 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + LOG_LAYOUT_HEAD_HTML + """
     // 注意：这里用原生监听实现，而不是 Gradio 事件的 js=（后者会把表单输入变成空值）
     document.addEventListener('click', function (event) {
       var btn = event.target && event.target.closest && event.target.closest('.btn-primary');
-      if (!btn || !btn.textContent || btn.textContent.indexOf('开始生成') < 0) return;
+      if (!btn || btn.id !== 'generation_start' || btn.disabled) return;
       // 只滚动，不强行展开：真正展开由新的状态载荷触发（例如"正在启动"），
       // 这样若表单校验失败（没选文件）也不会把已经收起的进度条留在页面上。
       window.setTimeout(function () {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
       }, 120);
     }, true);
   }
@@ -2517,7 +2930,7 @@ HEAD_HTML = AMBIENT_LAYER_HTML + THEME_HEAD_HTML + LOG_LAYOUT_HEAD_HTML + """
   // 供「开始生成」按钮的 js= 调用：平滑滚动到进度条
   window.__ataScrollToProgress = function () {
     revealProgress();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   };
 
   if (document.readyState === 'loading') {
@@ -2599,7 +3012,7 @@ html, body {
   font-weight: 500 !important; color: var(--apple-text-3) !important;
   font-size: 0.95rem !important; padding: 9px 18px !important;
   border-radius: 980px !important; margin: 0 4px !important;
-  transition: all 0.25s cubic-bezier(0.4,0,0.2,1) !important;
+  transition: color 160ms ease, background-color 160ms ease, box-shadow 160ms ease !important;
 }
 .tab-nav button:hover { color: var(--apple-text) !important; background: var(--ata-hover) !important; }
 .tab-nav button.selected {
@@ -3074,7 +3487,7 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
 .btn-mini {
   background: var(--apple-surface-2) !important; color: var(--apple-text-2) !important; border: none !important;
   border-radius: 980px !important; font-size: 0.82rem !important; font-weight: 500 !important;
-  padding: 7px 15px !important; transition: all 0.18s ease !important; cursor: pointer !important;
+  padding: 7px 15px !important; transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease !important; cursor: pointer !important;
 }
 .btn-mini:hover { background: var(--ata-hover-strong) !important; color: var(--apple-text) !important; }
 
@@ -3083,7 +3496,7 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
 @media (min-width: 560px) { .toggle-grid { grid-template-columns: 1fr 1fr; } }
 .toggle {
   background: var(--apple-surface) !important; border: 1px solid var(--apple-border-soft) !important;
-  border-radius: 14px !important; padding: 12px 16px !important; transition: all 0.25s ease !important;
+  border-radius: 14px !important; padding: 12px 16px !important; transition: background-color 160ms ease, border-color 160ms ease !important;
 }
 .toggle:hover { border-color: var(--apple-border) !important; }
 /* 隐藏 Gradio 原生 checkbox 及任何额外渲染的开关圆点（仅保留伪元素做的苹果风 toggle） */
@@ -3109,7 +3522,7 @@ div:has(> .progress-bar-wrap) ~ .gr-box:empty { display: none !important; }
 .file-checks label {
   background: var(--apple-surface) !important; border: 1px solid var(--apple-border-soft) !important;
   border-radius: 12px !important; padding: 10px 14px !important; margin-bottom: 6px !important;
-  transition: all 0.2s ease !important; cursor: pointer !important;
+  transition: background-color 160ms ease, border-color 160ms ease !important; cursor: pointer !important;
 }
 .file-checks label:hover { border-color: var(--apple-blue) !important; background: var(--apple-blue-soft) !important; }
 .file-checks label:has(input:checked) {
@@ -3680,7 +4093,7 @@ body.modal-open::before {
 @media (min-width: 1440px) {
   .gradio-container { max-width: 1320px !important; }
 }
-""" + AMBIENT_CSS + THEME_CSS
+""" + AMBIENT_CSS + THEME_CSS + WORKFLOW_CSS + CHAPTER_CSS + ROLE_STUDIO_CSS
 
 # ── 主装配 ────────────────────────────────────────────────────────
 def host_ui(config):
@@ -3726,14 +4139,15 @@ def host_ui(config):
             </button>
         </div>''')
 
-        with gr.Tabs(selected="tab_convert") as main_tabs:
+        with gr.Tabs(selected="tab_convert", elem_id="studio_tabs") as main_tabs:
             # ════════════ 转换页 ════════════
-            with gr.Tab("转换", id="tab_convert"):
+            with gr.Tab("生成有声书", id="tab_convert"):
                 gr.HTML('''
                 <div class="hero">
                     <h1>让文字化作声音</h1>
-                    <p>上传书籍，选择语音引擎，一键生成有声书。多引擎、多格式、批量处理。</p>
+                    <p>从一本书开始，选好声音，再生成和下载。</p>
                 </div>''')
+                gr.HTML(workflow_steps_html())
                 # 进度条
                 # 注意：Timer 必须放在可见层级，不能包进 visible=False 的容器。
                 # Gradio 前端对"有效可见性为 false"的组件不会应用 active 更新，也不会启动
@@ -3745,50 +4159,8 @@ def host_ui(config):
                 progress_bar = gr.HTML(_progress_scaffold_html(), elem_classes="progress-bar-wrap")
                 progress_state = gr.HTML("", elem_id="progress_state", elem_classes="progress-state-hidden")
                 progress_timer = gr.Timer(2, active=False)
-                # 上传按钮隐藏脚本（运行在浏览器端）
-                gr.HTML('''
-                <script>
-                (function() {
-                    function hideUploadWhenFilesExist() {
-                        // 遍历所有书籍文件上传组件
-                        document.querySelectorAll('.book-file-upload').forEach(function(fileComp) {
-                            // 检查是否已有文件（thumbnails 容器有子元素）
-                            var thumbs = fileComp.querySelector('[data-testid="container_el"], .thumbnails, .file-preview');
-                            if (!thumbs || thumbs.offsetHeight === 0 || thumbs.children.length === 0) return;
-                            
-                            // 隐藏上传按钮/拖拽区
-                            var uploaders = fileComp.querySelectorAll(
-                                '.upload-container, [data-testid="file-upload"], .source-selection, button.center'
-                            );
-                            uploaders.forEach(function(el) {
-                                el.style.setProperty('display', 'none', 'important');
-                            });
-                            
-                            // 也隐藏可能的 "添加更多" 按钮
-                            var addBtns = fileComp.querySelectorAll('button:not(.delete-button):not(.thumbnail-item)');
-                            addBtns.forEach(function(btn) {
-                                if (btn.querySelector('svg') || btn.textContent.includes('上传') || btn.textContent.includes('拖放')) {
-                                    btn.style.setProperty('display', 'none', 'important');
-                                }
-                            });
-                        });
-                    }
-                    
-                    // MutationObserver 监听 DOM 变化
-                    var observer = new MutationObserver(hideUploadWhenFilesExist);
-                    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
-                    
-                    // 定时检查（备用方案）
-                    setInterval(hideUploadWhenFilesExist, 1000);
-                    
-                    // 初始执行
-                    hideUploadWhenFilesExist();
-                })();
-                </script>
-                ''', visible=False)
-
                 # —— Step 1 文件 + 章节范围 ——
-                with gr.Group(elem_classes="app-card"):
+                with gr.Group(elem_classes="app-card", elem_id="book_setup"):
                     gr.HTML('<p class="card-title"><span class="card-num">1</span>上传书籍文件</p>')
                     gr.HTML('<p class="card-desc">支持 EPUB / DOC / DOCX，可多选。输出目录将根据书名自动生成。</p>')
                     input_file = gr.File(label="书籍文件", file_types=[".epub", ".doc", ".docx"],
@@ -3798,14 +4170,27 @@ def host_ui(config):
                     input_file.change(fn=update_output_dir_from_file, inputs=input_file, outputs=output_dir, show_progress="hidden")
                     gr.HTML('<div class="section-divider"></div>')
                     gr.HTML('<p class="card-sub-title">章节范围</p>')
-                    with gr.Row():
-                        chapter_start = gr.Slider(minimum=1, maximum=100, step=1, label="起始章节页码", value=1, interactive=True)
-                        chapter_end = gr.Slider(minimum=-1, maximum=100, step=1, label="结束章节页码", value=-1, info="-1 代表处理至最后一章", interactive=True)
+                    book_chapter_catalog = gr.State({})
+                    book_directory_loaded = gr.State("")
+                    chapter_selection_source = gr.Textbox(value="", visible=False)
+                    with gr.Column(elem_id="chapter_catalog_panel"):
+                        with gr.Row(elem_id="chapter_named_range") as chapter_named_range:
+                            chapter_from_name = gr.Dropdown([], label="起始章节", value=None, interactive=False,
+                                                            filterable=True, elem_id="chapter_from_name")
+                            chapter_to_name = gr.Dropdown([], label="结束章节", value=None, interactive=False,
+                                                          filterable=True, elem_id="chapter_to_name")
+                        gr.HTML(CHAPTER_OVERVIEW_HTML, elem_id="chapter_overview")
+                        chapter_range_state = gr.HTML(range_payload([]), elem_id="chapter_range_state")
+                        chapter_reload = gr.Button("重新读取目录", elem_classes="btn-mini", size="sm")
+                        with gr.Row(visible=False) as chapter_numeric_range:
+                            chapter_start = gr.Number(minimum=1, precision=0, label="从第几章开始", value=1, interactive=True)
+                            chapter_end = gr.Number(minimum=-1, precision=0, label="到第几章结束", value=-1,
+                                                    info="-1 代表处理至最后一章", interactive=True)
                     gr.HTML('<div class="section-divider"></div>')
                     gr.HTML('<button type="button" class="btn-ghost modal-trigger" onclick="openAdvancedModal(event)" style="width:100%;padding:12px;border-radius:14px;font-size:1rem;cursor:pointer;">⚙\u00a0\u00a0高级设置</button>')
 
                 # —— Step 2 引擎 ——
-                with gr.Group(elem_classes="app-card"):
+                with gr.Group(elem_classes="app-card", elem_id="voice_setup"):
                     gr.HTML('''
                     <div class="card-title-row">
                         <p class="card-title"><span class="card-num">2</span>选择语音引擎</p>
@@ -3842,8 +4227,8 @@ def host_ui(config):
                         # ── Edge ──
                         with gr.Tab("🌐 Edge", id="Edge") as edge_tab:
                             with gr.Row():
-                                edge_language = gr.Dropdown(get_edge_tts_supported_language(), value="en-US", label="语言", interactive=True)
-                                edge_voice = get_edge_voices_by_language("en-US")
+                                edge_language = gr.Dropdown(get_edge_tts_supported_language(), value="zh-CN", label="语言", interactive=True)
+                                edge_voice = get_edge_voices_by_language("zh-CN")
                                 edge_output_format = gr.Dropdown(get_edge_tts_supported_output_formats(), label="输出格式", interactive=True)
                             proxy = gr.Textbox(label="代理 Proxy", value="", interactive=True)
                             with gr.Row():
@@ -3933,6 +4318,150 @@ def host_ui(config):
                             voxcpm_preview_btn = voxcpm_panel.preview_btn
                             voxcpm_preview_audio = voxcpm_panel.preview_audio
 
+                with gr.Group(elem_classes="app-card role-studio", elem_id="role_studio"):
+                    gr.HTML('''<div class="advanced-section-head">
+  <span class="card-num">3</span><div class="advanced-section-copy">
+    <h3>多角色配音 <span class="optional-label">可选</span></h3>
+    <p>生成剧本，为人物选择声音，试听满意后确认生成。每次处理一本书。</p>
+  </div></div>''')
+                    role_mode = gr.Checkbox(label="为旁白和人物使用不同声音", value=False,
+                        elem_classes="toggle advanced-switch", elem_id="role_mode_toggle")
+                    role_provider_hint = gr.Markdown("当前引擎支持多角色模式；剧本必须与所选引擎一致。", elem_id="role_provider_hint")
+                    with gr.Group(visible=False, elem_id="role_config_panel") as role_config_panel:
+                        gr.HTML('<p id="role_workflow_hint" class="role-workflow-hint" role="status" aria-live="polite">下一步：先生成剧本，或上传已有剧本。</p>')
+                        with gr.Tabs(elem_classes="role-setup-tabs", elem_id="role_setup_tabs"):
+                            with gr.Tab("生成剧本"):
+                                gr.HTML('<div class="role-section-title"><h4>准备所选章节的剧本</h4><p>使用上方已选书籍与章节。DeepSeek 逐章识别叙述者，再拆分人物与对白；人物自述与本人对白共用声音。每个所选章节额外进行一次叙述视角分析。</p></div>')
+                                role_regenerate_btn = gr.Button("生成 / 重新拆分剧本", elem_classes="btn-primary", elem_id="role_split_btn")
+                            with gr.Tab("DeepSeek 连接"):
+                                gr.Markdown("首次使用时配置，已保存的连接会自动读取。")
+                                deepseek_api_key = gr.Textbox(label="DeepSeek API Key", placeholder="请输入 API Key", type="password", elem_classes="role-field")
+                                deepseek_show_key = gr.Checkbox(label="显示 API Key", value=False, elem_classes="toggle advanced-compact-toggle")
+                                deepseek_api_key_display = gr.HTML("")
+                                with gr.Row():
+                                    deepseek_base_url = gr.Textbox(label="服务地址", value=DEEPSEEK_DEFAULT_BASE_URL, placeholder="https://api.deepseek.com", elem_classes="role-field")
+                                    deepseek_model = gr.Textbox(label="DeepSeek 模型", value=DEEPSEEK_DEFAULT_MODEL, placeholder="deepseek-chat", elem_classes="role-field")
+                                with gr.Row(elem_classes="role-action-row"):
+                                    deepseek_test_btn = gr.Button("测试连接", elem_classes="btn-ghost")
+                                    deepseek_save_btn = gr.Button("保存连接", elem_classes="btn-primary")
+                                deepseek_msg = gr.HTML("")
+                            with gr.Tab("导入与选项"):
+                                role_script_file = gr.File(label="导入已有剧本 / 下载当前剧本（JSON）", file_types=[".json"], file_count="single", type="filepath", interactive=True, elem_classes="role-field")
+                                auto_role_split = gr.Checkbox(label="上传书籍后自动调用 DeepSeek 拆分角色", value=False, elem_classes="toggle", elem_id="auto_role_split_toggle")
+                                fullbook_index_ack = gr.Checkbox(label="同时分析全书人物（也向 DeepSeek 发送未选章节，增加调用量）", value=False, elem_classes="toggle")
+                                gr.Markdown("默认只分析所选章节，逐章扩展时复用已保存的人物声音。", elem_classes="role-caption")
+                        role_split_status = gr.HTML(render_split_status(), elem_id="role_split_status")
+                        with gr.Group(visible=False, elem_id="role_editor") as role_editor:
+                            role_split_confirmed = gr.State(False)
+                            role_split_generated = gr.State(False)
+                            role_confirmed_signature = gr.State("")
+                            # 保留 DOM 状态载体，供流程提示读取；CSS 负责视觉隐藏。
+                            role_confirmation_probe_host = gr.HTML("", elem_id="role_confirmation_probe_host")
+                            with gr.Tabs(elem_classes="role-workspace-tabs", elem_id="role_workspace_tabs"):
+                                with gr.Tab("角色声音"):
+                                    gr.HTML('<div class="role-section-title"><h4>为每个人物选好声音</h4><p>选人物 → 调整并应用 → 试听。主要人物可将满意的试听固定为参考音。</p></div>')
+                                    with gr.Row(elem_classes="role-voice-columns"):
+                                        with gr.Column(scale=6, min_width=260):
+                                            role_preview_role = gr.Dropdown(choices=[], label="当前人物", interactive=True, allow_custom_value=False, elem_classes="role-field", elem_id="role_current_character")
+                                            with gr.Group(elem_id="role_voice_controls") as role_voice_controls:
+                                                with gr.Row():
+                                                    role_voice_mode = gr.Dropdown(label="声音来源", choices=[("预设声音", "preset"), ("描述声音", "design"), ("参考音克隆", "clone")], value="preset", elem_classes="role-field")
+                                                    role_voice_language = gr.Dropdown(label="朗读语言", choices=[("英语", "en"), ("中文", "zh")], value="en", elem_classes="role-field")
+                                                role_voice_builtin = gr.Dropdown(label="预设声音", choices=role_voice_choices(), value="mimo_default", info="青年男声 Bryce 使用已核验的固定参考音；其他选项为 MiMo 内置声音。", elem_classes="role-field", elem_id="role_voice_preset")
+                                                role_voice_description = gr.Textbox(label="声音描述", visible=False, lines=3, placeholder="例如：年轻男性，清晰的美式英语，声音轻快，语速适中。", elem_classes="role-field")
+                                                role_voice_reference = gr.File(label="参考音（PCM16 WAV）", visible=False, file_types=[".wav"], type="filepath", elem_classes="role-field")
+                                                role_voice_pace = gr.Slider(label="当前人物语速", minimum=0.25, maximum=4, value=1, step=0.05, info="1.0 为当前声音的原始倍率；越小越慢。", elem_classes="role-field")
+                                                role_voice_instructions = gr.Textbox(label="朗读要求（可选）", placeholder="例如：平静、自然地朗读。", lines=2, elem_classes="role-field")
+                                                role_voice_apply = gr.Button("应用当前人物的声音设置", elem_classes="btn-primary", elem_id="role_voice_apply")
+                                                role_voice_status = gr.Markdown("请先选择角色。", elem_classes="role-caption")
+                                        with gr.Column(scale=5, min_width=260, elem_classes="role-listen-pane"):
+                                            role_preview_text = gr.Textbox(label="试听文本", value="Do you remember where we agreed to meet? Please wait beside the bridge until I arrive.", lines=4, interactive=True, elem_classes="role-field")
+                                            role_preview_btn = gr.Button("试听当前人物", elem_classes="btn-primary", elem_id="role_preview_btn")
+                                            role_preview_audio = gr.Audio(label="试听结果", type="filepath", interactive=False, elem_classes="role-field", elem_id="role_preview_audio")
+                                            role_voice_freeze = gr.Button("固定这次试听的音色", elem_classes="btn-ghost", elem_id="role_voice_freeze")
+                                            gr.Markdown("固定只保存到本地。下次试听或生成时，该参考音会发送给 MiMo；描述声音的多次生成可能变化。", elem_classes="role-caption")
+                                with gr.Tab("剧本与归属"):
+                                    with gr.Group(visible=False, elem_id="role_verification_panel") as role_verification_panel:
+                                        gr.HTML('<div class="role-section-title"><h4>剧本概览</h4><p>核对人物、章节及叙述声音；视角切换时复用对应人物声音，身份不明保留默认旁白待核对。</p></div>')
+                                        role_verification_summary = gr.Markdown("", elem_classes="role-summary")
+                                    gr.HTML('<div class="role-section-title"><h4>本章叙述声音</h4><p>单一叙述者的章节可一次指定人物，并复用其声音设置。将覆盖本章所有已识别的叙述段；对白保持原归属，章内多视角请逐段修改。</p></div>')
+                                    with gr.Row():
+                                        role_narration_chapter = gr.Dropdown(label="叙述章节", choices=[], interactive=False, elem_classes="role-field", elem_id="role_narration_chapter")
+                                        role_narration_entity = gr.Dropdown(label="由哪位人物叙述", choices=[], interactive=False, elem_classes="role-field", elem_id="role_narration_entity")
+                                    role_narration_apply = gr.Button("应用本章叙述声音", interactive=False, elem_classes="btn-ghost", elem_id="role_narration_apply")
+                                    role_narration_status = gr.Markdown("生成剧本后可选择。", elem_classes="role-caption")
+                                    gr.HTML('<div class="role-section-title"><h4>核对说话人</h4><p>V2 剧本支持查看原文证据、修正归属，或合并同一人物的别名。</p></div>')
+                                    role_review_load_btn = gr.Button("读取需要复核的段落", elem_classes="btn-ghost")
+                                    role_review_segment = gr.Dropdown(label="待复核段落", choices=[], interactive=True, elem_classes="role-field")
+                                    role_review_info = gr.Markdown("点击上方按钮读取。", elem_classes="role-summary")
+                                    role_review_entity = gr.Dropdown(label="这段由谁说话", choices=[], interactive=True, elem_classes="role-field")
+                                    with gr.Row(elem_classes="role-action-row"):
+                                        role_review_confirm_btn = gr.Button("确认此段说话人", elem_classes="btn-primary")
+                                        role_review_lock_btn = gr.Button("锁定该人物音色", elem_classes="btn-ghost")
+                                    with gr.Accordion("合并同一人物的不同称呼", open=False):
+                                        with gr.Row():
+                                            role_merge_source = gr.Dropdown(label="别名人物（并入后移除）", choices=[], interactive=True, elem_classes="role-field")
+                                            role_merge_target = gr.Dropdown(label="目标人物（保留声音）", choices=[], interactive=True, elem_classes="role-field")
+                                        role_merge_btn = gr.Button("确认同一人物并合并", elem_classes="btn-ghost")
+                                with gr.Tab("高级工具"):
+                                    gr.HTML('<div class="role-section-title"><h4>统一各人物的语速</h4><p>仅在音色间快慢明显时使用。先调好旁白语速，再用同一试听文本比较。</p></div>')
+                                    gr.Markdown("将为每个角色调用一次 MiMo，使用「角色声音」中的试听文本（20～400 字）估算倍率；没有旁白时以首个角色为基准。校准后仍需试听。", elem_classes="role-caption")
+                                    role_calibrate_btn = gr.Button("以旁白为基准校准所有人物", elem_classes="btn-ghost", elem_id="role_calibrate_btn")
+                                    role_calibration_status = gr.Markdown("尚未校准。", elem_classes="role-summary")
+                                    gr.HTML('<div class="role-section-title"><h4>完整人物参数</h4><p>日常音色和语速在「角色声音」调整；这里用于批量编辑。</p></div>')
+                                    role_table = gr.Dataframe(headers=ROLE_TABLE_HEADERS,
+                                        datatype=["str", "str", "str", "str", "number", "str", "number", "number", "str"], value=[],
+                                        label="完整人物参数表", interactive=True, wrap=False, max_height=300,
+                                        column_widths=[120, 100, 100, 170, 90, 280, 80, 80, 160], elem_id="role_parameter_table", show_fullscreen_button=True)
+                                    gr.HTML('<div class="role-section-title"><h4>校验详情</h4></div>')
+                                    role_validation_summary = gr.Markdown("尚未生成剧本。", elem_classes="role-diagnostics")
+                            with gr.Row(elem_classes="role-confirm-bar"):
+                                with gr.Column(scale=2, min_width=240):
+                                    gr.Markdown("音色、语速和归属检查完后确认。修改设置会要求重新确认，之后再点击页面下方的「开始生成」。")
+                                role_confirm_btn = gr.Button("确认剧本与角色参数", elem_classes="btn-primary", elem_id="role_confirm_btn", scale=1)
+                        with gr.Accordion("更多兼容选项", open=False, elem_classes="role-details"):
+                            with gr.Tabs():
+                                with gr.Tab("补充音色目录"):
+                                    gr.Markdown("内置声音可直接使用。仅在需要补充其他音色时导入官网说明，之后重新拆分剧本。")
+                                    voice_catalog_file = gr.File(label="TTS 官网音色说明", file_types=_VOICE_CATALOG_FILE_TYPES, file_count="single", type="filepath", interactive=True, elem_classes="role-field")
+                                    voice_catalog_text = gr.TextArea(label="或粘贴音色说明", placeholder="支持 JSON、CSV、Markdown/文本表格；上传文件优先。", lines=4, interactive=True, elem_classes="role-field")
+                                    with gr.Row():
+                                        voice_catalog_provider = gr.Dropdown(choices=list(_VOICE_CATALOG_PROVIDERS), value="自动识别", label="对应引擎", interactive=True, elem_classes="role-field")
+                                        voice_catalog_language = gr.Dropdown(choices=list(_VOICE_CATALOG_LANGUAGES), value="自动识别", label="默认语言", interactive=True, elem_classes="role-field")
+                                    with gr.Row(elem_classes="role-action-row"):
+                                        voice_catalog_clear_btn = gr.Button("清空用户音色目录", elem_classes="btn-ghost")
+                                        voice_catalog_import_btn = gr.Button("解析并保存音色目录", elem_classes="btn-primary")
+                                    voice_catalog_status = gr.Markdown(_voice_catalog_overview_markdown(), elem_id="voice_catalog_status")
+                                with gr.Tab("匹配与容错"):
+                                    allow_role_text_override = gr.Checkbox(label="允许剧本文本覆盖书籍正文", value=False, elem_classes="toggle")
+                                    allow_role_title_mismatch = gr.Checkbox(label="允许章节标题不匹配", value=False, elem_classes="toggle")
+                                    allow_role_fallback = gr.Checkbox(label="缺失角色回退到旁白 / 全局声音", value=False, elem_classes="toggle")
+                                with gr.Tab("旧版质量测评"):
+                                    role_quality_enabled = gr.Checkbox(label="启用旧版逐段测评（仅未启用下方统一音频检查时生效）", value=False, elem_classes="toggle")
+                                    role_quality_max_rate = gr.Slider(minimum=2.0, maximum=7.0, step=0.1, value=4.3, label="中文语速上限（汉字/秒）", elem_classes="role-field")
+                                    gr.Markdown("旧版结果写入 role_quality_reports。需要本地 SenseVoice；失败片段可能将诊断发送至 DeepSeek，并增加一次 MiMo 合成。日常建议使用下方统一音频检查。", elem_classes="role-caption")
+
+
+                with gr.Group(elem_classes="app-card", elem_id="quality_setup"):
+                    gr.HTML('<p class="card-title">音频检查与修复</p>')
+                    audio_core_enabled = gr.Checkbox(label="MiMo 生成时检查内容、拼接与角色一致性", value=True, elem_classes="toggle")
+                    audio_core_repair = gr.Checkbox(label="按次数与时限自动修复问题片段", value=False, elem_classes="toggle")
+                    from audiobook_generator.ui.audio_quality import local_quality_status
+                    gr.Markdown(local_quality_status())
+                    gr.Markdown("默认保留原音频并生成检查报告。开启自动修复会增加合成请求；未校准的声音差异不会直接认定为缺陷。")
+                    with gr.Accordion("高级质量配置（可选）", open=False):
+                        audio_core_settings_file = gr.File(label="可选：本地模型与资源设置 JSON", file_types=[".json"])
+                        audio_core_casting_file = gr.File(label="可选：已审查角色选角 JSON", file_types=[".json"])
+                    with gr.Accordion("生成后查看检查结果", open=False):
+                        quality_refresh = gr.Button("读取输出目录中的质量报告", size="sm")
+                        quality_report_file = gr.Dropdown(label="质量报告", choices=[], interactive=True)
+                        quality_summary = gr.Markdown("尚未读取报告")
+                        quality_rows = gr.Dataframe(headers=["位置", "维度", "问题", "判断", "时间（秒）"], interactive=False)
+                        quality_download = gr.File(label="下载完整报告", interactive=False)
+                        quality_scope = gr.Dropdown(label="选择片段或拼接处试听", choices=[], interactive=True)
+                        quality_audio = gr.Audio(label="问题上下文试听", interactive=False)
+
+
                 # —— 高级设置弹窗（纯客户端控制；默认 display:none，JS 切换 .show） ——
                 with gr.Group(elem_classes="modal-overlay", elem_id="advanced_modal") as advanced_modal:
                     with gr.Column(elem_classes="modal-box"):
@@ -3940,7 +4469,7 @@ def host_ui(config):
 <div class="modal-header">
   <div>
     <p class="modal-title">高级设置</p>
-    <p class="modal-subtitle">集中配置多角色剧本、生成行为和章节解析。</p>
+    <p class="modal-subtitle">调整生成行为和章节解析；多角色配音在生成页独立配置。</p>
   </div>
   <button type="button" class="modal-close-btn" aria-label="关闭高级设置" onclick="closeAdvancedModal(event)">✕</button>
 </div>''', elem_classes="modal-header-wrap")
@@ -3951,236 +4480,6 @@ def host_ui(config):
                                 gr.HTML('''
 <div class="advanced-section-head">
   <span class="advanced-section-badge">1</span>
-  <div class="advanced-section-copy">
-    <h3>多角色剧本</h3>
-    <p>为旁白和不同人物分配音色。支持 MiMo / MiniMax，每次处理一本书。</p>
-  </div>
-</div>''')
-                                role_mode = gr.Checkbox(
-                                    label="启用多角色分段模式（MiMo / MiniMax，单本书）",
-                                    value=False,
-                                    elem_classes="toggle advanced-switch",
-                                    elem_id="role_mode_toggle",
-                                )
-                                role_provider_hint = gr.Markdown(
-                                    "当前引擎支持多角色模式；剧本必须与所选引擎一致。",
-                                    elem_id="role_provider_hint",
-                                )
-                                with gr.Group(visible=False, elem_id="role_config_panel") as role_config_panel:
-                                    gr.HTML('<p id="role_workflow_hint" class="role-workflow-hint" role="status" aria-live="polite">下一步：先生成剧本，或上传已有剧本。</p>')
-                                    gr.HTML('''
-<div class="advanced-subsection-head role-step-head">
-  <span class="role-step-number">1</span>
-  <div><h4>准备剧本</h4><p>先在生成页上传一本书并选择 MiMo 或 MiniMax，再生成剧本。已有剧本可直接上传。</p></div>
-</div>''')
-                                    with gr.Accordion("DeepSeek 连接配置（首次使用）", open=False, elem_classes="role-details"):
-                                        gr.Markdown("自动拆分需要 DeepSeek API Key；已保存配置会自动读取。")
-                                        deepseek_api_key = gr.Textbox(
-                                            label="DeepSeek API Key",
-                                            placeholder="请输入 DeepSeek API Key",
-                                            type="password",
-                                        )
-                                        deepseek_show_key = gr.Checkbox(
-                                            label="显示 DeepSeek API Key",
-                                            value=False,
-                                            elem_classes="toggle advanced-compact-toggle",
-                                        )
-                                        deepseek_api_key_display = gr.HTML("")
-                                        with gr.Row(elem_classes="advanced-field-row"):
-                                            deepseek_base_url = gr.Textbox(
-                                                label="DeepSeek Base URL",
-                                                value=DEEPSEEK_DEFAULT_BASE_URL,
-                                                placeholder="https://api.deepseek.com",
-                                                scale=1,
-                                            )
-                                            deepseek_model = gr.Textbox(
-                                                label="DeepSeek Model",
-                                                value=DEEPSEEK_DEFAULT_MODEL,
-                                                placeholder="deepseek-chat",
-                                                scale=1,
-                                            )
-                                        with gr.Row(elem_classes="advanced-action-row"):
-                                            deepseek_test_btn = gr.Button(
-                                                "🔍 测试 DeepSeek 连接", elem_classes="btn-ghost"
-                                            )
-                                            deepseek_save_btn = gr.Button(
-                                                "💾 保存 DeepSeek 配置", elem_classes="btn-primary"
-                                            )
-                                        deepseek_msg = gr.HTML("")
-                                    auto_role_split = gr.Checkbox(
-                                        label="上传书籍后自动调用 DeepSeek 拆分角色",
-                                        value=False, elem_classes="toggle",
-                                        elem_id="auto_role_split_toggle",
-                                    )
-                                    fullbook_index_ack = gr.Checkbox(
-                                        label="我已知晓：全书人物表会分析未选章节，并将正文发送给当前 DeepSeek 服务（会增加调用量）",
-                                        value=False, elem_classes="toggle",
-                                    )
-                                    role_regenerate_btn = gr.Button(
-                                        "生成 / 重新拆分剧本", elem_classes="btn-primary", elem_id="role_split_btn"
-                                    )
-                                    with gr.Accordion("上传或下载剧本 JSON", open=False, elem_classes="role-details"):
-                                        role_script_file = gr.File(
-                                            label="RoleScript JSON（支持 V1/V2，自动拆分生成 V2）",
-                                            file_types=[".json"], file_count="single", type="filepath", interactive=True,
-                                        )
-                                    gr.HTML('''
-<div class="advanced-subsection-head role-step-head">
-  <span class="role-step-number">2</span>
-  <div><h4>调整角色并试听</h4><p>MiMo 编辑 voice，MiniMax 编辑 voice_id。speed 是倍率：小于 1 更慢，大于 1 更快；不修改角色 ID。</p></div>
-</div>''')
-                                    role_validation_summary = gr.Markdown("**请上传或自动生成剧本 JSON 后校验**")
-                                    role_table = gr.Dataframe(
-                                        headers=ROLE_TABLE_HEADERS,
-                                        datatype=["str", "str", "str", "str", "number", "str", "number", "number"],
-                                        value=[],
-                                        label="角色参数表（可编辑音色、语速、instructions 等）",
-                                        interactive=True,
-                                        wrap=False,
-                                        max_height=300,
-                                        column_widths=[120, 100, 100, 170, 90, 280, 80, 80],
-                                        elem_id="role_parameter_table",
-                                        show_fullscreen_button=True,
-                                    )
-                                    with gr.Accordion("逐段证据与全书人物复核（V2）", open=False, elem_classes="role-details"):
-                                        role_review_load_btn = gr.Button("读取待复核段落", elem_classes="btn-ghost")
-                                        role_review_segment = gr.Dropdown(label="待复核段落", choices=[], interactive=True)
-                                        role_review_info = gr.Markdown("选择 V2 项目后点击读取。")
-                                        role_review_entity = gr.Dropdown(label="确认说话人／锁定此人物音色", choices=[], interactive=True)
-                                        with gr.Row(elem_classes="advanced-action-row"):
-                                            role_review_confirm_btn = gr.Button("确认此段说话人", elem_classes="btn-primary")
-                                            role_review_lock_btn = gr.Button("锁定该人物音色", elem_classes="btn-ghost")
-                                        with gr.Row(elem_classes="advanced-field-row"):
-                                            role_merge_source = gr.Dropdown(label="别名人物（并入后移除）", choices=[], interactive=True)
-                                            role_merge_target = gr.Dropdown(label="目标人物（保留其声音）", choices=[], interactive=True)
-                                        role_merge_btn = gr.Button("确认同一人物并合并", elem_classes="btn-ghost")
-                                    role_split_confirmed = gr.State(False)
-                                    role_split_generated = gr.State(False)
-                                    role_confirmed_signature = gr.State("")
-                                    # 只作为前端读取的人工确认状态载体（不承载剧本内容），
-                                    # 供 closeAdvancedModal 判断能否放行“完成”。
-                                    # 不能使用 visible=False：Gradio 前端不会渲染该组件，
-                                    # MutationObserver / closeAdvancedModal 都读不到
-                                    # #role_confirmation_probe，门禁会恒为“已确认”。
-                                    # 这里保持可见，用 CSS 做 1px 视觉隐藏。
-                                    role_confirmation_probe_host = gr.HTML(
-                                        "", elem_id="role_confirmation_probe_host"
-                                    )
-
-                                    with gr.Row(elem_classes="advanced-field-row advanced-preview-row"):
-                                        role_preview_role = gr.Dropdown(
-                                            choices=[],
-                                            label="试听角色",
-                                            interactive=True,
-                                            allow_custom_value=False,
-                                        )
-                                        role_preview_btn = gr.Button(
-                                            "🎧 试听该角色", elem_classes="btn-ghost"
-                                        )
-                                    role_preview_text = gr.Textbox(
-                                        label="试听文本",
-                                        value="傍晚的风轻轻吹过窗边，远处的灯光逐渐亮起。我们停下脚步，认真听完了这个温暖而平静的故事。",
-                                        lines=2,
-                                        interactive=True,
-                                    )
-                                    role_preview_audio = gr.Audio(
-                                        label="角色试听", type="filepath", interactive=False
-                                    )
-
-                                    with gr.Accordion("MiMo 音色间语速校准", open=False, elem_classes="role-details"):
-                                        gr.Markdown("先把旁白 speed 调到合适的节奏，再校准。将为每个角色调用一次 MiMo，用上方同一段试听文本（20～400 字）测量时长并回填倍率；没有旁白时以首个角色为基准。校准后再试听确认。")
-                                        role_calibrate_btn = gr.Button("以旁白为基准校准语速", elem_classes="btn-ghost")
-                                        role_calibration_status = gr.Markdown("尚未校准；可先试听，音色间快慢明显时再使用。")
-                                    gr.HTML('''
-<div class="advanced-subsection-head role-step-head">
-  <span class="role-step-number">3</span>
-  <div><h4>确认剧本并返回生成</h4><p>核对角色分配和章节摘要，确认当前参数后，返回生成页点击「开始生成」。修改参数后需要重新确认。</p></div>
-</div>''')
-                                    with gr.Group(
-                                        visible=False, elem_id="role_verification_panel"
-                                    ) as role_verification_panel:
-                                        gr.HTML('''
-<div class="advanced-verification-head">
-  <h4>剧本摘要</h4>
-  <p>检查下方摘要；音色和语速在上一步调整。</p>
-</div>''')
-                                        role_verification_summary = gr.Markdown("", elem_classes="role-summary")
-                                        with gr.Row(elem_classes="advanced-action-row"):
-                                            role_confirm_btn = gr.Button(
-                                                "确认剧本与角色参数", elem_classes="btn-primary", elem_id="role_confirm_btn"
-                                            )
-
-                                    with gr.Accordion("补充音色目录（可选）", open=False, elem_classes="role-details"):
-                                        gr.Markdown("内置音色可直接使用。需要补充官网音色时，在此导入文档，再重新拆分剧本。")
-                                        voice_catalog_file = gr.File(
-                                            label="上传 TTS 官网音色说明文档",
-                                            file_types=_VOICE_CATALOG_FILE_TYPES,
-                                            file_count="single",
-                                            type="filepath",
-                                            interactive=True,
-                                        )
-                                        voice_catalog_text = gr.TextArea(
-                                            label="或直接粘贴官网音色说明",
-                                            placeholder="支持 JSON、CSV、Markdown/文本表格，以及 voice_id | 名称 | 语言 | 性别 | 说明；文件优先于粘贴内容。",
-                                            lines=5,
-                                            interactive=True,
-                                        )
-                                        with gr.Row(elem_classes="advanced-field-row"):
-                                            voice_catalog_provider = gr.Dropdown(
-                                                choices=list(_VOICE_CATALOG_PROVIDERS),
-                                                value="自动识别",
-                                                label="文档对应的 TTS Provider",
-                                                interactive=True,
-                                            )
-                                            voice_catalog_language = gr.Dropdown(
-                                                choices=list(_VOICE_CATALOG_LANGUAGES),
-                                                value="自动识别",
-                                                label="文档默认语言",
-                                                interactive=True,
-                                            )
-                                        with gr.Row(elem_classes="advanced-action-row"):
-                                            voice_catalog_clear_btn = gr.Button(
-                                                "🧹 清空用户音色目录", elem_classes="btn-ghost"
-                                            )
-                                            voice_catalog_import_btn = gr.Button(
-                                                "📥 解析并保存音色目录", elem_classes="btn-primary"
-                                            )
-                                        voice_catalog_status = gr.Markdown(
-                                            _voice_catalog_overview_markdown(),
-                                            elem_id="voice_catalog_status",
-                                        )
-                                    with gr.Accordion("剧本匹配与容错（可选）", open=False, elem_classes="role-details"):
-                                        with gr.Group(elem_classes="toggle-grid advanced-toggle-grid"):
-                                            allow_role_text_override = gr.Checkbox(
-                                                label="允许剧本文本覆盖书籍正文", value=False, elem_classes="toggle"
-                                            )
-                                            allow_role_title_mismatch = gr.Checkbox(
-                                                label="允许章节标题不匹配", value=False, elem_classes="toggle"
-                                            )
-                                            allow_role_fallback = gr.Checkbox(
-                                                label="允许缺失角色回退到 narrator / 全局配置",
-                                                value=False,
-                                                elem_classes="toggle",
-                                            )
-                                    with gr.Accordion("生成音频质量测评（可选）", open=False, elem_classes="role-details"):
-                                        role_quality_enabled = gr.Checkbox(
-                                            label="逐段检测语速、可辨识度和音频完整性（MiMo 未通过时最多重试一次）",
-                                            value=False, elem_classes="toggle",
-                                        )
-                                        role_quality_max_rate = gr.Slider(
-                                            minimum=2.0, maximum=7.0, step=0.1, value=4.3,
-                                            label="中文语速上限（汉字/秒）",
-                                        )
-                                        gr.Markdown(
-                                            "测评结果保存到输出目录的 `role_quality_reports/`。可辨识度检测需安装本地 "
-                                            "FunASR/SenseVoice；不可用时明确标记为「未完整评测」。失败片段仅 MiMo 会将诊断发给 "
-                                            "DeepSeek 并重试一次；仍失败会保留最佳版本并标记人工复核。"
-                                        )
-
-                            with gr.Group(elem_classes="advanced-section"):
-                                gr.HTML('''
-<div class="advanced-section-head">
-  <span class="advanced-section-badge">2</span>
   <div class="advanced-section-copy">
     <h3>生成选项</h3>
     <p>控制导出内容、预解析、并行度和日志详细程度。</p>
@@ -4198,7 +4497,7 @@ def host_ui(config):
                             with gr.Group(elem_classes="advanced-section"):
                                 gr.HTML('''
 <div class="advanced-section-head">
-  <span class="advanced-section-badge">3</span>
+  <span class="advanced-section-badge">2</span>
   <div class="advanced-section-copy">
     <h3>解析设置</h3>
     <p>调整章节标题匹配、段落换行检测和文本替换规则。</p>
@@ -4218,40 +4517,48 @@ def host_ui(config):
   <button type="button" class="btn-primary modal-done" onclick="closeAdvancedModal(event)">返回生成页</button>
 </div>''', elem_classes="modal-footer-wrap")
 
-                # —— CTA ——
-                with gr.Row(elem_classes="row-cta"):
-                    stop_btn = gr.Button("停止转换", elem_classes="btn-ghost")
-                    start_btn = gr.Button("🚀 开始生成有声书", elem_classes="btn-primary pulse", variant="primary")
+                # —— 生成前检查与操作 ——
+                with gr.Group(elem_classes="app-card", elem_id="generation_setup"):
+                    gr.HTML('<p class="card-title"><span class="card-num">4</span>确认并生成</p>')
+                    generation_summary = gr.HTML('<div class="generation-summary" data-files="0">先上传书籍，再选择声音。生成完成后可到资源库试听和下载。</div>', elem_id="generation_summary")
+                    with gr.Row(elem_classes="row-cta"):
+                        stop_btn = gr.Button("停止转换", elem_classes="btn-ghost", elem_id="generation_stop", interactive=False)
+                        start_btn = gr.Button("开始生成有声书", elem_classes="btn-primary", variant="primary", interactive=False, elem_id="generation_start")
+                    result_library_btn = gr.Button("前往资源库试听与下载 →", elem_classes="btn-ghost", elem_id="result_library_btn")
+                result_library_btn.click(fn=lambda: gr.update(selected="tab_library"), outputs=main_tabs, show_progress="hidden")
 
             # ════════════ 资源库页 ════════════
             with gr.Tab("资源库", id="tab_library", elem_id="library_tab") as library_tab:
-                gr.HTML('<div class="hero"><h1>资源库</h1><p>管理已生成的音频文件：批量下载、打包导出、一键清理。</p></div>')
-                with gr.Row(elem_classes="row-stack"):
-                    with gr.Column(scale=3):
-                        with gr.Group(elem_classes="app-card lib-card"):
-                            gr.HTML('<p class="card-title">选择导出批次</p>')
+                gr.HTML('<div class="hero library-hero"><h1>资源库</h1><p>选择一本书，试听章节，直接下载或导出 ZIP。</p></div>')
+                with gr.Group(elem_classes="app-card lib-card", elem_id="library_workspace"):
+                    with gr.Row(elem_classes="library-toolbar"):
+                        folder_dropdown = gr.Dropdown(choices=get_folders_list(), label="选择书籍 / 批次", interactive=True, scale=4, elem_id="library_folder_picker")
+                        refresh_btn = gr.Button("刷新列表", elem_classes="btn-mini", scale=0, min_width=100)
+                    with gr.Row(elem_classes="library-columns"):
+                        with gr.Column(scale=3, min_width=280, elem_id="library_files"):
+                            gr.HTML('<h3 class="library-heading">章节与文件</h3>')
+                            library_search = gr.Textbox(label="查找文件", placeholder="输入章节名或文件名", elem_id="library_search")
                             with gr.Row(elem_classes="lib-row"):
-                                folder_dropdown = gr.Dropdown(choices=get_folders_list(), label="批次", show_label=False,
-                                                              interactive=True, scale=1, elem_id="library_folder_picker")
-                                refresh_btn = gr.Button("🔄 刷新", elem_classes="btn-mini", scale=0, min_width=0)
-                                delete_folder_btn = gr.Button("🗑️ 删除批次", elem_classes="btn-danger", scale=0, min_width=0)
-                        with gr.Group(elem_classes="app-card lib-card"):
-                            gr.HTML('<p class="card-title">选择分卷文件（默认全选）</p>')
-                            file_selector = gr.CheckboxGroup(choices=[], label="", show_label=False, interactive=True, elem_classes="file-checks")
-                            gr.HTML('<div class="section-divider"></div>')
-                            with gr.Row(elem_classes="lib-row"):
-                                select_all_btn = gr.Button("全选", elem_classes="btn-mini", scale=0, min_width=0)
-                                deselect_all_btn = gr.Button("取消", elem_classes="btn-mini", scale=0, min_width=0)
-                                delete_btn = gr.Button("🗑️ 删除选中", elem_classes="btn-danger lib-push-right", scale=0, min_width=0)
-                    with gr.Column(scale=2):
-                        with gr.Group(elem_classes="app-card lib-card"):
-                            gr.HTML('<p class="card-title">下载与清理</p>')
-                            gr.HTML('<p class="card-desc">勾选「阅后即焚」将在打包后自动删除源文件。</p>')
-                            auto_delete_cb = gr.Checkbox(label="阅后即焚（打包后删除源文件）", value=False, elem_classes="toggle")
-                            gr.HTML('<div class="section-divider"></div>')
-                            generate_btn = gr.Button("⚡ 打包并生成下载通道", elem_classes="btn-primary lib-generate")
-                            download_card = gr.HTML(_placeholder_html())
-                            real_download_file = gr.File(label="下载通道", interactive=False, visible=False, elem_classes="custom-download-zone")
+                                select_all_btn = gr.Button("全选", elem_classes="btn-mini", scale=0, min_width=80)
+                                deselect_all_btn = gr.Button("取消全选", elem_classes="btn-mini", scale=0, min_width=100)
+                            file_selector = gr.CheckboxGroup(choices=[], label="选择要下载的文件", interactive=True, elem_classes="file-checks", elem_id="library_file_list")
+                        with gr.Column(scale=2, min_width=280, elem_id="library_export"):
+                            library_selection_summary = gr.HTML('<p class="card-desc">生成完成后，选择书籍即可查看文件。</p>')
+                            library_preview_choice = gr.Dropdown(choices=[], label="试听章节", interactive=True)
+                            library_preview_audio = gr.Audio(label="章节试听", interactive=False, type="filepath")
+                            download_mode = gr.Radio(["逐个下载", "ZIP 打包"], value="逐个下载", label="下载方式")
+                            direct_download_files = gr.File(label="点击文件右侧下载图标保存", file_count="multiple", interactive=False, elem_id="library_direct_download")
+                            with gr.Group(visible=False, elem_id="library_zip_panel") as library_zip_panel:
+                                generate_btn = gr.Button("准备 ZIP 下载", elem_classes="btn-primary lib-generate", interactive=False)
+                                download_card = gr.HTML(_placeholder_html("勾选文件后准备 ZIP，再点击下载。"))
+                                real_download_file = gr.DownloadButton("下载 ZIP", visible=False, elem_classes="btn-primary", elem_id="library_zip_download")
+                            auto_delete_cb = gr.State(False)
+                    with gr.Accordion("清理文件", open=False, elem_id="library_cleanup"):
+                        gr.Markdown("下载会保留源文件。确认已保存到本地后，再手动清理；删除后无法恢复。")
+                        cleanup_ack = gr.Checkbox(label="我已保存需要的文件，确认可以删除", value=False)
+                        with gr.Row(elem_classes="lib-row"):
+                            delete_btn = gr.Button("删除选中文件", elem_classes="btn-danger", scale=0, min_width=150, interactive=False)
+                            delete_folder_btn = gr.Button("删除整个批次", elem_classes="btn-danger", scale=0, min_width=150, interactive=False)
 
             # ════════════ 日志页 ════════════
             with gr.Tab("日志", id="tab_logs"):
@@ -4356,6 +4663,7 @@ def host_ui(config):
             outputs=role_config_panel,
             show_progress="hidden",
         )
+        role_script_file.change(fn=lambda file_obj: gr.update(visible=bool(file_obj)), inputs=role_script_file, outputs=role_editor, show_progress="hidden")
         voice_catalog_import_btn.click(
             fn=import_voice_catalog_document_ui,
             inputs=[
@@ -4389,7 +4697,29 @@ def host_ui(config):
             deepseek_base_url,
             deepseek_model,
             fullbook_index_ack,
+            book_chapter_catalog, chapter_selection_source, chapter_from_name, chapter_to_name,
         ]
+        _chapter_catalog_inputs = [input_file, provider_state, title_mode, new_line_mode,
+                                   remove_endnotes, remove_reference_numbers, search_and_replace_file]
+        gr.on(
+            triggers=[input_file.change, provider_state.change, title_mode.change, new_line_mode.change,
+                      remove_endnotes.change, remove_reference_numbers.change,
+                      search_and_replace_file.change, chapter_reload.click],
+            fn=read_book_chapters, inputs=_chapter_catalog_inputs,
+            outputs=[book_chapter_catalog, chapter_from_name, chapter_to_name,
+                     chapter_start, chapter_end, chapter_range_state, chapter_numeric_range, chapter_named_range,
+                     chapter_selection_source, book_directory_loaded],
+            show_progress="hidden", trigger_mode="always_last",
+            concurrency_id="chapter-directory", concurrency_limit=1,
+        )
+        for selector, endpoint in [(chapter_from_name, "start"), (chapter_to_name, "end")]:
+            selector.input(
+                fn=lambda start, end, catalog, source, which=endpoint: select_book_chapter(start, end, catalog, which, source),
+                inputs=[chapter_from_name, chapter_to_name, book_chapter_catalog, chapter_selection_source],
+                outputs=[chapter_from_name, chapter_to_name, chapter_start, chapter_end, chapter_range_state],
+                show_progress="hidden", trigger_mode="always_last",
+                concurrency_id="chapter-directory", concurrency_limit=1,
+            )
         _auto_split_outputs = [
             role_script_file,
             role_table,
@@ -4401,26 +4731,34 @@ def host_ui(config):
             role_split_generated,
             role_confirmed_signature,
             role_confirmation_probe_host,
+            role_split_status,
+            role_regenerate_btn,
         ]
-        # 书籍上传后才触发；关闭角色模式时不会创建 Provider，也不会调用 DeepSeek。
-        input_file.change(
-            fn=auto_split_role_script,
+        # 当前书籍目录载入后才触发；重读同一本书的目录不会额外调用 DeepSeek。
+        book_directory_loaded.change(
+            fn=auto_split_role_script_ui, api_name="auto_split_role_script",
             inputs=_auto_split_inputs,
             outputs=_auto_split_outputs,
-            show_progress="full",
+            show_progress="hidden",
+            concurrency_id="role-script-split", concurrency_limit=1,
+            trigger_mode="once",
         )
         # 允许先上传书再开启角色模式，或直接点击“重新生成”。
         role_mode.change(
-            fn=auto_split_role_script,
+            fn=auto_split_role_script_ui, api_name="auto_split_role_script",
             inputs=_auto_split_inputs,
             outputs=_auto_split_outputs,
-            show_progress="full",
+            show_progress="hidden",
+            concurrency_id="role-script-split", concurrency_limit=1,
+            trigger_mode="once",
         )
         role_regenerate_btn.click(
-            fn=split_role_script_now,
+            fn=split_role_script_now_ui, api_name="split_role_script_now",
             inputs=_auto_split_inputs,
             outputs=_auto_split_outputs,
-            show_progress="full",
+            show_progress="hidden",
+            concurrency_id="role-script-split", concurrency_limit=1,
+            trigger_mode="once",
         )
         role_calibrate_btn.click(
             fn=calibrate_role_pace,
@@ -4428,12 +4766,29 @@ def host_ui(config):
                     model, voices, speed, instructions, enable_stream],
             outputs=[role_table, role_calibration_status],
             show_progress="full",
+            show_progress_on=[role_calibration_status],
         )
         role_review_load_btn.click(
             fn=load_role_review, inputs=role_script_file,
             outputs=[role_review_segment, role_review_entity, role_merge_source,
                      role_merge_target, role_review_info], show_progress="hidden",
-        )
+        ).then(fn=load_narration_controls, inputs=[role_script_file, role_narration_chapter],
+               outputs=[role_narration_chapter, role_narration_entity, role_narration_apply, role_narration_status],
+               show_progress="hidden")
+        role_script_file.change(fn=load_narration_controls, inputs=[role_script_file, role_narration_chapter],
+            outputs=[role_narration_chapter, role_narration_entity, role_narration_apply, role_narration_status],
+            show_progress="hidden")
+        role_narration_chapter.input(fn=lambda file_obj, chapter: load_narration_controls(file_obj, chapter)[1:],
+            inputs=[role_script_file, role_narration_chapter],
+            outputs=[role_narration_entity, role_narration_apply, role_narration_status], show_progress="hidden")
+        role_narration_apply.click(fn=apply_chapter_narration,
+            inputs=[role_script_file, role_table, role_narration_chapter, role_narration_entity],
+            outputs=[role_table, role_narration_status, role_split_confirmed, role_confirmed_signature,
+                     role_confirmation_probe_host, role_verification_summary],
+            show_progress="hidden", concurrency_id="role-project-review", concurrency_limit=1,
+        ).then(fn=load_role_review, inputs=role_script_file,
+            outputs=[role_review_segment, role_review_entity, role_merge_source, role_merge_target, role_review_info],
+            show_progress="hidden")
         role_review_segment.change(
             fn=role_review_details, inputs=[role_script_file, role_review_segment],
             outputs=role_review_info, show_progress="hidden",
@@ -4444,16 +4799,21 @@ def host_ui(config):
             (role_merge_btn, "merge"),
         ]:
             review_button.click(
-                fn=lambda file_obj, segment_id, entity_id, source_id, target_id, op=operation:
-                    apply_role_review(file_obj, op, segment_id, entity_id, source_id, target_id),
+                fn=lambda file_obj, segment_id, entity_id, source_id, target_id, table, op=operation:
+                    apply_role_review(file_obj, op, segment_id, entity_id, source_id, target_id, table),
                 inputs=[role_script_file, role_review_segment, role_review_entity,
-                        role_merge_source, role_merge_target],
+                        role_merge_source, role_merge_target, role_table],
                 outputs=[role_review_segment, role_table, role_review_info,
                          role_split_confirmed, role_confirmed_signature, role_confirmation_probe_host],
                 show_progress="hidden",
-            )
+                concurrency_id="role-project-review", concurrency_limit=1,
+            ).then(fn=refresh_role_summary, inputs=role_script_file, outputs=role_verification_summary,
+                   show_progress="hidden"
+            ).then(fn=load_narration_controls, inputs=[role_script_file, role_narration_chapter],
+                   outputs=[role_narration_chapter, role_narration_entity, role_narration_apply, role_narration_status],
+                   show_progress="hidden")
         role_confirm_btn.click(
-            fn=confirm_auto_role_script,
+            fn=confirm_auto_role_script_ui, api_name="confirm_auto_role_script",
             inputs=[
                 role_script_file,
                 role_table,
@@ -4467,8 +4827,10 @@ def host_ui(config):
                 role_validation_summary,
                 role_confirmed_signature,
                 role_confirmation_probe_host,
+                role_confirm_btn,
             ],
             show_progress="hidden",
+            concurrency_id="role-project-review", concurrency_limit=1,
         )
         role_script_file.change(
             fn=manual_role_script_uploaded,
@@ -4504,6 +4866,7 @@ def host_ui(config):
                 role_split_confirmed,
                 role_confirmed_signature,
                 role_table,
+                role_preview_role,
             ],
             outputs=[
                 role_validation_summary,
@@ -4514,13 +4877,42 @@ def host_ui(config):
             ],
             show_progress="hidden",
         )
+        role_preview_role.change(
+            fn=load_role_voice_settings, inputs=[role_script_file, role_table, role_preview_role],
+            outputs=[role_voice_mode, role_voice_builtin, role_voice_description, role_voice_reference,
+                     role_voice_language, role_voice_pace, role_voice_instructions, role_voice_status],
+            show_progress="hidden",
+        )
+        provider_state.change(fn=lambda provider: (gr.update(visible=provider == "Mimo"),
+                                                   gr.update(visible=provider == "Mimo")),
+                              inputs=provider_state, outputs=[role_voice_controls, role_voice_freeze],
+                              show_progress="hidden")
+        role_voice_mode.change(
+            fn=lambda mode: (gr.update(visible=mode == "preset"), gr.update(visible=mode == "design"),
+                             gr.update(visible=mode == "clone")),
+            inputs=role_voice_mode, outputs=[role_voice_builtin, role_voice_description, role_voice_reference],
+            show_progress="hidden",
+        )
+        role_voice_apply.click(
+            fn=apply_role_voice_settings,
+            inputs=[role_script_file, role_table, role_preview_role, role_voice_mode, role_voice_builtin,
+                    role_voice_description, role_voice_reference, role_voice_language, role_voice_pace,
+                    role_voice_instructions], outputs=[role_table, role_voice_status],
+        )
         role_preview_btn.click(
             fn=preview_role_segment,
             inputs=[provider_state, role_script_file, role_table, role_preview_role, role_preview_text,
                     model, voices, speed, instructions, enable_stream, openai_output_format,
                     minimax_model, minimax_voice, minimax_output_format],
             outputs=[role_preview_audio],
-            show_progress="hidden",
+            show_progress="full", show_progress_on=[role_preview_audio],
+        )
+
+        role_voice_freeze.click(
+            fn=use_preview_as_role_reference,
+            inputs=[role_script_file, role_table, role_preview_role, role_preview_audio,
+                    role_voice_language, role_voice_pace, role_voice_instructions],
+            outputs=[role_table, role_voice_status, role_voice_mode, role_voice_reference],
         )
 
         voxcpm_preview_btn.click(
@@ -4530,6 +4922,43 @@ def host_ui(config):
             outputs=[voxcpm_preview_audio],
             show_progress="hidden",
         )
+
+        def update_generation_summary(files, provider, roles, confirmed, parse_only, script_file=None, catalog_state=None):
+            count = len(files or [])
+            mismatch = False
+            if roles:
+                confirmed = (bool(script_file) and not _role_project_is_splitting(script_file)
+                             and not _role_project_needs_reconfirmation(script_file)
+                             and (bool(confirmed) or bool(_recall_role_confirmation(script_file))))
+                if confirmed:
+                    script, report = _load_uploaded_role_script(script_file)
+                    confirmed = bool(script and report.ok)
+                    mismatch = bool(script and script.provider != _role_provider_id(provider))
+            ready = bool(count) and (not roles or (count == 1 and bool(confirmed) and not mismatch and provider in ("Mimo", "MiniMax")))
+            directory_ready = catalog_state is None or (
+                catalog_state.get('mode') in ('single', 'batch')
+                and catalog_state.get('files') == [_uploaded_file_path(file_obj) for file_obj in (files or [])])
+            ready = ready and directory_ready
+            engine = html.escape(_PROVIDER_LABEL.get(provider, provider))
+            if not count:
+                message = "下一步：在第 1 步上传书籍。"
+            elif not directory_ready:
+                message = "正在准备当前书籍目录，请等待载入完成；读取失败时可重新读取目录。"
+            elif roles and count != 1:
+                message = "多角色配音每次处理一本书，请保留一个书籍文件。"
+            elif roles and provider not in ("Mimo", "MiniMax"):
+                message = "多角色配音支持 MiMo / MiniMax，请在第 2 步切换引擎。"
+            elif roles and mismatch:
+                message = "当前剧本与所选引擎不匹配，请切回剧本对应的引擎，或重新拆分剧本。"
+            elif roles and not confirmed:
+                message = "下一步：在第 3 步生成或上传剧本，试听并确认角色参数。"
+            else:
+                mode = "多角色配音" if roles else ("仅解析文本，不生成音频" if parse_only else "单声音朗读")
+                message = f"已准备 {count} 本书 · {engine} · {mode}。" + ("点击开始解析，完成后到日志查看章节与字数。" if parse_only and not roles else "点击开始生成，完成后在资源库试听与下载。")
+            return f'<div class="generation-summary" data-files="{count}" data-ready="{int(ready)}" data-parse-only="{int(bool(parse_only and not roles))}" role="status">{message}</div>', gr.update(interactive=ready, value="开始解析书籍" if parse_only and not roles else "开始生成有声书")
+
+        for source in (input_file, provider_state, role_mode, role_split_confirmed, role_confirmed_signature, role_script_file, preview, book_chapter_catalog):
+            source.change(fn=update_generation_summary, inputs=[input_file, provider_state, role_mode, role_split_confirmed, preview, role_script_file, book_chapter_catalog], outputs=[generation_summary, start_btn], show_progress="hidden")
 
         # 开始 / 停止
         start_btn.click(
@@ -4553,8 +4982,61 @@ def host_ui(config):
                     role_split_confirmed, role_split_generated, role_confirmed_signature,
                     allow_role_text_override, allow_role_title_mismatch, allow_role_fallback,
                     role_quality_enabled, role_quality_max_rate,
-                    deepseek_api_key, deepseek_base_url, deepseek_model],
+                    deepseek_api_key, deepseek_base_url, deepseek_model,
+                    audio_core_enabled, audio_core_repair, audio_core_settings_file, audio_core_casting_file,
+                    book_chapter_catalog, chapter_selection_source, chapter_from_name, chapter_to_name],
             outputs=[progress_state, progress_timer])
+        def refresh_quality_reports(folder):
+            from audiobook_generator.ui.audio_quality import find_quality_reports
+            reports = find_quality_reports(folder)
+            return gr.update(choices=reports, value=reports[0] if reports else None)
+
+        def show_quality_report(path):
+            if not path:
+                return "尚无报告", [], None, gr.update(choices=[], value=None)
+            from audiobook_generator.ui.audio_quality import load_quality_report, resource_summary_text
+            try:
+                report, rows, previews = load_quality_report(path)
+                generation = "音频已导出；请按报告核验" if report.get("generation_status") == "generated" else f"生成失败：{report.get('error_type', '未知原因')}"
+                return (f"第 {report['chapter_index']} 章：{report['quality_status']}；{generation}。\n\n{resource_summary_text(report)}",
+                        rows, path, gr.update(choices=list(previews), value=None))
+            except (OSError, ValueError, KeyError) as exc:
+                gr.Warning(f"报告读取失败：{exc}")
+                return "报告不可用", [], None, gr.update(choices=[], value=None)
+
+        def play_quality_issue(path, scope):
+            if not path or not scope:
+                return None
+            from audiobook_generator.ui.audio_quality import preview_quality_issue
+            try:
+                return preview_quality_issue(path, scope)
+            except (OSError, ValueError, KeyError):
+                return None
+
+        provider_state.change(fn=lambda provider: provider == "Mimo", inputs=provider_state,
+                              outputs=audio_core_enabled, show_progress="hidden")
+        quality_reports_seen = gr.State("")
+        def refresh_quality_after_progress(progress, folder, seen):
+            try:
+                mode = json.loads(progress or "{}").get("mode")
+            except (ValueError, TypeError):
+                return gr.update(), seen
+            if mode not in {"finished", "failed", "interrupted"}:
+                return gr.update(), seen
+            from audiobook_generator.ui.audio_quality import find_quality_reports
+            reports = find_quality_reports(folder)
+            fingerprint = json.dumps([(path, Path(path).stat().st_mtime_ns) for path in reports])
+            if not reports or fingerprint == seen:
+                return gr.update(), seen
+            return gr.update(choices=reports, value=reports[0]), fingerprint
+
+        progress_state.change(fn=refresh_quality_after_progress,
+                              inputs=[progress_state, output_dir, quality_reports_seen],
+                              outputs=[quality_report_file, quality_reports_seen], show_progress="hidden")
+        quality_refresh.click(fn=refresh_quality_reports, inputs=output_dir, outputs=quality_report_file)
+        quality_report_file.change(fn=show_quality_report, inputs=quality_report_file,
+                                   outputs=[quality_summary, quality_rows, quality_download, quality_scope])
+        quality_scope.change(fn=play_quality_issue, inputs=[quality_report_file, quality_scope], outputs=quality_audio)
         stop_btn.click(fn=terminate_generator, inputs=None, outputs=[progress_state, progress_timer])
 
         # 进度条定时更新
@@ -4570,14 +5052,35 @@ def host_ui(config):
         refresh_btn.click(fn=refresh_batches, inputs=None, outputs=[folder_dropdown, file_selector], show_progress="hidden")
         # 仅用户切换批次时默认全选，避免自动刷新回写下拉框时覆盖保留的勾选。
         folder_dropdown.input(fn=load_files_for_folder, inputs=folder_dropdown, outputs=file_selector, show_progress="hidden")
-        select_all_btn.click(fn=lambda f: gr.update(value=get_files_in_folder(f)), inputs=folder_dropdown, outputs=file_selector, show_progress="hidden")
+        select_all_btn.click(fn=lambda f, query: gr.update(value=[name for name in get_files_in_folder(f) if (query or "").casefold() in name.casefold()]), inputs=[folder_dropdown, library_search], outputs=file_selector, show_progress="hidden")
         deselect_all_btn.click(fn=lambda: gr.update(value=[]), inputs=None, outputs=file_selector, show_progress="hidden")
+        cleanup_ack.change(fn=lambda ack: (gr.update(interactive=bool(ack)), gr.update(interactive=bool(ack))), inputs=cleanup_ack, outputs=[delete_btn, delete_folder_btn], show_progress="hidden")
+        folder_dropdown.change(fn=lambda: False, outputs=cleanup_ack, show_progress="hidden")
         delete_btn.click(fn=delete_selected_files, inputs=[folder_dropdown, file_selector],
                          outputs=[folder_dropdown, file_selector, download_card, real_download_file])
         delete_folder_btn.click(fn=delete_entire_folder, inputs=folder_dropdown,
                                 outputs=[folder_dropdown, file_selector, download_card, real_download_file])
         generate_btn.click(fn=generate_download, inputs=[folder_dropdown, file_selector, auto_delete_cb],
                            outputs=[folder_dropdown, file_selector, download_card, real_download_file])
+
+        def update_library_selection(folder, selected):
+            summary, paths, audio_choices = selection_details(get_output_dir(), folder, selected)
+            return summary, gr.update(value=paths or None), gr.update(choices=audio_choices, value=None), gr.update(value=None), gr.update(interactive=bool(paths)), gr.update(value=None, visible=False), gr.update(value=_placeholder_html("勾选文件后准备 ZIP，再点击下载。"))
+
+        def filter_library_files(folder, query, selected):
+            files = get_files_in_folder(folder)
+            matches = [name for name in files if (query or "").casefold() in name.casefold()]
+            # 搜索只缩小当前操作集，隐藏的文件不参与打包或删除。
+            return gr.update(choices=matches, value=[name for name in (selected or []) if name in matches])
+
+        file_selector.change(fn=update_library_selection, inputs=[folder_dropdown, file_selector], outputs=[library_selection_summary, direct_download_files, library_preview_choice, library_preview_audio, generate_btn, real_download_file, download_card], show_progress="hidden", queue=False)
+        folder_dropdown.change(fn=lambda: ("", gr.update(value=None, visible=False)), outputs=[library_search, real_download_file], show_progress="hidden")
+        library_search.input(fn=filter_library_files, inputs=[folder_dropdown, library_search, file_selector], outputs=file_selector, show_progress="hidden")
+        download_mode.change(fn=lambda mode: (gr.update(visible=mode == "逐个下载"), gr.update(visible=mode == "ZIP 打包")), inputs=download_mode, outputs=[direct_download_files, library_zip_panel], show_progress="hidden")
+        def preview_library_file(folder, name):
+            _, paths, _ = selection_details(get_output_dir(), folder, [name] if name else [])
+            return paths[0] if paths else None
+        library_preview_choice.change(fn=preview_library_file, inputs=[folder_dropdown, library_preview_choice], outputs=library_preview_audio, show_progress="hidden")
 
         # 持久化开关
         output_text.change(fn=lambda v: _save_checkbox("output_text", v), inputs=output_text, outputs=None, show_progress="hidden")

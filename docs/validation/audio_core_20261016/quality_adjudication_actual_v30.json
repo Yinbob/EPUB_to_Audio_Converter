@@ -1,0 +1,86 @@
+{
+  "version": "quality_adjudication_v30",
+  "direct_human_followup": {
+    "F01_loudness_preference": "新版本更自然，音量差可接受",
+    "F01_F03_Bring": "F01、F03 的 Bring 都完整"
+  },
+  "receipt": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_loudness_20261016/human_acceptance_v30.json",
+  "receipt_sha256": "74161cf773d5d2a552819a287d4ad5bf68c8cf56769b226a5d4133474f157193",
+  "selected_preview_accepted": true,
+  "accepted_scope_is_not_whole_chapter": true,
+  "reports": [
+    {
+      "chapter": 2,
+      "source_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000002/quality.json",
+      "source_sha256": "4514627455512fa628c827b7413de5ae7b852af114c3a774517d00124bc68e59",
+      "review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/quality_reviews/chapter_000002.review.json",
+      "review_sha256": "8af953eb628aaee25aa87bfd5759408264e300fa1e1e8f24df795e4236563114",
+      "derived_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/reviewed_reports/chapter_000002/quality.json",
+      "derived_sha256": "4fac3b0e2d56516b56790fc0606ae78cfa4e8dc651d6bb745eb814148b9f46ed",
+      "gate": "accepted_as_draft_not_full_human_verified",
+      "quality_status": "incomplete"
+    },
+    {
+      "chapter": 3,
+      "source_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000003/quality.json",
+      "source_sha256": "a770392261b866eb0085afaba006e822e659d543294a1bfc78ced0cd41e9ea24",
+      "review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/quality_reviews/chapter_000003.review.json",
+      "review_sha256": "933a9202e22950372b646443c9c9db53a2800ada9b21b1b4144e03f46f98a4a5",
+      "derived_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/reviewed_reports/chapter_000003/quality.json",
+      "derived_sha256": "3b57730dc768a729b996bc2590d38dd126ca66ae1b355bb33dc963cb93fef82a",
+      "gate": "rejected: 角色辨识材料存在已检出问题或内容未完成检查，请先复核",
+      "quality_status": "incomplete"
+    },
+    {
+      "chapter": 6,
+      "source_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000006/quality.json",
+      "source_sha256": "85e81a1b0cb19da1d2689dea7e4f781936765532370c770a33ab10f6d08d2d65",
+      "review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/quality_reviews/chapter_000006.review.json",
+      "review_sha256": "7e0cd1006942cfa1a5e4b52ba610a2ccf1c2e94cb627710df9b7b85c1cdbbc80",
+      "derived_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/reviewed_reports/chapter_000006/quality.json",
+      "derived_sha256": "1bd1a46d6c589b9f884ae5a42d2c091cc5dab2ca55a437b6d47d2c7794bf9ba7",
+      "gate": "accepted_as_draft_not_full_human_verified",
+      "quality_status": "incomplete"
+    },
+    {
+      "chapter": 8,
+      "source_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000008/quality.json",
+      "source_sha256": "d02d5f94488016603ca1f333a124fe898188961863337a036e68f797e74a3d5f",
+      "review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/quality_reviews/chapter_000008.review.json",
+      "review_sha256": "5fac6e1194a5f392d8aebfb0065d61d924a77d8ad7242f210131200265b93ae5",
+      "derived_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/reviewed_reports/chapter_000008/quality.json",
+      "derived_sha256": "d007976080c3eb9ddd30f2d6b7cb81ebe0d3aa569d655c66f71c227264d29581",
+      "gate": "accepted_as_draft_not_full_human_verified",
+      "quality_status": "incomplete"
+    },
+    {
+      "chapter": 9,
+      "source_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000009/quality.json",
+      "source_sha256": "ec8f79a287aa8b6ca21c23edaf0b394defe0cfff27394135e2aac1dc81d076c3",
+      "review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/quality_reviews/chapter_000009.review.json",
+      "review_sha256": "3d9eba96a19da9521da451e76252e96714b17954d539f9cd4a06361fa20b55ea",
+      "derived_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/reviewed_reports/chapter_000009/quality.json",
+      "derived_sha256": "c289930696cc8fa1725444ac75555aaba68d56e439422fafbb69b90b604d9c80",
+      "gate": "accepted_as_draft_not_full_human_verified",
+      "quality_status": "incomplete"
+    }
+  ],
+  "original_reports_unchanged": true,
+  "real_report_adjudications": 5,
+  "unique_audio_rate_decisions": 1,
+  "original_Bring_false_positives_confirmed": 3,
+  "source_generation_requests_still": 22,
+  "new_tts_requests": 0,
+  "listener_pack_rejection": "角色辨识材料存在已检出问题或内容未完成检查，请先复核",
+  "listener_pack_published": false,
+  "full_chapter_human_review": false,
+  "formal_listener_results": null,
+  "remaining": [
+    "其余整章质量核验",
+    "正式选角比较统一响度协议",
+    "真实边界阳性及独立来源划分",
+    "独立听众试验"
+  ],
+  "human_focus_review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focused_human_review.json",
+  "human_focus_review_sha256": "ce19fb9e081bfccad1a850d9df2c715e5b67220d028a04640508124ed53b1d10"
+}

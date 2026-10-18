@@ -1,0 +1,16 @@
+{
+  "version": "flipped-cmon-user-feedback-v48",
+  "source": "explicit_user_reply",
+  "user_reply": "3分59处原文有一个难发音的单词c'mon,在完整章节候选音频中的3:59-4:04位置，tts模型尝试发了2-3次音，这个应该也属于尾部重复问题吧，请修正",
+  "source_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/assembly_manifest.json",
+  "source_manifest_sha256": "967f1bdd25cf1e0da22a51fcdccc6643b9ab11355f1ca43f6ed797d5dc26fa23",
+  "sample_id": "R034",
+  "audio_sha256": "241193f660d3c6b5e6840cb85421ff35967d388cfbfb215e16541d4210c59d7f",
+  "chapter_seconds": [
+    239.0,
+    244.92
+  ],
+  "confirmed_issue": "user_heard_two_or_three_pronunciation_attempts",
+  "complete_first_reading_not_yet_established": true,
+  "whole_chapter_human_verified": false
+}

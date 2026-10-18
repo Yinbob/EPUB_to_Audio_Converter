@@ -1,0 +1,20 @@
+{
+  "kind": "real_pretrained_offline_inference_after_content_versioning",
+  "new_tts_requests": 0,
+  "source_report": "audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/6f40a0049eaa4ba8a54c0c41283537f4/chapter_000001/quality.json",
+  "content_status": "passed",
+  "asr_cer": 0.0,
+  "speaker_dimensions": 192,
+  "speaker_norm": 1.0,
+  "in_memory_embedding_reuse_equal": true,
+  "model_fingerprints": {
+    "asr": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6",
+    "speaker": "9cc19ee039c6ded8c46311e5b94b2595a9c9ff2d11fed1a29fb838ddd7b15f27"
+  },
+  "model_file_counts": {
+    "asr": 5,
+    "speaker": 6
+  },
+  "runtime_seconds": 6.236539040924981,
+  "interpretation": "Existing authored sample only; no human defect accuracy or real repair benefit established"
+}

@@ -7,6 +7,9 @@ __pycache__/
 # Virtual environment
 venv/
 venv_chatterbox/
+venv_audio_quality/
+venv_audio_quality_runtime/
+.audio_quality_models/
 .idea
 .history/
 .run/

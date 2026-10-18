@@ -1,0 +1,20 @@
+{
+  "version": "flipped-v46-independent-delivery-integrity",
+  "source_characters": 14311,
+  "exact_unchanged_chunks": 97,
+  "changed_samples": [
+    "R018",
+    "R039",
+    "R076"
+  ],
+  "all_100_reference_roles_match": true,
+  "retained_speech_pcm_exact": true,
+  "j076_estimated_pause_seconds": 1.0,
+  "pcm_layout_verified": true,
+  "html_targets_verified": 12,
+  "standard_report_sha256": "ecc1ea01d479ae014a7bcafee53af889daafbc4a450811f7a4f07e8f942c0757",
+  "actual_ui_verified_final_sha256": true,
+  "new_requests": 0,
+  "human_status": "pending_three_local_edits",
+  "whole_chapter_human_pass": false
+}

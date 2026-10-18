@@ -2,33 +2,10 @@ import sys
 import os
 import shutil
 
-# ═══════════════════════════════════════════════════════════════
-# 自动检测 & 切换到 Chatterbox 虚拟环境
-# 这样用户只需一条命令即可：
-#   python3 main.py input.epub output_dir --tts chatterbox
-# ═══════════════════════════════════════════════════════════════
-_self_dir = os.path.dirname(os.path.abspath(__file__))
-_venv_python = os.path.join(_self_dir, 'venv_chatterbox', 'bin', 'python3')
-_venv_cache = os.path.join(_self_dir, 'venv_chatterbox', '.cache')
+from audiobook_generator.utils.project_runtime import bootstrap_project_python
 
-if os.path.exists(_venv_python) and sys.executable != _venv_python:
-    os.environ.setdefault('NUMBA_CACHE_DIR', os.path.join(_venv_cache, 'numba'))
-    os.environ.setdefault('HF_HOME', os.path.join(_venv_cache, 'huggingface'))
-    os.environ.setdefault('HUGGINGFACE_HUB_CACHE', os.path.join(_venv_cache, 'huggingface', 'hub'))
-    # 国内部署默认走 HuggingFace 镜像（GitHub/HF 国际链路常被阻断）；可用环境变量 HF_ENDPOINT 覆盖
-    os.environ.setdefault('HF_ENDPOINT', 'https://hf-mirror.com')
-    # 新版 huggingface_hub 对大文件默认走 Xet/CAS 协议，会绕过镜像直连官方后端（国内 401）；
-    # 统一禁用，走镜像的普通 HTTP 下载。官方网络用户可显式设 HF_HUB_DISABLE_XET=0 覆盖
-    os.environ.setdefault('HF_HUB_DISABLE_XET', '1')
-    os.environ.setdefault('MODELSCOPE_CACHE', os.path.join(_venv_cache, 'modelscope'))
-    os.environ.setdefault('TORCHINDUCTOR_CACHE_DIR', os.path.join(_venv_cache, 'torchinductor'))
-    os.environ.setdefault('OMP_WAIT_POLICY', 'PASSIVE')
-    os.makedirs(os.environ['NUMBA_CACHE_DIR'], exist_ok=True)
-    os.makedirs(os.path.join(_venv_cache, 'huggingface', 'hub'), exist_ok=True)
-    os.makedirs(os.environ['MODELSCOPE_CACHE'], exist_ok=True)
-    os.makedirs(os.environ['TORCHINDUCTOR_CACHE_DIR'], exist_ok=True)
-    os.execv(_venv_python, [_venv_python] + sys.argv)
-# ═══════════════════════════════════════════════════════════════
+if __name__ == '__main__':
+    bootstrap_project_python(os.path.dirname(os.path.abspath(__file__)), 'cli')
 
 import argparse
 from pathlib import Path
@@ -219,6 +196,29 @@ def handle_args():
         "--role_quality_max_rate", type=float, default=4.3,
         help="角色音频中文语速上限（汉字/秒，默认 4.3）。",
     )
+    parser.add_argument("--audio_core_enabled", action="store_true", help="启用 MiMo 统一分块、拼接和质量报告（普通／角色模式）")
+    parser.add_argument("--audio_core_repair", action="store_true", help="统一核心：启用受限局部修复")
+    parser.add_argument("--audio_core_max_english_wpm", type=float, default=300.0, help="英文语速筛查上限（词/分钟；未标定的保守规则）")
+    parser.add_argument("--audio_core_chunk_chars", type=int, default=300, help="统一核心分块目标，20～1500 字符")
+    parser.add_argument("--audio_core_max_requests", type=int, default=1000, help="本次运行最多实际合成请求次数")
+    parser.add_argument("--audio_core_max_repairs", type=int, default=24, help="本次运行最多追加修复请求次数")
+    parser.add_argument("--audio_core_max_repair_characters", type=int, default=None, help="本次运行最多追加修复正文字符数（默认不设上限，0 禁用重合成）")
+    parser.add_argument("--audio_core_max_seconds", type=float, default=3600, help="统一核心运行时限（秒）")
+    parser.add_argument("--audio_core_no_asr", action="store_true", help="关闭内容转写检查，报告标记未完整评测")
+    parser.add_argument("--audio_core_no_speaker", action="store_true", help="关闭声纹检查，报告标记未完整评测")
+    parser.add_argument("--audio_core_vad", action="store_true", help="使用本地 Silero VAD 辅助语速分析")
+    parser.add_argument("--audio_core_asr_model", help="本地 SenseVoice 模型目录，不自动下载")
+    parser.add_argument("--audio_core_speaker_model", help="本地 ECAPA 模型目录，不自动下载")
+    parser.add_argument("--audio_core_boundary_model", help="已训练的边界特征分类器 JSON")
+    parser.add_argument("--audio_core_role_references", help="人工核验且绑定声音版本的固定跨章参考文件")
+    parser.add_argument('--audio_core_tail_repeat_mode', choices=['off','review','auto'], default='review',
+                        help='尾部重复：off关闭，review导出候选，auto在启用修复时尝试严格匹配的安全裁切')
+    parser.add_argument("--audio_core_casting", help="已审查的 MiMo 角色选角 JSON")
+    parser.add_argument("--audio_core_reading_dictionary", help="显式朗读词典 JSON：原文→实际读法，不支持 SSML")
+    parser.add_argument("--audio_core_transition_boundaries", nargs="+", default=[],
+                        help="指定接缝编号（左块|右块），使用人工确认的 50%→100%／100 毫秒起读处理")
+    parser.add_argument("--audio_core_transition_source_group",
+                        help="起读处理对应报告的 source_group_id；正文不符时在合成前报错")
 
     parser.add_argument(
         "--voice_name",

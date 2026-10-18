@@ -1,0 +1,169 @@
+{
+  "version": "casting_feedback_loudness_v29",
+  "kind": "actual_human_feedback_and_local_preview",
+  "human_statement": {
+    "joins": "F01两段声音音量不一致，后一个音色的音量大一些；F02无问题；F03两种音色有点相似，难以辨认区别",
+    "consistency": "差异可接受，无明显异常"
+  },
+  "review_scope": {
+    "F01": {
+      "loudness_mismatch": true,
+      "louder_side": "right",
+      "Bring_complete": null,
+      "join_other_defects": null
+    },
+    "F02": {
+      "Bring_complete": true,
+      "join_acceptable": true
+    },
+    "F03": {
+      "role_voice_separation_acceptable": false,
+      "Bring_complete": null,
+      "actual_voices": [
+        "Mia",
+        "Mia"
+      ],
+      "interpretation": "共享同一声音的适配基线；不是双声音相似度的独立验证"
+    },
+    "F06_F07": {
+      "relative_consistency_acceptable": true,
+      "applies_to_chapters": [
+        2,
+        8
+      ],
+      "scope": "相同F06音频与F07的比较，不代表整章或其他块通过"
+    }
+  },
+  "F03_verified_assignment": [
+    "Mia",
+    "Mia"
+  ],
+  "same_F06_source_used_in_chapters": [
+    2,
+    8
+  ],
+  "csv_rows_changed": 0,
+  "machine_quality_reports_changed": false,
+  "new_tts_requests": 0,
+  "human_feedback_file": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/human_feedback_v29.json",
+  "source_bound_preview_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_loudness_20261016/manifest.json",
+  "operation": {
+    "kind": "constant_attenuation_right_chunk",
+    "attenuation_db": 5.0,
+    "gain": 0.5623413251903491,
+    "start_sample": 176640,
+    "end_sample": 334080,
+    "max_attenuation_db": 6.0
+  },
+  "before_loudness": {
+    "left": {
+      "integrated_lufs": -22.44,
+      "true_peak_dbfs": -4.73,
+      "lra_lu": 5.8,
+      "gate_lufs": -32.85,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    },
+    "right": {
+      "integrated_lufs": -17.44,
+      "true_peak_dbfs": -0.91,
+      "lra_lu": 2.3,
+      "gate_lufs": -27.89,
+      "measurement": "ffmpeg_loudnorm_input_only"
+    }
+  },
+  "after_right_loudness": {
+    "integrated_lufs": -22.44,
+    "true_peak_dbfs": -5.91,
+    "lra_lu": 2.3,
+    "gate_lufs": -32.89,
+    "measurement": "ffmpeg_loudnorm_input_only"
+  },
+  "candidate_right_minus_left_lu": 0.0,
+  "all_samples_match_declared_gain_operation": true,
+  "untouched_regions_equal": true,
+  "original_pair_matches_F01_pcm": true,
+  "frames_unchanged": true,
+  "no_pcm_clipping": true,
+  "content_checks": {
+    "original_pair": "asr_difference",
+    "matched_pair": "no_asr_difference"
+  },
+  "preview_automatically_applied": false,
+  "preview_human_preference": null,
+  "formal_listener_results": null,
+  "new_test_methods": 4,
+  "regression": {
+    "ran": 527,
+    "skipped": 30,
+    "seconds": 15.451,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_feedback_loudness_regression_v29.log",
+    "log_sha256": "a44b13948e8487c00e2f0e30348b8adefe556f61b6fb8604a2dc56a5c24be96a"
+  },
+  "artifacts": [
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/human_feedback_v29.json",
+      "sha256": "29444715ffba70f828dee1c85ee85a94e9e7c3ab858f809d6f66548717f0b22b"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focused_human_review.json",
+      "sha256": "e5ab3d08bf198264929f90f7b726b1e6aefbf70b1244eb4c5c65753d9ea99373"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focused_human_review.before_feedback_v29.json",
+      "sha256": "8d34258d22922be9cb55ba01e8206453d1e0cb42e33ff030bafdbea1089f078b"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/feedback_and_next_review.md",
+      "sha256": "dddc397cf46afe0766e4993bfde96508d5a0fb450cf9d7ea94f8b3b3111267da"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_loudness_20261016/manifest.json",
+      "sha256": "9553d35a7fa7422efca3251a2c7c57c3e434d39e82225f6567231a63297d5067"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_loudness_20261016/index.html",
+      "sha256": "2aef23c9fed6dbd31f915d26fafc34a14b9a9257afa8a6fd4a60c3b8ffd228cb"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_generator/audio_core/loudness_preview.py",
+      "sha256": "a259104cd7c4970dff9297d93056dcd3e3225366c5693186dcbeef5c9980e0a6"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_generator/audio_core/__main__.py",
+      "sha256": "a02eb4a301d5e85ccdf7c7c147fdaba3be32eea9d7135c4d9b58c099837e47d3"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/tests/audiobook_generator/audio_core/loudness_preview_test.py",
+      "sha256": "6bd769ed0bf2b415c427a7ce14005f6c5d6cf8e1234e167f475bc918dfa853c0"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_feedback_loudness_targeted_v29.log",
+      "sha256": "0d671394764f080aef8750b89daae2197657ceeb919ce7ebab9c40165e6073f9"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_feedback_loudness_regression_v29.log",
+      "sha256": "a44b13948e8487c00e2f0e30348b8adefe556f61b6fb8604a2dc56a5c24be96a"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_feedback_loudness_actual_v29.log",
+      "sha256": "59a0f499e2f3d8c187eb52bfedcaf37f774947905af05800fcce34315e87d175"
+    }
+  ],
+  "remaining": [
+    "F01衰减试听偏好",
+    "F01/F03的Bring完整性明确核验",
+    "其他整章质量核验",
+    "E06T／英文数字人工核验",
+    "真实边界阳性及独立来源划分",
+    "独立听众实验"
+  ],
+  "authorized_review_files_updated": [
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focused_human_review.json",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focused_review.md"
+  ],
+  "other_v27_bound_artifacts_unchanged": true,
+  "source_generation_request_events_still": 22,
+  "source_assembly_request_events_still": 0,
+  "local_review_links_verified": 30
+}

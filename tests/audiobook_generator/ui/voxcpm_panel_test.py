@@ -88,7 +88,8 @@ class VoxCPMPanelTest(unittest.TestCase):
         inputs = next(k.value for k in click.keywords if k.arg == "inputs")
         names = [item.id for item in inputs.elts]
         aliases = {"provider_state": "provider", "deepseek_api_key": "role_quality_deepseek_api_key",
-                   "deepseek_base_url": "role_quality_deepseek_base_url", "deepseek_model": "role_quality_deepseek_model"}
+                   "deepseek_base_url": "role_quality_deepseek_base_url", "deepseek_model": "role_quality_deepseek_model",
+                   "book_chapter_catalog": "chapter_catalog_state"}
         self.assertEqual([aliases.get(name, name) for name in names], parameters)
         for name in parameters:
             if name.startswith("voxcpm_"):
@@ -102,7 +103,9 @@ class VoxCPMPanelTest(unittest.TestCase):
         form = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "process_form")
         launch = MagicMock()
         ns = {"gr": MagicMock(), "os": os, "Path": Path, "GeneralConfig": GeneralConfig,
-              "launch_batch": launch, "get_progress_info": lambda: None}
+              "launch_batch": launch, "get_progress_info": lambda: None,
+              # 此处只隔离检查参数；真实装饰器的并发行为由 lifecycle 测试覆盖。
+              "_role_project_operation": lambda callback: callback}
         exec(compile(ast.Module(body=[form], type_ignores=[]), "web_ui.py", "exec"), ns)
         with tempfile.TemporaryDirectory() as folder:
             params = {name: None for name in inspect.signature(ns["process_form"]).parameters}

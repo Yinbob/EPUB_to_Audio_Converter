@@ -1,0 +1,19 @@
+{
+  "chunk_chars": 300,
+  "max_requests": 1000,
+  "max_repairs": 24,
+  "max_repair_characters": null,
+  "max_seconds": 3600,
+  "no_asr": false,
+  "no_speaker": false,
+  "tail_repeat_mode": "review",
+  "vad": false,
+  "asr_model": null,
+  "speaker_model": null,
+  "boundary_model": null,
+  "role_references": null,
+  "reading_dictionary": {},
+  "transition_boundaries": [],
+  "transition_source_group": null,
+  "max_english_wpm": 300
+}

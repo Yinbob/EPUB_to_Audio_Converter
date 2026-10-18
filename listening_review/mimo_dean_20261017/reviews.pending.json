@@ -1,0 +1,20 @@
+[
+  {
+    "sample_id": "D01",
+    "voice": "Dean",
+    "audio_sha256": "29f77da5a34f09e996a1b91a002ef1819c62fd939d701a537f22923335d61ff9",
+    "content_complete": null,
+    "same_voice_consistent": null,
+    "bryce_voice_suitable": null,
+    "notes": ""
+  },
+  {
+    "sample_id": "D02",
+    "voice": "Dean",
+    "audio_sha256": "ea2f5b016402c43a7fa3759d5961b25d4bc06c864f7efb19253501ddde74b667",
+    "content_complete": null,
+    "same_voice_consistent": null,
+    "bryce_voice_suitable": null,
+    "notes": ""
+  }
+]

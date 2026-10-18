@@ -1,0 +1,59 @@
+{
+  "recorded_at": "2026-10-16T19:53:53.645570+08:00",
+  "scope": "Bounded English numeric/date equivalence for ASR comparison; original English TTS body unchanged",
+  "normalization_version": "bilingual-reading-v5",
+  "english_policy_version": "en-comparison-v1",
+  "new_real_tts_requests": 0,
+  "new_test_methods": 9,
+  "tests": {
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q",
+    "ran": 487,
+    "seconds": 13.935,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/english_reading_regression_v17.log",
+    "log_sha256": "158137bcc9712b59c6b58b9d7b7183a7e111d163e9898c9158958b039cb24435"
+  },
+  "supported": [
+    "ordinary 0..999 integers",
+    "proper comma-grouped integers up to 999999",
+    "signed decimal numbers with up to four fractional digits",
+    "percentages",
+    "valid numeric ordinals",
+    "valid full-English-month dates from 1900 through 2099; cardinal/ordinal day and common spoken year alternatives"
+  ],
+  "not_automatically_equated": [
+    "identifier contexts, leading zero numbers, version strings, phone numbers",
+    "slash/ISO dates, invalid dates or invalid ordinal suffixes",
+    "plain ungrouped years and numbers >=1000 without other context",
+    "unsupported precision, currency/unit abbreviations, acronyms and contractions",
+    "British cardinal and variants outside supported named-month dates"
+  ],
+  "comparison_event_coordinates": "NFKC and explicit-dictionary comparison input, not raw book source offsets",
+  "pipeline_fixture_checks": {
+    "equivalent_20_twenty": {
+      "initial_fake_requests": 1,
+      "repair_fake_requests": 0
+    },
+    "wrong_20_twenty_one": {
+      "initial_fake_requests": 1,
+      "repair_fake_requests": 1,
+      "remaining_mismatch_preserved": true
+    },
+    "interpretation": "Constructed audio and transcriber verify bounded repair scheduling only; no real ASR accuracy or repair efficacy claim"
+  },
+  "actual_content_regression": {
+    "record": "english_reading_real_audio_v17.json",
+    "sha256": "80a138a3b3f8fc507feaf61f4eec781ba05634e06c39f0fe1c771355a5f47bea",
+    "existing_unchanged_audio_samples": 18,
+    "chinese_samples": 12,
+    "english_samples": 6,
+    "zero_alignment_error_samples": 17,
+    "suspected_mismatch_samples": [
+      "E06"
+    ],
+    "human_english_review": "pending",
+    "no_new_audio_synthesized": true
+  },
+  "research_status": "incomplete: no real boundary positives or independent split, no listener benefit experiment; no verified English voice bank"
+}

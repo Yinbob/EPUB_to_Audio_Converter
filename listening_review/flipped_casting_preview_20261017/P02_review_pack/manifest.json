@@ -1,0 +1,264 @@
+{
+  "schema": "audio-quality-human-review-v1",
+  "provider": "mimo",
+  "sample_count": 11,
+  "chunk_count": 6,
+  "boundary_count": 5,
+  "human_reviewed_count": 0,
+  "requests_sent": 0,
+  "audio_files": [
+    {
+      "path": "audio/chapter_000005_full.wav",
+      "sha256": "2d68cb30ac59fbfc29c1c12e9ed123d6ebeb3a6500138c5690ce653c146ec5df",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 380160,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/90e522be07bd4c53b206ff80040cbab4/chapter_000005/chapter.wav"
+    },
+    {
+      "path": "audio/C000005_001.wav",
+      "sha256": "373b63978c17460c4d65e5c32463853131de05152b7f135d404513534151f938",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 49920,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/adb14dc3cecea34ae8cb3140794190090c84a54b1a3b3b95f9683227ce5c51f2.wav"
+    },
+    {
+      "path": "audio/C000005_002.wav",
+      "sha256": "6d91d475c876abc480f4b6e1b0866ea9b7d4a35367a0d9292b494cbde56fe8a8",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 84480,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/af80e059bf9ec5197f7fe2c4af254c3bc859eea30dab7ce41cfcbe3ca3adac27.wav"
+    },
+    {
+      "path": "audio/C000005_003.wav",
+      "sha256": "a72b14fc3b5a22f801d3b45002a18692b7f8026141c19342658f5637127cd218",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 69120,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/1d62706862b422b440933542fb933a7cad4f64795530aa819967f15f91f0d9d7.wav"
+    },
+    {
+      "path": "audio/C000005_004.wav",
+      "sha256": "a141698fa2f6085e097f2cd79ff64a8d63f76e8d0449fd6867bfbd9173f26f40",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 76800,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/aab1ef85b87f7e900d66b7647d8c0a2bbf6e6b0a0ac4f9bfa07d96ccca9d458e.wav"
+    },
+    {
+      "path": "audio/C000005_005.wav",
+      "sha256": "017a7f7ef528117156f1497ba7a59d88b71761ffc7f22aa0df88f7e92be10361",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 76800,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/23ef5c5fba6c69e38a3b4fc86a76fff2e701d3a610e9e5634a44acf3ab8a465c.wav"
+    },
+    {
+      "path": "audio/C000005_006.wav",
+      "sha256": "d15362ba631926349e444c620bf3791cbc9a894e17b99f38113efb446e1b92d3",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 23040,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/2c45578fc37f2e758989ad324a133db370d26d59b04ec39762c136301d4502e2.wav"
+    },
+    {
+      "path": "audio/B000005_001.wav",
+      "sha256": "4a8ac636e336edccc1bdd50b020906523bafdccd85eee6525a4f2a2c3151c9c8",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 96000,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/90e522be07bd4c53b206ff80040cbab4/chapter_000005/chapter.wav"
+    },
+    {
+      "path": "audio/B000005_002.wav",
+      "sha256": "8a98db0df81eee85a453669ed92d5b52b6b5457303179d2c2caf5a78d6a170b4",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 96000,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/90e522be07bd4c53b206ff80040cbab4/chapter_000005/chapter.wav"
+    },
+    {
+      "path": "audio/B000005_003.wav",
+      "sha256": "9fca4ca01ed47a3c644eb312e839e20a0ee6be78a65417a7432e3489a15bb675",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 96000,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/90e522be07bd4c53b206ff80040cbab4/chapter_000005/chapter.wav"
+    },
+    {
+      "path": "audio/B000005_004.wav",
+      "sha256": "fbdd5f704c470a46dfbfa2e1ee915cab3655321846d902e03473294aa8ac1562",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 96000,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/90e522be07bd4c53b206ff80040cbab4/chapter_000005/chapter.wav"
+    },
+    {
+      "path": "audio/B000005_005.wav",
+      "sha256": "0a95bd9f6ba0d39eb29a2318c9c2fbd9d0bd88759f93550c16ca64fbdb5084b0",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 71040,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/90e522be07bd4c53b206ff80040cbab4/chapter_000005/chapter.wav"
+    }
+  ],
+  "boundary_data_sha256": "e2915264f15fe50ab885b3ec67a8e6a57f99780ebc3657fa1acc414180778425",
+  "review_records": [
+    {
+      "sample_id": "C000005_001",
+      "sample_type": "chunk",
+      "chapter": "5",
+      "role_ids": "bryce_mother",
+      "same_speaker": "",
+      "audio_path": "audio/C000005_001.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": "“And what's your name, honey?”",
+      "expected_tts_text": "“And what's your name, honey?”",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "C000005_002",
+      "sample_type": "chunk",
+      "chapter": "5",
+      "role_ids": "juli",
+      "same_speaker": "",
+      "audio_path": "audio/C000005_002.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": "“Julianna Baker. I live right over there,”",
+      "expected_tts_text": "“Julianna Baker. I live right over there,”",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "C000005_003",
+      "sample_type": "chunk",
+      "chapter": "5",
+      "role_ids": "narrator",
+      "same_speaker": "",
+      "audio_path": "audio/C000005_003.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": " she says, pointing with her unoccupied hand. ",
+      "expected_tts_text": " she says, pointing with her unoccupied hand. ",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "C000005_004",
+      "sample_type": "chunk",
+      "chapter": "5",
+      "role_ids": "bryce_mother",
+      "same_speaker": "",
+      "audio_path": "audio/C000005_004.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": "“Well, I see you've met my son,”",
+      "expected_tts_text": "“Well, I see you've met my son,”",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "C000005_005",
+      "sample_type": "chunk",
+      "chapter": "5",
+      "role_ids": "narrator",
+      "same_speaker": "",
+      "audio_path": "audio/C000005_005.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": " she says, still grinning away. ",
+      "expected_tts_text": " she says, still grinning away. ",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "C000005_006",
+      "sample_type": "chunk",
+      "chapter": "5",
+      "role_ids": "juli",
+      "same_speaker": "",
+      "audio_path": "audio/C000005_006.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": "“Uh-huh!”",
+      "expected_tts_text": "“Uh-huh!”",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "B000005_001",
+      "sample_type": "boundary",
+      "chapter": "5",
+      "role_ids": "bryce_mother → juli",
+      "same_speaker": "false",
+      "audio_path": "audio/B000005_001.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "2.0",
+      "source_text": "“And what's your name, honey?” ｜ “Julianna Baker. I live right over there,”",
+      "expected_tts_text": "“And what's your name, honey?” ｜ “Julianna Baker. I live right over there,”",
+      "scope_kind": "original_boundary",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "B000005_002",
+      "sample_type": "boundary",
+      "chapter": "5",
+      "role_ids": "juli → narrator",
+      "same_speaker": "false",
+      "audio_path": "audio/B000005_002.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "2.0",
+      "source_text": "“Julianna Baker. I live right over there,” ｜  she says, pointing with her unoccupied hand. ",
+      "expected_tts_text": "“Julianna Baker. I live right over there,” ｜  she says, pointing with her unoccupied hand. ",
+      "scope_kind": "original_boundary",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "B000005_003",
+      "sample_type": "boundary",
+      "chapter": "5",
+      "role_ids": "narrator → bryce_mother",
+      "same_speaker": "false",
+      "audio_path": "audio/B000005_003.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "2.0",
+      "source_text": " she says, pointing with her unoccupied hand.  ｜ “Well, I see you've met my son,”",
+      "expected_tts_text": " she says, pointing with her unoccupied hand.  ｜ “Well, I see you've met my son,”",
+      "scope_kind": "original_boundary",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "B000005_004",
+      "sample_type": "boundary",
+      "chapter": "5",
+      "role_ids": "bryce_mother → narrator",
+      "same_speaker": "false",
+      "audio_path": "audio/B000005_004.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "2.0",
+      "source_text": "“Well, I see you've met my son,” ｜  she says, still grinning away. ",
+      "expected_tts_text": "“Well, I see you've met my son,” ｜  she says, still grinning away. ",
+      "scope_kind": "original_boundary",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "B000005_005",
+      "sample_type": "boundary",
+      "chapter": "5",
+      "role_ids": "narrator → juli",
+      "same_speaker": "false",
+      "audio_path": "audio/B000005_005.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "2.0",
+      "source_text": " she says, still grinning away.  ｜ “Uh-huh!”",
+      "expected_tts_text": " she says, still grinning away.  ｜ “Uh-huh!”",
+      "scope_kind": "original_boundary",
+      "parent_chunk_id": ""
+    }
+  ]
+}

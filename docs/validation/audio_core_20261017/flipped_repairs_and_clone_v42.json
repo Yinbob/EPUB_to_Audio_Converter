@@ -1,0 +1,44 @@
+{
+  "version": "flipped-repair-clone-validation-v42",
+  "human_feedback": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/human_feedback_v42.json",
+  "local_repair_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/manifest.json",
+  "local_repair_requests": 0,
+  "unchanged_chunks_verified": 94,
+  "pause_seconds": {
+    "J009": 1.0,
+    "J013": 1.0,
+    "J023": 1.0,
+    "J076": 1.0
+  },
+  "cropped_content_asr_exact": [
+    "R022",
+    "R049"
+  ],
+  "clone_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_r001_clone_20261017/manifest.json",
+  "clone_run_id": "7fa4fcdc626949a897382cdd152ed8d4",
+  "clone_resources": {
+    "succeeded": {
+      "requests": 3,
+      "characters": 541,
+      "repair_requests": 0
+    }
+  },
+  "clone_requests_verified": 3,
+  "reference_upload_consent": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_chapter_pilot_20261017/r001_clone_probe_v42/reference_upload_consent.json",
+  "same_reference_comparison": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_r001_clone_20261017/same_reference_comparison.json",
+  "longer_parent_reference_candidates": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_chapter_pilot_20261017/role_reference_candidates.longer_parents.v42.json",
+  "review_audio_links_verified": 16,
+  "full_tests": {
+    "run": 567,
+    "passed": 537,
+    "skipped": 30,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 17.755,
+    "log": "/tmp/flipped_v42_full_tests.log"
+  },
+  "new_candidate_human_review": "pending",
+  "whole_chapter_voice_replaced": false,
+  "production_clone_enabled": false,
+  "other_chapters_sent": false
+}

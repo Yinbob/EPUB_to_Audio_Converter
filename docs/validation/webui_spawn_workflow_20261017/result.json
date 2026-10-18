@@ -1,0 +1,51 @@
+{
+  "selected_chapters": [
+    2,
+    2
+  ],
+  "numeric_fallback_snapshot": [
+    1,
+    -1
+  ],
+  "request_models": [
+    "mimo-v2.5-tts-voiceclone",
+    "mimo-v2.5-tts"
+  ],
+  "success_state": {
+    "mode": "finished",
+    "status": "✅ 全部完成",
+    "pct": 100,
+    "detail": "章节 1/1",
+    "book": "Test",
+    "active": false
+  },
+  "exported_files": [
+    "0002_Chapter_2.txt",
+    "0002_Chapter_2.wav"
+  ],
+  "quality_chapter": 2,
+  "quality_status": "incomplete",
+  "download_count": 1,
+  "archive_count": 1,
+  "external_requests": 0,
+  "audio_kind": "synthetic tone, not speech",
+  "resume_new_requests": 0,
+  "resume_state": {
+    "mode": "finished",
+    "status": "✅ 全部完成",
+    "pct": 100,
+    "detail": "章节 1/1",
+    "book": "Test",
+    "active": false
+  },
+  "failure_state": {
+    "mode": "failed",
+    "status": "⚠️ 批次存在转换失败，详见日志",
+    "pct": 0,
+    "detail": "章节 0/1 · 第 2 章 1/2 块",
+    "book": "Test",
+    "active": false
+  },
+  "failure_exports": 0,
+  "failure_report_visible": true
+}

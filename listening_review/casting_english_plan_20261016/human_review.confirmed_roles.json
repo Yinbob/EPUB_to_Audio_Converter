@@ -1,0 +1,132 @@
+{
+  "status": "role_ownership_confirmed_fit_pending",
+  "source_kind": "assistant_authored_stimulus_not_book_gold",
+  "role_script_sha256": "738c0c1926fd66e5a279da8ee5d435028f1bef81efda00e4f599e6ee2b6fdb25",
+  "voice_bank_sha256": "efc122113c3a08c325c1e92e815eeb153b03b00bd4da3a6a075d0a0fc6082117",
+  "role_assignments": [
+    {
+      "segment_id": "S01U01",
+      "proposed_role": "alex",
+      "accepted": true,
+      "corrected_role": null,
+      "notes": ""
+    },
+    {
+      "segment_id": "S01U02",
+      "proposed_role": "blair",
+      "accepted": true,
+      "corrected_role": null,
+      "notes": ""
+    },
+    {
+      "segment_id": "S01U03",
+      "proposed_role": "alex",
+      "accepted": true,
+      "corrected_role": null,
+      "notes": ""
+    },
+    {
+      "segment_id": "S01U04",
+      "proposed_role": "casey",
+      "accepted": true,
+      "corrected_role": null,
+      "notes": ""
+    },
+    {
+      "segment_id": "S02U01",
+      "proposed_role": "blair",
+      "accepted": true,
+      "corrected_role": null,
+      "notes": ""
+    },
+    {
+      "segment_id": "S02U02",
+      "proposed_role": "casey",
+      "accepted": true,
+      "corrected_role": null,
+      "notes": ""
+    },
+    {
+      "segment_id": "S02U03",
+      "proposed_role": "blair",
+      "accepted": true,
+      "corrected_role": null,
+      "notes": ""
+    },
+    {
+      "segment_id": "S02U04",
+      "proposed_role": "alex",
+      "accepted": true,
+      "corrected_role": null,
+      "notes": ""
+    },
+    {
+      "segment_id": "S03U01",
+      "proposed_role": "alex",
+      "accepted": true,
+      "corrected_role": null,
+      "notes": ""
+    },
+    {
+      "segment_id": "S03U02",
+      "proposed_role": "blair",
+      "accepted": true,
+      "corrected_role": null,
+      "notes": ""
+    },
+    {
+      "segment_id": "S03U03",
+      "proposed_role": "alex",
+      "accepted": true,
+      "corrected_role": null,
+      "notes": ""
+    },
+    {
+      "segment_id": "S03U04",
+      "proposed_role": "blair",
+      "accepted": true,
+      "corrected_role": null,
+      "notes": ""
+    }
+  ],
+  "roles": {
+    "alex": {
+      "display_name": "Alex",
+      "description": "推动行动并提出下一步安排；不预设性别、年龄或音高。",
+      "accepted": true,
+      "notes": ""
+    },
+    "blair": {
+      "display_name": "Blair",
+      "description": "核对地图与细节，并与 Alex 反复交流；不预设性别、年龄或音高。",
+      "accepted": true,
+      "notes": ""
+    },
+    "casey": {
+      "display_name": "Casey",
+      "description": "提供钥匙和入门方法；不预设性别、年龄或音高。",
+      "accepted": true,
+      "notes": ""
+    }
+  },
+  "fit_penalties": {
+    "alex": {
+      "Mia": null,
+      "Chloe": null
+    },
+    "blair": {
+      "Mia": null,
+      "Chloe": null
+    },
+    "casey": {
+      "Mia": null,
+      "Chloe": null
+    }
+  },
+  "fit_scale": "待试听两种声音后按 0=适合、1=一般、2=不适合填写；这是偏好，不是辨识答案。",
+  "fit_review_status": "pending",
+  "reviewer": "project_user",
+  "proposed_role_script_sha256": "0e02939d3d0555b2e53386e0bc00c6292d7351efe38b4bcfa79136aea3b39e10",
+  "confirmation_origin": "direct_user_reply_in_current_chat",
+  "confirmation_verbatim": "保留草稿的角色设定和逐句归属"
+}

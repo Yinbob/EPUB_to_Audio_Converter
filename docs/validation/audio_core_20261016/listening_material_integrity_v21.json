@@ -1,0 +1,48 @@
+{
+  "scope": "Material integrity and quality eligibility only; no listener experiment",
+  "actual_problem_report_checks": [
+    {
+      "report_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_e06_repair_connected_20261016/pipeline_result.json",
+      "report_sha256": "e285e3d64b2667059a035cea6fc15d6d7dd68ac87aeb260e11cc397cd07a91e8",
+      "rejected": true,
+      "reason": "角色辨识材料存在已检出问题或内容未完成检查，请先复核",
+      "partial_pack_exists": false
+    },
+    {
+      "report_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_e06_resegment_20261016/pipeline_result.json",
+      "report_sha256": "37c82dd12ed1b0ededa52af9bbfe664bb35121859711454070aab4c62db98f63",
+      "rejected": true,
+      "reason": "角色辨识材料存在已检出问题或内容未完成检查，请先复核",
+      "partial_pack_exists": false
+    }
+  ],
+  "additional_tts_requests": 0,
+  "human_answers_created": 0,
+  "new_tests": 7,
+  "limitations": [
+    "Uncalibrated consistency/stitching screening still requires human review",
+    "No listening benefit measured",
+    "E06T human verification remains pending"
+  ],
+  "tests": {
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q",
+    "ran": 499,
+    "seconds": 14.473,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/listening_material_integrity_v21.log",
+    "log_sha256": "a060cd1ee5816e6c417927abe16d2767840c366718610cc6f96b40099c8970d8"
+  },
+  "initial_regression": {
+    "ran": 499,
+    "failures": 1,
+    "skipped": 30,
+    "reason": "Historical CLI fixture lacked generated MiMo report, content/signal and encoding evidence; upgraded fixture to satisfy the new real contract without weakening production checks.",
+    "log": "listening_material_integrity_v21_initial.log"
+  },
+  "files": {
+    "audiobook_generator/audio_core/listening.py": "d327d43803a59f786b920cf2a44bff863725cf5a044bd11e7d83860e14abc4b7",
+    "tests/audiobook_generator/audio_core/listening_test.py": "b4bab0f46fd244faf8f40169d3cdfe20bb1305bc37f56ee64d83f3d72d8fe918",
+    "tests/audiobook_generator/audio_core/research_cli_test.py": "593c672e2fcf2192d719174b95328270d4bac4e36ab294615706b3761b61f474"
+  }
+}

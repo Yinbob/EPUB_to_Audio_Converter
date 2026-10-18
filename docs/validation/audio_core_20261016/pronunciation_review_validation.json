@@ -1,0 +1,96 @@
+{
+  "kind": "text_only_review_hints_for_existing_authored_samples",
+  "requests_sent": 0,
+  "audio_pronunciation_verified": false,
+  "chapters": [
+    {
+      "chapter": 1,
+      "source_report": "audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/6f40a0049eaa4ba8a54c0c41283537f4/chapter_000001/quality.json",
+      "review": {
+        "version": "polyphone-review-v1",
+        "status": "needs_review",
+        "scope": "non_exhaustive_text_hints_only",
+        "audio_pronunciation_verified": false,
+        "hints": [
+          {
+            "chunk_id": "1:2:narrator:chunk:1",
+            "character": "长",
+            "context": "6日，记录显示增长了3.5%。他放",
+            "unit_id": "1:2:narrator",
+            "unit_start": 19,
+            "unit_end": 20,
+            "source_scope": "unit",
+            "source_span": null,
+            "reading_override_declared": false,
+            "declared_readings": [],
+            "review_status": "pending"
+          }
+        ]
+      }
+    },
+    {
+      "chapter": 2,
+      "source_report": "audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/6f40a0049eaa4ba8a54c0c41283537f4/chapter_000002/quality.json",
+      "review": {
+        "version": "polyphone-review-v1",
+        "status": "needs_review",
+        "scope": "non_exhaustive_text_hints_only",
+        "audio_pronunciation_verified": false,
+        "hints": [
+          {
+            "chunk_id": "2:1:hero:chunk:1",
+            "character": "还",
+            "context": "你还记得昨天约定的时",
+            "unit_id": "2:1:hero",
+            "unit_start": 1,
+            "unit_end": 2,
+            "source_scope": "unit",
+            "source_span": null,
+            "reading_override_declared": false,
+            "declared_readings": [],
+            "review_status": "pending"
+          },
+          {
+            "chunk_id": "2:1:hero:chunk:1",
+            "character": "得",
+            "context": "你还记得昨天约定的时间吗",
+            "unit_id": "2:1:hero",
+            "unit_start": 3,
+            "unit_end": 4,
+            "source_scope": "unit",
+            "source_span": null,
+            "reading_override_declared": false,
+            "declared_readings": [],
+            "review_status": "pending"
+          },
+          {
+            "chunk_id": "2:2:other:chunk:1",
+            "character": "着",
+            "context": "不用着急，先把手头的事",
+            "unit_id": "2:2:other",
+            "unit_start": 2,
+            "unit_end": 3,
+            "source_scope": "unit",
+            "source_span": null,
+            "reading_override_declared": false,
+            "declared_readings": [],
+            "review_status": "pending"
+          },
+          {
+            "chunk_id": "2:2:other:chunk:1",
+            "character": "着",
+            "context": "停以后，我们再沿着这条小路慢慢走回",
+            "unit_id": "2:2:other",
+            "unit_start": 27,
+            "unit_end": 28,
+            "source_scope": "unit",
+            "source_span": null,
+            "reading_override_declared": false,
+            "declared_readings": [],
+            "review_status": "pending"
+          }
+        ]
+      }
+    }
+  ]
+}

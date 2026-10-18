@@ -1,0 +1,74 @@
+{
+  "schema_version": "hybrid-human-review-v1",
+  "source": "用户对六条探针的直接回复",
+  "verbatim_response": "内容完整、同角色一致、两角色容易区分",
+  "quality_report_sha256": "fb13d49fe328bcfff7af3aee1d7caae90238a4ba06f0ae181935ee1651c10e9f",
+  "reviews": [
+    {
+      "sample_id": "lead_1",
+      "role_id": "lead",
+      "voice_version": "90ca000613ec7181e6de09ff3161e8cb4ef52b2d689aca89cd36fa62c6d079a6",
+      "audio_sha256": "463636b78897a610327125600879f81da5e99778a51a30005446bf24fc881302",
+      "content_complete": true,
+      "signal_acceptable": true,
+      "identity_accepted": true,
+      "notes": "用户核验：内容完整、同角色一致、两角色容易区分。"
+    },
+    {
+      "sample_id": "lead_2",
+      "role_id": "lead",
+      "voice_version": "90ca000613ec7181e6de09ff3161e8cb4ef52b2d689aca89cd36fa62c6d079a6",
+      "audio_sha256": "ed8d60b19822b42f92bf74650696f0af37371aefccc2134612fd03928d4ad85e",
+      "content_complete": true,
+      "signal_acceptable": true,
+      "identity_accepted": true,
+      "notes": "用户核验：内容完整、同角色一致、两角色容易区分。"
+    },
+    {
+      "sample_id": "lead_3",
+      "role_id": "lead",
+      "voice_version": "90ca000613ec7181e6de09ff3161e8cb4ef52b2d689aca89cd36fa62c6d079a6",
+      "audio_sha256": "63fc91df364ea24284a946bbb4416b7b0e43e7a2169d392bc4d0b693170b05a5",
+      "content_complete": true,
+      "signal_acceptable": true,
+      "identity_accepted": true,
+      "notes": "用户核验：内容完整、同角色一致、两角色容易区分。"
+    },
+    {
+      "sample_id": "guest_1",
+      "role_id": "guest",
+      "voice_version": "cfabf46fb167f798545337135ffc5ee1d512f24248bd42aacbfc7cd37d7b7db7",
+      "audio_sha256": "ce23b9f895fc93614d3c9dde58e02b51ad1452b9f258698bb5500594f18a0c59",
+      "content_complete": true,
+      "signal_acceptable": true,
+      "identity_accepted": true,
+      "notes": "用户核验：内容完整、同角色一致、两角色容易区分。"
+    },
+    {
+      "sample_id": "guest_2",
+      "role_id": "guest",
+      "voice_version": "cfabf46fb167f798545337135ffc5ee1d512f24248bd42aacbfc7cd37d7b7db7",
+      "audio_sha256": "7ec6f8bbb4ae36e47c0d94baab8f6bb4b783df92a426f5586f24042bbdba932a",
+      "content_complete": true,
+      "signal_acceptable": true,
+      "identity_accepted": true,
+      "notes": "用户核验：内容完整、同角色一致、两角色容易区分。"
+    },
+    {
+      "sample_id": "guest_3",
+      "role_id": "guest",
+      "voice_version": "cfabf46fb167f798545337135ffc5ee1d512f24248bd42aacbfc7cd37d7b7db7",
+      "audio_sha256": "ba743307e07d8e362e2ce1b7098ad5f1539fe1550320ab28b45341b7adb7b976",
+      "content_complete": true,
+      "signal_acceptable": true,
+      "identity_accepted": true,
+      "notes": "用户核验：内容完整、同角色一致、两角色容易区分。"
+    }
+  ],
+  "role_discriminability": "accepted_for_this_two_role_pilot_only",
+  "machine_flags_preserved": [
+    "lead_2:speaker_drift",
+    "guest_2:speaker_drift"
+  ],
+  "not_evidence_for": "多听众辨识率、其他声音版本或真实长篇全书"
+}

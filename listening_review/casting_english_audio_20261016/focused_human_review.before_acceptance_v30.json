@@ -1,0 +1,116 @@
+{
+  "status": "partially_reviewed",
+  "chapter_3_Bring_complete": null,
+  "chapter_6_Bring_complete": true,
+  "chapter_9_Bring_complete": null,
+  "chapter_3_join_normal": null,
+  "chapter_6_join_normal": true,
+  "chapter_9_join_normal": null,
+  "Alex_F06_rate_acceptable_relative_to_F07": true,
+  "other_chapters_quality": null,
+  "reviewer": "project_user",
+  "notes": "F01后段偏响；F02无问题；F03难以辨认，实际两角色都使用Mia；F06/F07差异可接受。F01/F03的Bring完整性及其他整章质量仍未明确回答。",
+  "recorded_at": "2026-10-16T21:31:20+08:00",
+  "feedback_verbatim": {
+    "joins": "F01两段声音音量不一致，后一个音色的音量大一些；F02无问题；F03两种音色有点相似，难以辨认区别",
+    "consistency": "差异可接受，无明显异常"
+  },
+  "specific_observations": {
+    "F01": {
+      "loudness_mismatch": true,
+      "louder_side": "right",
+      "Bring_complete": null,
+      "join_other_defects": null
+    },
+    "F02": {
+      "Bring_complete": true,
+      "join_acceptable": true
+    },
+    "F03": {
+      "role_voice_separation_acceptable": false,
+      "Bring_complete": null,
+      "actual_voices": [
+        "Mia",
+        "Mia"
+      ],
+      "interpretation": "共享同一声音的适配基线；不是双声音相似度的独立验证"
+    },
+    "F06_F07": {
+      "relative_consistency_acceptable": true,
+      "applies_to_chapters": [
+        2,
+        8
+      ],
+      "scope": "相同F06音频与F07的比较，不代表整章或其他块通过"
+    }
+  },
+  "source_bindings": {
+    "F01": {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focus/F01_scene3_join.wav",
+      "sha256": "7a46094f3e1e061384e571ff73c9a1f0d5300e5277e5a3373c456c3f0ef686aa"
+    },
+    "F02": {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focus/F02_scene3_join.wav",
+      "sha256": "7f03541fd6d05cecf76c737e247f83b6de7ab27fbd4942383564cfe365948ea4"
+    },
+    "F03": {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focus/F03_scene3_join.wav",
+      "sha256": "2e7be7ff84f5f25ab4f6affbc380b4a8a196f2ebcd2ca00cef86a990eab72891"
+    },
+    "F04": {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focus/F04_Bring_Chloe.wav",
+      "sha256": "4bcba9da7b43089b27f01e33fc1b76e523331d00f38406af0af481df77ad50fa"
+    },
+    "F05": {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focus/F05_Bring_Mia.wav",
+      "sha256": "b69b0b8f5c1b3f715b20a546cf803ff9288ada70e969d929418ddade7f9b017a"
+    },
+    "F06": {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focus/F06_Alex_target.wav",
+      "sha256": "de38a4bd262d91611d46bfd3180ba60238422edfbb14117ade5db05fd4b01ce1"
+    },
+    "F07": {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focus/F07_Alex_reference.wav",
+      "sha256": "61a99754a4e7a5c5f87988e8d1456ddb1b746126bb3ae1ca820ac06fc3ca35d7"
+    }
+  },
+  "actual_assignment_evidence": {
+    "3": {
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000003/quality.json",
+      "report_sha256": "a770392261b866eb0085afaba006e822e659d543294a1bfc78ced0cd41e9ea24",
+      "roles": [
+        "alex",
+        "blair"
+      ],
+      "voices": [
+        "Mia",
+        "Chloe"
+      ]
+    },
+    "6": {
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000006/quality.json",
+      "report_sha256": "85e81a1b0cb19da1d2689dea7e4f781936765532370c770a33ab10f6d08d2d65",
+      "roles": [
+        "alex",
+        "blair"
+      ],
+      "voices": [
+        "Chloe",
+        "Mia"
+      ]
+    },
+    "9": {
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000009/quality.json",
+      "report_sha256": "ec8f79a287aa8b6ca21c23edaf0b394defe0cfff27394135e2aac1dc81d076c3",
+      "roles": [
+        "alex",
+        "blair"
+      ],
+      "voices": [
+        "Mia",
+        "Mia"
+      ]
+    }
+  },
+  "prior_review_sha256": "8d34258d22922be9cb55ba01e8206453d1e0cb42e33ff030bafdbea1089f078b"
+}

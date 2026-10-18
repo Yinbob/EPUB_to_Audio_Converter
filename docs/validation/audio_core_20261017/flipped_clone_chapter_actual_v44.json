@@ -1,0 +1,71 @@
+{
+  "review_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/review_manifest.json",
+  "review_manifest_sha256": "74393278f4ce302829c87ff070672b6e8aa99e55969aba0a06752d9783e43382",
+  "render_manifest_sha256": "57d3bb0bfe2e538c1e552573cb6b725035ef9f58f5f8a702ddd27c9d1ec17271",
+  "consent_sha256": "395f49e94176b7d4509594b8b89e1a17140a47b4985e72b198e552ef89bc4498",
+  "new_requests": 67,
+  "new_characters": 12925,
+  "duration_seconds": 1072.88,
+  "source_coverage_verified": true,
+  "pcm_layout_verified": true,
+  "chunks_evaluated": 100,
+  "boundaries_evaluated": 99,
+  "warnings": {
+    "asr_mismatch": 59,
+    "pitch_drift": 1,
+    "speaker_drift": 1,
+    "rate_drift": 1,
+    "boundary_content_mismatch": 77,
+    "unexpected_gap": 1
+  },
+  "speaker_unavailable_count": 33,
+  "pause_checks": [
+    {
+      "sample_id": "J009",
+      "estimated_pause_seconds": 0.22,
+      "human_requested_target_seconds": 1.0,
+      "target_tolerance_seconds": 0.3,
+      "near_requested_target": false,
+      "old_cut_positions_reused": false,
+      "new_audio_edited": false,
+      "human_review_status": "pending_new_context"
+    },
+    {
+      "sample_id": "J013",
+      "estimated_pause_seconds": 0.56,
+      "human_requested_target_seconds": 1.0,
+      "target_tolerance_seconds": 0.3,
+      "near_requested_target": false,
+      "old_cut_positions_reused": false,
+      "new_audio_edited": false,
+      "human_review_status": "pending_new_context"
+    },
+    {
+      "sample_id": "J023",
+      "estimated_pause_seconds": 0.32,
+      "human_requested_target_seconds": 1.0,
+      "target_tolerance_seconds": 0.3,
+      "near_requested_target": false,
+      "old_cut_positions_reused": false,
+      "new_audio_edited": false,
+      "human_review_status": "pending_new_context"
+    },
+    {
+      "sample_id": "J076",
+      "estimated_pause_seconds": 2.04,
+      "human_requested_target_seconds": 1.0,
+      "target_tolerance_seconds": 0.3,
+      "near_requested_target": false,
+      "old_cut_positions_reused": false,
+      "new_audio_edited": false,
+      "human_review_status": "pending_new_context"
+    }
+  ],
+  "human_review_status": "pending",
+  "overall_project_complete": false,
+  "focused_content_samples": [
+    "R039",
+    "R018"
+  ],
+  "focus_revision": 2
+}

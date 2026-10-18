@@ -1,0 +1,132 @@
+{
+  "actual_text_requests": 15,
+  "requests_by_chapter_stage": [
+    {
+      "chapter": 5,
+      "stage": "index",
+      "count": 3
+    },
+    {
+      "chapter": 5,
+      "stage": "narration",
+      "count": 1
+    },
+    {
+      "chapter": 5,
+      "stage": "split",
+      "count": 3
+    },
+    {
+      "chapter": 6,
+      "stage": "index",
+      "count": 3
+    },
+    {
+      "chapter": 6,
+      "stage": "narration",
+      "count": 1
+    },
+    {
+      "chapter": 6,
+      "stage": "split",
+      "count": 4
+    }
+  ],
+  "only_authorized_chapters": true,
+  "tts_requests": 0,
+  "chapters": [
+    {
+      "chapter": 5,
+      "title": "Diving_Under",
+      "expected_viewpoint_from_user": "Bryce",
+      "segment_count": 64,
+      "exact_source_coverage": true,
+      "source_characters_by_kind": {
+        "narration": 13180,
+        "dialogue": 1131
+      },
+      "narration_characters_by_voice": {
+        "Bryce Loski": 6419,
+        "Narrator": 6761
+      },
+      "unclassified_characters_by_voice": {},
+      "frozen_initial_narration_spans_characters_by_voice": {
+        "Bryce Loski": 6419,
+        "Narrator": 6761
+      },
+      "initial_dialogue_reassigned_characters": 0,
+      "unexpected_narration_segment_ids": [
+        "ch000005_s00003",
+        "ch000005_s00005",
+        "ch000005_s00007",
+        "ch000005_s00009",
+        "ch000005_s00011",
+        "ch000005_s00014",
+        "ch000005_s00017",
+        "ch000005_s00019",
+        "ch000005_s00021",
+        "ch000005_s00023",
+        "ch000005_s00025",
+        "ch000005_s00027",
+        "ch000005_s00029",
+        "ch000005_s00031",
+        "ch000005_s00033",
+        "ch000005_s00035",
+        "ch000005_s00038",
+        "ch000005_s00040",
+        "ch000005_s00042",
+        "ch000005_s00044",
+        "ch000005_s00046",
+        "ch000005_s00048",
+        "ch000005_s00050",
+        "ch000005_s00064"
+      ],
+      "identity_evidence_segment_counts": {
+        "with_identity_evidence": 8,
+        "without_identity_evidence": 24
+      },
+      "expected_person_shared_narration_dialogue_role_ids": [
+        "char_89c8a1814830"
+      ],
+      "expected_person_voice_profile_ids": [
+        "voice_char_89c8a1814830"
+      ]
+    },
+    {
+      "chapter": 6,
+      "title": "Flipped",
+      "expected_viewpoint_from_user": "Juli",
+      "segment_count": 16,
+      "exact_source_coverage": true,
+      "source_characters_by_kind": {
+        "narration": 12423,
+        "dialogue": 520
+      },
+      "narration_characters_by_voice": {
+        "Juli Baker": 11465,
+        "Narrator": 958
+      },
+      "unclassified_characters_by_voice": {},
+      "frozen_initial_narration_spans_characters_by_voice": {
+        "Juli Baker": 11465,
+        "Narrator": 958
+      },
+      "initial_dialogue_reassigned_characters": 0,
+      "unexpected_narration_segment_ids": [
+        "ch000006_s00016"
+      ],
+      "identity_evidence_segment_counts": {
+        "with_identity_evidence": 8,
+        "without_identity_evidence": 1
+      },
+      "expected_person_shared_narration_dialogue_role_ids": [
+        "char_aababc2c69cb"
+      ],
+      "expected_person_voice_profile_ids": [
+        "voice_char_aababc2c69cb"
+      ]
+    }
+  ],
+  "machine_proposal_sha256": "b77a6ee75c2ce508e23b0f515edf46082131b5524fa8b1d6aae03d03aeecc7df",
+  "scope": "真实模型输出与用户指定整章视角的一致性及工程校验；不等于逐段人工标注准确率或声音听感验收"
+}

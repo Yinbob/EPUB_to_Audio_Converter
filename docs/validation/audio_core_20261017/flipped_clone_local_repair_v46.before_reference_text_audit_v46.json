@@ -1,0 +1,22 @@
+{
+  "version": "flipped-clone-local-repair-validation-v46",
+  "manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/assembly_manifest.json",
+  "manifest_sha256": "967f1bdd25cf1e0da22a51fcdccc6643b9ab11355f1ca43f6ed797d5dc26fa23",
+  "quality_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/quality.json",
+  "quality_report_sha256": "11d3be10eea73fb8d9784db3d0aea28985a1be1b854ed5b3bdc6c3a36c46ee7f",
+  "standard_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/bc16494e0d524eacba962dc1c3c303a4/chapter_000005/quality.json",
+  "standard_report_sha256": "f241a26693991f1378ea5da8650a2f47c0aee0ab0f732b6e45d6e81cdce5f02a",
+  "chunks_unchanged": 97,
+  "chunks_changed": 3,
+  "boundaries_rechecked": 6,
+  "standard_preview_count": 200,
+  "pcm_layout_verified": true,
+  "decoded_pcm_equal": true,
+  "source_audio_unchanged": true,
+  "duration_seconds": 1058.28,
+  "j076_pause_seconds": 1.0,
+  "new_requests": 0,
+  "prior_clone_run_requests_unchanged": 67,
+  "human_review_status": "pending_three_local_edits",
+  "overall_project_complete": false
+}

@@ -1,0 +1,101 @@
+{
+  "actual_text_requests": 19,
+  "requests_by_chapter_stage": [
+    {
+      "chapter": 5,
+      "stage": "index",
+      "count": 3
+    },
+    {
+      "chapter": 5,
+      "stage": "narration",
+      "count": 1
+    },
+    {
+      "chapter": 5,
+      "stage": "split",
+      "count": 6
+    },
+    {
+      "chapter": 6,
+      "stage": "index",
+      "count": 3
+    },
+    {
+      "chapter": 6,
+      "stage": "narration",
+      "count": 1
+    },
+    {
+      "chapter": 6,
+      "stage": "split",
+      "count": 5
+    }
+  ],
+  "only_authorized_chapters": true,
+  "tts_requests": 0,
+  "chapters": [
+    {
+      "chapter": 5,
+      "title": "Diving_Under",
+      "expected_viewpoint_from_user": "Bryce",
+      "segment_count": 62,
+      "exact_source_coverage": true,
+      "source_characters_by_kind": {
+        "narration": 13180,
+        "dialogue": 1131
+      },
+      "narration_characters_by_voice": {
+        "Bryce Loski": 13180
+      },
+      "unclassified_characters_by_voice": {},
+      "frozen_initial_narration_spans_characters_by_voice": {
+        "Bryce Loski": 13180
+      },
+      "initial_dialogue_reassigned_characters": 0,
+      "unexpected_narration_segment_ids": [],
+      "identity_evidence_segment_counts": {
+        "with_identity_evidence": 30
+      },
+      "expected_person_shared_narration_dialogue_role_ids": [
+        "char_89c8a1814830"
+      ],
+      "expected_person_voice_profile_ids": [
+        "voice_char_89c8a1814830"
+      ]
+    },
+    {
+      "chapter": 6,
+      "title": "Flipped",
+      "expected_viewpoint_from_user": "Juli",
+      "segment_count": 15,
+      "exact_source_coverage": true,
+      "source_characters_by_kind": {
+        "narration": 12423,
+        "dialogue": 520
+      },
+      "narration_characters_by_voice": {
+        "Juli Baker": 12423
+      },
+      "unclassified_characters_by_voice": {},
+      "frozen_initial_narration_spans_characters_by_voice": {
+        "Juli Baker": 12423
+      },
+      "initial_dialogue_reassigned_characters": 0,
+      "unexpected_narration_segment_ids": [],
+      "identity_evidence_segment_counts": {
+        "with_identity_evidence": 8
+      },
+      "expected_person_shared_narration_dialogue_role_ids": [
+        "char_aababc2c69cb"
+      ],
+      "expected_person_voice_profile_ids": [
+        "voice_char_aababc2c69cb"
+      ]
+    }
+  ],
+  "machine_proposal_sha256": "d37dce7fb6a9e59660da4de20e76bfe611b41e7fc94f65da446099608d8f9d61",
+  "scope": "真实模型输出与用户指定整章视角的一致性及工程校验；不等于逐段人工标注准确率或声音听感验收",
+  "chapter_narrator_override_includes_opening": true,
+  "override_check_saved_to_project": false
+}

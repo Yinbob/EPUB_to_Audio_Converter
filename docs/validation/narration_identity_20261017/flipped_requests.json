@@ -1,0 +1,163 @@
+[
+  {
+    "number": 1,
+    "chapter": 5,
+    "stage": "index",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:08.991063+00:00"
+  },
+  {
+    "number": 2,
+    "chapter": 5,
+    "stage": "index",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:10.016434+00:00"
+  },
+  {
+    "number": 3,
+    "chapter": 5,
+    "stage": "index",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:12.007487+00:00"
+  },
+  {
+    "number": 4,
+    "chapter": 6,
+    "stage": "index",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:12.862924+00:00"
+  },
+  {
+    "number": 5,
+    "chapter": 6,
+    "stage": "index",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:14.511420+00:00"
+  },
+  {
+    "number": 6,
+    "chapter": 6,
+    "stage": "index",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:16.079005+00:00"
+  },
+  {
+    "number": 7,
+    "chapter": 5,
+    "stage": "narration",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:17.167205+00:00"
+  },
+  {
+    "number": 8,
+    "chapter": 5,
+    "stage": "split",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:18.471283+00:00"
+  },
+  {
+    "number": 9,
+    "chapter": 5,
+    "stage": "split",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:29.701210+00:00"
+  },
+  {
+    "number": 10,
+    "chapter": 5,
+    "stage": "split",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:37.682543+00:00"
+  },
+  {
+    "number": 11,
+    "chapter": 6,
+    "stage": "narration",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:41.863682+00:00"
+  },
+  {
+    "number": 12,
+    "chapter": 6,
+    "stage": "split",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:42.978751+00:00"
+  },
+  {
+    "number": 13,
+    "chapter": 6,
+    "stage": "split",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:51.243348+00:00"
+  },
+  {
+    "number": 14,
+    "chapter": 6,
+    "stage": "split",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:54:59.169411+00:00"
+  },
+  {
+    "number": 15,
+    "chapter": 6,
+    "stage": "split",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:55:05.458594+00:00"
+  },
+  {
+    "number": 16,
+    "chapter": 5,
+    "stage": "split",
+    "chunk": 1,
+    "round": "targeted_review",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:59:44.590249+00:00"
+  },
+  {
+    "number": 17,
+    "chapter": 5,
+    "stage": "split",
+    "chunk": 3,
+    "round": "targeted_review",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:59:56.247863+00:00"
+  },
+  {
+    "number": 18,
+    "chapter": 6,
+    "stage": "split",
+    "chunk": 3,
+    "round": "targeted_review",
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T13:59:59.335687+00:00"
+  },
+  {
+    "number": 19,
+    "chapter": 5,
+    "stage": "split",
+    "round": "opening_type_classification",
+    "source_start": 0,
+    "source_end": 659,
+    "model": "deepseek-chat",
+    "service_host": "api.deepseek.com",
+    "sent_at": "2026-10-17T14:06:48.592853+00:00"
+  }
+]

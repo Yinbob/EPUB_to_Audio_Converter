@@ -1,0 +1,204 @@
+{
+  "kind": "constructed_vector_fixture_only",
+  "new_real_tts_requests": 0,
+  "listener_effectiveness": "not_established",
+  "constraint_tests": 8,
+  "exhaustive_lock_combinations_checked": 27,
+  "voice_bank_metadata_tests": 3,
+  "voice_bank_metadata_origin": "constructed_audio_and_encoder_only",
+  "checks": [
+    "exclusive_narrator_all_strategies",
+    "hard_locks_preserved",
+    "capacity_failure_explained",
+    "scarce_character_voices_can_share",
+    "tampered_or_partial_casting_cannot_bypass_constraint",
+    "V2_CLI_casting_preserves_voice_lock",
+    "actual_boolean_verification_required",
+    "audio_hash_metrics_rate_and_model_provenance_retained",
+    "mid_build_model_or_audio_change_rejected"
+  ],
+  "results": [
+    {
+      "schema_version": "mimo-casting-v1",
+      "provider": "openai",
+      "roles": {
+        "a": "冰糖",
+        "narrator": "苏打",
+        "b": "茉莉",
+        "c": "冰糖"
+      },
+      "locked_voices": {
+        "a": "冰糖"
+      },
+      "objective": 0.30030987165268586,
+      "shared_voices": {
+        "冰糖": [
+          "a",
+          "c"
+        ]
+      },
+      "edges": [
+        {
+          "left": "a",
+          "right": "b",
+          "weight": 10
+        },
+        {
+          "left": "b",
+          "right": "c",
+          "weight": 3
+        }
+      ],
+      "metric_kind": "embedding_proxy_not_listener_probability",
+      "strategy": "interaction",
+      "seed": 7,
+      "voice_bank_model": null,
+      "voice_bank_speaker_fingerprint": null,
+      "constraints": {
+        "narrator_exclusive": true
+      },
+      "constraint_status": {
+        "narrator_exclusive": "satisfied"
+      }
+    },
+    {
+      "schema_version": "mimo-casting-v1",
+      "provider": "openai",
+      "roles": {
+        "a": "冰糖",
+        "narrator": "苏打",
+        "b": "茉莉",
+        "c": "茉莉"
+      },
+      "locked_voices": {
+        "a": "冰糖"
+      },
+      "objective": 2.1284102070466604,
+      "shared_voices": {
+        "茉莉": [
+          "b",
+          "c"
+        ]
+      },
+      "edges": [
+        {
+          "left": "a",
+          "right": "b",
+          "weight": 1.0
+        },
+        {
+          "left": "a",
+          "right": "c",
+          "weight": 1.0
+        },
+        {
+          "left": "a",
+          "right": "narrator",
+          "weight": 1.0
+        },
+        {
+          "left": "b",
+          "right": "c",
+          "weight": 1.0
+        },
+        {
+          "left": "b",
+          "right": "narrator",
+          "weight": 1.0
+        },
+        {
+          "left": "c",
+          "right": "narrator",
+          "weight": 1.0
+        }
+      ],
+      "metric_kind": "embedding_proxy_not_listener_probability",
+      "strategy": "global",
+      "seed": 7,
+      "voice_bank_model": null,
+      "voice_bank_speaker_fingerprint": null,
+      "constraints": {
+        "narrator_exclusive": true
+      },
+      "constraint_status": {
+        "narrator_exclusive": "satisfied"
+      }
+    },
+    {
+      "schema_version": "mimo-casting-v1",
+      "provider": "openai",
+      "roles": {
+        "a": "冰糖",
+        "narrator": "茉莉",
+        "b": "冰糖",
+        "c": "冰糖"
+      },
+      "locked_voices": {
+        "a": "冰糖"
+      },
+      "objective": 0.05,
+      "shared_voices": {
+        "冰糖": [
+          "a",
+          "b",
+          "c"
+        ]
+      },
+      "edges": [],
+      "metric_kind": "embedding_proxy_not_listener_probability",
+      "strategy": "fit",
+      "seed": 7,
+      "voice_bank_model": null,
+      "voice_bank_speaker_fingerprint": null,
+      "constraints": {
+        "narrator_exclusive": true
+      },
+      "constraint_status": {
+        "narrator_exclusive": "satisfied"
+      }
+    },
+    {
+      "schema_version": "mimo-casting-v1",
+      "provider": "openai",
+      "roles": {
+        "a": "冰糖",
+        "narrator": "茉莉",
+        "b": "苏打",
+        "c": "苏打"
+      },
+      "locked_voices": {
+        "a": "冰糖"
+      },
+      "objective": 13.147944695827935,
+      "shared_voices": {
+        "苏打": [
+          "b",
+          "c"
+        ]
+      },
+      "edges": [
+        {
+          "left": "a",
+          "right": "b",
+          "weight": 10
+        },
+        {
+          "left": "b",
+          "right": "c",
+          "weight": 3
+        }
+      ],
+      "metric_kind": "embedding_proxy_not_listener_probability",
+      "strategy": "random",
+      "seed": 7,
+      "voice_bank_model": null,
+      "voice_bank_speaker_fingerprint": null,
+      "constraints": {
+        "narrator_exclusive": true
+      },
+      "constraint_status": {
+        "narrator_exclusive": "satisfied"
+      }
+    }
+  ]
+}

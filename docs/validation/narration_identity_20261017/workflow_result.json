@@ -1,0 +1,131 @@
+{
+  "selected_chapters": [
+    1,
+    2
+  ],
+  "never_sent_chapter": 3,
+  "deepseek_requests": [
+    {
+      "stage": "registry",
+      "chapter": 1
+    },
+    {
+      "stage": "perspective",
+      "chapter": 1
+    },
+    {
+      "stage": "segments",
+      "chapter": 1
+    },
+    {
+      "stage": "registry",
+      "chapter": 2
+    },
+    {
+      "stage": "perspective",
+      "chapter": 2
+    },
+    {
+      "stage": "segments",
+      "chapter": 2
+    }
+  ],
+  "tts_requests": [
+    {
+      "stage": "tts",
+      "model": "mimo-v2.5-tts-voiceclone",
+      "clone": true,
+      "frequency": 440,
+      "text": "Viewpoint 1 I am Alex. I waited beside the bridge. "
+    },
+    {
+      "stage": "tts",
+      "model": "mimo-v2.5-tts-voiceclone",
+      "clone": true,
+      "frequency": 440,
+      "text": "“Please wait,” I said."
+    },
+    {
+      "stage": "tts",
+      "model": "mimo-v2.5-tts",
+      "clone": false,
+      "frequency": 880,
+      "text": "Viewpoint 2 I am Blair. I waited beside the bridge. "
+    },
+    {
+      "stage": "tts",
+      "model": "mimo-v2.5-tts",
+      "clone": false,
+      "frequency": 880,
+      "text": "“Please wait,” I said."
+    }
+  ],
+  "generation_state": {
+    "mode": "finished",
+    "status": "✅ 全部完成",
+    "pct": 100,
+    "detail": "章节 2/2",
+    "book": "Perspectives",
+    "active": false
+  },
+  "exported_files": [
+    "0001_Viewpoint_1.txt",
+    "0001_Viewpoint_1.wav",
+    "0002_Viewpoint_2.txt",
+    "0002_Viewpoint_2.wav"
+  ],
+  "narration_and_dialogue_share_role": true,
+  "alex_clone_preserved_on_extension": true,
+  "manual_narration_assignment_saved": true,
+  "artifact_frequency_hz": [
+    440.0,
+    880.0
+  ],
+  "cache_rerun_new_requests": 0,
+  "download_count": 2,
+  "quality_status": "incomplete",
+  "audio_kind": "synthetic tones, not speech",
+  "external_requests": 0,
+  "progress_stages": [
+    {
+      "value": 0,
+      "stage": "正在读取书籍与所选章节…"
+    },
+    {
+      "value": null,
+      "stage": "正在建立人物表：第 1 章（范围 1～1）"
+    },
+    {
+      "value": null,
+      "stage": "DeepSeek 正在拆分第 1 章（1/1）"
+    },
+    {
+      "value": null,
+      "stage": "DeepSeek 正在识别第 1 章的叙述者"
+    },
+    {
+      "value": 1,
+      "stage": "剧本已保存，请选择人物试听"
+    },
+    {
+      "value": 0,
+      "stage": "正在读取书籍与所选章节…"
+    },
+    {
+      "value": null,
+      "stage": "正在建立人物表：第 2 章（范围 2～2）"
+    },
+    {
+      "value": null,
+      "stage": "DeepSeek 正在拆分第 2 章（1/1）"
+    },
+    {
+      "value": null,
+      "stage": "DeepSeek 正在识别第 2 章的叙述者"
+    },
+    {
+      "value": 1,
+      "stage": "剧本已保存，请选择人物试听"
+    }
+  ]
+}

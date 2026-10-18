@@ -1,0 +1,3177 @@
+{
+  "version": "flipped-local-repair-v42",
+  "source_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/review_manifest.json",
+  "source_manifest_sha256": "44195749077b4c77550159af21a08752f7125e77910b60ef88ebf88b6d98f110",
+  "source_audio_sha256": "359cffc1a3a4f80897cd33084433d8e8a61455a669ffe0f3b94c50b5af18ee55",
+  "output_file": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/chapter_05_repaired.matched.wav",
+  "output_sha256": "dd56b975d8f22781b83e7ee60f3e94d6d57f3324408c2a30bc6d189f56ae0960",
+  "duration_seconds": 918.06,
+  "operations": [
+    {
+      "sample_id": "R022",
+      "kind": "reviewed_extra_suffix_crop",
+      "input_sha256": "da85c0fdc6e3a83362f812e2f8df3ee10e1c1912e18fe7f90ade60aa655c744c",
+      "retained_start_sample": 0,
+      "retained_end_sample": 96000,
+      "removed_samples": 80640,
+      "quiet_guard_samples": 2400,
+      "sample_rate": 24000,
+      "approval": {
+        "audio_sha256": "da85c0fdc6e3a83362f812e2f8df3ee10e1c1912e18fe7f90ade60aa655c744c",
+        "confirmed_defect": "extra_suffix",
+        "user_reply": "R022确认重复My mom knows where I am；R049朗读内容是go on don't just so placed（不确定单词） go on，前后都有go on；"
+      },
+      "retained_pcm_bit_exact": true,
+      "human_candidate_review": "pending",
+      "output_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/R022_candidate.wav",
+      "output_sha256": "911e306726029773b3fb68b3df3f93d0c04ac21360b5cb30f8de0dd9a4bb0ade"
+    },
+    {
+      "sample_id": "R049",
+      "kind": "reviewed_extra_suffix_crop",
+      "input_sha256": "9df474c3136146d052e002f1131158c46948e4e3f0390527d543e1450d5040fd",
+      "retained_start_sample": 0,
+      "retained_end_sample": 28800,
+      "removed_samples": 147840,
+      "quiet_guard_samples": 2400,
+      "sample_rate": 24000,
+      "approval": {
+        "audio_sha256": "9df474c3136146d052e002f1131158c46948e4e3f0390527d543e1450d5040fd",
+        "confirmed_defect": "extra_suffix",
+        "user_reply": "R022确认重复My mom knows where I am；R049朗读内容是go on don't just so placed（不确定单词） go on，前后都有go on；"
+      },
+      "retained_pcm_bit_exact": true,
+      "human_candidate_review": "pending",
+      "output_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/R049_candidate.wav",
+      "output_sha256": "be961f07450a4e38f65ff8e9c33a6d660c914cd8279e65e41395bafa8d032c0d"
+    },
+    {
+      "sample_id": "J009",
+      "left_sample_id": "R009",
+      "kind": "reviewed_pause_compaction",
+      "input_sha256": "7008f1b68a16ee4d32d10a4bd43520c4482e375113c899181f3d3ea9b61b5486",
+      "removed_start_sample": 35520,
+      "removed_end_sample": 57120,
+      "removed_samples": 21600,
+      "sample_rate": 24000,
+      "quiet_start_sample": 23520,
+      "quiet_end_sample": 69120,
+      "approval": {
+        "audio_sha256": "7008f1b68a16ee4d32d10a4bd43520c4482e375113c899181f3d3ea9b61b5486",
+        "confirmed_defect": "long_pause",
+        "user_reply": "都有些过长，停顿在1秒左右合适"
+      },
+      "remaining_pcm_bit_exact": true,
+      "human_candidate_review": "pending",
+      "output_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/R009_pause_candidate.wav",
+      "output_sha256": "7463a8b8ebec84e7461b36c1b3505158fe350be10311efec9724466b2cfb2558",
+      "pause_before_seconds": 1.9,
+      "pause_after_seconds": 1.0
+    },
+    {
+      "sample_id": "J013",
+      "left_sample_id": "R013",
+      "kind": "reviewed_pause_compaction",
+      "input_sha256": "42224f546ad7503c4b6ff625f32ae6409a4c2adf204a36c4e7c4396fb7a1e09a",
+      "removed_start_sample": 26880,
+      "removed_end_sample": 59040,
+      "removed_samples": 32160,
+      "sample_rate": 24000,
+      "quiet_start_sample": 16800,
+      "quiet_end_sample": 69120,
+      "approval": {
+        "audio_sha256": "42224f546ad7503c4b6ff625f32ae6409a4c2adf204a36c4e7c4396fb7a1e09a",
+        "confirmed_defect": "long_pause",
+        "user_reply": "都有些过长，停顿在1秒左右合适"
+      },
+      "remaining_pcm_bit_exact": true,
+      "human_candidate_review": "pending",
+      "output_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/R013_pause_candidate.wav",
+      "output_sha256": "ef289f01d5bc0a8a4b5020d6e1e9a443f703ec80fc74bd1eb960f6ed9742f4ac",
+      "pause_before_seconds": 2.3400000000000003,
+      "pause_after_seconds": 1.0
+    },
+    {
+      "sample_id": "J023",
+      "left_sample_id": "R023",
+      "kind": "reviewed_pause_compaction",
+      "input_sha256": "91f056fe5879c1950f7799941fd157bbe47578693e1cb7e18209694164086ce2",
+      "removed_start_sample": 66720,
+      "removed_end_sample": 95520,
+      "removed_samples": 28800,
+      "sample_rate": 24000,
+      "quiet_start_sample": 54720,
+      "quiet_end_sample": 107520,
+      "approval": {
+        "audio_sha256": "91f056fe5879c1950f7799941fd157bbe47578693e1cb7e18209694164086ce2",
+        "confirmed_defect": "long_pause",
+        "user_reply": "都有些过长，停顿在1秒左右合适"
+      },
+      "remaining_pcm_bit_exact": true,
+      "human_candidate_review": "pending",
+      "output_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/R023_pause_candidate.wav",
+      "output_sha256": "ea1dd9e4c911bd40d99bc012102881c0ae91f8fe122242280958742faa62af90",
+      "pause_before_seconds": 2.2,
+      "pause_after_seconds": 1.0
+    },
+    {
+      "sample_id": "J076",
+      "left_sample_id": "R076",
+      "kind": "reviewed_pause_compaction",
+      "input_sha256": "0385511a1eeb1131a8b301ecd3818b119dd6ef3400831fdd6b5729325eb28590",
+      "removed_start_sample": 39600,
+      "removed_end_sample": 61680,
+      "removed_samples": 22080,
+      "sample_rate": 24000,
+      "quiet_start_sample": 28320,
+      "quiet_end_sample": 72960,
+      "approval": {
+        "audio_sha256": "0385511a1eeb1131a8b301ecd3818b119dd6ef3400831fdd6b5729325eb28590",
+        "confirmed_defect": "long_pause",
+        "user_reply": "都有些过长，停顿在1秒左右合适"
+      },
+      "remaining_pcm_bit_exact": true,
+      "human_candidate_review": "pending",
+      "output_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/R076_pause_candidate.wav",
+      "output_sha256": "8c1c1835870d5c8cdb881c20e18b10b6bca0a809f5ac9c1dd80ed1cc56519487",
+      "pause_before_seconds": 1.9200000000000002,
+      "pause_after_seconds": 1.0
+    }
+  ],
+  "content_checks": [
+    {
+      "sample_id": "R022",
+      "report": {
+        "scope_id": "5:22:juli:chunk:1",
+        "dimensions": {
+          "signal": "passed",
+          "content": "passed",
+          "consistency": "incomplete"
+        },
+        "metrics": {
+          "evaluation_models": {
+            "asr": {
+              "kind": "asr",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/SenseVoiceSmall",
+              "state": "local_files",
+              "runtime_version": "1.4.16",
+              "files": [
+                {
+                  "path": "am.mvn",
+                  "bytes": 11203,
+                  "sha256": "29b3c740a2c0cfc6b308126d31d7f265fa2be74f3bb095cd2f143ea970896ae5"
+                },
+                {
+                  "path": "chn_jpn_yue_eng_ko_spectok.bpe.model",
+                  "bytes": 377341,
+                  "sha256": "aa87f86064c3730d799ddf7af3c04659151102cba548bce325cf06ba4da4e6a8"
+                },
+                {
+                  "path": "config.yaml",
+                  "bytes": 1855,
+                  "sha256": "f71e239ba36705564b5bf2d2ffd07eece07b8e3f2bbf6d2c99d8df856339ac19"
+                },
+                {
+                  "path": "configuration.json",
+                  "bytes": 396,
+                  "sha256": "02810a7f8e9e8aee10370a265f7e799728ce25b4c00cdbf4602b303ee395a38e"
+                },
+                {
+                  "path": "model.pt",
+                  "bytes": 936291369,
+                  "sha256": "833ca2dcfdf8ec91bd4f31cfac36d6124e0c459074d5e909aec9cabe6204a3ea"
+                }
+              ],
+              "fingerprint": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6"
+            },
+            "speaker": {
+              "kind": "speaker",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/ecapa",
+              "state": "local_files",
+              "runtime_version": "1.1.1",
+              "files": [
+                {
+                  "path": "classifier.ckpt",
+                  "bytes": 5534328,
+                  "sha256": "fd9e3634fe68bd0a427c95e354c0c677374f62b3f434e45b78599950d860d535"
+                },
+                {
+                  "path": "embedding_model.ckpt",
+                  "bytes": 83316686,
+                  "sha256": "0575cb64845e6b9a10db9bcb74d5ac32b326b8dc90352671d345e2ee3d0126a2"
+                },
+                {
+                  "path": "hyperparams.yaml",
+                  "bytes": 1919,
+                  "sha256": "6f78854fa04ba59e761437b76a2575d3aba5e5016de3e9b69f0c9a5077fb1a41"
+                },
+                {
+                  "path": "label_encoder.ckpt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "label_encoder.txt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "mean_var_norm_emb.ckpt",
+                  "bytes": 1921,
+                  "sha256": "cd70225b05b37be64fc5a95e24395d804231d43f74b2e1e5a513db7b69b34c33"
+                }
+              ],
+              "fingerprint": "9cc19ee039c6ded8c46311e5b94b2595a9c9ff2d11fed1a29fb838ddd7b15f27"
+            }
+          },
+          "duration_seconds": 4.0,
+          "sample_rate": 24000,
+          "samples": 96000,
+          "peak": 0.457763671875,
+          "clipped_fraction": 0.0,
+          "active_seconds": 2.96,
+          "silence_fraction": 0.26,
+          "rms_dbfs": -21.24924180680892,
+          "pitch": {
+            "median_hz": 222.22222222222223,
+            "iqr_hz": 58.064516129032256,
+            "voiced_frames": 117
+          },
+          "language": "en",
+          "reading_unit": "word",
+          "reading_unit_count": 12,
+          "reading_count_basis": "normalized_reference_not_observed_word_timestamps",
+          "articulation_rate_unit": "words_per_second",
+          "rate_threshold": 5.0,
+          "rate_threshold_kind": "uncalibrated_heuristic",
+          "articulation_rate": 4.054054054054054,
+          "overall_rate": 3.0,
+          "words_per_minute": 180.0,
+          "content_alignment": {
+            "error_rate": 0.0,
+            "operations": [],
+            "reference": "oh my mom knows where i am she said it was fine",
+            "hypothesis": "oh my mom knows where i am she said it was fine",
+            "reference_tokens": [
+              "oh",
+              "my",
+              "mom",
+              "knows",
+              "where",
+              "i",
+              "am",
+              "she",
+              "said",
+              "it",
+              "was",
+              "fine"
+            ],
+            "hypothesis_tokens": [
+              "oh",
+              "my",
+              "mom",
+              "knows",
+              "where",
+              "i",
+              "am",
+              "she",
+              "said",
+              "it",
+              "was",
+              "fine"
+            ],
+            "language": "en",
+            "error_metric": "WER",
+            "alignment_unit": "word",
+            "reference_unit_count": 12,
+            "normalization_version": "bilingual-reading-v6",
+            "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+            "comparison_normalization": {
+              "reference": {
+                "tokens": [
+                  "oh",
+                  "my",
+                  "mom",
+                  "knows",
+                  "where",
+                  "i",
+                  "am",
+                  "she",
+                  "said",
+                  "it",
+                  "was",
+                  "fine"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              },
+              "hypothesis": {
+                "tokens": [
+                  "oh",
+                  "my",
+                  "mom",
+                  "knows",
+                  "where",
+                  "i",
+                  "am",
+                  "she",
+                  "said",
+                  "it",
+                  "was",
+                  "fine"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              }
+            },
+            "deletions": 0,
+            "insertions": 0,
+            "substitutions": 0
+          },
+          "rate_policy_version": "reference-rate-content-gate-v1",
+          "rate_estimate_usable_for_heuristics": true,
+          "rate_estimate_status": "reference_estimate_content_aligned",
+          "consistency_reference": "not_available",
+          "evaluation_seconds": 6.970328958006576
+        },
+        "issues": [],
+        "version": "audio-core-v1",
+        "status": "incomplete"
+      },
+      "human_review": "pending"
+    },
+    {
+      "sample_id": "R049",
+      "report": {
+        "scope_id": "5:46:bryce_mother:chunk:1",
+        "dimensions": {
+          "signal": "passed",
+          "content": "passed",
+          "consistency": "incomplete"
+        },
+        "metrics": {
+          "evaluation_models": {
+            "asr": {
+              "kind": "asr",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/SenseVoiceSmall",
+              "state": "local_files",
+              "runtime_version": "1.4.16",
+              "files": [
+                {
+                  "path": "am.mvn",
+                  "bytes": 11203,
+                  "sha256": "29b3c740a2c0cfc6b308126d31d7f265fa2be74f3bb095cd2f143ea970896ae5"
+                },
+                {
+                  "path": "chn_jpn_yue_eng_ko_spectok.bpe.model",
+                  "bytes": 377341,
+                  "sha256": "aa87f86064c3730d799ddf7af3c04659151102cba548bce325cf06ba4da4e6a8"
+                },
+                {
+                  "path": "config.yaml",
+                  "bytes": 1855,
+                  "sha256": "f71e239ba36705564b5bf2d2ffd07eece07b8e3f2bbf6d2c99d8df856339ac19"
+                },
+                {
+                  "path": "configuration.json",
+                  "bytes": 396,
+                  "sha256": "02810a7f8e9e8aee10370a265f7e799728ce25b4c00cdbf4602b303ee395a38e"
+                },
+                {
+                  "path": "model.pt",
+                  "bytes": 936291369,
+                  "sha256": "833ca2dcfdf8ec91bd4f31cfac36d6124e0c459074d5e909aec9cabe6204a3ea"
+                }
+              ],
+              "fingerprint": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6"
+            },
+            "speaker": {
+              "kind": "speaker",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/ecapa",
+              "state": "local_files",
+              "runtime_version": "1.1.1",
+              "files": [
+                {
+                  "path": "classifier.ckpt",
+                  "bytes": 5534328,
+                  "sha256": "fd9e3634fe68bd0a427c95e354c0c677374f62b3f434e45b78599950d860d535"
+                },
+                {
+                  "path": "embedding_model.ckpt",
+                  "bytes": 83316686,
+                  "sha256": "0575cb64845e6b9a10db9bcb74d5ac32b326b8dc90352671d345e2ee3d0126a2"
+                },
+                {
+                  "path": "hyperparams.yaml",
+                  "bytes": 1919,
+                  "sha256": "6f78854fa04ba59e761437b76a2575d3aba5e5016de3e9b69f0c9a5077fb1a41"
+                },
+                {
+                  "path": "label_encoder.ckpt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "label_encoder.txt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "mean_var_norm_emb.ckpt",
+                  "bytes": 1921,
+                  "sha256": "cd70225b05b37be64fc5a95e24395d804231d43f74b2e1e5a513db7b69b34c33"
+                }
+              ],
+              "fingerprint": "9cc19ee039c6ded8c46311e5b94b2595a9c9ff2d11fed1a29fb838ddd7b15f27"
+            }
+          },
+          "duration_seconds": 1.2,
+          "sample_rate": 24000,
+          "samples": 28800,
+          "peak": 0.675384521484375,
+          "clipped_fraction": 0.0,
+          "active_seconds": 0.76,
+          "silence_fraction": 0.3666666666666667,
+          "rms_dbfs": -19.871118074812056,
+          "pitch": {
+            "median_hz": 205.12820512820514,
+            "iqr_hz": 107.42235265346054,
+            "voiced_frames": 35
+          },
+          "language": "en",
+          "reading_unit": "word",
+          "reading_unit_count": 2,
+          "reading_count_basis": "normalized_reference_not_observed_word_timestamps",
+          "articulation_rate_unit": "words_per_second",
+          "rate_threshold": 5.0,
+          "rate_threshold_kind": "uncalibrated_heuristic",
+          "articulation_rate": null,
+          "overall_rate": 1.6666666666666667,
+          "words_per_minute": 100.0,
+          "content_alignment": {
+            "error_rate": 0.0,
+            "operations": [],
+            "reference": "go on",
+            "hypothesis": "go on",
+            "reference_tokens": [
+              "go",
+              "on"
+            ],
+            "hypothesis_tokens": [
+              "go",
+              "on"
+            ],
+            "language": "en",
+            "error_metric": "WER",
+            "alignment_unit": "word",
+            "reference_unit_count": 2,
+            "normalization_version": "bilingual-reading-v6",
+            "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+            "comparison_normalization": {
+              "reference": {
+                "tokens": [
+                  "go",
+                  "on"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              },
+              "hypothesis": {
+                "tokens": [
+                  "go",
+                  "on"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              }
+            },
+            "deletions": 0,
+            "insertions": 0,
+            "substitutions": 0
+          },
+          "rate_policy_version": "reference-rate-content-gate-v1",
+          "rate_estimate_usable_for_heuristics": false,
+          "rate_estimate_status": "insufficient_duration_or_units",
+          "consistency_reference": "not_available",
+          "evaluation_seconds": 0.14433870813809335
+        },
+        "issues": [],
+        "version": "audio-core-v1",
+        "status": "incomplete"
+      },
+      "human_review": "pending"
+    }
+  ],
+  "assembly": {
+    "sample_rate": 24000,
+    "channels": 1,
+    "total_samples": 22033440,
+    "spans": [
+      {
+        "chunk_id": "5:1:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 0,
+        "end_sample": 341760,
+        "source_start": 0,
+        "source_end": 223,
+        "unit_id": "5:1:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 0,
+          "end": 223
+        },
+        "source_scope": "chapter",
+        "render_sha256": "0ef58edb31d5bb0f3a5111f1d36e6afb9ba9da022627ce11f446072bed912a14"
+      },
+      {
+        "chunk_id": "5:1:narrator:chunk:2",
+        "role_id": "narrator",
+        "start_sample": 341760,
+        "end_sample": 687360,
+        "source_start": 223,
+        "source_end": 461,
+        "unit_id": "5:1:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 223,
+          "end": 461
+        },
+        "source_scope": "chapter",
+        "render_sha256": "82fd710e5ddd6737a8b93fe45cb5e56afcc190bf37c5a3afbccd2fda7fb1dd07"
+      },
+      {
+        "chunk_id": "5:1:narrator:chunk:3",
+        "role_id": "narrator",
+        "start_sample": 687360,
+        "end_sample": 967680,
+        "source_start": 461,
+        "source_end": 659,
+        "unit_id": "5:1:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 461,
+          "end": 659
+        },
+        "source_scope": "chapter",
+        "render_sha256": "bd2b068352c1093112dd43a4dd94ebe8d41e6ab28d448629d381d7dc971c0038"
+      },
+      {
+        "chunk_id": "5:2:bryce_father:chunk:1",
+        "role_id": "bryce_father",
+        "start_sample": 967680,
+        "end_sample": 990720,
+        "source_start": 0,
+        "source_end": 6,
+        "unit_id": "5:2:bryce_father",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 659,
+          "end": 665
+        },
+        "source_scope": "chapter",
+        "render_sha256": "833963c3fc63f8afc261dd37c014332f3f1fdbd8e44e8c7c26e2fc10e5bae818"
+      },
+      {
+        "chunk_id": "5:3:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 990720,
+        "end_sample": 1056000,
+        "source_start": 0,
+        "source_end": 48,
+        "unit_id": "5:3:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 665,
+          "end": 713
+        },
+        "source_scope": "chapter",
+        "render_sha256": "ef251dcb2f555ef31305c6ed788ff31cfefb8293d8565b5688efac2790f224cb"
+      },
+      {
+        "chunk_id": "5:4:bryce_father:chunk:1",
+        "role_id": "bryce_father",
+        "start_sample": 1056000,
+        "end_sample": 1136640,
+        "source_start": 0,
+        "source_end": 52,
+        "unit_id": "5:4:bryce_father",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 713,
+          "end": 765
+        },
+        "source_scope": "chapter",
+        "render_sha256": "1a6d9668e6f4dcb25e3a4d98ee4148aafa2965a86e4f3c8011c0bf5efae49704"
+      },
+      {
+        "chunk_id": "5:5:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 1136640,
+        "end_sample": 1413120,
+        "source_start": 0,
+        "source_end": 179,
+        "unit_id": "5:5:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 765,
+          "end": 944
+        },
+        "source_scope": "chapter",
+        "render_sha256": "1de2de0cd6e665af1724c21fe56160e5ec79684514881c44dc061b43062c84bc"
+      },
+      {
+        "chunk_id": "5:6:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 1413120,
+        "end_sample": 1459200,
+        "source_start": 0,
+        "source_end": 27,
+        "unit_id": "5:6:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 944,
+          "end": 971
+        },
+        "source_scope": "chapter",
+        "render_sha256": "32d1b679b27c343394917edb59e4f47adc8c3f5704afbb91c26f39ff9b4aa82e"
+      },
+      {
+        "chunk_id": "5:7:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 1459200,
+        "end_sample": 1506720,
+        "source_start": 0,
+        "source_end": 21,
+        "unit_id": "5:7:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 971,
+          "end": 992
+        },
+        "source_scope": "chapter",
+        "render_sha256": "7463a8b8ebec84e7461b36c1b3505158fe350be10311efec9724466b2cfb2558"
+      },
+      {
+        "chunk_id": "5:8:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 1506720,
+        "end_sample": 1598880,
+        "source_start": 0,
+        "source_end": 33,
+        "unit_id": "5:8:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 992,
+          "end": 1025
+        },
+        "source_scope": "chapter",
+        "render_sha256": "97f1394c6db280e732ff1c7841b078f7a57084fbd19e009d7cb16e9b4f1e2149"
+      },
+      {
+        "chunk_id": "5:9:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 1598880,
+        "end_sample": 1810080,
+        "source_start": 0,
+        "source_end": 155,
+        "unit_id": "5:9:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1025,
+          "end": 1180
+        },
+        "source_scope": "chapter",
+        "render_sha256": "dbe041dde504ddb14cd4461eeb54766b1a80a5c3abc8a607cbafd876c3aa7f47"
+      },
+      {
+        "chunk_id": "5:10:bryce_father:chunk:1",
+        "role_id": "bryce_father",
+        "start_sample": 1810080,
+        "end_sample": 1863840,
+        "source_start": 0,
+        "source_end": 21,
+        "unit_id": "5:10:bryce_father",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1180,
+          "end": 1201
+        },
+        "source_scope": "chapter",
+        "render_sha256": "9ea2bf90b0bc2f3a177e3aa86fdf0ece9aad6896bb91ef69ac7e2ce16fc3cd75"
+      },
+      {
+        "chunk_id": "5:11:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 1863840,
+        "end_sample": 1900800,
+        "source_start": 0,
+        "source_end": 16,
+        "unit_id": "5:11:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1201,
+          "end": 1217
+        },
+        "source_scope": "chapter",
+        "render_sha256": "ef289f01d5bc0a8a4b5020d6e1e9a443f703ec80fc74bd1eb960f6ed9742f4ac"
+      },
+      {
+        "chunk_id": "5:12:bryce_father:chunk:1",
+        "role_id": "bryce_father",
+        "start_sample": 1900800,
+        "end_sample": 1996800,
+        "source_start": 0,
+        "source_end": 52,
+        "unit_id": "5:12:bryce_father",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1217,
+          "end": 1269
+        },
+        "source_scope": "chapter",
+        "render_sha256": "5c741336f6d4fa0bbe51afa4db07a41ed4325afd841b75716de6aa2e8a72daab"
+      },
+      {
+        "chunk_id": "5:14:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 1996800,
+        "end_sample": 2077440,
+        "source_start": 0,
+        "source_end": 31,
+        "unit_id": "5:14:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1270,
+          "end": 1301
+        },
+        "source_scope": "chapter",
+        "render_sha256": "b87407491d302bc307c2cd125d79f3bc12693ffb210a8512d0bd173e4700d769"
+      },
+      {
+        "chunk_id": "5:15:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 2077440,
+        "end_sample": 2161920,
+        "source_start": 0,
+        "source_end": 64,
+        "unit_id": "5:15:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1301,
+          "end": 1365
+        },
+        "source_scope": "chapter",
+        "render_sha256": "2d08010ea3fbd5ea6c6433692cd38742cb78870ba8df262dd4c171a724d8b37d"
+      },
+      {
+        "chunk_id": "5:16:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 2164320,
+        "end_sample": 2229600,
+        "source_start": 0,
+        "source_end": 29,
+        "unit_id": "5:16:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1365,
+          "end": 1394
+        },
+        "source_scope": "chapter",
+        "render_sha256": "a8189ab55b11d742b72afb2a933303ce4f4bca2d8e0d75a9cf339c5df1662197"
+      },
+      {
+        "chunk_id": "5:18:bryce_father:chunk:1",
+        "role_id": "bryce_father",
+        "start_sample": 2229600,
+        "end_sample": 2436960,
+        "source_start": 0,
+        "source_end": 13,
+        "unit_id": "5:18:bryce_father",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1395,
+          "end": 1408
+        },
+        "source_scope": "chapter",
+        "render_sha256": "ee63a56a21e8ac8abb717699834bf7148712e812809ae2fe3f02ad30902c13b6"
+      },
+      {
+        "chunk_id": "5:19:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 2436960,
+        "end_sample": 2513760,
+        "source_start": 0,
+        "source_end": 44,
+        "unit_id": "5:19:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1408,
+          "end": 1452
+        },
+        "source_scope": "chapter",
+        "render_sha256": "9c3ec0e8beedfa9dfeecc9c67829fe447d406e3ca76d58d142514f9ec74bfcf9"
+      },
+      {
+        "chunk_id": "5:20:bryce_father:chunk:1",
+        "role_id": "bryce_father",
+        "start_sample": 2513760,
+        "end_sample": 2632800,
+        "source_start": 0,
+        "source_end": 79,
+        "unit_id": "5:20:bryce_father",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1452,
+          "end": 1531
+        },
+        "source_scope": "chapter",
+        "render_sha256": "b71f5dd65eb8eaf4843a0c205acc271aa724732b650959b4807a2772212b5737"
+      },
+      {
+        "chunk_id": "5:21:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 2632800,
+        "end_sample": 2928480,
+        "source_start": 0,
+        "source_end": 197,
+        "unit_id": "5:21:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1531,
+          "end": 1728
+        },
+        "source_scope": "chapter",
+        "render_sha256": "d32c30e0c5d818d212a960267ebb933c09bb0c7596dd7e76694b859f6b36f100"
+      },
+      {
+        "chunk_id": "5:22:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 2928480,
+        "end_sample": 3024480,
+        "source_start": 0,
+        "source_end": 52,
+        "unit_id": "5:22:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1728,
+          "end": 1780
+        },
+        "source_scope": "chapter",
+        "render_sha256": "911e306726029773b3fb68b3df3f93d0c04ac21360b5cb30f8de0dd9a4bb0ade"
+      },
+      {
+        "chunk_id": "5:23:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 3024480,
+        "end_sample": 3103200,
+        "source_start": 0,
+        "source_end": 45,
+        "unit_id": "5:23:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1780,
+          "end": 1825
+        },
+        "source_scope": "chapter",
+        "render_sha256": "ea1dd9e4c911bd40d99bc012102881c0ae91f8fe122242280958742faa62af90"
+      },
+      {
+        "chunk_id": "5:24:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 3103200,
+        "end_sample": 3168480,
+        "source_start": 0,
+        "source_end": 32,
+        "unit_id": "5:24:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1825,
+          "end": 1857
+        },
+        "source_scope": "chapter",
+        "render_sha256": "fd83398323bfaa0e678af77043a469b38d1138f05cddf4e8201a0e5ce8e132fb"
+      },
+      {
+        "chunk_id": "5:25:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 3168480,
+        "end_sample": 3249120,
+        "source_start": 0,
+        "source_end": 54,
+        "unit_id": "5:25:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1857,
+          "end": 1911
+        },
+        "source_scope": "chapter",
+        "render_sha256": "4e5cd11e38a99025ed4202a757102e6e488bfe18fd851ed50f8884bca0708cef"
+      },
+      {
+        "chunk_id": "5:26:bryce_father:chunk:1",
+        "role_id": "bryce_father",
+        "start_sample": 3249120,
+        "end_sample": 3287520,
+        "source_start": 0,
+        "source_end": 9,
+        "unit_id": "5:26:bryce_father",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1911,
+          "end": 1920
+        },
+        "source_scope": "chapter",
+        "render_sha256": "2415280e89f81acbdf8f4cdfa1543ed76faa906e201295cbdee290dd54e67a39"
+      },
+      {
+        "chunk_id": "5:27:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 3287520,
+        "end_sample": 3364320,
+        "source_start": 0,
+        "source_end": 43,
+        "unit_id": "5:27:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1920,
+          "end": 1963
+        },
+        "source_scope": "chapter",
+        "render_sha256": "bf8d45501ea56c2728d58efebd8a0fcd0926a434ea4414cb88f4f1f8c0f8c5bb"
+      },
+      {
+        "chunk_id": "5:28:bryce_father:chunk:1",
+        "role_id": "bryce_father",
+        "start_sample": 3364320,
+        "end_sample": 3483360,
+        "source_start": 0,
+        "source_end": 65,
+        "unit_id": "5:28:bryce_father",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 1963,
+          "end": 2028
+        },
+        "source_scope": "chapter",
+        "render_sha256": "51db9a98ccc526bcf86348bb3686ec0e9a10dbacb79453d5635c7d95f68e67f4"
+      },
+      {
+        "chunk_id": "5:29:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 3483360,
+        "end_sample": 3771360,
+        "source_start": 0,
+        "source_end": 201,
+        "unit_id": "5:29:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 2028,
+          "end": 2229
+        },
+        "source_scope": "chapter",
+        "render_sha256": "5a21d3488c9e3f9c09c672ff5f47663361e52abc80a1c1aa82a1f2fc02e252f0"
+      },
+      {
+        "chunk_id": "5:29:narrator:chunk:2",
+        "role_id": "narrator",
+        "start_sample": 3771360,
+        "end_sample": 4186080,
+        "source_start": 201,
+        "source_end": 442,
+        "unit_id": "5:29:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 2229,
+          "end": 2470
+        },
+        "source_scope": "chapter",
+        "render_sha256": "1825abf23ad3d2b3d004e39330b094f0a36b7857f9df330bc1090f0aa88c1c2b"
+      },
+      {
+        "chunk_id": "5:29:narrator:chunk:3",
+        "role_id": "narrator",
+        "start_sample": 4186080,
+        "end_sample": 4481760,
+        "source_start": 442,
+        "source_end": 650,
+        "unit_id": "5:29:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 2470,
+          "end": 2678
+        },
+        "source_scope": "chapter",
+        "render_sha256": "7516e7f34608c856d20c49901c451b3f6e1fb31ed08da7bf3e20ca282febf170"
+      },
+      {
+        "chunk_id": "5:29:narrator:chunk:4",
+        "role_id": "narrator",
+        "start_sample": 4481760,
+        "end_sample": 4792800,
+        "source_start": 650,
+        "source_end": 862,
+        "unit_id": "5:29:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 2678,
+          "end": 2890
+        },
+        "source_scope": "chapter",
+        "render_sha256": "e04f848392383b8e9b8f7f36fedcb5e8a9efef43bf9a9e1051bc3fe76afafc22"
+      },
+      {
+        "chunk_id": "5:29:narrator:chunk:5",
+        "role_id": "narrator",
+        "start_sample": 4792800,
+        "end_sample": 5169120,
+        "source_start": 862,
+        "source_end": 1143,
+        "unit_id": "5:29:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 2890,
+          "end": 3171
+        },
+        "source_scope": "chapter",
+        "render_sha256": "f93460675e71050e516d1658eb418820a5818ee1bba29563deb901cad93008fc"
+      },
+      {
+        "chunk_id": "5:30:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 5169120,
+        "end_sample": 5311200,
+        "source_start": 0,
+        "source_end": 8,
+        "unit_id": "5:30:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3171,
+          "end": 3179
+        },
+        "source_scope": "chapter",
+        "render_sha256": "241193f660d3c6b5e6840cb85421ff35967d388cfbfb215e16541d4210c59d7f"
+      },
+      {
+        "chunk_id": "5:31:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 5311200,
+        "end_sample": 5403360,
+        "source_start": 0,
+        "source_end": 89,
+        "unit_id": "5:31:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3179,
+          "end": 3268
+        },
+        "source_scope": "chapter",
+        "render_sha256": "009cbec6598f98d7cfe2eac29626c07c91af12923a374ee1862de924dd8198d9"
+      },
+      {
+        "chunk_id": "5:32:bryce_mother:chunk:1",
+        "role_id": "bryce_mother",
+        "start_sample": 5404800,
+        "end_sample": 5454720,
+        "source_start": 0,
+        "source_end": 14,
+        "unit_id": "5:32:bryce_mother",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3268,
+          "end": 3282
+        },
+        "source_scope": "chapter",
+        "render_sha256": "ba5f5f037d95366c5cd180d66ada6b868d49b5cb333a1d8aa790ec55fd10b67d"
+      },
+      {
+        "chunk_id": "5:33:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 5454720,
+        "end_sample": 5512320,
+        "source_start": 0,
+        "source_end": 19,
+        "unit_id": "5:33:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3282,
+          "end": 3301
+        },
+        "source_scope": "chapter",
+        "render_sha256": "b934ad661e4fb680702b4a0effc1f0cd13702d87f4b3428546ac44dcf7ee0d99"
+      },
+      {
+        "chunk_id": "5:34:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 5512320,
+        "end_sample": 5543040,
+        "source_start": 0,
+        "source_end": 5,
+        "unit_id": "5:34:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3301,
+          "end": 3306
+        },
+        "source_scope": "chapter",
+        "render_sha256": "08cc7b4050e709d2e3ba668bed667556c7d170859bca7c926f388cfd9bffa68e"
+      },
+      {
+        "chunk_id": "5:35:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 5543040,
+        "end_sample": 5708160,
+        "source_start": 0,
+        "source_end": 134,
+        "unit_id": "5:35:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3306,
+          "end": 3440
+        },
+        "source_scope": "chapter",
+        "render_sha256": "c7bcd9a5325609386d22923edbb19a0652c159e06102e7aa0144d215370dab6a"
+      },
+      {
+        "chunk_id": "5:36:bryce_mother:chunk:1",
+        "role_id": "bryce_mother",
+        "start_sample": 5708160,
+        "end_sample": 5758080,
+        "source_start": 0,
+        "source_end": 30,
+        "unit_id": "5:36:bryce_mother",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3440,
+          "end": 3470
+        },
+        "source_scope": "chapter",
+        "render_sha256": "63101782c8ca5ddde8ba5c7ca030f338360ab3934c834c04ff83a1f8c9732cbf"
+      },
+      {
+        "chunk_id": "5:38:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 5758080,
+        "end_sample": 5842560,
+        "source_start": 0,
+        "source_end": 42,
+        "unit_id": "5:38:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3471,
+          "end": 3513
+        },
+        "source_scope": "chapter",
+        "render_sha256": "53516e153114084492e15abbb124b1995e681bfb4d6779a51c082eb64cc6d738"
+      },
+      {
+        "chunk_id": "5:39:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 5842560,
+        "end_sample": 5911680,
+        "source_start": 0,
+        "source_end": 46,
+        "unit_id": "5:39:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3513,
+          "end": 3559
+        },
+        "source_scope": "chapter",
+        "render_sha256": "10d2232ab3d5a3a14670b21b0770a3e9286370425a346dced729e68a5d781d80"
+      },
+      {
+        "chunk_id": "5:40:bryce_mother:chunk:1",
+        "role_id": "bryce_mother",
+        "start_sample": 5911680,
+        "end_sample": 5988480,
+        "source_start": 0,
+        "source_end": 32,
+        "unit_id": "5:40:bryce_mother",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3559,
+          "end": 3591
+        },
+        "source_scope": "chapter",
+        "render_sha256": "c6738650070a6d9417abd8dfcd9b88e04ad86f000ac8156b6035a74d98d7de79"
+      },
+      {
+        "chunk_id": "5:41:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 5988480,
+        "end_sample": 6065280,
+        "source_start": 0,
+        "source_end": 32,
+        "unit_id": "5:41:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3591,
+          "end": 3623
+        },
+        "source_scope": "chapter",
+        "render_sha256": "8481c30f1a8f5274dec9962b439eb2e3cb007b3e03169126ac816f881c1f6658"
+      },
+      {
+        "chunk_id": "5:42:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 6065280,
+        "end_sample": 6088320,
+        "source_start": 0,
+        "source_end": 9,
+        "unit_id": "5:42:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3623,
+          "end": 3632
+        },
+        "source_scope": "chapter",
+        "render_sha256": "ac7eeacaef158b0f220f299e79ebd2a3f4b6b9f8860f9c9f3b3510362caacadf"
+      },
+      {
+        "chunk_id": "5:43:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 6088320,
+        "end_sample": 6314880,
+        "source_start": 0,
+        "source_end": 152,
+        "unit_id": "5:43:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3632,
+          "end": 3784
+        },
+        "source_scope": "chapter",
+        "render_sha256": "f729da519232ea3e27b82265bedbde01a07a533d8f6b11cee3c21e59d3c343ec"
+      },
+      {
+        "chunk_id": "5:44:bryce_mother:chunk:1",
+        "role_id": "bryce_mother",
+        "start_sample": 6315360,
+        "end_sample": 6426720,
+        "source_start": 0,
+        "source_end": 61,
+        "unit_id": "5:44:bryce_mother",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3784,
+          "end": 3845
+        },
+        "source_scope": "chapter",
+        "render_sha256": "875ea3498b022553690e26e57f9309309fda250fc492c7b843d322d9f2ed104d"
+      },
+      {
+        "chunk_id": "5:45:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 6426720,
+        "end_sample": 6618720,
+        "source_start": 0,
+        "source_end": 124,
+        "unit_id": "5:45:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3845,
+          "end": 3969
+        },
+        "source_scope": "chapter",
+        "render_sha256": "a8e307d434a6fdc61a326dd12e590f28f85c48cdcb77aa5d4cfb664249adbfc8"
+      },
+      {
+        "chunk_id": "5:46:bryce_mother:chunk:1",
+        "role_id": "bryce_mother",
+        "start_sample": 6618720,
+        "end_sample": 6647520,
+        "source_start": 0,
+        "source_end": 8,
+        "unit_id": "5:46:bryce_mother",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3969,
+          "end": 3977
+        },
+        "source_scope": "chapter",
+        "render_sha256": "be961f07450a4e38f65ff8e9c33a6d660c914cd8279e65e41395bafa8d032c0d"
+      },
+      {
+        "chunk_id": "5:47:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 6647520,
+        "end_sample": 7046880,
+        "source_start": 0,
+        "source_end": 285,
+        "unit_id": "5:47:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 3977,
+          "end": 4262
+        },
+        "source_scope": "chapter",
+        "render_sha256": "8438c0eb7c6758c376e1f39f2bc1177c1b9a4d927b0eeece18b719e917766bdd"
+      },
+      {
+        "chunk_id": "5:47:narrator:chunk:2",
+        "role_id": "narrator",
+        "start_sample": 7046880,
+        "end_sample": 7469280,
+        "source_start": 285,
+        "source_end": 570,
+        "unit_id": "5:47:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 4262,
+          "end": 4547
+        },
+        "source_scope": "chapter",
+        "render_sha256": "56073bafb91b538aa92fc80452fddfd5026ff2ab943c8867038a5a095cf2cfd5"
+      },
+      {
+        "chunk_id": "5:47:narrator:chunk:3",
+        "role_id": "narrator",
+        "start_sample": 7469280,
+        "end_sample": 7860960,
+        "source_start": 570,
+        "source_end": 770,
+        "unit_id": "5:47:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 4547,
+          "end": 4747
+        },
+        "source_scope": "chapter",
+        "render_sha256": "7e500e5b935e97201a5cc8aa69d1b70567ce6d227e0c31e2847b4166818f24fe"
+      },
+      {
+        "chunk_id": "5:48:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 7862400,
+        "end_sample": 7923840,
+        "source_start": 0,
+        "source_end": 17,
+        "unit_id": "5:48:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 4747,
+          "end": 4764
+        },
+        "source_scope": "chapter",
+        "render_sha256": "4686b684e6f8e78d2f8abe73f6640b4cff236392938fe50833663ec7d77fc115"
+      },
+      {
+        "chunk_id": "5:49:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 7923840,
+        "end_sample": 8000640,
+        "source_start": 0,
+        "source_end": 64,
+        "unit_id": "5:49:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 4764,
+          "end": 4828
+        },
+        "source_scope": "chapter",
+        "render_sha256": "155edba8e274bbb3ec670185dd6ae36521736a2c349025c8e13c1a5fb3e8d07c"
+      },
+      {
+        "chunk_id": "5:50:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 8000640,
+        "end_sample": 8050560,
+        "source_start": 0,
+        "source_end": 18,
+        "unit_id": "5:50:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 4828,
+          "end": 4846
+        },
+        "source_scope": "chapter",
+        "render_sha256": "11e9ccf573f5852488ba194b78c12d4390862e2932e08852ae1c85a2b5e965cf"
+      },
+      {
+        "chunk_id": "5:51:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 8050560,
+        "end_sample": 8423040,
+        "source_start": 0,
+        "source_end": 253,
+        "unit_id": "5:51:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 4846,
+          "end": 5099
+        },
+        "source_scope": "chapter",
+        "render_sha256": "9967c5037d7f01a43a4dbd7f58e4e747b332c727d2bf7f6f5c0cd7340c6ab675"
+      },
+      {
+        "chunk_id": "5:51:narrator:chunk:2",
+        "role_id": "narrator",
+        "start_sample": 8423040,
+        "end_sample": 8968320,
+        "source_start": 253,
+        "source_end": 553,
+        "unit_id": "5:51:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 5099,
+          "end": 5399
+        },
+        "source_scope": "chapter",
+        "render_sha256": "9eeeefdcaba530e75d47459a2bed663f90ef9e08b08eb87eff19d449f7dfe58a"
+      },
+      {
+        "chunk_id": "5:51:narrator:chunk:3",
+        "role_id": "narrator",
+        "start_sample": 8968320,
+        "end_sample": 9383040,
+        "source_start": 553,
+        "source_end": 847,
+        "unit_id": "5:51:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 5399,
+          "end": 5693
+        },
+        "source_scope": "chapter",
+        "render_sha256": "d95dd14924d7bc4c9fbb42943b9d2656cf4d05c601efcfda28f24250f8eccdb1"
+      },
+      {
+        "chunk_id": "5:51:narrator:chunk:4",
+        "role_id": "narrator",
+        "start_sample": 9383040,
+        "end_sample": 9736320,
+        "source_start": 847,
+        "source_end": 1118,
+        "unit_id": "5:51:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 5693,
+          "end": 5964
+        },
+        "source_scope": "chapter",
+        "render_sha256": "e1a5ad6a9240ccc98de382818037a1da2d6c6b758a7f028d827ec982a1f21de1"
+      },
+      {
+        "chunk_id": "5:51:narrator:chunk:5",
+        "role_id": "narrator",
+        "start_sample": 9736320,
+        "end_sample": 10070400,
+        "source_start": 1118,
+        "source_end": 1321,
+        "unit_id": "5:51:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 5964,
+          "end": 6167
+        },
+        "source_scope": "chapter",
+        "render_sha256": "5e5f59d24b490d372837e696bdab2d41b4ffd334ccb4655a305a2d3f61349bc2"
+      },
+      {
+        "chunk_id": "5:51:narrator:chunk:6",
+        "role_id": "narrator",
+        "start_sample": 10070400,
+        "end_sample": 10439040,
+        "source_start": 1321,
+        "source_end": 1571,
+        "unit_id": "5:51:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 6167,
+          "end": 6417
+        },
+        "source_scope": "chapter",
+        "render_sha256": "354f1c556ee4c66f74512e19f2cadd32e0409ff3329b30982d18ca556a0dfba8"
+      },
+      {
+        "chunk_id": "5:51:narrator:chunk:7",
+        "role_id": "narrator",
+        "start_sample": 10439040,
+        "end_sample": 10707840,
+        "source_start": 1571,
+        "source_end": 1769,
+        "unit_id": "5:51:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 6417,
+          "end": 6615
+        },
+        "source_scope": "chapter",
+        "render_sha256": "bf837fc69f8e7defbe99dea0483e61a49046689f588d1fae72a55cf508c28e21"
+      },
+      {
+        "chunk_id": "5:51:narrator:chunk:8",
+        "role_id": "narrator",
+        "start_sample": 10707840,
+        "end_sample": 11045760,
+        "source_start": 1769,
+        "source_end": 2000,
+        "unit_id": "5:51:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 6615,
+          "end": 6846
+        },
+        "source_scope": "chapter",
+        "render_sha256": "6fd124a346bf15428b04f4587a101301a22752726d50796990eaa7cba31599e4"
+      },
+      {
+        "chunk_id": "5:51:narrator:chunk:9",
+        "role_id": "narrator",
+        "start_sample": 11045760,
+        "end_sample": 11464320,
+        "source_start": 2000,
+        "source_end": 2294,
+        "unit_id": "5:51:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 6846,
+          "end": 7140
+        },
+        "source_scope": "chapter",
+        "render_sha256": "ee01699e60bd5839b620a611dd7951ecb7ef3b7e8db776e5b5a327ef1a32d1ce"
+      },
+      {
+        "chunk_id": "5:51:narrator:chunk:10",
+        "role_id": "narrator",
+        "start_sample": 11464320,
+        "end_sample": 11806080,
+        "source_start": 2294,
+        "source_end": 2566,
+        "unit_id": "5:51:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 7140,
+          "end": 7412
+        },
+        "source_scope": "chapter",
+        "render_sha256": "184c3692e890e33b758c20b15d57fe210c0e969327404e2f8b06b7498792c7ef"
+      },
+      {
+        "chunk_id": "5:51:narrator:chunk:11",
+        "role_id": "narrator",
+        "start_sample": 11806080,
+        "end_sample": 12105600,
+        "source_start": 2566,
+        "source_end": 2798,
+        "unit_id": "5:51:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 7412,
+          "end": 7644
+        },
+        "source_scope": "chapter",
+        "render_sha256": "b45e061a9769128506b5b2ac5f3703ad8054de30d33f41574700016767022359"
+      },
+      {
+        "chunk_id": "5:51:narrator:chunk:12",
+        "role_id": "narrator",
+        "start_sample": 12105600,
+        "end_sample": 12439680,
+        "source_start": 2798,
+        "source_end": 3054,
+        "unit_id": "5:51:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 7644,
+          "end": 7900
+        },
+        "source_scope": "chapter",
+        "render_sha256": "1adc63c5b9bbe047fd7f7d17862755d196aeb119d0d92d9db697657720f0889e"
+      },
+      {
+        "chunk_id": "5:52:bryce_mother:chunk:1",
+        "role_id": "bryce_mother",
+        "start_sample": 12439680,
+        "end_sample": 12577920,
+        "source_start": 0,
+        "source_end": 89,
+        "unit_id": "5:52:bryce_mother",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 7900,
+          "end": 7989
+        },
+        "source_scope": "chapter",
+        "render_sha256": "9edcdc0bccfe89a05c9bda7afbf280eea0a62a61edbc91b2c63bea9c61f580ad"
+      },
+      {
+        "chunk_id": "5:53:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 12577920,
+        "end_sample": 12915840,
+        "source_start": 0,
+        "source_end": 237,
+        "unit_id": "5:53:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 7989,
+          "end": 8226
+        },
+        "source_scope": "chapter",
+        "render_sha256": "134ace5c7f57062431216a967cbd6338ca485e41bdc9fd3e4e3634f4d6888658"
+      },
+      {
+        "chunk_id": "5:53:narrator:chunk:2",
+        "role_id": "narrator",
+        "start_sample": 12915840,
+        "end_sample": 13023360,
+        "source_start": 237,
+        "source_end": 318,
+        "unit_id": "5:53:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 8226,
+          "end": 8307
+        },
+        "source_scope": "chapter",
+        "render_sha256": "4baa7b1e7c76bb9a7790276206cea98c91d314227b097dd05ca8fa255a58c6d3"
+      },
+      {
+        "chunk_id": "5:54:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 13025280,
+        "end_sample": 13052160,
+        "source_start": 0,
+        "source_end": 8,
+        "unit_id": "5:54:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 8307,
+          "end": 8315
+        },
+        "source_scope": "chapter",
+        "render_sha256": "bacf2f0cc64b842e4c01ca397a98c209a078b5931c37660bb05cdf2d7d98f813"
+      },
+      {
+        "chunk_id": "5:55:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 13052160,
+        "end_sample": 13109760,
+        "source_start": 0,
+        "source_end": 15,
+        "unit_id": "5:55:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 8315,
+          "end": 8330
+        },
+        "source_scope": "chapter",
+        "render_sha256": "351e9d1559b847c5ea2b39f97e7764605813b3c1e79ca94ff2c56f34856dae21"
+      },
+      {
+        "chunk_id": "5:56:juli:chunk:1",
+        "role_id": "juli",
+        "start_sample": 13109760,
+        "end_sample": 13140480,
+        "source_start": 0,
+        "source_end": 14,
+        "unit_id": "5:56:juli",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 8330,
+          "end": 8344
+        },
+        "source_scope": "chapter",
+        "render_sha256": "1e38b53454de31e4d7b7496a5040d610f9cbdae3bbd1d19af28cd3bcc59d3d23"
+      },
+      {
+        "chunk_id": "5:57:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 13140480,
+        "end_sample": 13589760,
+        "source_start": 0,
+        "source_end": 278,
+        "unit_id": "5:57:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 8344,
+          "end": 8622
+        },
+        "source_scope": "chapter",
+        "render_sha256": "ca34392beca5edaacf2169f0b7ad8f8295639d0f65b6a366daafb1358b899b63"
+      },
+      {
+        "chunk_id": "5:58:classmates:chunk:1",
+        "role_id": "classmates",
+        "start_sample": 13591200,
+        "end_sample": 13641120,
+        "source_start": 0,
+        "source_end": 34,
+        "unit_id": "5:58:classmates",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 8622,
+          "end": 8656
+        },
+        "source_scope": "chapter",
+        "render_sha256": "45a5ef1c5060bc8edf0cd4f20671722ceea881eb169d5abcf5fe0a10b45b7904"
+      },
+      {
+        "chunk_id": "5:60:classmates:chunk:1",
+        "role_id": "classmates",
+        "start_sample": 13641120,
+        "end_sample": 13692000,
+        "source_start": 0,
+        "source_end": 29,
+        "unit_id": "5:60:classmates",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 8657,
+          "end": 8686
+        },
+        "source_scope": "chapter",
+        "render_sha256": "8c1c1835870d5c8cdb881c20e18b10b6bca0a809f5ac9c1dd80ed1cc56519487"
+      },
+      {
+        "chunk_id": "5:61:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 13692000,
+        "end_sample": 13826400,
+        "source_start": 0,
+        "source_end": 111,
+        "unit_id": "5:61:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 8686,
+          "end": 8797
+        },
+        "source_scope": "chapter",
+        "render_sha256": "14dce60a388e164638b6b6a5fe33321f638bb68441ed8ba605095662c292de8a"
+      },
+      {
+        "chunk_id": "5:62:classmates:chunk:1",
+        "role_id": "classmates",
+        "start_sample": 13829280,
+        "end_sample": 13975200,
+        "source_start": 0,
+        "source_end": 50,
+        "unit_id": "5:62:classmates",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 8797,
+          "end": 8847
+        },
+        "source_scope": "chapter",
+        "render_sha256": "781864c84e8c68727cc833205c0233946d07b7834db9690c56dd149ef024cf78"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:1",
+        "role_id": "narrator",
+        "start_sample": 13977120,
+        "end_sample": 14380320,
+        "source_start": 0,
+        "source_end": 267,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 8847,
+          "end": 9114
+        },
+        "source_scope": "chapter",
+        "render_sha256": "a6d3b8f75aaed891ba139978835d92c4c82771387455ad3a3b34676a4f71884c"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:2",
+        "role_id": "narrator",
+        "start_sample": 14380320,
+        "end_sample": 14764320,
+        "source_start": 267,
+        "source_end": 484,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 9114,
+          "end": 9331
+        },
+        "source_scope": "chapter",
+        "render_sha256": "36124bbb585c71594b09714fe7bdca5f6d4ad50457b0d91b8ef2a057f3fd9830"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:3",
+        "role_id": "narrator",
+        "start_sample": 14764320,
+        "end_sample": 15086880,
+        "source_start": 484,
+        "source_end": 704,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 9331,
+          "end": 9551
+        },
+        "source_scope": "chapter",
+        "render_sha256": "5105677faacd6ba3c47df6497c5c246d354640345019bb93647429a698c69192"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:4",
+        "role_id": "narrator",
+        "start_sample": 15086880,
+        "end_sample": 15359520,
+        "source_start": 704,
+        "source_end": 910,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 9551,
+          "end": 9757
+        },
+        "source_scope": "chapter",
+        "render_sha256": "54975b083155c3824381fdd6403a56a7e5067859d22b652fc784326b638f2ad5"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:5",
+        "role_id": "narrator",
+        "start_sample": 15359520,
+        "end_sample": 15751200,
+        "source_start": 910,
+        "source_end": 1200,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 9757,
+          "end": 10047
+        },
+        "source_scope": "chapter",
+        "render_sha256": "fb0fa28fe1a92a1121fb9f164f9c6813d767e004ff59ad20134a4a1fb35624aa"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:6",
+        "role_id": "narrator",
+        "start_sample": 15751200,
+        "end_sample": 16023840,
+        "source_start": 1200,
+        "source_end": 1398,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 10047,
+          "end": 10245
+        },
+        "source_scope": "chapter",
+        "render_sha256": "0fdc1bf5d7f9a7ee0f8bf547784e8a867215a4346a1b3e120131d1f28de8cde2"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:7",
+        "role_id": "narrator",
+        "start_sample": 16023840,
+        "end_sample": 16419360,
+        "source_start": 1398,
+        "source_end": 1688,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 10245,
+          "end": 10535
+        },
+        "source_scope": "chapter",
+        "render_sha256": "8da8f00eabdb6318aa87ad7da82c3400d8beb001910cf30defa2d3c9256d8769"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:8",
+        "role_id": "narrator",
+        "start_sample": 16419360,
+        "end_sample": 16845600,
+        "source_start": 1688,
+        "source_end": 1985,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 10535,
+          "end": 10832
+        },
+        "source_scope": "chapter",
+        "render_sha256": "afbc954e79680fb404212601873360c159514eb396a578a96eaf6a663bc76ca3"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:9",
+        "role_id": "narrator",
+        "start_sample": 16845600,
+        "end_sample": 17314080,
+        "source_start": 1985,
+        "source_end": 2276,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 10832,
+          "end": 11123
+        },
+        "source_scope": "chapter",
+        "render_sha256": "1b41fda96ac8b6829b9eb957dab376e956115909d71beb71604a57ac8bae2b60"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:10",
+        "role_id": "narrator",
+        "start_sample": 17314080,
+        "end_sample": 17663520,
+        "source_start": 2276,
+        "source_end": 2529,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 11123,
+          "end": 11376
+        },
+        "source_scope": "chapter",
+        "render_sha256": "72aa2a4fc6f6b500baed427713d318136dff09005aa047f2a8a02f2f9ee9f763"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:11",
+        "role_id": "narrator",
+        "start_sample": 17663520,
+        "end_sample": 17970720,
+        "source_start": 2529,
+        "source_end": 2756,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 11376,
+          "end": 11603
+        },
+        "source_scope": "chapter",
+        "render_sha256": "3a2c47749382008957ff8eda6fc0f4270c5e196c42bdac98d04f6da41e02b5e6"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:12",
+        "role_id": "narrator",
+        "start_sample": 17970720,
+        "end_sample": 18212640,
+        "source_start": 2756,
+        "source_end": 2938,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 11603,
+          "end": 11785
+        },
+        "source_scope": "chapter",
+        "render_sha256": "3a424f4cb7e8e183fb0f9b23951214098d1e71d5ae8c6b6748ecc54618c4d88f"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:13",
+        "role_id": "narrator",
+        "start_sample": 18212640,
+        "end_sample": 18665760,
+        "source_start": 2938,
+        "source_end": 3224,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 11785,
+          "end": 12071
+        },
+        "source_scope": "chapter",
+        "render_sha256": "68b609b1149e147945fa0313670aa14c590acc93d224ab0c2d86ce268659f8c8"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:14",
+        "role_id": "narrator",
+        "start_sample": 18665760,
+        "end_sample": 19103520,
+        "source_start": 3224,
+        "source_end": 3503,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 12071,
+          "end": 12350
+        },
+        "source_scope": "chapter",
+        "render_sha256": "b271d74fdab1d437c11e4bdd76fb98299a56c42417be8dd68801f1ff09151958"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:15",
+        "role_id": "narrator",
+        "start_sample": 19103520,
+        "end_sample": 19464480,
+        "source_start": 3503,
+        "source_end": 3750,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 12350,
+          "end": 12597
+        },
+        "source_scope": "chapter",
+        "render_sha256": "67796179b68c4294cc8beec6e0f2fe9dd3445aaae4285176af53829a81f2b031"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:16",
+        "role_id": "narrator",
+        "start_sample": 19464480,
+        "end_sample": 19894560,
+        "source_start": 3750,
+        "source_end": 4036,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 12597,
+          "end": 12883
+        },
+        "source_scope": "chapter",
+        "render_sha256": "d5a5b294eda8349b0c768712f750dd80a7cc81ffae38ab6a70dbb6eb527f53bc"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:17",
+        "role_id": "narrator",
+        "start_sample": 19894560,
+        "end_sample": 20332320,
+        "source_start": 4036,
+        "source_end": 4335,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 12883,
+          "end": 13182
+        },
+        "source_scope": "chapter",
+        "render_sha256": "38c30e65b2f4d2f96fb9aee4d1c1730b7015818d8401bfb380d85c32ae589d17"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:18",
+        "role_id": "narrator",
+        "start_sample": 20332320,
+        "end_sample": 20727840,
+        "source_start": 4335,
+        "source_end": 4580,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 13182,
+          "end": 13427
+        },
+        "source_scope": "chapter",
+        "render_sha256": "060893f754d8852ea2203b4d7ac0a5bd342e5810c80dfb6a3c9cd6bfdf53e111"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:19",
+        "role_id": "narrator",
+        "start_sample": 20727840,
+        "end_sample": 21019680,
+        "source_start": 4580,
+        "source_end": 4820,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 13427,
+          "end": 13667
+        },
+        "source_scope": "chapter",
+        "render_sha256": "66dcb69ce56e018775fe8fd23672898017b5c952f18d49b49f3ffaa647be7dc6"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:20",
+        "role_id": "narrator",
+        "start_sample": 21019680,
+        "end_sample": 21407520,
+        "source_start": 4820,
+        "source_end": 5105,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 13667,
+          "end": 13952
+        },
+        "source_scope": "chapter",
+        "render_sha256": "a8d20436c2fad4d791a3c32b14d69140f380a86d1cda0d265db36ffbe5586efd"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:21",
+        "role_id": "narrator",
+        "start_sample": 21407520,
+        "end_sample": 21826080,
+        "source_start": 5105,
+        "source_end": 5336,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 13952,
+          "end": 14183
+        },
+        "source_scope": "chapter",
+        "render_sha256": "64063956f15f9eba8532891d4aee829f4448aca233d4e28eed50f33e2d78ccd3"
+      },
+      {
+        "chunk_id": "5:63:narrator:chunk:22",
+        "role_id": "narrator",
+        "start_sample": 21826080,
+        "end_sample": 22033440,
+        "source_start": 5336,
+        "source_end": 5464,
+        "unit_id": "5:63:narrator",
+        "source_span": {
+          "chapter_index": 5,
+          "start": 14183,
+          "end": 14311
+        },
+        "source_scope": "chapter",
+        "render_sha256": "efdfeb57d8d3f18cd674d61b2747d04176b4f7c30a1ac153a5b7a43dd17d656f"
+      }
+    ],
+    "boundaries": [
+      {
+        "boundary_id": "5:1:narrator:chunk:1|5:1:narrator:chunk:2",
+        "left_chunk_id": "5:1:narrator:chunk:1",
+        "right_chunk_id": "5:1:narrator:chunk:2",
+        "start_sample": 341760,
+        "end_sample": 341760,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:1:narrator:chunk:2|5:1:narrator:chunk:3",
+        "left_chunk_id": "5:1:narrator:chunk:2",
+        "right_chunk_id": "5:1:narrator:chunk:3",
+        "start_sample": 687360,
+        "end_sample": 687360,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:1:narrator:chunk:3|5:2:bryce_father:chunk:1",
+        "left_chunk_id": "5:1:narrator:chunk:3",
+        "right_chunk_id": "5:2:bryce_father:chunk:1",
+        "start_sample": 967680,
+        "end_sample": 967680,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:2:bryce_father:chunk:1|5:3:narrator:chunk:1",
+        "left_chunk_id": "5:2:bryce_father:chunk:1",
+        "right_chunk_id": "5:3:narrator:chunk:1",
+        "start_sample": 990720,
+        "end_sample": 990720,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:3:narrator:chunk:1|5:4:bryce_father:chunk:1",
+        "left_chunk_id": "5:3:narrator:chunk:1",
+        "right_chunk_id": "5:4:bryce_father:chunk:1",
+        "start_sample": 1056000,
+        "end_sample": 1056000,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:4:bryce_father:chunk:1|5:5:narrator:chunk:1",
+        "left_chunk_id": "5:4:bryce_father:chunk:1",
+        "right_chunk_id": "5:5:narrator:chunk:1",
+        "start_sample": 1136640,
+        "end_sample": 1136640,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:5:narrator:chunk:1|5:6:juli:chunk:1",
+        "left_chunk_id": "5:5:narrator:chunk:1",
+        "right_chunk_id": "5:6:juli:chunk:1",
+        "start_sample": 1413120,
+        "end_sample": 1413120,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:6:juli:chunk:1|5:7:narrator:chunk:1",
+        "left_chunk_id": "5:6:juli:chunk:1",
+        "right_chunk_id": "5:7:narrator:chunk:1",
+        "start_sample": 1459200,
+        "end_sample": 1459200,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:7:narrator:chunk:1|5:8:juli:chunk:1",
+        "left_chunk_id": "5:7:narrator:chunk:1",
+        "right_chunk_id": "5:8:juli:chunk:1",
+        "start_sample": 1506720,
+        "end_sample": 1506720,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:8:juli:chunk:1|5:9:narrator:chunk:1",
+        "left_chunk_id": "5:8:juli:chunk:1",
+        "right_chunk_id": "5:9:narrator:chunk:1",
+        "start_sample": 1598880,
+        "end_sample": 1598880,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:9:narrator:chunk:1|5:10:bryce_father:chunk:1",
+        "left_chunk_id": "5:9:narrator:chunk:1",
+        "right_chunk_id": "5:10:bryce_father:chunk:1",
+        "start_sample": 1810080,
+        "end_sample": 1810080,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:10:bryce_father:chunk:1|5:11:narrator:chunk:1",
+        "left_chunk_id": "5:10:bryce_father:chunk:1",
+        "right_chunk_id": "5:11:narrator:chunk:1",
+        "start_sample": 1863840,
+        "end_sample": 1863840,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:11:narrator:chunk:1|5:12:bryce_father:chunk:1",
+        "left_chunk_id": "5:11:narrator:chunk:1",
+        "right_chunk_id": "5:12:bryce_father:chunk:1",
+        "start_sample": 1900800,
+        "end_sample": 1900800,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:12:bryce_father:chunk:1|5:14:juli:chunk:1",
+        "left_chunk_id": "5:12:bryce_father:chunk:1",
+        "right_chunk_id": "5:14:juli:chunk:1",
+        "start_sample": 1996800,
+        "end_sample": 1996800,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:14:juli:chunk:1|5:15:narrator:chunk:1",
+        "left_chunk_id": "5:14:juli:chunk:1",
+        "right_chunk_id": "5:15:narrator:chunk:1",
+        "start_sample": 2077440,
+        "end_sample": 2077440,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:15:narrator:chunk:1|5:16:juli:chunk:1",
+        "left_chunk_id": "5:15:narrator:chunk:1",
+        "right_chunk_id": "5:16:juli:chunk:1",
+        "start_sample": 2161920,
+        "end_sample": 2164320,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 2400
+      },
+      {
+        "boundary_id": "5:16:juli:chunk:1|5:18:bryce_father:chunk:1",
+        "left_chunk_id": "5:16:juli:chunk:1",
+        "right_chunk_id": "5:18:bryce_father:chunk:1",
+        "start_sample": 2229600,
+        "end_sample": 2229600,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:18:bryce_father:chunk:1|5:19:narrator:chunk:1",
+        "left_chunk_id": "5:18:bryce_father:chunk:1",
+        "right_chunk_id": "5:19:narrator:chunk:1",
+        "start_sample": 2436960,
+        "end_sample": 2436960,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:19:narrator:chunk:1|5:20:bryce_father:chunk:1",
+        "left_chunk_id": "5:19:narrator:chunk:1",
+        "right_chunk_id": "5:20:bryce_father:chunk:1",
+        "start_sample": 2513760,
+        "end_sample": 2513760,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:20:bryce_father:chunk:1|5:21:narrator:chunk:1",
+        "left_chunk_id": "5:20:bryce_father:chunk:1",
+        "right_chunk_id": "5:21:narrator:chunk:1",
+        "start_sample": 2632800,
+        "end_sample": 2632800,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:21:narrator:chunk:1|5:22:juli:chunk:1",
+        "left_chunk_id": "5:21:narrator:chunk:1",
+        "right_chunk_id": "5:22:juli:chunk:1",
+        "start_sample": 2928480,
+        "end_sample": 2928480,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:22:juli:chunk:1|5:23:narrator:chunk:1",
+        "left_chunk_id": "5:22:juli:chunk:1",
+        "right_chunk_id": "5:23:narrator:chunk:1",
+        "start_sample": 3024480,
+        "end_sample": 3024480,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:23:narrator:chunk:1|5:24:juli:chunk:1",
+        "left_chunk_id": "5:23:narrator:chunk:1",
+        "right_chunk_id": "5:24:juli:chunk:1",
+        "start_sample": 3103200,
+        "end_sample": 3103200,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:24:juli:chunk:1|5:25:narrator:chunk:1",
+        "left_chunk_id": "5:24:juli:chunk:1",
+        "right_chunk_id": "5:25:narrator:chunk:1",
+        "start_sample": 3168480,
+        "end_sample": 3168480,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:25:narrator:chunk:1|5:26:bryce_father:chunk:1",
+        "left_chunk_id": "5:25:narrator:chunk:1",
+        "right_chunk_id": "5:26:bryce_father:chunk:1",
+        "start_sample": 3249120,
+        "end_sample": 3249120,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:26:bryce_father:chunk:1|5:27:narrator:chunk:1",
+        "left_chunk_id": "5:26:bryce_father:chunk:1",
+        "right_chunk_id": "5:27:narrator:chunk:1",
+        "start_sample": 3287520,
+        "end_sample": 3287520,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:27:narrator:chunk:1|5:28:bryce_father:chunk:1",
+        "left_chunk_id": "5:27:narrator:chunk:1",
+        "right_chunk_id": "5:28:bryce_father:chunk:1",
+        "start_sample": 3364320,
+        "end_sample": 3364320,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:28:bryce_father:chunk:1|5:29:narrator:chunk:1",
+        "left_chunk_id": "5:28:bryce_father:chunk:1",
+        "right_chunk_id": "5:29:narrator:chunk:1",
+        "start_sample": 3483360,
+        "end_sample": 3483360,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:29:narrator:chunk:1|5:29:narrator:chunk:2",
+        "left_chunk_id": "5:29:narrator:chunk:1",
+        "right_chunk_id": "5:29:narrator:chunk:2",
+        "start_sample": 3771360,
+        "end_sample": 3771360,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:29:narrator:chunk:2|5:29:narrator:chunk:3",
+        "left_chunk_id": "5:29:narrator:chunk:2",
+        "right_chunk_id": "5:29:narrator:chunk:3",
+        "start_sample": 4186080,
+        "end_sample": 4186080,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:29:narrator:chunk:3|5:29:narrator:chunk:4",
+        "left_chunk_id": "5:29:narrator:chunk:3",
+        "right_chunk_id": "5:29:narrator:chunk:4",
+        "start_sample": 4481760,
+        "end_sample": 4481760,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:29:narrator:chunk:4|5:29:narrator:chunk:5",
+        "left_chunk_id": "5:29:narrator:chunk:4",
+        "right_chunk_id": "5:29:narrator:chunk:5",
+        "start_sample": 4792800,
+        "end_sample": 4792800,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:29:narrator:chunk:5|5:30:juli:chunk:1",
+        "left_chunk_id": "5:29:narrator:chunk:5",
+        "right_chunk_id": "5:30:juli:chunk:1",
+        "start_sample": 5169120,
+        "end_sample": 5169120,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:30:juli:chunk:1|5:31:narrator:chunk:1",
+        "left_chunk_id": "5:30:juli:chunk:1",
+        "right_chunk_id": "5:31:narrator:chunk:1",
+        "start_sample": 5311200,
+        "end_sample": 5311200,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:31:narrator:chunk:1|5:32:bryce_mother:chunk:1",
+        "left_chunk_id": "5:31:narrator:chunk:1",
+        "right_chunk_id": "5:32:bryce_mother:chunk:1",
+        "start_sample": 5403360,
+        "end_sample": 5404800,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 1440
+      },
+      {
+        "boundary_id": "5:32:bryce_mother:chunk:1|5:33:narrator:chunk:1",
+        "left_chunk_id": "5:32:bryce_mother:chunk:1",
+        "right_chunk_id": "5:33:narrator:chunk:1",
+        "start_sample": 5454720,
+        "end_sample": 5454720,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:33:narrator:chunk:1|5:34:juli:chunk:1",
+        "left_chunk_id": "5:33:narrator:chunk:1",
+        "right_chunk_id": "5:34:juli:chunk:1",
+        "start_sample": 5512320,
+        "end_sample": 5512320,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:34:juli:chunk:1|5:35:narrator:chunk:1",
+        "left_chunk_id": "5:34:juli:chunk:1",
+        "right_chunk_id": "5:35:narrator:chunk:1",
+        "start_sample": 5543040,
+        "end_sample": 5543040,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:35:narrator:chunk:1|5:36:bryce_mother:chunk:1",
+        "left_chunk_id": "5:35:narrator:chunk:1",
+        "right_chunk_id": "5:36:bryce_mother:chunk:1",
+        "start_sample": 5708160,
+        "end_sample": 5708160,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:36:bryce_mother:chunk:1|5:38:juli:chunk:1",
+        "left_chunk_id": "5:36:bryce_mother:chunk:1",
+        "right_chunk_id": "5:38:juli:chunk:1",
+        "start_sample": 5758080,
+        "end_sample": 5758080,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:38:juli:chunk:1|5:39:narrator:chunk:1",
+        "left_chunk_id": "5:38:juli:chunk:1",
+        "right_chunk_id": "5:39:narrator:chunk:1",
+        "start_sample": 5842560,
+        "end_sample": 5842560,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:39:narrator:chunk:1|5:40:bryce_mother:chunk:1",
+        "left_chunk_id": "5:39:narrator:chunk:1",
+        "right_chunk_id": "5:40:bryce_mother:chunk:1",
+        "start_sample": 5911680,
+        "end_sample": 5911680,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:40:bryce_mother:chunk:1|5:41:narrator:chunk:1",
+        "left_chunk_id": "5:40:bryce_mother:chunk:1",
+        "right_chunk_id": "5:41:narrator:chunk:1",
+        "start_sample": 5988480,
+        "end_sample": 5988480,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:41:narrator:chunk:1|5:42:juli:chunk:1",
+        "left_chunk_id": "5:41:narrator:chunk:1",
+        "right_chunk_id": "5:42:juli:chunk:1",
+        "start_sample": 6065280,
+        "end_sample": 6065280,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:42:juli:chunk:1|5:43:narrator:chunk:1",
+        "left_chunk_id": "5:42:juli:chunk:1",
+        "right_chunk_id": "5:43:narrator:chunk:1",
+        "start_sample": 6088320,
+        "end_sample": 6088320,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:43:narrator:chunk:1|5:44:bryce_mother:chunk:1",
+        "left_chunk_id": "5:43:narrator:chunk:1",
+        "right_chunk_id": "5:44:bryce_mother:chunk:1",
+        "start_sample": 6314880,
+        "end_sample": 6315360,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 480
+      },
+      {
+        "boundary_id": "5:44:bryce_mother:chunk:1|5:45:narrator:chunk:1",
+        "left_chunk_id": "5:44:bryce_mother:chunk:1",
+        "right_chunk_id": "5:45:narrator:chunk:1",
+        "start_sample": 6426720,
+        "end_sample": 6426720,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:45:narrator:chunk:1|5:46:bryce_mother:chunk:1",
+        "left_chunk_id": "5:45:narrator:chunk:1",
+        "right_chunk_id": "5:46:bryce_mother:chunk:1",
+        "start_sample": 6618720,
+        "end_sample": 6618720,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:46:bryce_mother:chunk:1|5:47:narrator:chunk:1",
+        "left_chunk_id": "5:46:bryce_mother:chunk:1",
+        "right_chunk_id": "5:47:narrator:chunk:1",
+        "start_sample": 6647520,
+        "end_sample": 6647520,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:47:narrator:chunk:1|5:47:narrator:chunk:2",
+        "left_chunk_id": "5:47:narrator:chunk:1",
+        "right_chunk_id": "5:47:narrator:chunk:2",
+        "start_sample": 7046880,
+        "end_sample": 7046880,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:47:narrator:chunk:2|5:47:narrator:chunk:3",
+        "left_chunk_id": "5:47:narrator:chunk:2",
+        "right_chunk_id": "5:47:narrator:chunk:3",
+        "start_sample": 7469280,
+        "end_sample": 7469280,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:47:narrator:chunk:3|5:48:juli:chunk:1",
+        "left_chunk_id": "5:47:narrator:chunk:3",
+        "right_chunk_id": "5:48:juli:chunk:1",
+        "start_sample": 7860960,
+        "end_sample": 7862400,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 1440
+      },
+      {
+        "boundary_id": "5:48:juli:chunk:1|5:49:narrator:chunk:1",
+        "left_chunk_id": "5:48:juli:chunk:1",
+        "right_chunk_id": "5:49:narrator:chunk:1",
+        "start_sample": 7923840,
+        "end_sample": 7923840,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:49:narrator:chunk:1|5:50:juli:chunk:1",
+        "left_chunk_id": "5:49:narrator:chunk:1",
+        "right_chunk_id": "5:50:juli:chunk:1",
+        "start_sample": 8000640,
+        "end_sample": 8000640,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:50:juli:chunk:1|5:51:narrator:chunk:1",
+        "left_chunk_id": "5:50:juli:chunk:1",
+        "right_chunk_id": "5:51:narrator:chunk:1",
+        "start_sample": 8050560,
+        "end_sample": 8050560,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:51:narrator:chunk:1|5:51:narrator:chunk:2",
+        "left_chunk_id": "5:51:narrator:chunk:1",
+        "right_chunk_id": "5:51:narrator:chunk:2",
+        "start_sample": 8423040,
+        "end_sample": 8423040,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:51:narrator:chunk:2|5:51:narrator:chunk:3",
+        "left_chunk_id": "5:51:narrator:chunk:2",
+        "right_chunk_id": "5:51:narrator:chunk:3",
+        "start_sample": 8968320,
+        "end_sample": 8968320,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:51:narrator:chunk:3|5:51:narrator:chunk:4",
+        "left_chunk_id": "5:51:narrator:chunk:3",
+        "right_chunk_id": "5:51:narrator:chunk:4",
+        "start_sample": 9383040,
+        "end_sample": 9383040,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:51:narrator:chunk:4|5:51:narrator:chunk:5",
+        "left_chunk_id": "5:51:narrator:chunk:4",
+        "right_chunk_id": "5:51:narrator:chunk:5",
+        "start_sample": 9736320,
+        "end_sample": 9736320,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:51:narrator:chunk:5|5:51:narrator:chunk:6",
+        "left_chunk_id": "5:51:narrator:chunk:5",
+        "right_chunk_id": "5:51:narrator:chunk:6",
+        "start_sample": 10070400,
+        "end_sample": 10070400,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:51:narrator:chunk:6|5:51:narrator:chunk:7",
+        "left_chunk_id": "5:51:narrator:chunk:6",
+        "right_chunk_id": "5:51:narrator:chunk:7",
+        "start_sample": 10439040,
+        "end_sample": 10439040,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:51:narrator:chunk:7|5:51:narrator:chunk:8",
+        "left_chunk_id": "5:51:narrator:chunk:7",
+        "right_chunk_id": "5:51:narrator:chunk:8",
+        "start_sample": 10707840,
+        "end_sample": 10707840,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:51:narrator:chunk:8|5:51:narrator:chunk:9",
+        "left_chunk_id": "5:51:narrator:chunk:8",
+        "right_chunk_id": "5:51:narrator:chunk:9",
+        "start_sample": 11045760,
+        "end_sample": 11045760,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:51:narrator:chunk:9|5:51:narrator:chunk:10",
+        "left_chunk_id": "5:51:narrator:chunk:9",
+        "right_chunk_id": "5:51:narrator:chunk:10",
+        "start_sample": 11464320,
+        "end_sample": 11464320,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:51:narrator:chunk:10|5:51:narrator:chunk:11",
+        "left_chunk_id": "5:51:narrator:chunk:10",
+        "right_chunk_id": "5:51:narrator:chunk:11",
+        "start_sample": 11806080,
+        "end_sample": 11806080,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:51:narrator:chunk:11|5:51:narrator:chunk:12",
+        "left_chunk_id": "5:51:narrator:chunk:11",
+        "right_chunk_id": "5:51:narrator:chunk:12",
+        "start_sample": 12105600,
+        "end_sample": 12105600,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:51:narrator:chunk:12|5:52:bryce_mother:chunk:1",
+        "left_chunk_id": "5:51:narrator:chunk:12",
+        "right_chunk_id": "5:52:bryce_mother:chunk:1",
+        "start_sample": 12439680,
+        "end_sample": 12439680,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:52:bryce_mother:chunk:1|5:53:narrator:chunk:1",
+        "left_chunk_id": "5:52:bryce_mother:chunk:1",
+        "right_chunk_id": "5:53:narrator:chunk:1",
+        "start_sample": 12577920,
+        "end_sample": 12577920,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:53:narrator:chunk:1|5:53:narrator:chunk:2",
+        "left_chunk_id": "5:53:narrator:chunk:1",
+        "right_chunk_id": "5:53:narrator:chunk:2",
+        "start_sample": 12915840,
+        "end_sample": 12915840,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:53:narrator:chunk:2|5:54:juli:chunk:1",
+        "left_chunk_id": "5:53:narrator:chunk:2",
+        "right_chunk_id": "5:54:juli:chunk:1",
+        "start_sample": 13023360,
+        "end_sample": 13025280,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 1920
+      },
+      {
+        "boundary_id": "5:54:juli:chunk:1|5:55:narrator:chunk:1",
+        "left_chunk_id": "5:54:juli:chunk:1",
+        "right_chunk_id": "5:55:narrator:chunk:1",
+        "start_sample": 13052160,
+        "end_sample": 13052160,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:55:narrator:chunk:1|5:56:juli:chunk:1",
+        "left_chunk_id": "5:55:narrator:chunk:1",
+        "right_chunk_id": "5:56:juli:chunk:1",
+        "start_sample": 13109760,
+        "end_sample": 13109760,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:56:juli:chunk:1|5:57:narrator:chunk:1",
+        "left_chunk_id": "5:56:juli:chunk:1",
+        "right_chunk_id": "5:57:narrator:chunk:1",
+        "start_sample": 13140480,
+        "end_sample": 13140480,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:57:narrator:chunk:1|5:58:classmates:chunk:1",
+        "left_chunk_id": "5:57:narrator:chunk:1",
+        "right_chunk_id": "5:58:classmates:chunk:1",
+        "start_sample": 13589760,
+        "end_sample": 13591200,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 1440
+      },
+      {
+        "boundary_id": "5:58:classmates:chunk:1|5:60:classmates:chunk:1",
+        "left_chunk_id": "5:58:classmates:chunk:1",
+        "right_chunk_id": "5:60:classmates:chunk:1",
+        "start_sample": 13641120,
+        "end_sample": 13641120,
+        "same_speaker": true,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:60:classmates:chunk:1|5:61:narrator:chunk:1",
+        "left_chunk_id": "5:60:classmates:chunk:1",
+        "right_chunk_id": "5:61:narrator:chunk:1",
+        "start_sample": 13692000,
+        "end_sample": 13692000,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:61:narrator:chunk:1|5:62:classmates:chunk:1",
+        "left_chunk_id": "5:61:narrator:chunk:1",
+        "right_chunk_id": "5:62:classmates:chunk:1",
+        "start_sample": 13826400,
+        "end_sample": 13829280,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 2880
+      },
+      {
+        "boundary_id": "5:62:classmates:chunk:1|5:63:narrator:chunk:1",
+        "left_chunk_id": "5:62:classmates:chunk:1",
+        "right_chunk_id": "5:63:narrator:chunk:1",
+        "start_sample": 13975200,
+        "end_sample": 13977120,
+        "same_speaker": false,
+        "boundary_kind": "unit_end",
+        "added_silence_samples": 1920
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:1|5:63:narrator:chunk:2",
+        "left_chunk_id": "5:63:narrator:chunk:1",
+        "right_chunk_id": "5:63:narrator:chunk:2",
+        "start_sample": 14380320,
+        "end_sample": 14380320,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:2|5:63:narrator:chunk:3",
+        "left_chunk_id": "5:63:narrator:chunk:2",
+        "right_chunk_id": "5:63:narrator:chunk:3",
+        "start_sample": 14764320,
+        "end_sample": 14764320,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:3|5:63:narrator:chunk:4",
+        "left_chunk_id": "5:63:narrator:chunk:3",
+        "right_chunk_id": "5:63:narrator:chunk:4",
+        "start_sample": 15086880,
+        "end_sample": 15086880,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:4|5:63:narrator:chunk:5",
+        "left_chunk_id": "5:63:narrator:chunk:4",
+        "right_chunk_id": "5:63:narrator:chunk:5",
+        "start_sample": 15359520,
+        "end_sample": 15359520,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:5|5:63:narrator:chunk:6",
+        "left_chunk_id": "5:63:narrator:chunk:5",
+        "right_chunk_id": "5:63:narrator:chunk:6",
+        "start_sample": 15751200,
+        "end_sample": 15751200,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:6|5:63:narrator:chunk:7",
+        "left_chunk_id": "5:63:narrator:chunk:6",
+        "right_chunk_id": "5:63:narrator:chunk:7",
+        "start_sample": 16023840,
+        "end_sample": 16023840,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:7|5:63:narrator:chunk:8",
+        "left_chunk_id": "5:63:narrator:chunk:7",
+        "right_chunk_id": "5:63:narrator:chunk:8",
+        "start_sample": 16419360,
+        "end_sample": 16419360,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:8|5:63:narrator:chunk:9",
+        "left_chunk_id": "5:63:narrator:chunk:8",
+        "right_chunk_id": "5:63:narrator:chunk:9",
+        "start_sample": 16845600,
+        "end_sample": 16845600,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:9|5:63:narrator:chunk:10",
+        "left_chunk_id": "5:63:narrator:chunk:9",
+        "right_chunk_id": "5:63:narrator:chunk:10",
+        "start_sample": 17314080,
+        "end_sample": 17314080,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:10|5:63:narrator:chunk:11",
+        "left_chunk_id": "5:63:narrator:chunk:10",
+        "right_chunk_id": "5:63:narrator:chunk:11",
+        "start_sample": 17663520,
+        "end_sample": 17663520,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:11|5:63:narrator:chunk:12",
+        "left_chunk_id": "5:63:narrator:chunk:11",
+        "right_chunk_id": "5:63:narrator:chunk:12",
+        "start_sample": 17970720,
+        "end_sample": 17970720,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:12|5:63:narrator:chunk:13",
+        "left_chunk_id": "5:63:narrator:chunk:12",
+        "right_chunk_id": "5:63:narrator:chunk:13",
+        "start_sample": 18212640,
+        "end_sample": 18212640,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:13|5:63:narrator:chunk:14",
+        "left_chunk_id": "5:63:narrator:chunk:13",
+        "right_chunk_id": "5:63:narrator:chunk:14",
+        "start_sample": 18665760,
+        "end_sample": 18665760,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:14|5:63:narrator:chunk:15",
+        "left_chunk_id": "5:63:narrator:chunk:14",
+        "right_chunk_id": "5:63:narrator:chunk:15",
+        "start_sample": 19103520,
+        "end_sample": 19103520,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:15|5:63:narrator:chunk:16",
+        "left_chunk_id": "5:63:narrator:chunk:15",
+        "right_chunk_id": "5:63:narrator:chunk:16",
+        "start_sample": 19464480,
+        "end_sample": 19464480,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:16|5:63:narrator:chunk:17",
+        "left_chunk_id": "5:63:narrator:chunk:16",
+        "right_chunk_id": "5:63:narrator:chunk:17",
+        "start_sample": 19894560,
+        "end_sample": 19894560,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:17|5:63:narrator:chunk:18",
+        "left_chunk_id": "5:63:narrator:chunk:17",
+        "right_chunk_id": "5:63:narrator:chunk:18",
+        "start_sample": 20332320,
+        "end_sample": 20332320,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:18|5:63:narrator:chunk:19",
+        "left_chunk_id": "5:63:narrator:chunk:18",
+        "right_chunk_id": "5:63:narrator:chunk:19",
+        "start_sample": 20727840,
+        "end_sample": 20727840,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:19|5:63:narrator:chunk:20",
+        "left_chunk_id": "5:63:narrator:chunk:19",
+        "right_chunk_id": "5:63:narrator:chunk:20",
+        "start_sample": 21019680,
+        "end_sample": 21019680,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:20|5:63:narrator:chunk:21",
+        "left_chunk_id": "5:63:narrator:chunk:20",
+        "right_chunk_id": "5:63:narrator:chunk:21",
+        "start_sample": 21407520,
+        "end_sample": 21407520,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      },
+      {
+        "boundary_id": "5:63:narrator:chunk:21|5:63:narrator:chunk:22",
+        "left_chunk_id": "5:63:narrator:chunk:21",
+        "right_chunk_id": "5:63:narrator:chunk:22",
+        "start_sample": 21826080,
+        "end_sample": 21826080,
+        "same_speaker": true,
+        "boundary_kind": "continuation",
+        "added_silence_samples": 0
+      }
+    ]
+  },
+  "preview_pairs": [
+    {
+      "sample_id": "J009",
+      "condition": "before",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/J009_before.wav",
+      "audio_sha256": "b7a6d31ada52a629935eb2104a829c2e479f052dc451bb2e823ffc0fa7b8e05f"
+    },
+    {
+      "sample_id": "J009",
+      "condition": "after",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/J009_after.wav",
+      "audio_sha256": "a0419821c5d5b3fd4a025dd089892cc8a3273825ca97295e0cd050f77b8d75d2"
+    },
+    {
+      "sample_id": "J013",
+      "condition": "before",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/J013_before.wav",
+      "audio_sha256": "3e911307680e77c26a9a060d0e4189780df80220647742825948da208e007685"
+    },
+    {
+      "sample_id": "J013",
+      "condition": "after",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/J013_after.wav",
+      "audio_sha256": "88b83459dfdf41e6054e1f93e7756763b76ef672b806630392c0f8f07d9677bf"
+    },
+    {
+      "sample_id": "J023",
+      "condition": "before",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/J023_before.wav",
+      "audio_sha256": "87a56d3c239e1e238937fe3509e0577b00829f187ba90944ba28da4255ba98ed"
+    },
+    {
+      "sample_id": "J023",
+      "condition": "after",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/J023_after.wav",
+      "audio_sha256": "8ddf41f8f0c21ec512b7bca9d2c4316ad96276b1a7a2d0527fe1c644de538a4b"
+    },
+    {
+      "sample_id": "J076",
+      "condition": "before",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/J076_before.wav",
+      "audio_sha256": "f27b20cc6ff3276c079824ded084df28c2731ad61265f25080ca433eb244c91f"
+    },
+    {
+      "sample_id": "J076",
+      "condition": "after",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/J076_after.wav",
+      "audio_sha256": "09a2334ddeb23cc38bc8191a194fd1b582c41a19aa9adb6f8e229b46e30f2626"
+    }
+  ],
+  "replaced_indices": [
+    9,
+    13,
+    22,
+    23,
+    49,
+    76
+  ],
+  "unchanged_chunk_count": 94,
+  "pcm_layout_verified": true,
+  "text_and_source_spans_unchanged": true,
+  "requests_sent": 0,
+  "automatic_promotion": false,
+  "human_review_status": "pending",
+  "Bryce_voice_changed": false
+}

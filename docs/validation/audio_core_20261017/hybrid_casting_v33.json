@@ -1,0 +1,162 @@
+{
+  "schema_version": "mimo-hybrid-validation-v33",
+  "date": "2026-10-17",
+  "status": "implementation_and_pilot_complete_pending_new_scene_human_review",
+  "scope": "engineering_pilot_not_multibook_or_listener_efficacy",
+  "implemented": [
+    "full_script_role_usage",
+    "injective_preset_allocation_with_explicit_locks",
+    "versioned_llm_voice_cards",
+    "per_role_mimo_model_routing",
+    "source_bound_fixed_human_references",
+    "source_measured_utterance_loudness_matching"
+  ],
+  "source_text_and_ownership_preserved": true,
+  "statistics_fixture_chapters": 12,
+  "observed_tts_requests": 17,
+  "model_requests": {
+    "mimo-v2.5-tts-voicedesign": 11,
+    "mimo-v2.5-tts": 6
+  },
+  "characters": 1104,
+  "repair_requests": 0,
+  "llm_voice_card_successful_requests": 1,
+  "llm_card_receipt": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_plan_20261017/voice_card_generation.json",
+  "probe_human_acceptance": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/hybrid_voicedesign_20261017/human_acceptance_v33.json",
+    "sha256": "f8eaf6545ca3e4d2434648ed38ae3b3fcf53ba1621fa77b30b0df9bb9d2a7384",
+    "verbatim": "内容完整、同角色一致、两角色容易区分"
+  },
+  "new_scene_raw_audio_hashes": [
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/chapter_01_full.wav",
+      "sha256": "2d3c38aad0821c846af06296fe03f9d579881d9782a292f47cc4d4b3a555a5cb"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/chapter_04_full.wav",
+      "sha256": "0d5fff60af51711818a75aa8a1704f8fda91dcd9951d0e13296dd547ef54285d"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/chapter_08_full.wav",
+      "sha256": "c8eadbe807fe1e656185cdc7c31e3f5046b83c2619f73c89f024eebadd4f5e6c"
+    }
+  ],
+  "fixed_reference_uses": [
+    {
+      "chapter": 1,
+      "role": "lead",
+      "sha256": "463636b78897a610327125600879f81da5e99778a51a30005446bf24fc881302"
+    },
+    {
+      "chapter": 1,
+      "role": "guest",
+      "sha256": "ce23b9f895fc93614d3c9dde58e02b51ad1452b9f258698bb5500594f18a0c59"
+    },
+    {
+      "chapter": 4,
+      "role": "lead",
+      "sha256": "463636b78897a610327125600879f81da5e99778a51a30005446bf24fc881302"
+    },
+    {
+      "chapter": 8,
+      "role": "guest",
+      "sha256": "ce23b9f895fc93614d3c9dde58e02b51ad1452b9f258698bb5500594f18a0c59"
+    },
+    {
+      "chapter": 8,
+      "role": "lead",
+      "sha256": "463636b78897a610327125600879f81da5e99778a51a30005446bf24fc881302"
+    }
+  ],
+  "chapters": [
+    {
+      "chapter": 1,
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_matched_20261017/chapter_01/quality.json",
+      "report_sha256": "3791509b3aca3b723b839e8a995a07827982026410e2b8964b137261e8bc47dd",
+      "pcm_preserved": true,
+      "machine_quality_status": "incomplete",
+      "human_status": "pending",
+      "chunk_issues": [
+        {
+          "role": "late",
+          "codes": [
+            "asr_mismatch"
+          ]
+        }
+      ]
+    },
+    {
+      "chapter": 4,
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_matched_20261017/chapter_04/quality.json",
+      "report_sha256": "f62fa812447bd00e0fe6c30abe5a391d536734ad7855f35d2adbdd56021cd8af",
+      "pcm_preserved": true,
+      "machine_quality_status": "incomplete",
+      "human_status": "pending",
+      "chunk_issues": []
+    },
+    {
+      "chapter": 8,
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_matched_20261017/chapter_08/quality.json",
+      "report_sha256": "7aa50285c998f330837e67c87246e22621258167876543890952bd74c88988c8",
+      "pcm_preserved": true,
+      "machine_quality_status": "incomplete",
+      "human_status": "pending",
+      "chunk_issues": [
+        {
+          "role": "guest",
+          "codes": [
+            "asr_mismatch",
+            "speaker_drift"
+          ]
+        }
+      ]
+    }
+  ],
+  "conditioning": {
+    "requests_sent": 0,
+    "target_lufs": -25.41,
+    "samples_preserved": true,
+    "constant_gain_formula_verified_chunks": 11,
+    "original_scene_files_unchanged": true,
+    "playable_audio_links_verified": 13
+  },
+  "review_page": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/hybrid_mixed_20261017/index.html",
+  "remaining": [
+    "new_scene_Bring_Follow_content_review",
+    "new_scene_Taylor_cross_chapter_identity",
+    "new_scene_stitching_loudness_and_narration_rate_review"
+  ],
+  "limitations": [
+    "No new Chinese VoiceDesign acoustic acceptance yet",
+    "Whole-book allocation currently requires a single Chinese or English script; mixed-language ranking rejected explicitly",
+    "No new voiceclone or local-engine integration",
+    "No efficacy claim from synthetic 12-chapter fixture"
+  ],
+  "code_sha256s": {
+    "audiobook_generator/audio_core/hybrid_casting.py": "4253f176cd325cfed63afcacd41acccbd9d2ee99599539a6f20702f343cebf12",
+    "audiobook_generator/audio_core/casting.py": "a9558c522c5c631f92f5f03b7b8be21ebdbbf5d6fd8e93781acb74f83fa88c1e",
+    "audiobook_generator/audio_core/hybrid_probe.py": "b89bae1cce5596fd400bb737dc6b07fca07fea0e78268b2b816c1130ceb98eaf",
+    "audiobook_generator/audio_core/hybrid_scenes.py": "c2879340045d683888a6f7df8c24c77d7b82d423dc42eb1b0ad97a31839d912a",
+    "audiobook_generator/audio_core/hybrid_loudness.py": "72772d8efa9ca0432389a3d3ffda7ece81ccc44ba77f40e28d2880fdc647dcd1",
+    "audiobook_generator/audio_core/role_references.py": "a4d32334115c32687da818e0339dd3b3f9fed9c0d6b7a92be1c2ecf51e1cdaf9",
+    "audiobook_generator/audio_core/pipeline.py": "9d81e16e212d01ded159473d2fdd0cf341644912217ce7bdc05f5a2e234b8e0e",
+    "audiobook_generator/audio_core/__main__.py": "7fa06b490814e4425964463e368ed35c5f09da3979c148e9a7d05b8b9bd9b6ca",
+    "audiobook_generator/tts_providers/mimo_voice.py": "5c045354af41ef9f5125e2295d1aeb13b81e7446190d595069274150e38f8396",
+    "audiobook_generator/tts_providers/openai_tts_provider.py": "3c5942a0841b67dc59e0f4b19863d54fa0a8c39fb03317747e8bb1903013af62",
+    "audiobook_generator/role_script/validator.py": "151c276b3a7fb6ccd7af362ecf29fdb590988915ba784a5c9e868bef773856c4",
+    "audiobook_generator/role_script/deepseek_splitter.py": "da85237e3200679e9754d0e821f4f53d513bf594fb757ebceb9b52485025f809",
+    "tests/audiobook_generator/audio_core/hybrid_casting_test.py": "1fa80bb9b21396aadc3b7f141cecb7461134c1696307f4800edc233110233768",
+    "tests/audiobook_generator/audio_core/mimo_design_test.py": "116b199b65f5ac43c51169a76601db35cd7bce2fb064bbacc37701e5139f18e6"
+  },
+  "regression": {
+    "tests_run": 556,
+    "passed": 526,
+    "skipped": 30,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 15.795,
+    "python": "3.11.17",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261017/hybrid_v33_regression.log",
+    "log_sha256": "faef37bb2233fbbbd6568733bb787e8f7447d8af617cada63049198f9e694eed"
+  }
+}

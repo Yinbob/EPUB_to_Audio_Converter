@@ -1,0 +1,22 @@
+[
+  {
+    "sample_id": "lead_1",
+    "role_id": "lead",
+    "voice_version": "90ca000613ec7181e6de09ff3161e8cb4ef52b2d689aca89cd36fa62c6d079a6",
+    "audio_sha256": "463636b78897a610327125600879f81da5e99778a51a30005446bf24fc881302",
+    "content_complete": true,
+    "signal_acceptable": true,
+    "identity_accepted": true,
+    "notes": "用户核验：内容完整、同角色一致、两角色容易区分。"
+  },
+  {
+    "sample_id": "guest_1",
+    "role_id": "guest",
+    "voice_version": "cfabf46fb167f798545337135ffc5ee1d512f24248bd42aacbfc7cd37d7b7db7",
+    "audio_sha256": "ce23b9f895fc93614d3c9dde58e02b51ad1452b9f258698bb5500594f18a0c59",
+    "content_complete": true,
+    "signal_acceptable": true,
+    "identity_accepted": true,
+    "notes": "用户核验：内容完整、同角色一致、两角色容易区分。"
+  }
+]

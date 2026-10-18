@@ -1,0 +1,48 @@
+{
+  "version": "flipped-clone-human-acceptance-v44",
+  "source": "explicit_user_reply",
+  "user_reply": "这三条都保留了年轻的音色，像同一个人且内容完整",
+  "heard_reference_sha256": "0ef58edb31d5bb0f3a5111f1d36e6afb9ba9da022627ce11f446072bed912a14",
+  "samples": [
+    {
+      "sample_id": "K01",
+      "heard_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_r001_clone_20261017/audio/K01.wav",
+      "heard_audio_sha256": "3a6a0cab8eec63bdddde573028e2fc035d00dcbdba77355c091e3a161f86c561",
+      "raw_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/raw/f90c2391263d853d2c92b04287ccd3efce6b0269d1dac0c23ac2729bafd29f38/fefb009edfc54553a47b9df44faa0cec.wav",
+      "raw_audio_sha256": "365885131b8d3015fd3d2518c02b40a3cc82422a4f3c8cf6e91597488fd9ff2b",
+      "preview_gain_db": -1.870000000000001,
+      "content_complete": true,
+      "same_identity_with_other_probes": true,
+      "young_timbre_retained": true,
+      "R001_entire_content_accepted": false
+    },
+    {
+      "sample_id": "K02",
+      "heard_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_r001_clone_20261017/audio/K02.wav",
+      "heard_audio_sha256": "91a7e17e355e53367b75e44b8e0d2da88c43375d2c1194a544d2980d385c0e66",
+      "raw_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/raw/daa67fed07d6aa7dd5d758e182b7932931133065c9c4da694bbef48eeab26508/3e1bf2c2ecc54fc2b07309bd74812f4b.wav",
+      "raw_audio_sha256": "ce6da503b4496ae2cf41e0c65551c422b1019346fdb5ab129e71d3c47437412a",
+      "preview_gain_db": -1.7199999999999989,
+      "content_complete": true,
+      "same_identity_with_other_probes": true,
+      "young_timbre_retained": true,
+      "R001_entire_content_accepted": false
+    },
+    {
+      "sample_id": "K03",
+      "heard_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_r001_clone_20261017/audio/K03.wav",
+      "heard_audio_sha256": "2aa93aec5a760d3776750ff47b42ae61a92661e3fe58ecb1b53ee985e27b5a3a",
+      "raw_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/raw/daa67fed07d6aa7dd5d758e182b7932931133065c9c4da694bbef48eeab26508/457eb27ea5174907a3745629dc8b7fe0.wav",
+      "raw_audio_sha256": "b25d0b17ca1c4856cf02f4f749e38694e498b5132c95c533fce3b9b634ae3482",
+      "preview_gain_db": -0.9899999999999984,
+      "content_complete": true,
+      "same_identity_with_other_probes": true,
+      "young_timbre_retained": true,
+      "R001_entire_content_accepted": false
+    }
+  ],
+  "whole_chapter_replacement_accepted": false,
+  "further_reference_upload_authorized": false,
+  "signal_not_separately_rated": true,
+  "machine_reports_unchanged": true
+}

@@ -1,0 +1,109 @@
+{
+  "recorded_at": "2026-10-16T20:06:31.664805+08:00",
+  "scope": "Actual bounded E06 repair attempt, trusted English voice subset and content-aware reference-rate screening",
+  "new_request_events": [
+    {
+      "id": "5e256a83e9f047a0ab45850f0aa3d0af",
+      "run_id": "deef79bcc2b341e1bafb929e096eda15",
+      "request_key": "afeff99aa58aa8b77afdb4b1bf1256e098f0e6e3663ade0b4d47b40740858ad2",
+      "repair": 1,
+      "status": "failed",
+      "started": 1792151965.231383,
+      "finished": 1792151965.341989,
+      "characters": 86,
+      "artifact": null,
+      "error_type": "APIConnectionError"
+    },
+    {
+      "id": "d7060107d3914b42bd4c6c5b437ba7f7",
+      "run_id": "759d6ab5b35f4be1984aa7eea40a9444",
+      "request_key": "afeff99aa58aa8b77afdb4b1bf1256e098f0e6e3663ade0b4d47b40740858ad2",
+      "repair": 1,
+      "status": "succeeded",
+      "started": 1792152053.641574,
+      "finished": 1792152080.0024588,
+      "characters": 86,
+      "artifact": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/raw/afeff99aa58aa8b77afdb4b1bf1256e098f0e6e3663ade0b4d47b40740858ad2/a34c8a3a5d354bf7852f59f77f94f589.wav",
+      "error_type": null
+    }
+  ],
+  "request_accounting": {
+    "attempts": 2,
+    "connection_failed": 1,
+    "succeeded": 1,
+    "attempted_body_characters": 172,
+    "successful_body_characters": 86,
+    "hidden_sdk_retries": 0,
+    "note": "First run could not resolve MiMo in sandbox; unauthenticated DNS/HTTPS check succeeded outside sandbox. Separate connected run then made one request. Failed request remains counted; no server billing assertion."
+  },
+  "repair": {
+    "original_run": "12597360e41f449f88ae897792225a86",
+    "failed_connection_run": "deef79bcc2b341e1bafb929e096eda15",
+    "connected_run": "759d6ab5b35f4be1984aa7eea40a9444",
+    "record": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_e06_repair_connected_20261016/repair_validation.json",
+    "initial_wer": 0.9375,
+    "candidate_wer": 0.5,
+    "candidate_extra_words_suspected": 8,
+    "candidate_duration_seconds": 12.96,
+    "candidate_content_status": "incomplete",
+    "candidate_selected_as_relative_improvement": true,
+    "repair_success": false,
+    "human_candidate_review": "pending",
+    "rejected_original_preserved": true,
+    "approved_replacement": false,
+    "encoding_verification_scope": "Only preservation of selected PCM; passing this does not mean intended text is correct."
+  },
+  "rate_gate": {
+    "policy": "reference-rate-content-gate-v1",
+    "known_content_mismatch": "keep numeric reference-rate estimates but suppress too_fast and rate_drift; preserve asr_mismatch and content_repair",
+    "bad_rate_reference": "skip rate drift using a known-content-mismatched or explicitly invalid reference",
+    "asr_disabled_or_unavailable": "existing optional unverified heuristic retained and labelled reference_estimate_content_unverified; not a content pass",
+    "cache_policy": "rate policy version included in role anchor/render selection context",
+    "real_audio_recheck": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_e06_repair_connected_20261016/rate_policy_recheck.json",
+    "real_original_issues": [
+      "asr_mismatch"
+    ],
+    "real_candidate_issues": [
+      "asr_mismatch"
+    ],
+    "audio_transformed_by_this_change": false,
+    "new_test_methods": 5
+  },
+  "verified_english_bank": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/voice_bank.en.mia_chloe.json",
+    "sha256": "efc122113c3a08c325c1e92e815eeb153b03b00bd4da3a6a075d0a0fc6082117",
+    "manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/probes.reviewed.en.mia_chloe.json",
+    "manifest_sha256": "7c8acd32d12101f6dadf535b3f3cc5d6787bcf9ce305f3a3e8167012d1980fe9",
+    "human_review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/human_review.json",
+    "human_review_sha256": "2da19d9d66ebb23ea9680f4ce8268daf544262ec11a66faf9489002440aee047",
+    "languages": [
+      "en"
+    ],
+    "voices": [
+      "Mia",
+      "Chloe"
+    ],
+    "samples": 4,
+    "probes_per_voice": 2,
+    "embedding_dimensions": 192,
+    "speaker_model_fingerprint": "9cc19ee039c6ded8c46311e5b94b2595a9c9ff2d11fed1a29fb838ddd7b15f27",
+    "excluded_Milo": true,
+    "new_tts_requests_for_bank": 0,
+    "listener_benefit_measured": false
+  },
+  "tests": {
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q",
+    "ran": 492,
+    "seconds": 13.917,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/english_content_rate_regression_v19.log",
+    "log_sha256": "4276b625992681e88e79079f04114966de9e0ed722a9d178c9d83d088b8aadb1"
+  },
+  "limitations": [
+    "One user-confirmed original content defect, no independent human success validation for new candidate",
+    "No real boundary-label positive or independent training/dev/test split",
+    "No listener experiment or benefit result",
+    "Qwen TTS and VoxCPM new-core adapters remain future work"
+  ]
+}

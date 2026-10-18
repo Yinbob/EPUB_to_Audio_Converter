@@ -1,0 +1,23 @@
+{
+  "version": "audio-quality-human-review-v1",
+  "source_report_sha256": "c490845e432e2425fc1755930bfec74f9c7195cf11c66d9c5c03adb43aee63a7",
+  "source_audio_sha256": "3784dc6b798d0e2ea99e5ebfbdb6767c5ec73e6575cd693fc0cfe2dc01e1358f",
+  "reviewer": "project_user",
+  "reviewed_at": "2026-10-17T15:17:43.439020+08:00",
+  "human_acceptance": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/human_acceptance_v49.json",
+    "sha256": "a0048cff54b233284124a41d4eae69c076e3622662890883b567f6eaab7e7d0d"
+  },
+  "decisions": [
+    {
+      "scope": "chunk",
+      "index": 33,
+      "issue_sha256": "000ae1e6157ed31121723248b8b235fe6185c86c9ba3611de9853d2b3d273075",
+      "resolution": "false_positive",
+      "reason": "只读一次，发音与接缝均正常",
+      "verified_tts_text": "“Come on!”",
+      "content_complete": true,
+      "no_additions": true
+    }
+  ]
+}

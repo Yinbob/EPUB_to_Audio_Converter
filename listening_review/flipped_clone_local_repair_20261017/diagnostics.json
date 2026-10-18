@@ -1,0 +1,104 @@
+{
+  "version": "flipped-repair-diagnostics-v46",
+  "feedback_sha256": "0bbff5ae7721b0f95d3e75e4f3ffe6c0091c59cfdac9a761c1c21390d0601740",
+  "models": {
+    "asr": {
+      "kind": "asr",
+      "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/SenseVoiceSmall",
+      "state": "local_files",
+      "runtime_version": "1.4.16",
+      "files": [
+        {
+          "path": "am.mvn",
+          "bytes": 11203,
+          "sha256": "29b3c740a2c0cfc6b308126d31d7f265fa2be74f3bb095cd2f143ea970896ae5"
+        },
+        {
+          "path": "chn_jpn_yue_eng_ko_spectok.bpe.model",
+          "bytes": 377341,
+          "sha256": "aa87f86064c3730d799ddf7af3c04659151102cba548bce325cf06ba4da4e6a8"
+        },
+        {
+          "path": "config.yaml",
+          "bytes": 1855,
+          "sha256": "f71e239ba36705564b5bf2d2ffd07eece07b8e3f2bbf6d2c99d8df856339ac19"
+        },
+        {
+          "path": "configuration.json",
+          "bytes": 396,
+          "sha256": "02810a7f8e9e8aee10370a265f7e799728ce25b4c00cdbf4602b303ee395a38e"
+        },
+        {
+          "path": "model.pt",
+          "bytes": 936291369,
+          "sha256": "833ca2dcfdf8ec91bd4f31cfac36d6124e0c459074d5e909aec9cabe6204a3ea"
+        }
+      ],
+      "fingerprint": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6"
+    }
+  },
+  "requests_sent": 0,
+  "rows": [
+    {
+      "sample_id": "R039",
+      "source_audio_sha256": "707782afd9ed12bf56637fbd69dcf787a0de6683660a70edb002d9ff761763c3",
+      "cut_seconds": 10.8,
+      "part": "prefix",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/diagnostics/R039_10.8s_prefix.wav",
+      "audio_sha256": "219f71e6dc68e8dbe85b84f379c8b4373116b72fa38f8cf48079186489e3c1e3",
+      "transcript": "I am still trying to pull free, but the girls got me in a death grip. My mom's grinning, looking at our hands and my fiery red face.",
+      "expected_text": " I'm still trying to pull free, but the girl's got me in a death grip. My mom's grinning, looking at our hands and my fiery red face. "
+    },
+    {
+      "sample_id": "R039",
+      "source_audio_sha256": "707782afd9ed12bf56637fbd69dcf787a0de6683660a70edb002d9ff761763c3",
+      "cut_seconds": 10.8,
+      "part": "suffix",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/diagnostics/R039_10.8s_suffix.wav",
+      "audio_sha256": "8cb8d42c40e8f21f2e881af956a1a8e3a0a3c004fd21614237d63e5e2e91ef2e",
+      "transcript": "My mom's grinning, looking at our hands and my fiery red face.",
+      "expected_text": " I'm still trying to pull free, but the girl's got me in a death grip. My mom's grinning, looking at our hands and my fiery red face. "
+    },
+    {
+      "sample_id": "R018",
+      "source_audio_sha256": "ee63a56a21e8ac8abb717699834bf7148712e812809ae2fe3f02ad30902c13b6",
+      "cut_seconds": 3.0,
+      "part": "prefix",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/diagnostics/R018_3s_prefix.wav",
+      "audio_sha256": "347ed59a1e5d167e66146dab22d32e5009534557b1ea668c530d0374ac1c1970",
+      "transcript": "No, no, no.",
+      "expected_text": "“No, no, no!”"
+    },
+    {
+      "sample_id": "R018",
+      "source_audio_sha256": "ee63a56a21e8ac8abb717699834bf7148712e812809ae2fe3f02ad30902c13b6",
+      "cut_seconds": 3.0,
+      "part": "suffix",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/diagnostics/R018_3s_suffix.wav",
+      "audio_sha256": "91223bab36cfea803ef3ed11d95be9effa633cd446507d8b06a536a46f531d91",
+      "transcript": "No, no.",
+      "expected_text": "“No, no, no!”"
+    },
+    {
+      "sample_id": "R018",
+      "source_audio_sha256": "ee63a56a21e8ac8abb717699834bf7148712e812809ae2fe3f02ad30902c13b6",
+      "cut_seconds": 5.0,
+      "part": "prefix",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/diagnostics/R018_5s_prefix.wav",
+      "audio_sha256": "8059f2f740bb058a753c56dfc1f67afda26334437f814619f221b97748408be2",
+      "transcript": "No, no, no.",
+      "expected_text": "“No, no, no!”"
+    },
+    {
+      "sample_id": "R018",
+      "source_audio_sha256": "ee63a56a21e8ac8abb717699834bf7148712e812809ae2fe3f02ad30902c13b6",
+      "cut_seconds": 5.0,
+      "part": "suffix",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/diagnostics/R018_5s_suffix.wav",
+      "audio_sha256": "517467210c0ec6bb26469e5944644f40ee299f170d626cd8b8e94c7ce7464356",
+      "transcript": "No, no.",
+      "expected_text": "“No, no, no!”"
+    }
+  ],
+  "not_human_acceptance": true
+}

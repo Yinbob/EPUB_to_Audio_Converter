@@ -1,0 +1,22 @@
+{
+  "version": "flipped-clone-standard-report-v45",
+  "standard_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/16658ffc23df47fc897af80a12473c1e/chapter_000005/quality.json",
+  "standard_report_sha256": "76f4d2e1ef5e699bdc151a2ab1213886467a4d1c24b90da51d98d95229acf646",
+  "source_review_manifest_sha256": "74393278f4ce302829c87ff070672b6e8aa99e55969aba0a06752d9783e43382",
+  "discovery_output_dir": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017",
+  "preview_count": 200,
+  "issue_rows": 201,
+  "chunks": 100,
+  "boundaries": 99,
+  "source_group_matches_original": true,
+  "pcm_equal": true,
+  "source_audio_unchanged": true,
+  "current_run_requests": 67,
+  "recorded_generation_history_requests": 100,
+  "generation_history_incomplete": true,
+  "import_new_requests": 0,
+  "resource_summary_text": "本次运行累计 67 次合成请求（修复 0 次）。生成来源与候选历史已记录 100 次请求。历史记录不全，未知部分未计作零。两项可能重叠，不相加。",
+  "quality_status": "incomplete",
+  "human_review_status": "pending",
+  "overall_project_complete": false
+}

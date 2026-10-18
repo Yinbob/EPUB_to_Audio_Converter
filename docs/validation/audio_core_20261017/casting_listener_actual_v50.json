@@ -1,0 +1,93 @@
+{
+  "version": "casting-listener-export-actual-v50",
+  "acceptance": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_final_focus_20261017/human_acceptance_v50.json",
+    "sha256": "051abe4f13e511ead6f62de8677504bd318c885b539d4461aecd6b80cb4df78b"
+  },
+  "derived_reports": [
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/reviewed_v50/condition_02/scene_03/quality.json",
+      "sha256": "5c2a5c72b9c1e023e42527ecfe2df52eb9a8cd7f63999f10722ba98080aaec14"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/reviewed_v50/condition_03/scene_03/quality.json",
+      "sha256": "d78057905c56fb2ebe2987a4bd542baf508702abe80abe3a04b94b6b4721a958"
+    }
+  ],
+  "conditions": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/conditions.human_reviewed_v50.json",
+    "sha256": "6ea1a72fbbc43c31c89508e0d3e74a0f746ddb6b6512b029e9847d6658b60bd8"
+  },
+  "export": {
+    "trials": 36,
+    "output": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_listener_pilot_20261017",
+    "human_review_required": true,
+    "requests_sent": 0,
+    "distribution_note": "只分发 public 目录；答案文件留给实验者，不与材料一起发给听众。"
+  },
+  "quality_gates_passed": 9,
+  "conditions_count": 3,
+  "scenes_per_condition": 3,
+  "roles": 3,
+  "trials": 36,
+  "public_checksums_verified": 24,
+  "trial_counts": [
+    {
+      "condition": "fit",
+      "role": "alex",
+      "trials": 5
+    },
+    {
+      "condition": "fit",
+      "role": "blair",
+      "trials": 5
+    },
+    {
+      "condition": "fit",
+      "role": "casey",
+      "trials": 2
+    },
+    {
+      "condition": "global",
+      "role": "alex",
+      "trials": 5
+    },
+    {
+      "condition": "global",
+      "role": "blair",
+      "trials": 5
+    },
+    {
+      "condition": "global",
+      "role": "casey",
+      "trials": 2
+    },
+    {
+      "condition": "interaction+random",
+      "role": "alex",
+      "trials": 5
+    },
+    {
+      "condition": "interaction+random",
+      "role": "blair",
+      "trials": 5
+    },
+    {
+      "condition": "interaction+random",
+      "role": "casey",
+      "trials": 2
+    }
+  ],
+  "unanswered_score": {
+    "conditions": {},
+    "analysis_kind": "descriptive_pilot",
+    "note": "未做重复测量或场景聚类推断；不据此声称显著改善。"
+  },
+  "original_reports_unchanged": true,
+  "focused_audio_unchanged": true,
+  "whole_chapter_listening_complete": false,
+  "independent_listener_results": false,
+  "new_tts_requests": 0,
+  "new_llm_requests": 0,
+  "overall_project_complete": false
+}

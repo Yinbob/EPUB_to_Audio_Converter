@@ -1,0 +1,13 @@
+{
+  "planned_requests": 22,
+  "planned_characters": 2151,
+  "chapters": 9,
+  "conditions": 3,
+  "actual_requests": 0,
+  "input_hashes": {
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/voice_bank.en.mia_chloe.json": "efc122113c3a08c325c1e92e815eeb153b03b00bd4da3a6a075d0a0fc6082117",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/human_review.fit_confirmed.json": "ac9adb072caef5d52f78aa363d670d22f490af8517d5895d625307de967e912f",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_exact_20261016/offline_validation.json": "7279eae737a0b03f6388c64bc692162017e26dd2c0fed7babfd54ad1690e0dd5",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_exact_20261016/request_plan.json": "a4385452cd5a1ff51fd0c3e27507c2b9b9f24d74a4ed42d71f72fa2b456bd7f2"
+  }
+}

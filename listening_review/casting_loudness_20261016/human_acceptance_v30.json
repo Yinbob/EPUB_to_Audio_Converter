@@ -1,0 +1,30 @@
+{
+  "version": "reviewed-loudness-acceptance-v1",
+  "reviewer": "project_user",
+  "recorded_at": "2026-10-16T21:46:40.579728+08:00",
+  "origin": "direct_user_reply_current_chat",
+  "verbatim": "新版本更自然，音量差可接受",
+  "preview_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_loudness_20261016/manifest.json",
+  "preview_manifest_sha256": "9553d35a7fa7422efca3251a2c7c57c3e434d39e82225f6567231a63297d5067",
+  "source_group_id": "6950bc5455a8753e699992dfb9b84606a4757210d109432544692b1ab409aa8a",
+  "source_report_sha256": "a770392261b866eb0085afaba006e822e659d543294a1bfc78ced0cd41e9ea24",
+  "source_audio_sha256": "550cb2318214b23e38c3c16bafbb34749d7370ed732a48b264c371ed327fb328",
+  "boundary_id": "3:1:alex:chunk:1|3:2:blair:chunk:1",
+  "operation": {
+    "kind": "constant_attenuation_right_chunk",
+    "attenuation_db": 5.0,
+    "gain": 0.5623413251903491,
+    "start_sample": 176640,
+    "end_sample": 334080,
+    "max_attenuation_db": 6.0
+  },
+  "selected_pair": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_loudness_20261016/audio/matched_pair.wav",
+  "selected_pair_sha256": "0bd6a6502f23a9c5921734d6553307f310d899bc5da6e82f68cea43ee4b83274",
+  "selected_full_context": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_loudness_20261016/audio/matched_full.wav",
+  "selected_full_context_sha256": "919bff5dd9fbb220ba48b70efdbb06fec0ba02c2ebd7d4ef6dc56213684daa1b",
+  "accepted": true,
+  "scope": "F01所示接缝及右句衰减，不代表全章质量或其他来源",
+  "automatically_enabled_globally": false,
+  "formal_casting_comparison_ready": false,
+  "requests_sent": 0
+}

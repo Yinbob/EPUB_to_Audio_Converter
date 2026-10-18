@@ -19,7 +19,7 @@ _TOP_LEVEL_FIELDS = {
 }
 _ROLE_FIELDS = {"display_name", "provider_params", "gender"}
 _CHAPTER_FIELDS = {"chapter_index", "title", "segments"}
-_SEGMENT_FIELDS = {"role_id", "text", "tone", "pause_after_ms"}
+_SEGMENT_FIELDS = {"role_id", "text", "tone", "pause_after_ms", "text_kind"}
 
 
 def _format_json_path(path: Tuple[Any, ...]) -> str:
@@ -213,6 +213,9 @@ def parse_role_script(raw: Any, report: Optional[ValidationReport] = None) -> Op
                     text = segment_raw.get("text")
                     tone = segment_raw.get("tone")
                     pause = segment_raw.get("pause_after_ms")
+                    text_kind = segment_raw.get("text_kind")
+                    if text_kind is not None and text_kind not in ("narration", "dialogue", "unknown"):
+                        report.error("invalid_text_kind", f"{segment_path}.text_kind", "段落类型只能是 narration/dialogue/unknown 或省略")
                     if not isinstance(role_id, str) or not role_id:
                         report.error("invalid_segment_role", f"{segment_path}.role_id", "role_id 必须是非空字符串")
                     if not isinstance(text, str) or not text:
@@ -235,6 +238,7 @@ def parse_role_script(raw: Any, report: Optional[ValidationReport] = None) -> Op
                                 text=text,
                                 tone=tone,
                                 pause_after_ms=pause,
+                                text_kind=text_kind,
                             )
                         )
             if (

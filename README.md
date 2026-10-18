@@ -21,6 +21,8 @@ python3 main.py <input_file> <output_folder> [options]
 
 > 服务器（Miniconda / GPU）部署见 [Linux 服务器部署（Miniconda）](#linux-服务器部署miniconda)。
 
+启动环境：直接运行 `python3 main_ui.py` 时，优先使用项目内已存在的 `venv_audio_quality/`，没有时回退 `venv_chatterbox/`，均不存在时使用当前 Python。已激活的虚拟环境／Conda 环境优先保留。需要指定本地引擎环境时，使用 `./venv_chatterbox/bin/python3 main_ui.py`；已配置的 MiMo 质检环境也可显式使用 `./venv_audio_quality/bin/python3 main_ui.py`。不会自动安装依赖或下载模型。模块导入和 spawn 后台进程不会切换环境。
+
 多角色分段 TTS（MiMo / MiniMax）的完整说明、JSON 规范和 CLI/WebUI 操作见 [多角色分段 TTS MVP](docs/multi_role_tts_mvp.md)。
 
 ### 自动更新 TTS 英文音色（可选）
@@ -154,7 +156,7 @@ python3 -c "from main import handle_args; print('main import ok')"
 
 ### 4️⃣ （可选）安装 Chatterbox 本地引擎（NVIDIA GPU）
 
-Chatterbox 依赖 PyTorch（约 2~3 GB）与模型文件（约 3.1 GB）。项目约定将其隔离在 `venv_chatterbox/`，`main.py` / `main_ui.py` 会自动切换到该环境（无需手动 `activate`）。
+Chatterbox 依赖 PyTorch（约 2~3 GB）与模型文件（约 3.1 GB）。项目约定将其隔离在 `venv_chatterbox/`；启动环境选择见上文，需要时显式使用该环境的 Python。
 
 ```bash
 conda activate epub2audio
@@ -604,7 +606,7 @@ For OpenAI TTS, you can specify the model, voice, and format options using `--mo
 
 ### 1️⃣ 虚拟环境搭建
 
-项目约定使用根目录下的独立虚拟环境 `venv_chatterbox/`（`main.py` / `main_ui.py` 会自动切换）。**macOS / CPU 环境**：
+项目约定使用根目录下的独立虚拟环境 `venv_chatterbox/`（可用该环境的 Python 显式启动，避免覆盖当前选择的环境）。**macOS / CPU 环境**：
 
 ```bash
 # 在项目根目录执行
@@ -817,7 +819,7 @@ python3 -m venv venv_chatterbox --system-site-packages
 
 ### 2️⃣ 安装（Ubuntu + RTX 4090，Python 3.11）
 
-VoxCPM 要求 **Python 3.10~3.12**、`torch>=2.5`、CUDA≥12，因此必须与主环境（或 Chatterbox 环境）一起放进 `venv_chatterbox/`，`main.py` / `main_ui.py` 会自动切换解释器：
+VoxCPM 要求 **Python 3.10~3.12**、`torch>=2.5`、CUDA≥12，因此本项目部署到 `venv_chatterbox/`。需要使用该环境时可显式运行 `./venv_chatterbox/bin/python3 main_ui.py`：
 
 > 💡 **一键部署**（推荐，等价于下面 1~6 步）：
 > ```bash

@@ -39,6 +39,33 @@ def confirm_segment_speaker(script: RoleScriptV2, segment_id: str, entity_id: st
     return replace(script, chapters=tuple(chapters))
 
 
+def assign_chapter_narrator(script: RoleScriptV2, chapter_index: int, entity_id: str):
+    """人工指定单一叙述者；仅修改本章已识别叙述段，保留对白和原文。"""
+    if type(chapter_index) is not int:
+        raise ValueError('请选择有效章节')
+    if entity_id not in script.entities or entity_id not in script.roles:
+        raise ValueError('所选人物没有有效的声音配置')
+    chapters, changed = [], 0
+    for chapter in script.chapters:
+        if chapter.chapter_index != chapter_index:
+            chapters.append(chapter)
+            continue
+        segments = []
+        for segment in chapter.segments:
+            if segment.text_kind == 'narration':
+                if segment.speaker is None:
+                    raise ValueError('叙述段缺少归属信息，请重新拆分剧本')
+                segment = replace(segment, role_id=entity_id,
+                    speaker=replace(segment.speaker, entity_id=entity_id, status='confirmed',
+                                    confidence=None, confidence_kind='human'))
+                changed += 1
+            segments.append(segment)
+        chapters.append(replace(chapter, segments=tuple(segments)))
+    if not changed:
+        raise ValueError('本章没有已识别的叙述段；旧剧本请先重新拆分，章内多视角请逐段修改')
+    return replace(script, chapters=tuple(chapters)), changed
+
+
 def merge_entities(script: RoleScriptV2, source_id: str, target_id: str) -> RoleScriptV2:
     """人工确认同一人后，把源 ID 并入目标 ID；目标声音保持不变。"""
     if source_id == target_id or source_id == "narrator" or target_id == "narrator":

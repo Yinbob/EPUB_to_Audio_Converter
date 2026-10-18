@@ -1,0 +1,40 @@
+{
+  "kind": "constructed_offline_engineering_tests_and_read_only_pack_validation",
+  "new_tests": 8,
+  "strengthened_existing_local_speed_test": 1,
+  "full_suite": {
+    "ran": 445,
+    "skipped": 30,
+    "status": "OK",
+    "seconds": 12.81
+  },
+  "character_budget": {
+    "default": null,
+    "zero_disables_resynthesis_only": true,
+    "counts": "actual normalized repair body string length, including punctuation, excluding instructions",
+    "failed_and_running_consume": true,
+    "initial_synthesis_excluded": true,
+    "concurrent_fixture": {
+      "limit": 7,
+      "request_characters": 2,
+      "attempts": 8,
+      "accepted": 3,
+      "remaining": 1
+    },
+    "compound_fixture": {
+      "insufficient_full_body": "no repair request sent",
+      "exact_fit": "two children, body counted once"
+    },
+    "automatic_baseline_ratio": false,
+    "note": "Fixtures verify implementation; no real repair benefit established."
+  },
+  "annotation_pack": {
+    "path": "audiobook_output/audio_core_validation_20261016/annotation/review_pack_v1",
+    "total_samples": 6,
+    "pending": 6,
+    "reviewed": 0,
+    "import_check": "passed --check-only; 0 reviewed boundaries",
+    "modified": false
+  },
+  "additional_real_tts_requests": 0
+}

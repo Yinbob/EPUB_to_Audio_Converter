@@ -1,0 +1,56 @@
+{
+  "manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/tail_repeat_detection_pilot_20261017/manifest.json",
+  "manifest_sha256": "f0727d8d7bfc1d3d8931392a4c3dc28efeed882e9ef66b636104f52b4b06f99d",
+  "results": [
+    {
+      "sample_id": "original_R022",
+      "historically_human_confirmed_tail_repeat": true,
+      "status": "candidate_pending_review",
+      "auto_eligible": true
+    },
+    {
+      "sample_id": "clone_R039",
+      "historically_human_confirmed_tail_repeat": true,
+      "status": "candidate_pending_review",
+      "auto_eligible": false
+    },
+    {
+      "sample_id": "clone_R018",
+      "historically_human_confirmed_tail_repeat": true,
+      "status": "candidate_pending_review",
+      "auto_eligible": false
+    },
+    {
+      "sample_id": "clone_R001",
+      "historically_human_confirmed_tail_repeat": false,
+      "status": "not_suspected",
+      "auto_eligible": null
+    },
+    {
+      "sample_id": "clone_R051",
+      "historically_human_confirmed_tail_repeat": false,
+      "status": "not_suspected",
+      "auto_eligible": null
+    },
+    {
+      "sample_id": "clone_R100",
+      "historically_human_confirmed_tail_repeat": false,
+      "status": "not_suspected",
+      "auto_eligible": null
+    },
+    {
+      "sample_id": "accepted_repair_R018",
+      "historically_human_confirmed_tail_repeat": false,
+      "status": "not_suspected",
+      "auto_eligible": null
+    },
+    {
+      "sample_id": "accepted_repair_R039",
+      "historically_human_confirmed_tail_repeat": false,
+      "status": "not_suspected",
+      "auto_eligible": null
+    }
+  ],
+  "new_requests": 0,
+  "not_independent_validation": true
+}

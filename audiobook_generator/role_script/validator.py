@@ -16,7 +16,9 @@ from .normalization import (
 SUPPORTED_PROVIDERS = ("openai", "minimax")
 PARAM_RULES = {
     "openai": {
-        "allowed": {"voice", "instructions", "speed"},
+        "allowed": {"voice", "instructions", "speed", "voice_mode", "voice_description",
+                    "voice_profile_id", "voice_version", "voice_language",
+                    "reference_audio_path", "reference_audio_sha256"},
         "required": {"voice"},
         "speed": (0.25, 4.0),
     },
@@ -57,7 +59,9 @@ def _normalize_params(role_id: str, params: Dict[str, Any], provider: str, repor
         if key not in allowed:
             report.error("unknown_provider_param", f"{role_path}.{key}", f"{provider} 不支持参数：{key}")
             continue
-        if key in {"voice", "voice_id", "instructions"}:
+        if key in {"voice", "voice_id", "instructions", "voice_mode", "voice_description",
+                   "voice_profile_id", "voice_version", "voice_language",
+                   "reference_audio_path", "reference_audio_sha256"}:
             if not isinstance(value, str) or (key != "instructions" and not value.strip()):
                 report.error("invalid_provider_param", f"{role_path}.{key}", f"{key} 必须是非空字符串")
                 continue
@@ -83,7 +87,35 @@ def _normalize_params(role_id: str, params: Dict[str, Any], provider: str, repor
                 )
                 continue
         normalized[key] = numeric
-    for required in rules["required"]:
+    required_fields = rules['required']
+    if provider == 'openai':
+        mode = normalized.get('voice_mode', 'preset')
+        if mode not in {'preset', 'design', 'clone'}:
+            report.error('invalid_voice_mode', role_path, 'voice_mode 只允许 preset/design/clone')
+        if mode == 'design':
+            required_fields = {'voice_description', 'voice_profile_id', 'voice_version', 'voice_language'}
+            if 'voice' in normalized:
+                report.error('design_has_preset_voice', role_path, '描述声音不能同时设置内置 voice')
+        elif mode == 'clone':
+            required_fields = {'reference_audio_path', 'reference_audio_sha256', 'voice_profile_id',
+                               'voice_version', 'voice_language'}
+            if 'voice' in normalized or 'voice_description' in normalized:
+                report.error('clone_has_other_identity', role_path, '克隆声音不能同时设置内置voice或声音设计描述')
+            if required_fields <= normalized.keys():
+                from audiobook_generator.tts_providers.mimo_reference import load_clone_reference
+                try:
+                    load_clone_reference(normalized['reference_audio_path'], normalized['reference_audio_sha256'])
+                except (ValueError, OSError) as exc:
+                    report.error('invalid_clone_reference', role_path, str(exc))
+        elif 'voice_description' in normalized:
+            report.error('preset_has_description', role_path, '内置声音不能携带描述声音身份条件')
+        if mode != 'clone' and any(k in normalized for k in ('reference_audio_path', 'reference_audio_sha256')):
+            report.error('unexpected_clone_reference', role_path, '只有clone模式可以携带参考音频')
+        if 'voice_language' in normalized and normalized['voice_language'] not in {'en', 'zh'}:
+            report.error('invalid_voice_language', role_path, '声音卡语言只允许 en/zh')
+        if len(normalized.get('voice_description', '')) > 1500:
+            report.error('voice_description_too_long', role_path, '声音描述最长1500字符')
+    for required in required_fields:
         if required not in normalized:
             report.error("missing_provider_param", f"{role_path}.{required}", f"缺少必填参数：{required}")
     return normalized
@@ -133,6 +165,9 @@ def _normalize_chapters(script: RoleScriptV1, report: ValidationReport) -> Tuple
             segment_path = f"{path}.segments[{segment_pos}]"
             if not segment.text:
                 report.error("empty_segment_text", f"{segment_path}.text", "segment text 不能为空")
+                continue
+            if segment.text_kind is not None and segment.text_kind not in ("narration", "dialogue", "unknown"):
+                report.error("invalid_text_kind", f"{segment_path}.text_kind", "段落类型无效")
                 continue
             if segment.tone is not None and len(segment.tone) > 200:
                 report.error("invalid_tone", f"{segment_path}.tone", "tone 最长 200 字符")
@@ -328,6 +363,10 @@ def _validate_v2(script: RoleScriptV2, chapters, report: ValidationReport) -> No
                 report.error("segment_span_gap", f"{path}.source_span", "段落区间没有连续覆盖原文")
             previous_end = span.end
             speaker = segment.speaker
+            if not isinstance(speaker.confidence_kind, str) or speaker.confidence_kind not in {
+                "uncalibrated", "calibrated", "human"
+            }:
+                report.error("invalid_confidence_kind", f"{path}.speaker.confidence_kind", "置信度类型无效")
             if speaker.status not in {"proposed", "confirmed", "needs_review", "unknown", "legacy_unassessed"}:
                 report.error("invalid_speaker_status", f"{path}.speaker.status", "归属状态无效")
             if speaker.entity_id is not None and speaker.entity_id not in script.entities:

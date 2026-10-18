@@ -15,12 +15,15 @@ DEFAULT_ASR_MODEL = "iic/SenseVoiceSmall"
 
 _asr_model = None
 _asr_device = None
+_asr_model_id = None
+_asr_model_revision = None
 
 
-def _get_or_load_asr_model(model_id: str = DEFAULT_ASR_MODEL, device: str = "cpu"):
+def _get_or_load_asr_model(model_id: str = DEFAULT_ASR_MODEL, device: str = "cpu", model_revision=None):
     """懒加载 SenseVoice（进程内只加载一次）。"""
-    global _asr_model, _asr_device
-    if _asr_model is not None and _asr_device == device:
+    global _asr_model, _asr_device, _asr_model_id, _asr_model_revision
+    if (_asr_model is not None and _asr_device == device and _asr_model_id == model_id
+            and _asr_model_revision == model_revision):
         return _asr_model
     try:
         from funasr import AutoModel
@@ -39,12 +42,14 @@ def _get_or_load_asr_model(model_id: str = DEFAULT_ASR_MODEL, device: str = "cpu
         device=device,
     )
     _asr_device = device
+    _asr_model_id = model_id
+    _asr_model_revision = model_revision
     logger.info("SenseVoice 转写模型加载完成")
     return _asr_model
 
 
 def transcribe_audio(audio_path: str, model_id: str = DEFAULT_ASR_MODEL,
-                     device: str = "cpu") -> str:
+                     device: str = "cpu", model_revision=None) -> str:
     """识别参考音频内容，返回纯文本转写（去掉 SenseVoice 的 tag/标点标记）。
 
     SenseVoice 输出形如 "<|zh|><|NEUTRAL|><|Speech|><|woitn|>你好世界"，
@@ -53,7 +58,7 @@ def transcribe_audio(audio_path: str, model_id: str = DEFAULT_ASR_MODEL,
     if not audio_path or not os.path.exists(audio_path):
         raise FileNotFoundError(f"参考音频不存在，无法自动转写：{audio_path}")
 
-    model = _get_or_load_asr_model(model_id=model_id, device=device)
+    model = _get_or_load_asr_model(model_id=model_id, device=device, model_revision=model_revision)
     logger.info(f"自动转写参考音频：{audio_path}")
     result = model.generate(
         input=audio_path,

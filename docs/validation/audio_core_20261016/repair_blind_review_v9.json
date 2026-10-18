@@ -1,0 +1,120 @@
+{
+  "kind": "actual_existing_encoded_audio_export_and_constructed_contract_tests",
+  "pack": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/annotation/repair_blind_review_v1",
+  "trials": 2,
+  "available_source_groups": 2,
+  "audio_files": [
+    {
+      "path": "audio/T001_A.wav",
+      "sha256": "a3186f79d949841e1681d82e270962f434916b607c72936e90734d2fbeea3429",
+      "frames": 478989,
+      "sample_rate": 24000,
+      "channels": 1,
+      "subtype": "PCM_16"
+    },
+    {
+      "path": "audio/T001_B.wav",
+      "sha256": "3d970cb3360e7aa82851ef92548bcd27cafd88f21bcba1f1ed4329a0ba4df8ad",
+      "frames": 464640,
+      "sample_rate": 24000,
+      "channels": 1,
+      "subtype": "PCM_16"
+    },
+    {
+      "path": "audio/T002_A.wav",
+      "sha256": "305f4b36c8cedd21bed28207ed9fa5a40bcc961e0144d0b9a98f60e6a63aef79",
+      "frames": 330240,
+      "sample_rate": 24000,
+      "channels": 1,
+      "subtype": "PCM_16"
+    },
+    {
+      "path": "audio/T002_B.wav",
+      "sha256": "a503bd8ae18da4a1f2a0f9a245be725d3d1c59a083d6fcc1f019cd08c5420391",
+      "frames": 348069,
+      "sample_rate": 24000,
+      "channels": 1,
+      "subtype": "PCM_16"
+    }
+  ],
+  "source_integrity": [
+    {
+      "trial_id": "T001",
+      "report_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/0b68846ce9c34b27a757a1a4b4b2ed29/chapter_000001/quality.json",
+      "report_sha256": "eefd5c91d839e2e12c8ec55ca2b22755b3d7eb4718e623d05b75ae293174f7eb",
+      "encoded_sha256": "b148efd8eb724be434caaa78e2e853142598bb465a3f0fdde0326334938d03c2"
+    },
+    {
+      "trial_id": "T001",
+      "report_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/post_encoding_reevaluation/chapter_000001/quality.json",
+      "report_sha256": "9ab9a8778df638b9f33c5b67a2b20fc8700af8ae946af16bbeef1e2bdf38b04a",
+      "encoded_sha256": "8dc3c8a3120a2cc3f003c17cd76575dfd24c5967f0f9f7e2035ed215d0421d5e"
+    },
+    {
+      "trial_id": "T002",
+      "report_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/post_encoding_reevaluation/chapter_000002/quality.json",
+      "report_sha256": "4d7f7ae0004e41f3c135b81331f6b42fd45831f8a66362276c301131b5c7333e",
+      "encoded_sha256": "d6223cbd3a9378e3828b273ce2126c13e53eae9d3067656124b3e98f753062a5"
+    },
+    {
+      "trial_id": "T002",
+      "report_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/a665c1c6884646eb899fd4cdade66d64/chapter_000002/quality.json",
+      "report_sha256": "b6efec4cbf72cb28f4398e3a7408e1c0965b20487138e3ba52402452b53ac656",
+      "encoded_sha256": "a9d060c4a83c44166e5000f39fefcd338fd89acb80b38311f4ac79d17bfbd54a"
+    }
+  ],
+  "score_of_unfilled_table": {
+    "analysis_kind": "descriptive_blind_repair_pilot",
+    "reviewed": 0,
+    "skipped": 2,
+    "participants": 0,
+    "source_groups": 0,
+    "dimension_preferences": {
+      "stitching": {
+        "baseline": 0,
+        "candidate": 0,
+        "tie": 0,
+        "uncertain": 0,
+        "not_applicable": 0
+      },
+      "consistency": {
+        "baseline": 0,
+        "candidate": 0,
+        "tie": 0,
+        "uncertain": 0,
+        "not_applicable": 0
+      },
+      "content": {
+        "baseline": 0,
+        "candidate": 0,
+        "tie": 0,
+        "uncertain": 0,
+        "not_applicable": 0
+      },
+      "signal": {
+        "baseline": 0,
+        "candidate": 0,
+        "tie": 0,
+        "uncertain": 0,
+        "not_applicable": 0
+      }
+    },
+    "status": "awaiting_human_review",
+    "requests_sent": 0,
+    "note": "偏好票数不是缺陷修复率；未做重复测量或来源聚类推断，不据此声称显著改善。"
+  },
+  "new_tests": 5,
+  "additional_real_tts_requests": 0,
+  "limitations": [
+    "No human conclusions or preference benefit established.",
+    "Preference counts do not estimate defect repair rate.",
+    "Fixed pilot order needs participant counterbalancing for formal studies."
+  ],
+  "full_suite": {
+    "ran": 450,
+    "skipped": 30,
+    "status": "OK",
+    "seconds": 12.288,
+    "log": "/private/tmp/audio_quality_regression_final_v9.log"
+  }
+}

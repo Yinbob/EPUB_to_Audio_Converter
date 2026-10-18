@@ -1,0 +1,12 @@
+[
+  {
+    "antipattern": "layout-transition",
+    "name": "Layout property animation",
+    "description": "Animating width, height, padding, or margin causes layout thrash and janky performance. Use transform and opacity instead, or grid-template-rows for height animations.",
+    "severity": "warning",
+    "category": "quality",
+    "file": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_generator/ui/web_ui.py",
+    "line": 3045,
+    "snippet": "transition: width"
+  }
+]

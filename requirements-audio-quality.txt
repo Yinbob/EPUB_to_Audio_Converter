@@ -1,0 +1,7 @@
+# 可选：在隔离的 Python 3.11 环境中安装；不升级主 UI 的 Gradio。
+# CPU 规则评估只需 scipy + 主 requirements.txt 中的 numpy/soundfile。
+scipy>=1.11
+# 以下用于本地预训练评估；安装包不等于已下载模型权重。
+funasr
+speechbrain
+silero-vad[onnx-cpu]

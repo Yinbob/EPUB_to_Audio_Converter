@@ -1,0 +1,135 @@
+{
+  "version": "flipped-clone-human-feedback-v46",
+  "source": "explicit_user_reply",
+  "source_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/review_manifest.json",
+  "source_manifest_sha256": "74393278f4ce302829c87ff070672b6e8aa99e55969aba0a06752d9783e43382",
+  "confirmed_defects": [
+    {
+      "sample_id": "R039",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/R039.wav",
+      "audio_sha256": "707782afd9ed12bf56637fbd69dcf787a0de6683660a70edb002d9ff761763c3",
+      "confirmed_defect": "extra_suffix",
+      "user_reply": "R039读完后又重复了一遍前半段；R018读完后又重复了两遍no（实际读了5个no）；",
+      "description": "完整读完后重复；用户描述为前半段，实际切点须独立定位。"
+    },
+    {
+      "sample_id": "R018",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/R018.wav",
+      "audio_sha256": "ee63a56a21e8ac8abb717699834bf7148712e812809ae2fe3f02ad30902c13b6",
+      "confirmed_defect": "extra_suffix",
+      "user_reply": "R039读完后又重复了一遍前半段；R018读完后又重复了两遍no（实际读了5个no）；",
+      "expected_no_count": 3,
+      "heard_no_count": 5
+    },
+    {
+      "sample_id": "J076",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/J076.wav",
+      "audio_sha256": "a18d47969764e94d499484f88f29ce436260f41f859718b68ce30c4334ff451d",
+      "confirmed_defect": "long_pause",
+      "user_reply": "修复后的接缝自然、音量合适，J076应缩到1秒左右",
+      "target_pause_seconds": 1.0,
+      "heard_estimated_pause_seconds": 2.04
+    }
+  ],
+  "accepted_voice_samples": [
+    {
+      "sample_id": "R001",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/R001.wav",
+      "audio_sha256": "c4755a7583725dae2053abb1a7a38a0c82343d6e8a105d1622cfea3c383762ed",
+      "role_id": "narrator",
+      "voice_version": "20990afb2fae266d18a26f5eb4836a6d979ecc5a93000e43c76911fc1d7ee052",
+      "content_complete": true,
+      "signal_acceptable": true,
+      "identity_accepted": true,
+      "young_voice_preserved": true,
+      "user_reply": "全部保留了原R001的年轻音色、像同一个人，且内容完整、无明显杂音或爆音"
+    },
+    {
+      "sample_id": "R051",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/R051.wav",
+      "audio_sha256": "77eb1ee50034a0bead6012de1bed9bb1515ce7e3a45cb7b3e0c45bd9211eff0e",
+      "role_id": "narrator",
+      "voice_version": "20990afb2fae266d18a26f5eb4836a6d979ecc5a93000e43c76911fc1d7ee052",
+      "content_complete": true,
+      "signal_acceptable": true,
+      "identity_accepted": true,
+      "young_voice_preserved": true,
+      "user_reply": "全部保留了原R001的年轻音色、像同一个人，且内容完整、无明显杂音或爆音"
+    },
+    {
+      "sample_id": "R100",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/R100.wav",
+      "audio_sha256": "d73822103dd8bde0ae6f600c0a78046b6bcb86a4714b88790eafa5cc25d83f2a",
+      "role_id": "narrator",
+      "voice_version": "20990afb2fae266d18a26f5eb4836a6d979ecc5a93000e43c76911fc1d7ee052",
+      "content_complete": true,
+      "signal_acceptable": true,
+      "identity_accepted": true,
+      "young_voice_preserved": true,
+      "user_reply": "全部保留了原R001的年轻音色、像同一个人，且内容完整、无明显杂音或爆音"
+    }
+  ],
+  "accepted_join_contexts": [
+    {
+      "sample_id": "J009",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/J009.wav",
+      "audio_sha256": "c8315039e03bafc6a0d650a6e4587b44e73911f91a459a1018cbce0afdce5ce4",
+      "natural": true,
+      "loudness_acceptable": true,
+      "user_reply": "修复后的接缝自然、音量合适，J076应缩到1秒左右"
+    },
+    {
+      "sample_id": "J013",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/J013.wav",
+      "audio_sha256": "1a3ebd9e9bd401eeea95162f9fd5a10adeb4ca17c4cfb135bb73a2ddce6a9863",
+      "natural": true,
+      "loudness_acceptable": true,
+      "user_reply": "修复后的接缝自然、音量合适，J076应缩到1秒左右"
+    },
+    {
+      "sample_id": "J023",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/J023.wav",
+      "audio_sha256": "3420eb2429999ca3287e28bbe8b4f2558215e1960f1fd954ef6e07d24e429cf3",
+      "natural": true,
+      "loudness_acceptable": true,
+      "user_reply": "修复后的接缝自然、音量合适，J076应缩到1秒左右"
+    },
+    {
+      "sample_id": "J021",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/J021.wav",
+      "audio_sha256": "26b997f058b104a9914402372b6aaf62bf86c1530710b1a31d92057e079fc02c",
+      "natural": true,
+      "loudness_acceptable": true,
+      "user_reply": "修复后的接缝自然、音量合适，J076应缩到1秒左右"
+    },
+    {
+      "sample_id": "J022",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/J022.wav",
+      "audio_sha256": "a0aa0acaf2df34fbd660def684110c246f06c2d7051dcf2223060713dcd11593",
+      "natural": true,
+      "loudness_acceptable": true,
+      "user_reply": "修复后的接缝自然、音量合适，J076应缩到1秒左右"
+    },
+    {
+      "sample_id": "J048",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/J048.wav",
+      "audio_sha256": "9c3a04c4fb7aff09960b99319edec5cae7aaa6766028881b19bc84cda2a6db00",
+      "natural": true,
+      "loudness_acceptable": true,
+      "user_reply": "修复后的接缝自然、音量合适，J076应缩到1秒左右"
+    },
+    {
+      "sample_id": "J049",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/J049.wav",
+      "audio_sha256": "5af67f33a8502757dcfa41aae8cf9758860e91f913ad43531c4743c4afd0ea81",
+      "natural": true,
+      "loudness_acceptable": true,
+      "user_reply": "修复后的接缝自然、音量合适，J076应缩到1秒左右"
+    }
+  ],
+  "scope": "only_explicitly_reviewed_samples_and_join_contexts",
+  "original_reference_R001_not_reclassified": true,
+  "whole_chapter_listening_complete": false,
+  "machine_reports_unchanged": true,
+  "new_repair_candidates_not_yet_accepted": true
+}

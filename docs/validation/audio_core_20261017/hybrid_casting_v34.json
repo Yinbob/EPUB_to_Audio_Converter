@@ -1,0 +1,35 @@
+{
+  "schema_version": "hybrid-engineering-validation-v34",
+  "date": "2026-10-17",
+  "previous_snapshot": "hybrid_casting_v33.json",
+  "status": "mixed_voice_pilot_human_accepted_formal_entry_wiring_checked",
+  "changes": [
+    "网页质量设置支持固定角色参考文件",
+    "固定参考路径类型校验",
+    "正式转换入口两章混合角色JSON与固定参考离线集成验收"
+  ],
+  "new_online_tts_requests": 0,
+  "new_llm_requests": 0,
+  "offline_integration_scope": "真实计划、任务pickle、MiMo参数路由、PCM输出及报告；外部合成返回由测试正弦波替代，不证明音质",
+  "regression": {
+    "tests_run": 558,
+    "passed": 528,
+    "skipped": 30,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 16.826,
+    "log_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261017/hybrid_v34_regression.log",
+    "log_sha256": "d97272af7d0823ad421587d0c45c11ee505fcadbe9f88d7b026cf9d294f9e60e"
+  },
+  "source_sha256": {
+    "audiobook_generator/ui/audio_quality.py": "edb46476e7a7b44a668a0352e73c4ce0600824e54f05fba3c1abbf3b9b7e4900",
+    "audiobook_generator/audio_core/models.py": "2626fd23c1e85790ec1704b15c39a8f49bf85b50fcfb4748a74aa7caefd6f9e1",
+    "tests/audiobook_generator/ui/audio_quality_test.py": "80d248c608cf172f63b61bc959fda2e2747b34219a274af650a2faedc72da0a4",
+    "tests/audiobook_generator/audio_core/integration_test.py": "06d19d3bb8aebee060360c71f692842e1461ec1022be9a12d04f20bc34c6023d",
+    "examples/audio_core.settings.example.json": "0087ee4b4c898589471e65b9fe70283f80d1435ec6dc17702f29fa7b1a585b4d"
+  },
+  "human_acceptance_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/hybrid_mixed_20261017/human_acceptance_v34.json",
+  "human_acceptance_sha256": "c1023be92401c9851f66c75369a70b4c2379b94216d7a7af8838d7f789bfb142",
+  "machine_reports_unchanged": true,
+  "real_book_and_independent_listener_effectiveness": "not_yet_evaluated"
+}

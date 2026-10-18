@@ -1,0 +1,28 @@
+{
+  "version": "asr-adjudication-actual-v49",
+  "acceptance": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/human_acceptance_v49.json",
+    "sha256": "a0048cff54b233284124a41d4eae69c076e3622662890883b567f6eaab7e7d0d"
+  },
+  "derived_report": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/833889352480474a859cd06200d0ed5e/chapter_000005/quality.human_reviewed_v49.json",
+    "sha256": "542942700049d8f427873058effb37f7b8d66b01e7a30b059969f1e8aca5a076"
+  },
+  "review": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/asr_review_v49.json",
+    "sha256": "e6eeb5623f1113dc74dc6a636055bbcd4bdb537c27e096ddcb12759fea62cde6"
+  },
+  "case_registry": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_chapter_pilot_20261017/reviewed_repair_cases_v49.json",
+    "sha256": "63ca00ae067d3101339dff1145dfc79cca9f703c39bd5a0a421519ec8a9506ad"
+  },
+  "cases": 10,
+  "unique_groups": 1,
+  "human_content_resolution": "R034_only",
+  "consistency_stays_incomplete": true,
+  "original_machine_report_unchanged": true,
+  "preview_count": 200,
+  "new_tts_requests": 0,
+  "new_llm_requests": 0,
+  "overall_project_complete": false
+}

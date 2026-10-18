@@ -1,0 +1,246 @@
+{
+  "version": "casting-common-gain-material-acceptance-v52",
+  "source": "explicit_user_reply",
+  "question_item_id": "call_bedf747bd7564f8ea9f6c2dec4063cca:0",
+  "user_reply": "9章上述质量检查均正常”",
+  "reviewer": "project_user",
+  "recorded_at": "2026-10-17T16:17:44.511603+08:00",
+  "source_pending_template": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_common_gain_20261016/chapter_review.json",
+    "sha256": "51524eb2e33b2977bcb4393ff29828178a6fd20c508a3eff31ac4b852d6da562"
+  },
+  "chapters": [
+    {
+      "chapter": 1,
+      "condition": "interaction+random",
+      "scene": 1,
+      "played_audio": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_common_gain_20261016/audio/chapter_000001_full.wav",
+        "sha256": "ea48cdf62fc108f9e976dbedec984e0d24595533e439d56d34848012fe08601f"
+      },
+      "source_report": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_01/scene_01/quality.json",
+        "sha256": "e52df8edd3c56b36c29e6c2c90d8b3faac656532f5d0158fd8ff9e6e1eac1294"
+      },
+      "source_pcm": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_01/scene_01/chapter.wav",
+        "sha256": "ea48cdf62fc108f9e976dbedec984e0d24595533e439d56d34848012fe08601f"
+      },
+      "duration_seconds": 28.48,
+      "human_status": "accepted_for_asked_quality_checks",
+      "content_complete": true,
+      "no_repetition_or_omission": true,
+      "joins_acceptable": true,
+      "no_obvious_signal_noise": true,
+      "loudness_and_rate_acceptable": true,
+      "same_role_consistency_acceptable_within_condition": true
+    },
+    {
+      "chapter": 2,
+      "condition": "interaction+random",
+      "scene": 2,
+      "played_audio": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_common_gain_20261016/audio/chapter_000002_full.wav",
+        "sha256": "bf9fb7a313eead5ff238471e09579449be48b241d1e183def0b58e93ed9ed284"
+      },
+      "source_report": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_01/scene_02/quality.json",
+        "sha256": "9b19edf764d3605e7dd53cd8d6e0b5932eec9fc99599ca474b89bb3c68604a0d"
+      },
+      "source_pcm": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_01/scene_02/chapter.wav",
+        "sha256": "bf9fb7a313eead5ff238471e09579449be48b241d1e183def0b58e93ed9ed284"
+      },
+      "duration_seconds": 26.08,
+      "human_status": "accepted_for_asked_quality_checks",
+      "content_complete": true,
+      "no_repetition_or_omission": true,
+      "joins_acceptable": true,
+      "no_obvious_signal_noise": true,
+      "loudness_and_rate_acceptable": true,
+      "same_role_consistency_acceptable_within_condition": true
+    },
+    {
+      "chapter": 3,
+      "condition": "interaction+random",
+      "scene": 3,
+      "played_audio": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_common_gain_20261016/audio/chapter_000003_full.wav",
+        "sha256": "e7501ea6bd58eb797d47540fee27a8bf25d365c9f5ae960f93e8d98e1da31474"
+      },
+      "source_report": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_01/scene_03/quality.json",
+        "sha256": "3221e0acc0f4e0259af13678e1f43cf80034d8caeeaec3c08faf8b73d248ee2d"
+      },
+      "source_pcm": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_01/scene_03/chapter.wav",
+        "sha256": "e7501ea6bd58eb797d47540fee27a8bf25d365c9f5ae960f93e8d98e1da31474"
+      },
+      "duration_seconds": 29.44,
+      "human_status": "accepted_for_asked_quality_checks",
+      "content_complete": true,
+      "no_repetition_or_omission": true,
+      "joins_acceptable": true,
+      "no_obvious_signal_noise": true,
+      "loudness_and_rate_acceptable": true,
+      "same_role_consistency_acceptable_within_condition": true
+    },
+    {
+      "chapter": 4,
+      "condition": "global",
+      "scene": 1,
+      "played_audio": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_common_gain_20261016/audio/chapter_000004_full.wav",
+        "sha256": "88fecc69654d6cbd5aafeddcc2d234858589805b0185a91bae46eb0b31e1ba92"
+      },
+      "source_report": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_02/scene_01/quality.json",
+        "sha256": "b84569dce85afd800acaa72b73e59f93b2fe1b6b7b2c1d52b5b6d97669180bde"
+      },
+      "source_pcm": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_02/scene_01/chapter.wav",
+        "sha256": "88fecc69654d6cbd5aafeddcc2d234858589805b0185a91bae46eb0b31e1ba92"
+      },
+      "duration_seconds": 28.48,
+      "human_status": "accepted_for_asked_quality_checks",
+      "content_complete": true,
+      "no_repetition_or_omission": true,
+      "joins_acceptable": true,
+      "no_obvious_signal_noise": true,
+      "loudness_and_rate_acceptable": true,
+      "same_role_consistency_acceptable_within_condition": true
+    },
+    {
+      "chapter": 5,
+      "condition": "global",
+      "scene": 2,
+      "played_audio": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_common_gain_20261016/audio/chapter_000005_full.wav",
+        "sha256": "584606e6f778f81de714a1d0acbea94919d95f12330ac6ad5d6443c52e4d37dc"
+      },
+      "source_report": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_02/scene_02/quality.json",
+        "sha256": "8e464016c29308580015e09203223537a28310df57eb69747b258ed84c5179f4"
+      },
+      "source_pcm": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_02/scene_02/chapter.wav",
+        "sha256": "584606e6f778f81de714a1d0acbea94919d95f12330ac6ad5d6443c52e4d37dc"
+      },
+      "duration_seconds": 26.08,
+      "human_status": "accepted_for_asked_quality_checks",
+      "content_complete": true,
+      "no_repetition_or_omission": true,
+      "joins_acceptable": true,
+      "no_obvious_signal_noise": true,
+      "loudness_and_rate_acceptable": true,
+      "same_role_consistency_acceptable_within_condition": true
+    },
+    {
+      "chapter": 6,
+      "condition": "global",
+      "scene": 3,
+      "played_audio": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_common_gain_20261016/audio/chapter_000006_full.wav",
+        "sha256": "f4f266916e24eb55978e0286690d8398d807296a4ef5fe69667502882d11ef96"
+      },
+      "source_report": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_02/scene_03/quality.json",
+        "sha256": "c586f0b604f79cd0151c423a76095e13f0179e12a7d787425968e7ec7385e60f"
+      },
+      "source_pcm": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_02/scene_03/chapter.wav",
+        "sha256": "f4f266916e24eb55978e0286690d8398d807296a4ef5fe69667502882d11ef96"
+      },
+      "duration_seconds": 30.4,
+      "human_status": "accepted_for_asked_quality_checks",
+      "content_complete": true,
+      "no_repetition_or_omission": true,
+      "joins_acceptable": true,
+      "no_obvious_signal_noise": true,
+      "loudness_and_rate_acceptable": true,
+      "same_role_consistency_acceptable_within_condition": true
+    },
+    {
+      "chapter": 7,
+      "condition": "fit",
+      "scene": 1,
+      "played_audio": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_common_gain_20261016/audio/chapter_000007_full.wav",
+        "sha256": "13d4431b791d7f3be369289f81d617e4f0612c0a4d564884e49770d8a9cdb286"
+      },
+      "source_report": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_03/scene_01/quality.json",
+        "sha256": "c87febc915e2417c00ab06a8781656de1215fa048a50fd8ea5273ee35aac544e"
+      },
+      "source_pcm": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_03/scene_01/chapter.wav",
+        "sha256": "13d4431b791d7f3be369289f81d617e4f0612c0a4d564884e49770d8a9cdb286"
+      },
+      "duration_seconds": 28.48,
+      "human_status": "accepted_for_asked_quality_checks",
+      "content_complete": true,
+      "no_repetition_or_omission": true,
+      "joins_acceptable": true,
+      "no_obvious_signal_noise": true,
+      "loudness_and_rate_acceptable": true,
+      "same_role_consistency_acceptable_within_condition": true
+    },
+    {
+      "chapter": 8,
+      "condition": "fit",
+      "scene": 2,
+      "played_audio": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_common_gain_20261016/audio/chapter_000008_full.wav",
+        "sha256": "d9ea7aca20ab489b40f2b2ef8d8a2e7ad8a32765fa2d594f8d3fc14a7906a32d"
+      },
+      "source_report": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_03/scene_02/quality.json",
+        "sha256": "e6264050dac7a4173972654adc919a44ef4b1946d3ef5771ec85c156a2b29923"
+      },
+      "source_pcm": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_03/scene_02/chapter.wav",
+        "sha256": "d9ea7aca20ab489b40f2b2ef8d8a2e7ad8a32765fa2d594f8d3fc14a7906a32d"
+      },
+      "duration_seconds": 25.6,
+      "human_status": "accepted_for_asked_quality_checks",
+      "content_complete": true,
+      "no_repetition_or_omission": true,
+      "joins_acceptable": true,
+      "no_obvious_signal_noise": true,
+      "loudness_and_rate_acceptable": true,
+      "same_role_consistency_acceptable_within_condition": true
+    },
+    {
+      "chapter": 9,
+      "condition": "fit",
+      "scene": 3,
+      "played_audio": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_common_gain_20261016/audio/chapter_000009_full.wav",
+        "sha256": "e3b2f70386567d95636ae0d6fba39d6b566b6161536f995e343929aa056d03b1"
+      },
+      "source_report": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_03/scene_03/quality.json",
+        "sha256": "0a56d88927b00267ffede1da38e6486d712fb0e534e8585782a23a82f2bcd4c0"
+      },
+      "source_pcm": {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_03/scene_03/chapter.wav",
+        "sha256": "e3b2f70386567d95636ae0d6fba39d6b566b6161536f995e343929aa056d03b1"
+      },
+      "duration_seconds": 30.4,
+      "human_status": "accepted_for_asked_quality_checks",
+      "content_complete": true,
+      "no_repetition_or_omission": true,
+      "joins_acceptable": true,
+      "no_obvious_signal_noise": true,
+      "loudness_and_rate_acceptable": true,
+      "same_role_consistency_acceptable_within_condition": true
+    }
+  ],
+  "same_role_consistency_scope": "within_each_condition_only",
+  "total_seconds": 253.44,
+  "listener_identification_result": false,
+  "independent_listener": false,
+  "machine_reports_modified": false,
+  "new_tts_requests": 0,
+  "new_llm_requests": 0
+}

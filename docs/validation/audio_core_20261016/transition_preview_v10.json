@@ -1,0 +1,91 @@
+{
+  "kind": "single_real_boundary_manual_preview_no_preference_result",
+  "manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/annotation/transition_preview_v1/manifest.json",
+  "manifest_sha256": "1986a93a6ffbc862fc671c4eadbdd998c36059bc13075dbb3478a96923bdeaa3",
+  "source_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/post_encoding_reevaluation/chapter_000001/quality.json",
+  "encoded_source_sha256": "8dc3c8a3120a2cc3f003c17cd76575dfd24c5967f0f9f7e2035ed215d0421d5e",
+  "asr_model_fingerprint": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6",
+  "low_energy_estimate_seconds": {
+    "left_tail": 0.36,
+    "right_head": 0.14,
+    "existing_inserted_gap": 0.0,
+    "note": "RMS threshold estimate; not verified silence or missing-pause diagnosis"
+  },
+  "variants": [
+    {
+      "name": "original",
+      "samples": 464640,
+      "duration_seconds": 19.36,
+      "operation": {
+        "kind": "reference",
+        "added_samples": 0
+      },
+      "sha256": "3d970cb3360e7aa82851ef92548bcd27cafd88f21bcba1f1ed4329a0ba4df8ad",
+      "outside_operation_pcm_unchanged": true,
+      "asr_error_rate": 0.0
+    },
+    {
+      "name": "pause_plus_150ms",
+      "samples": 468240,
+      "duration_seconds": 19.51,
+      "operation": {
+        "kind": "extra_pause",
+        "added_samples": 3600,
+        "insert_at_sample": 222720
+      },
+      "sha256": "ad29418526c9142655cd52f4d7a7847c6276984bbe15549e2cbc6451e7085ff3",
+      "outside_operation_pcm_unchanged": true,
+      "asr_error_rate": 0.0
+    },
+    {
+      "name": "onset_gain_200ms",
+      "samples": 464640,
+      "duration_seconds": 19.36,
+      "operation": {
+        "kind": "nonzero_onset_gain",
+        "added_samples": 0,
+        "start_sample": 226080,
+        "end_sample": 230880,
+        "initial_gain": 0.8,
+        "final_gain": 1.0,
+        "onset_kind": "low_energy_estimate_not_phoneme_alignment"
+      },
+      "sha256": "68ea3c0c2765b15044111f583ea636fda6b39a06daae4062a9b7407cd1bc047f",
+      "outside_operation_pcm_unchanged": true,
+      "asr_error_rate": 0.0
+    },
+    {
+      "name": "onset_gain_400ms",
+      "samples": 464640,
+      "duration_seconds": 19.36,
+      "operation": {
+        "kind": "nonzero_onset_gain",
+        "added_samples": 0,
+        "start_sample": 226080,
+        "end_sample": 235680,
+        "initial_gain": 0.8,
+        "final_gain": 1.0,
+        "onset_kind": "low_energy_estimate_not_phoneme_alignment"
+      },
+      "sha256": "491b7f572594743cedc36e972b96bbfefceaaeacd32bec2a2145b5cadbf829c9",
+      "outside_operation_pcm_unchanged": true,
+      "asr_error_rate": 0.0
+    }
+  ],
+  "human_preference": null,
+  "automatically_applied": false,
+  "additional_tts_requests": 0,
+  "full_suite": {
+    "ran": 456,
+    "skipped": 30,
+    "status": "OK",
+    "seconds": 13.929,
+    "log": "/private/tmp/audio_quality_regression_final_v10.log"
+  },
+  "new_tests": 6,
+  "limitations": [
+    "RMS low energy is not phonetic or perceptual silence ground truth.",
+    "Nonzero gain intentionally alters speech amplitude; ASR equality does not prove audibility or naturalness.",
+    "All variants share one source boundary; not independent samples."
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "version": "boundary_training_guard_v28",
+  "change": "拒绝无任何可用类别的边界训练，保留逐类支持计数与来源组数",
+  "before_control": "all-negative returned inactive model",
+  "after_control": "没有可训练类别：至少一类需在训练集和独立开发集各有正常与异常标注；不足时继续使用规则",
+  "controls_are_synthetic_not_real_training": true,
+  "synthetic_partial_ready_labels": [
+    true,
+    false,
+    false,
+    false
+  ],
+  "synthetic_label_support": {
+    "train": {
+      "boundary_click_suspected": {
+        "positive": 2,
+        "negative": 2
+      },
+      "cutoff_suspected": {
+        "positive": 0,
+        "negative": 4
+      },
+      "overlap": {
+        "positive": 0,
+        "negative": 4
+      },
+      "unexpected_gap": {
+        "positive": 0,
+        "negative": 4
+      }
+    },
+    "dev": {
+      "boundary_click_suspected": {
+        "positive": 2,
+        "negative": 2
+      },
+      "cutoff_suspected": {
+        "positive": 0,
+        "negative": 4
+      },
+      "overlap": {
+        "positive": 0,
+        "negative": 4
+      },
+      "unexpected_gap": {
+        "positive": 0,
+        "negative": 4
+      }
+    },
+    "test": {
+      "boundary_click_suspected": {
+        "positive": 0,
+        "negative": 0
+      },
+      "cutoff_suspected": {
+        "positive": 0,
+        "negative": 0
+      },
+      "overlap": {
+        "positive": 0,
+        "negative": 0
+      },
+      "unexpected_gap": {
+        "positive": 0,
+        "negative": 0
+      }
+    }
+  },
+  "synthetic_source_group_counts": {
+    "train": 4,
+    "dev": 4,
+    "test": 0
+  },
+  "model_saved": false,
+  "new_tts_requests": 0,
+  "real_training_performed": false,
+  "new_test_methods": 4,
+  "targeted_tests": 12,
+  "regression": {
+    "ran": 523,
+    "seconds": 15.264,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/boundary_training_guard_regression_v28.log",
+    "log_sha256": "ac32c9ceecc80c68c86930aa9aa2dca0d421594d9a91c6bfe4048ea9b3c5440d"
+  },
+  "checks": [
+    "全阴性和全阳性输入拒绝",
+    "训练与开发类别不相交时拒绝",
+    "部分可用类别继续工作并保存计数",
+    "测试标签不影响训练参数或开发阈值",
+    "CLI 拒绝时不创建／覆盖模型且无网络客户端调用",
+    "v27 原音频、报告、人工标注等26份已绑定产物指纹保持"
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_generator/audio_core/boundary_model.py",
+      "sha256": "f4f0661ce3d58d7af842fa4cb5a67ce1e128da2bec8f34899decd93e6229b929"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_generator/audio_core/__main__.py",
+      "sha256": "8b21094928247712dfee3a97a2de0a76b8ee454f72a9dd016d7bce9c751e4e7c"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/tests/audiobook_generator/audio_core/boundary_model_test.py",
+      "sha256": "d04d3944972d05474c965d603b8fd708bb40f0dea9c164c720b90e6dc7d30cab"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/tests/audiobook_generator/audio_core/research_cli_test.py",
+      "sha256": "f1b95b122adbd1994414f60f725467761e2130cbde15920b474f6a21cac3ee3b"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/boundary_training_guard_before_v28.json",
+      "sha256": "92d4286a49a94e4fff02f6f05d270e65ee10f0ac76207fd83a5542a534139147"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/boundary_training_guard_targeted_v28.log",
+      "sha256": "38c4519522d48e0c9ad757bd3b91abb72b8e34aee4e8f8d490954c14aba44be8"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/boundary_training_guard_regression_v28.log",
+      "sha256": "ac32c9ceecc80c68c86930aa9aa2dca0d421594d9a91c6bfe4048ea9b3c5440d"
+    }
+  ],
+  "human_records_preserved": [
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/human_review.fit_confirmed.json",
+      "sha256": "ac9adb072caef5d52f78aa363d670d22f490af8517d5895d625307de967e912f"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/annotation.csv",
+      "sha256": "794c5986606f6de3029f4fc718fa352f6e0ce5dffb2c827e46c2bb2f9478db22"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focused_human_review.json",
+      "sha256": "8d34258d22922be9cb55ba01e8206453d1e0cb42e33ff030bafdbea1089f078b"
+    }
+  ],
+  "remaining": [
+    "真实边界阳性标注和独立来源划分",
+    "英文新对白、数字及 E06T 人工核验",
+    "独立听众辨识实验",
+    "边界模型真实训练与测试、数据充分后再实现神经候选和校准"
+  ]
+}

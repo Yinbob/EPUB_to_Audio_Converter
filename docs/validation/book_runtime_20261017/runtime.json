@@ -1,0 +1,10 @@
+{
+  "parent_executable": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/venv_audio_quality/bin/python3",
+  "parent_prefix": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/venv_audio_quality",
+  "child": {
+    "executable": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/venv_audio_quality/bin/python3",
+    "prefix": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/venv_audio_quality",
+    "imports_preserved_runtime": true
+  },
+  "start_method": "spawn"
+}

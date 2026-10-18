@@ -1,0 +1,40 @@
+{
+  "scope": "Zero-request reevaluation report source preservation and per-task preview isolation",
+  "before": "reevaluation_source_binding_v23_before.json",
+  "actual_source_checks": "reevaluation_source_binding_v23_actual.json",
+  "actual_preview_checks": "reevaluation_preview_isolation_v23_actual.json",
+  "additional_tts_requests": 0,
+  "new_tests": 5,
+  "tests": {
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q",
+    "ran": 507,
+    "seconds": 14.309,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/reevaluation_source_regression_v23.log",
+    "log_sha256": "7fa53c528fcce0dcb36b83e7b07c1fc54edc2befde685c232d85ea3a6a45b612"
+  },
+  "human_feedback_unchanged": true,
+  "goal_complete": false,
+  "limitations": [
+    "No additional human quality judgments",
+    "No real boundary-positive training data or independent listener study",
+    "Report copy reuse requires original audio files to remain accessible"
+  ],
+  "initial_targeted_test_failure": {
+    "reason": "macOS /var and /private/var aliases compared as different strings; expected path now resolves to canonical absolute path, consistent with stored source metadata.",
+    "failures": 1,
+    "production_check_relaxed": false
+  },
+  "sources": {
+    "audiobook_generator/audio_core/report_sources.py": "6ef3c2e71cedd034ea5ceb0fca6481b5362ef6f7d518ba7070e9c921c8c4564e",
+    "audiobook_generator/audio_core/encoding.py": "f9f434fcd96308b7022fe130162d37ed3a8e3d7c06f9e97fb3f067ebfae0461c",
+    "audiobook_generator/audio_core/listening.py": "68dc22acc2eac75198d4ffa41c6c68254edf1e068c7a6b7d5c76c01998fb5080",
+    "audiobook_generator/audio_core/annotations.py": "ecd5b981919192acb5099ae94a1025fdeb84931fc968634d0396c680f68fe172",
+    "audiobook_generator/audio_core/__main__.py": "a51ac9dd1d707295b5700773bf9ff496ab1e6b265f26e7c04a75057be0e99da1",
+    "tests/audiobook_generator/audio_core/encoding_test.py": "8c0c95b56f078f6a9560268a661b80c012df1afe226e4128cf82749a5da7ffc8",
+    "tests/audiobook_generator/audio_core/listening_test.py": "fc274eadaa99abe7ebbc61e6797ee87f97f700b7e5e0fded88edf376d3a9ad4b",
+    "tests/audiobook_generator/audio_core/annotations_test.py": "e4f407a352539f8fb1beca1f5c18d0f9a56461acc4d44ad322f0cb6c1ba68242",
+    "tests/audiobook_generator/audio_core/research_cli_test.py": "48b5b58ab5ab5d0205d4ef0af4c7354e9fbfa1566049f33fa4e72be8bdcab450"
+  }
+}

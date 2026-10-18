@@ -1,0 +1,23 @@
+{
+  "version": "tail-repeat-engineering-validation-v47",
+  "tests_run": 593,
+  "tests_passed": 563,
+  "tests_skipped": 30,
+  "failures": 0,
+  "errors": 0,
+  "elapsed_seconds": 18.441,
+  "log": "/tmp/tail_repeat_v47_full_release.log",
+  "historical_sample_record_sha256": "1bbff2960873ca2507d67796b19b6caad85a135911e9d361aace429622c25333",
+  "actual_pipeline_replay_sha256": "fbb270fa764d1dc8ce415d6c485c00ad4566087c849ac7eec66322ef8de7b159",
+  "prior_three_edits_human_acceptance_sha256": "65f2b7f8a062c73f89b2473f55027e115c80d6d2e0862534d3bc5c499d42a3d1",
+  "new_tts_requests": 0,
+  "new_llm_requests": 0,
+  "existing_chapters_not_replaced": true,
+  "not_independent_research_acceptance": true,
+  "previous_full_check": {
+    "log": "/tmp/tail_repeat_v47_full_final.log",
+    "elapsed_seconds": 18.541,
+    "tests_run": 593
+  },
+  "tail_repeat_time_included_in_evaluation": true
+}

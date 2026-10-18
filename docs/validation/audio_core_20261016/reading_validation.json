@@ -1,0 +1,47 @@
+{
+  "normalization_version": "zh-reading-v3",
+  "source_text": "API报告显示，重量3.50千克，长度0.08米。版本v3.5和编号0012保持原样。",
+  "tts_text": "应用程序接口报告显示，重量三点五零千克，长度零点零八米。版本v3.5和编号0012保持原样。",
+  "dictionary": {
+    "API": "应用程序接口"
+  },
+  "edits": [
+    {
+      "kind": "user_dictionary",
+      "source_start": 0,
+      "source_end": 3,
+      "tts_start": 0,
+      "tts_end": 6,
+      "before": "API",
+      "after": "应用程序接口",
+      "version": "zh-reading-v3",
+      "confirmation": "user_configured"
+    },
+    {
+      "kind": "quantity_decimal",
+      "source_start": 10,
+      "source_end": 14,
+      "tts_start": 13,
+      "tts_end": 17,
+      "before": "3.50",
+      "after": "三点五零",
+      "version": "zh-reading-v3",
+      "unit": "千克"
+    },
+    {
+      "kind": "quantity_decimal",
+      "source_start": 19,
+      "source_end": 23,
+      "tts_start": 22,
+      "tts_end": 26,
+      "before": "0.08",
+      "after": "零点零八",
+      "version": "zh-reading-v3",
+      "unit": "米"
+    }
+  ],
+  "source_coverage_verified": true,
+  "chunk_count": 3,
+  "requests_sent": 0,
+  "acoustic_pronunciation_validation": "not_performed"
+}

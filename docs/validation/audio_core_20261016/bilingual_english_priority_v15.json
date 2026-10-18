@@ -1,0 +1,139 @@
+{
+  "version": "bilingual_english_priority_v15",
+  "recorded_at": "2026-10-16T19:40:23.509946+08:00",
+  "requirement": "Chinese and English supported; English higher priority; first-phase MiMo only",
+  "user_chinese_approval": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_voice_probe_pilot_20261016/human_review.json",
+    "sha256": "e56f92f7c2b730c822e2da29dab54bbb33fab3c55cefb176cf41a069038f8ab2",
+    "reviewed_samples": 12,
+    "reviewed_within_voice_groups": 3,
+    "scope": "Chinese only; user explicit conversation feedback recorded by assistant"
+  },
+  "chinese_bank": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_voice_probe_pilot_20261016/voice_bank.zh.json",
+    "sha256": "dec78ff3491c4f635157607819d26c9d1068342bf84ecff70e75f082530700cd",
+    "languages": [
+      "zh"
+    ],
+    "voices": 3,
+    "probe_count": 12,
+    "speaker_dimensions": 192,
+    "speaker_model_identity": {
+      "kind": "speaker",
+      "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/ecapa",
+      "state": "local_files",
+      "runtime_version": "1.1.1",
+      "files": [
+        {
+          "path": "classifier.ckpt",
+          "bytes": 5534328,
+          "sha256": "fd9e3634fe68bd0a427c95e354c0c677374f62b3f434e45b78599950d860d535"
+        },
+        {
+          "path": "embedding_model.ckpt",
+          "bytes": 83316686,
+          "sha256": "0575cb64845e6b9a10db9bcb74d5ac32b326b8dc90352671d345e2ee3d0126a2"
+        },
+        {
+          "path": "hyperparams.yaml",
+          "bytes": 1919,
+          "sha256": "6f78854fa04ba59e761437b76a2575d3aba5e5016de3e9b69f0c9a5077fb1a41"
+        },
+        {
+          "path": "label_encoder.ckpt",
+          "bytes": 128619,
+          "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+        },
+        {
+          "path": "label_encoder.txt",
+          "bytes": 128619,
+          "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+        },
+        {
+          "path": "mean_var_norm_emb.ckpt",
+          "bytes": 1921,
+          "sha256": "cd70225b05b37be64fc5a95e24395d804231d43f74b2e1e5a513db7b69b34c33"
+        }
+      ],
+      "fingerprint": "9cc19ee039c6ded8c46311e5b94b2595a9c9ff2d11fed1a29fb838ddd7b15f27"
+    }
+  },
+  "implementation": {
+    "normalization_version": "bilingual-reading-v4",
+    "English": [
+      "word-level WER preserving boundaries/negation/contractions",
+      "word-safe chunks, sentence periods, common abbreviations, decimal protection",
+      "English repair/tone instructions",
+      "written-word rate units and WPM; configurable default 300 uncalibrated heuristic",
+      "language-scoped voice bank and casting; pre-request budget checks"
+    ],
+    "Chinese": [
+      "conservative date/percentage/quantity mappings retained",
+      "character CER and Han characters per second retained"
+    ],
+    "mixed": "mixed token content checks; no single-language rate threshold or automatic casting",
+    "numeric_limit": "English numeral/verbalization, acronym and contraction variants require explicit dictionary or manual review; not silently equated"
+  },
+  "tests": {
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q",
+    "ran": 478,
+    "seconds": 13.385,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/bilingual_regression_v15.log",
+    "log_sha256": "a55b5039dd86048f67bc91217f38f8f106f1b6a117d2d31b62e9c07290111850"
+  },
+  "english_pilot": {
+    "manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/probes.json",
+    "manifest_sha256": "42def93b0d88d58c47bf60f0eb22ffb4344ae455e0fa641bf443efe2e1f3ab96",
+    "model": "mimo-v2.5-tts",
+    "resources": {
+      "succeeded": {
+        "requests": 6,
+        "characters": 519,
+        "repair_requests": 0
+      }
+    },
+    "duration_seconds": 49.440000000000005,
+    "samples": 6,
+    "automatic_wer_zero": 5,
+    "suspected_extra_reading": [
+      "E06"
+    ],
+    "all_human_review_status": "pending",
+    "verified_bank_created": false,
+    "automatic_checks": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/automatic_checks.json",
+    "review_readme": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/README.md",
+    "chapter_replay": [
+      {
+        "chapter": 1,
+        "mode": "ordinary",
+        "new_requests": 0,
+        "report_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/reports/4c445d7d85704b6497c287f01310e803/chapter_000001/quality.json",
+        "final_dimensions": {
+          "encoding": "passed",
+          "content": "passed"
+        },
+        "quality_status": "incomplete"
+      },
+      {
+        "chapter": 2,
+        "mode": "roles",
+        "new_requests": 0,
+        "report_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/reports/8e23c94eb4c045798acd6777a806d1d0/chapter_000002/quality.json",
+        "final_dimensions": {
+          "encoding": "passed",
+          "content": "incomplete"
+        },
+        "quality_status": "incomplete"
+      }
+    ]
+  },
+  "research_limits": [
+    "E06 ASR disagreement is suspected, not human-confirmed extra speech",
+    "No English human approval; Chinese feedback is not transferred",
+    "No real boundary positive training data or independently validated boundary classifier",
+    "No independent listener voice-identification benefit study",
+    "100ms 50%-100% policy remains bound to previously approved Chinese source join; no English blanket adoption"
+  ]
+}

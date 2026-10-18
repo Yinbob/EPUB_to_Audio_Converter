@@ -1,0 +1,448 @@
+{
+  "recorded_at": "2026-10-16T19:56:11.159847+08:00",
+  "scope": "E06 human-confirmed extra speech diagnosis; no new synthesis",
+  "new_tts_requests": 0,
+  "source_manifest_sha256": "42def93b0d88d58c47bf60f0eb22ffb4344ae455e0fa641bf443efe2e1f3ab96",
+  "observations": [
+    {
+      "sample_id": "E01",
+      "voice": "Mia",
+      "request_id_local": "23cbbe8a0acb454f8a2b2fb3e84ae25d",
+      "request_key": "e9cd1a706c7c42339e1f9b33ab21c305c81e7b0ab81111764e00cb1a93881b0f",
+      "reconstructed_request": {
+        "model": "mimo-v2.5-tts",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Use a steady audiobook pace. Read only the supplied text without omissions or additions."
+          },
+          {
+            "role": "assistant",
+            "content": "Morning sunlight fell across the quiet desk. She opened the old book and began to read."
+          }
+        ],
+        "audio": {
+          "format": "wav",
+          "voice": "Mia"
+        }
+      },
+      "reconstructed_key_matches_original_ledger": true,
+      "reconstruction_scope": "current adapter plus recorded text/voice/model; cryptographic key matches original ledger; not a captured historical HTTP request",
+      "sdk_max_retries": 0,
+      "raw_sha256": "73a87c3b59bfb4d922e01a332d612aadf5dd56633f209a0f9b6add5fbcc998eb",
+      "database_and_listening_copy_hash_match": true,
+      "duration_seconds": 7.04,
+      "sample_rate": 24000,
+      "channels": 1,
+      "format": "WAV",
+      "subtype": "PCM_16",
+      "bytes": 337964
+    },
+    {
+      "sample_id": "E02",
+      "voice": "Mia",
+      "request_id_local": "135370d095d64185b992fef1f7f6a54d",
+      "request_key": "57527527612cbed58bd5418a1992d4b693f400dacfcc24420198b3b9a8a9bc57",
+      "reconstructed_request": {
+        "model": "mimo-v2.5-tts",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Use a steady audiobook pace. Read only the supplied text without omissions or additions."
+          },
+          {
+            "role": "assistant",
+            "content": "Do you remember where we agreed to meet? Please wait beside the bridge until I arrive."
+          }
+        ],
+        "audio": {
+          "format": "wav",
+          "voice": "Mia"
+        }
+      },
+      "reconstructed_key_matches_original_ledger": true,
+      "reconstruction_scope": "current adapter plus recorded text/voice/model; cryptographic key matches original ledger; not a captured historical HTTP request",
+      "sdk_max_retries": 0,
+      "raw_sha256": "c7398c95bec78b095730e9cdea44650e5d43c5b390ac2dfc08dce9a04fe1482c",
+      "database_and_listening_copy_hash_match": true,
+      "duration_seconds": 7.04,
+      "sample_rate": 24000,
+      "channels": 1,
+      "format": "WAV",
+      "subtype": "PCM_16",
+      "bytes": 337964
+    },
+    {
+      "sample_id": "E03",
+      "voice": "Chloe",
+      "request_id_local": "27447642d3ec424799ff8bea110a6ea2",
+      "request_key": "6e8635d95416d97f9c362f739777229dbca9395c1753f1f39fd10ccc7078a57e",
+      "reconstructed_request": {
+        "model": "mimo-v2.5-tts",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Use a steady audiobook pace. Read only the supplied text without omissions or additions."
+          },
+          {
+            "role": "assistant",
+            "content": "Morning sunlight fell across the quiet desk. She opened the old book and began to read."
+          }
+        ],
+        "audio": {
+          "format": "wav",
+          "voice": "Chloe"
+        }
+      },
+      "reconstructed_key_matches_original_ledger": true,
+      "reconstruction_scope": "current adapter plus recorded text/voice/model; cryptographic key matches original ledger; not a captured historical HTTP request",
+      "sdk_max_retries": 0,
+      "raw_sha256": "28c564290e72913e29112ad41f2cc83c259728d4ee8123feb5e74825ce24a6e6",
+      "database_and_listening_copy_hash_match": true,
+      "duration_seconds": 7.36,
+      "sample_rate": 24000,
+      "channels": 1,
+      "format": "WAV",
+      "subtype": "PCM_16",
+      "bytes": 353324
+    },
+    {
+      "sample_id": "E04",
+      "voice": "Chloe",
+      "request_id_local": "b10ffa2c7b994d0d8e4df7b1ed00ea6f",
+      "request_key": "96d34de62d559121776f65d2f635f7136cabcbb6388c9a7ff0b0c43221613cca",
+      "reconstructed_request": {
+        "model": "mimo-v2.5-tts",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Use a steady audiobook pace. Read only the supplied text without omissions or additions."
+          },
+          {
+            "role": "assistant",
+            "content": "Do you remember where we agreed to meet? Please wait beside the bridge until I arrive."
+          }
+        ],
+        "audio": {
+          "format": "wav",
+          "voice": "Chloe"
+        }
+      },
+      "reconstructed_key_matches_original_ledger": true,
+      "reconstruction_scope": "current adapter plus recorded text/voice/model; cryptographic key matches original ledger; not a captured historical HTTP request",
+      "sdk_max_retries": 0,
+      "raw_sha256": "639cfc69c1345072a230952fb5e108fbacd59f4648c897448c8174afc54f80ed",
+      "database_and_listening_copy_hash_match": true,
+      "duration_seconds": 6.88,
+      "sample_rate": 24000,
+      "channels": 1,
+      "format": "WAV",
+      "subtype": "PCM_16",
+      "bytes": 330284
+    },
+    {
+      "sample_id": "E05",
+      "voice": "Milo",
+      "request_id_local": "793c916d66464343bd03354863f1def3",
+      "request_key": "c1a3e922e67e868004665426657635ec98dfa8cd0ea869b1ee8399469df91952",
+      "reconstructed_request": {
+        "model": "mimo-v2.5-tts",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Use a steady audiobook pace. Read only the supplied text without omissions or additions."
+          },
+          {
+            "role": "assistant",
+            "content": "Morning sunlight fell across the quiet desk. She opened the old book and began to read."
+          }
+        ],
+        "audio": {
+          "format": "wav",
+          "voice": "Milo"
+        }
+      },
+      "reconstructed_key_matches_original_ledger": true,
+      "reconstruction_scope": "current adapter plus recorded text/voice/model; cryptographic key matches original ledger; not a captured historical HTTP request",
+      "sdk_max_retries": 0,
+      "raw_sha256": "9b1237962d8836222f785f2c4b870ff19419f5f442d88c41714870edb141acc2",
+      "database_and_listening_copy_hash_match": true,
+      "duration_seconds": 6.56,
+      "sample_rate": 24000,
+      "channels": 1,
+      "format": "WAV",
+      "subtype": "PCM_16",
+      "bytes": 314924
+    },
+    {
+      "sample_id": "E06",
+      "voice": "Milo",
+      "request_id_local": "cac2bf20e3bb46f495e60d31f463451e",
+      "request_key": "8a6bac1aa28e941c3fc563cb3f1825e4e2d236003859f9becf664cb9c56aa506",
+      "reconstructed_request": {
+        "model": "mimo-v2.5-tts",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Use a steady audiobook pace. Read only the supplied text without omissions or additions."
+          },
+          {
+            "role": "assistant",
+            "content": "Do you remember where we agreed to meet? Please wait beside the bridge until I arrive."
+          }
+        ],
+        "audio": {
+          "format": "wav",
+          "voice": "Milo"
+        }
+      },
+      "reconstructed_key_matches_original_ledger": true,
+      "reconstruction_scope": "current adapter plus recorded text/voice/model; cryptographic key matches original ledger; not a captured historical HTTP request",
+      "sdk_max_retries": 0,
+      "raw_sha256": "140dd76c47c41ec35615f7ca4c26b89a7c507c0e1d7344c653692daa123dd00b",
+      "database_and_listening_copy_hash_match": true,
+      "duration_seconds": 14.56,
+      "sample_rate": 24000,
+      "channels": 1,
+      "format": "WAV",
+      "subtype": "PCM_16",
+      "bytes": 698924
+    }
+  ],
+  "e06_riff_chunks": [
+    {
+      "id": "fmt ",
+      "size": 16
+    },
+    {
+      "id": "data",
+      "size": 698880
+    }
+  ],
+  "e06_riff_size_and_single_data_chunk_valid": true,
+  "e06_raw_and_rendered_pcm_equal": true,
+  "e06_render_operations": [],
+  "e06_speed": 1.0,
+  "e06_source_and_tts_text_equal": true,
+  "e06_existing_asr_alignment": {
+    "error_rate": 0.9375,
+    "operations": [
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 16,
+        "reference": "",
+        "hypothesis": "and"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 17,
+        "reference": "",
+        "hypothesis": "if"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 18,
+        "reference": "",
+        "hypothesis": "you"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 19,
+        "reference": "",
+        "hypothesis": "created"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 20,
+        "reference": "",
+        "hypothesis": "out"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 21,
+        "reference": "",
+        "hypothesis": "the"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 22,
+        "reference": "",
+        "hypothesis": "boy"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 23,
+        "reference": "",
+        "hypothesis": "then"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 24,
+        "reference": "",
+        "hypothesis": "he"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 25,
+        "reference": "",
+        "hypothesis": "would"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 26,
+        "reference": "",
+        "hypothesis": "completely"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 27,
+        "reference": "",
+        "hypothesis": "product"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 28,
+        "reference": "",
+        "hypothesis": "their"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 29,
+        "reference": "",
+        "hypothesis": "entire"
+      },
+      {
+        "kind": "insert",
+        "reference_index": 16,
+        "hypothesis_index": 30,
+        "reference": "",
+        "hypothesis": "silence"
+      }
+    ],
+    "reference": "do you remember where we agreed to meet please wait beside the bridge until i arrive",
+    "hypothesis": "do you remember where we agreed to meet please wait beside the bridge until i arrive and if you created out the boy then he would completely product their entire silence",
+    "reference_tokens": [
+      "do",
+      "you",
+      "remember",
+      "where",
+      "we",
+      "agreed",
+      "to",
+      "meet",
+      "please",
+      "wait",
+      "beside",
+      "the",
+      "bridge",
+      "until",
+      "i",
+      "arrive"
+    ],
+    "hypothesis_tokens": [
+      "do",
+      "you",
+      "remember",
+      "where",
+      "we",
+      "agreed",
+      "to",
+      "meet",
+      "please",
+      "wait",
+      "beside",
+      "the",
+      "bridge",
+      "until",
+      "i",
+      "arrive",
+      "and",
+      "if",
+      "you",
+      "created",
+      "out",
+      "the",
+      "boy",
+      "then",
+      "he",
+      "would",
+      "completely",
+      "product",
+      "their",
+      "entire",
+      "silence"
+    ],
+    "language": "en",
+    "error_metric": "WER",
+    "alignment_unit": "word",
+    "reference_unit_count": 16,
+    "normalization_policy": "case_punctuation_only_en_numbers_and_contractions_require_explicit_dictionary",
+    "deletions": 0,
+    "insertions": 15,
+    "substitutions": 0
+  },
+  "chapter_02_affected": true,
+  "diagnosis": {
+    "established": "Extra speech is present in the raw bytes saved directly from one non-streaming MiMo response; no local chunk merge or audio transformation introduced it. Intended two-sentence input and English literal-reading instruction are consistent with original request fingerprint.",
+    "inference": "Most consistent with service-returned over-generation or unintended speech continuation; exact model decoding vs service-side routing cause unknown.",
+    "not_established": [
+      "Milo-wide defect or failure rate",
+      "EOS/stop-token decoding mechanism",
+      "server-side trace; historical response id and finish_reason not saved",
+      "training-data leakage or origin of extra phrase"
+    ],
+    "same_text_controls": [
+      "E02 Mia 7.04 seconds human passed",
+      "E04 Chloe 6.88 seconds human passed"
+    ],
+    "request_protocol_source": "https://mimo.mi.com/docs/zh-CN/quick-start/usage-guide/audio/speech-synthesis",
+    "protocol_check": "user instructions and assistant body match current official example; not generic-chat role semantics",
+    "secondary_rate_warning": "Expected 16 words divided by audio containing additional speech underestimates actual speech pace; rate_drift is not independent proof of a speaking-rate defect."
+  },
+  "research_label": {
+    "dimension": "content",
+    "label": "extra_reading",
+    "human_confirmed": true,
+    "boundary_training_eligible": false,
+    "independent_test_sample": false
+  },
+  "next_remedy": "Bypass rejected raw cache, bounded same-voice literal-reading resynthesis and ASR+human review; optionally sentence split with new boundary verification. No arbitrary time crop or global gain change.",
+  "human_review": {
+    "recorded_at": "2026-10-16T19:57:19.549767+08:00",
+    "user_statement_verbatim": "确认了，E06后半段异常，出现额外内容，转写大致为：and if you created out the boy, then he will completely product their entire silence;其余部分均正常，请检查原因",
+    "approximate_extra_text": "and if you created out the boy, then he will completely product their entire silence",
+    "accepted": [
+      "E01",
+      "E02",
+      "E03",
+      "E04",
+      "E05"
+    ],
+    "rejected": [
+      "E06"
+    ],
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/human_review.json",
+    "sha256": "2da19d9d66ebb23ea9680f4ce8268daf544262ec11a66faf9489002440aee047",
+    "original_probe_manifest_unchanged": true,
+    "verified_english_bank_created": false,
+    "eligible_complete_voice_sets": [
+      "Mia",
+      "Chloe"
+    ],
+    "Milo_status": "E05 passed but E06 rejected; replacement second probe required before a complete common-text set"
+  }
+}

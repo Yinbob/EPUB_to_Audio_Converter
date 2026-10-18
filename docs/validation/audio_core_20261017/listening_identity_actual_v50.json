@@ -1,0 +1,95 @@
+{
+  "version": "listening-identity-actual-v50",
+  "reports": [
+    {
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/833889352480474a859cd06200d0ed5e/chapter_000005/quality.human_reviewed_v49.json",
+      "report_sha256": "542942700049d8f427873058effb37f7b8d66b01e7a30b059969f1e8aca5a076",
+      "chunks": 100,
+      "mode_counts": {
+        "clone": 69,
+        "preset": 28,
+        "design": 3
+      },
+      "identities_per_role": {
+        "narrator": 1,
+        "bryce_father": 1,
+        "juli": 1,
+        "bryce_mother": 1,
+        "classmates": 1
+      },
+      "audio_modified": false
+    },
+    {
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_matched_20261017/chapter_01/quality.json",
+      "report_sha256": "3791509b3aca3b723b839e8a995a07827982026410e2b8964b137261e8bc47dd",
+      "chunks": 4,
+      "mode_counts": {
+        "preset": 2,
+        "design": 2
+      },
+      "identities_per_role": {
+        "narrator": 1,
+        "late": 1,
+        "lead": 1,
+        "guest": 1
+      },
+      "audio_modified": false
+    },
+    {
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_matched_20261017/chapter_04/quality.json",
+      "report_sha256": "f62fa812447bd00e0fe6c30abe5a391d536734ad7855f35d2adbdd56021cd8af",
+      "chunks": 3,
+      "mode_counts": {
+        "preset": 2,
+        "design": 1
+      },
+      "identities_per_role": {
+        "narrator": 1,
+        "late": 1,
+        "lead": 1
+      },
+      "audio_modified": false
+    },
+    {
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_matched_20261017/chapter_08/quality.json",
+      "report_sha256": "7aa50285c998f330837e67c87246e22621258167876543890952bd74c88988c8",
+      "chunks": 4,
+      "mode_counts": {
+        "preset": 2,
+        "design": 2
+      },
+      "identities_per_role": {
+        "narrator": 1,
+        "guest": 1,
+        "late": 1,
+        "lead": 1
+      },
+      "audio_modified": false
+    }
+  ],
+  "hybrid_cross_scene_identities_per_role": {
+    "narrator": 1,
+    "late": 1,
+    "lead": 1,
+    "guest": 1
+  },
+  "validated_chunks": 111,
+  "claims": "仅核对档案、实际请求、模型路由及克隆参考内容，不证明实际音色稳定或听众收益",
+  "tests": {
+    "run": 602,
+    "passed": 572,
+    "skipped": 30,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 18.832,
+    "log": "/tmp/listening_identity_v50_full_release.log",
+    "log_sha256": "c4d6711219c7eb25d7d821c1f79901fa1beba5f411cdb48c16cd4fe28352803d",
+    "initial_failure_log": "/tmp/listening_identity_v50_full.log",
+    "initial_failures": "两次错误明确为音频子进程SIGABRT；另一次候选未选中断言失败的直接原因未确认，原日志保留",
+    "affected_three_recheck_log": "/tmp/listening_identity_v50_ffmpeg_recheck.log",
+    "affected_three_recheck_passed": true
+  },
+  "new_tts_requests": 0,
+  "new_llm_requests": 0,
+  "overall_project_complete": false
+}

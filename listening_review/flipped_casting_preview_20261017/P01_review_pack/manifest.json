@@ -1,0 +1,220 @@
+{
+  "schema": "audio-quality-human-review-v1",
+  "provider": "mimo",
+  "sample_count": 9,
+  "chunk_count": 5,
+  "boundary_count": 4,
+  "human_reviewed_count": 0,
+  "requests_sent": 0,
+  "audio_files": [
+    {
+      "path": "audio/chapter_000005_full.wav",
+      "sha256": "f8ddf6796805632867aa8db211e9a6dd046762379d23d2da0142536265ff41b6",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 564480,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/d81c87e486f641c2abe23b675c37996c/chapter_000005/chapter.wav"
+    },
+    {
+      "path": "audio/C000005_001.wav",
+      "sha256": "c52629c4a1859fe97a8eac22ca8d7542eabd8213e624f4c852b38b01035e5036",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 80640,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/f246190bac3af1000628167a7a4fee4c6daa24a83339a29e2c970725c0146a11.wav"
+    },
+    {
+      "path": "audio/C000005_002.wav",
+      "sha256": "1612e5067edcaec695df91ca30fa53e79c3797325c28670d0dbc929ae231f494",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 276480,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/6e768508f90251af54ce8f4d1eb1c74a3660d386b946d07c7f1468a35db2bc14.wav"
+    },
+    {
+      "path": "audio/C000005_003.wav",
+      "sha256": "f090766507f4f113b9fc99b6c280538598110bb288e032bf99a8a91f281c8082",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 46080,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/0c3a938bd37997029950a1281004171ec7edfcba8eaf51b19104100cf6cc666f.wav"
+    },
+    {
+      "path": "audio/C000005_004.wav",
+      "sha256": "e8501934ea548ee529d28dfbadccdfd6ed8a5473abd8052568ea1e5965c75836",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 69120,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/952665544c17c88d62b5606b2df32fa50acec6c4c4b30862424b4f3ed39e5003.wav"
+    },
+    {
+      "path": "audio/C000005_005.wav",
+      "sha256": "d50606a59fc261072df7c2e1d46c5f68b842439e3a3f86a71578b1b8e04963f1",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 92160,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/4f49e074cb6ecc6bd73d12982a902530582d2c5515ada24cb8041a669ac214c6.wav"
+    },
+    {
+      "path": "audio/B000005_001.wav",
+      "sha256": "1bfaaa9db3524036e248494f6c589af541cb3172f80d4177ebb67d94ab65d678",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 96000,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/d81c87e486f641c2abe23b675c37996c/chapter_000005/chapter.wav"
+    },
+    {
+      "path": "audio/B000005_002.wav",
+      "sha256": "6f303d3367160be3775785dfb1f4d1537bbbe21d94579fd0d8f2f16284c1f4dd",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 96000,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/d81c87e486f641c2abe23b675c37996c/chapter_000005/chapter.wav"
+    },
+    {
+      "path": "audio/B000005_003.wav",
+      "sha256": "3e3d6ca93a7a2878935834176788b28c99ee41c56496bfc92020b93adc4ca815",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 96000,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/d81c87e486f641c2abe23b675c37996c/chapter_000005/chapter.wav"
+    },
+    {
+      "path": "audio/B000005_004.wav",
+      "sha256": "7cc51b63506eae53f9111083cd12aae208b02b3000f7561b5ae4115711eb3b26",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 96000,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/d81c87e486f641c2abe23b675c37996c/chapter_000005/chapter.wav"
+    }
+  ],
+  "boundary_data_sha256": "9f311b3b005af24ce5844582a22ee70ef5d9ada95e6d235eb283ac5e1d715362",
+  "review_records": [
+    {
+      "sample_id": "C000005_001",
+      "sample_type": "chunk",
+      "chapter": "5",
+      "role_ids": "bryce_father",
+      "same_speaker": "",
+      "audio_path": "audio/C000005_001.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": "“What are you doing? You're getting mud everywhere!”",
+      "expected_tts_text": "“What are you doing? You're getting mud everywhere!”",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "C000005_002",
+      "sample_type": "chunk",
+      "chapter": "5",
+      "role_ids": "narrator",
+      "same_speaker": "",
+      "audio_path": "audio/C000005_002.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": " So true, too. Her shoes were, like, caked with the stuff. She didn't hop out, though. Instead, she planted her rear end on the floor and started pushing a big box with her feet. ",
+      "expected_tts_text": " So true, too. Her shoes were, like, caked with the stuff. She didn't hop out, though. Instead, she planted her rear end on the floor and started pushing a big box with her feet. ",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "C000005_003",
+      "sample_type": "chunk",
+      "chapter": "5",
+      "role_ids": "juli",
+      "same_speaker": "",
+      "audio_path": "audio/C000005_003.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": "“Don't you want some help?”",
+      "expected_tts_text": "“Don't you want some help?”",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "C000005_004",
+      "sample_type": "chunk",
+      "chapter": "5",
+      "role_ids": "narrator",
+      "same_speaker": "",
+      "audio_path": "audio/C000005_004.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": " She glanced my way. ",
+      "expected_tts_text": " She glanced my way. ",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "C000005_005",
+      "sample_type": "chunk",
+      "chapter": "5",
+      "role_ids": "juli",
+      "same_speaker": "",
+      "audio_path": "audio/C000005_005.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": "“It sure looks like you need it.”",
+      "expected_tts_text": "“It sure looks like you need it.”",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "B000005_001",
+      "sample_type": "boundary",
+      "chapter": "5",
+      "role_ids": "bryce_father → narrator",
+      "same_speaker": "false",
+      "audio_path": "audio/B000005_001.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "2.0",
+      "source_text": "“What are you doing? You're getting mud everywhere!” ｜  So true, too. Her shoes were, like, caked with the stuff. She didn't hop out, though. Instead, she planted her rear end on the floor and started pushing a big box with her feet. ",
+      "expected_tts_text": "“What are you doing? You're getting mud everywhere!” ｜  So true, too. Her shoes were, like, caked with the stuff. She didn't hop out, though. Instead, she planted her rear end on the floor and started pushing a big box with her feet. ",
+      "scope_kind": "original_boundary",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "B000005_002",
+      "sample_type": "boundary",
+      "chapter": "5",
+      "role_ids": "narrator → juli",
+      "same_speaker": "false",
+      "audio_path": "audio/B000005_002.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "2.0",
+      "source_text": " So true, too. Her shoes were, like, caked with the stuff. She didn't hop out, though. Instead, she planted her rear end on the floor and started pushing a big box with her feet.  ｜ “Don't you want some help?”",
+      "expected_tts_text": " So true, too. Her shoes were, like, caked with the stuff. She didn't hop out, though. Instead, she planted her rear end on the floor and started pushing a big box with her feet.  ｜ “Don't you want some help?”",
+      "scope_kind": "original_boundary",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "B000005_003",
+      "sample_type": "boundary",
+      "chapter": "5",
+      "role_ids": "juli → narrator",
+      "same_speaker": "false",
+      "audio_path": "audio/B000005_003.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "2.0",
+      "source_text": "“Don't you want some help?” ｜  She glanced my way. ",
+      "expected_tts_text": "“Don't you want some help?” ｜  She glanced my way. ",
+      "scope_kind": "original_boundary",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "B000005_004",
+      "sample_type": "boundary",
+      "chapter": "5",
+      "role_ids": "narrator → juli",
+      "same_speaker": "false",
+      "audio_path": "audio/B000005_004.wav",
+      "full_context_path": "audio/chapter_000005_full.wav",
+      "boundary_at_seconds": "2.0",
+      "source_text": " She glanced my way.  ｜ “It sure looks like you need it.”",
+      "expected_tts_text": " She glanced my way.  ｜ “It sure looks like you need it.”",
+      "scope_kind": "original_boundary",
+      "parent_chunk_id": ""
+    }
+  ]
+}

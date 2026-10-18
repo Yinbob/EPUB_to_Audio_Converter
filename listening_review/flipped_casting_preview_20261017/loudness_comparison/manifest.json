@@ -1,0 +1,573 @@
+{
+  "version": "flipped-source-specific-loudness-v40",
+  "target_lufs": -23.04,
+  "target_basis": "median_of_four_current_Bryce_narration_chunks",
+  "operation": "attenuation_only",
+  "automatically_applied_to_production": false,
+  "requests_sent": 0,
+  "human_preference": null,
+  "onset_fade_applied": false,
+  "scenes": [
+    {
+      "sample_id": "P01",
+      "source_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/d81c87e486f641c2abe23b675c37996c/chapter_000005/quality.json",
+      "source_audio_sha256": "0952bf9478f5bc0a8e43f5485315b24d8a9181bd42e6595cdc5c5fafd80d8058",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P01_matched.wav",
+      "audio_sha256": "c4d57380ee9385c667e786bbc4ba513b48157b8d8999204c4e9df7839cd0b7b1",
+      "assembly": {
+        "sample_rate": 24000,
+        "channels": 1,
+        "total_samples": 564480,
+        "spans": [
+          {
+            "chunk_id": "5:4:bryce_father:chunk:1",
+            "role_id": "bryce_father",
+            "start_sample": 0,
+            "end_sample": 80640,
+            "source_start": 0,
+            "source_end": 52,
+            "unit_id": "5:4:bryce_father",
+            "source_span": {
+              "chapter_index": 5,
+              "start": 713,
+              "end": 765
+            },
+            "source_scope": "chapter",
+            "render_sha256": "d173e8010bfa918212dc54a53654da6f4351790c49b683b4e70fd921a8866f8c"
+          },
+          {
+            "chunk_id": "5:5:narrator:chunk:1",
+            "role_id": "narrator",
+            "start_sample": 80640,
+            "end_sample": 357120,
+            "source_start": 0,
+            "source_end": 179,
+            "unit_id": "5:5:narrator",
+            "source_span": {
+              "chapter_index": 5,
+              "start": 765,
+              "end": 944
+            },
+            "source_scope": "chapter",
+            "render_sha256": "c538aacdd058c2d84f044ae24e8e5bd3346cfeecbaa185022d775cdc1e4ac772"
+          },
+          {
+            "chunk_id": "5:6:juli:chunk:1",
+            "role_id": "juli",
+            "start_sample": 357120,
+            "end_sample": 403200,
+            "source_start": 0,
+            "source_end": 27,
+            "unit_id": "5:6:juli",
+            "source_span": {
+              "chapter_index": 5,
+              "start": 944,
+              "end": 971
+            },
+            "source_scope": "chapter",
+            "render_sha256": "1536c94212a872702f6b5cfd504c2a4863f95f2d4412b66d4647582155957961"
+          },
+          {
+            "chunk_id": "5:7:narrator:chunk:1",
+            "role_id": "narrator",
+            "start_sample": 403200,
+            "end_sample": 472320,
+            "source_start": 0,
+            "source_end": 21,
+            "unit_id": "5:7:narrator",
+            "source_span": {
+              "chapter_index": 5,
+              "start": 971,
+              "end": 992
+            },
+            "source_scope": "chapter",
+            "render_sha256": "7008f1b68a16ee4d32d10a4bd43520c4482e375113c899181f3d3ea9b61b5486"
+          },
+          {
+            "chunk_id": "5:8:juli:chunk:1",
+            "role_id": "juli",
+            "start_sample": 472320,
+            "end_sample": 564480,
+            "source_start": 0,
+            "source_end": 33,
+            "unit_id": "5:8:juli",
+            "source_span": {
+              "chapter_index": 5,
+              "start": 992,
+              "end": 1025
+            },
+            "source_scope": "chapter",
+            "render_sha256": "5965b7da9fe4b1a29c1a07c398174db3e288be069a9e132fb1491709855e9a99"
+          }
+        ],
+        "boundaries": [
+          {
+            "boundary_id": "5:4:bryce_father:chunk:1|5:5:narrator:chunk:1",
+            "left_chunk_id": "5:4:bryce_father:chunk:1",
+            "right_chunk_id": "5:5:narrator:chunk:1",
+            "start_sample": 80640,
+            "end_sample": 80640,
+            "same_speaker": false,
+            "boundary_kind": "unit_end",
+            "added_silence_samples": 0
+          },
+          {
+            "boundary_id": "5:5:narrator:chunk:1|5:6:juli:chunk:1",
+            "left_chunk_id": "5:5:narrator:chunk:1",
+            "right_chunk_id": "5:6:juli:chunk:1",
+            "start_sample": 357120,
+            "end_sample": 357120,
+            "same_speaker": false,
+            "boundary_kind": "unit_end",
+            "added_silence_samples": 0
+          },
+          {
+            "boundary_id": "5:6:juli:chunk:1|5:7:narrator:chunk:1",
+            "left_chunk_id": "5:6:juli:chunk:1",
+            "right_chunk_id": "5:7:narrator:chunk:1",
+            "start_sample": 403200,
+            "end_sample": 403200,
+            "same_speaker": false,
+            "boundary_kind": "unit_end",
+            "added_silence_samples": 0
+          },
+          {
+            "boundary_id": "5:7:narrator:chunk:1|5:8:juli:chunk:1",
+            "left_chunk_id": "5:7:narrator:chunk:1",
+            "right_chunk_id": "5:8:juli:chunk:1",
+            "start_sample": 472320,
+            "end_sample": 472320,
+            "same_speaker": false,
+            "boundary_kind": "unit_end",
+            "added_silence_samples": 0
+          }
+        ]
+      },
+      "operations": [
+        {
+          "chunk_id": "5:4:bryce_father:chunk:1",
+          "start_sample": 0,
+          "end_sample": 80640,
+          "gain_db": -7.539999999999999,
+          "gain": 0.4197589839910076,
+          "input_loudness": {
+            "integrated_lufs": -15.5,
+            "true_peak_dbfs": -0.05,
+            "lra_lu": 0.3,
+            "gate_lufs": -26.03,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "output_loudness": {
+            "integrated_lufs": -23.02,
+            "true_peak_dbfs": -7.59,
+            "lra_lu": 0.4,
+            "gate_lufs": -33.56,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P01_01.wav",
+          "audio_sha256": "d173e8010bfa918212dc54a53654da6f4351790c49b683b4e70fd921a8866f8c"
+        },
+        {
+          "chunk_id": "5:5:narrator:chunk:1",
+          "start_sample": 80640,
+          "end_sample": 357120,
+          "gain_db": -0.7300000000000004,
+          "gain": 0.9193904748039811,
+          "input_loudness": {
+            "integrated_lufs": -22.31,
+            "true_peak_dbfs": -2.85,
+            "lra_lu": 3.8,
+            "gate_lufs": -32.8,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "output_loudness": {
+            "integrated_lufs": -23.03,
+            "true_peak_dbfs": -3.58,
+            "lra_lu": 3.8,
+            "gate_lufs": -33.52,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P01_02.wav",
+          "audio_sha256": "c538aacdd058c2d84f044ae24e8e5bd3346cfeecbaa185022d775cdc1e4ac772"
+        },
+        {
+          "chunk_id": "5:6:juli:chunk:1",
+          "start_sample": 357120,
+          "end_sample": 403200,
+          "gain_db": -7.219999999999999,
+          "gain": 0.43551187368556865,
+          "input_loudness": {
+            "integrated_lufs": -15.82,
+            "true_peak_dbfs": -2.02,
+            "lra_lu": 0.0,
+            "gate_lufs": -26.4,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "output_loudness": {
+            "integrated_lufs": -23.04,
+            "true_peak_dbfs": -9.24,
+            "lra_lu": 0.0,
+            "gate_lufs": -33.61,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P01_03.wav",
+          "audio_sha256": "1536c94212a872702f6b5cfd504c2a4863f95f2d4412b66d4647582155957961"
+        },
+        {
+          "chunk_id": "5:7:narrator:chunk:1",
+          "start_sample": 403200,
+          "end_sample": 472320,
+          "gain_db": 0.0,
+          "gain": 1.0,
+          "input_loudness": {
+            "integrated_lufs": -23.76,
+            "true_peak_dbfs": -8.6,
+            "lra_lu": 0.0,
+            "gate_lufs": -34.21,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "output_loudness": {
+            "integrated_lufs": -23.76,
+            "true_peak_dbfs": -8.6,
+            "lra_lu": 0.0,
+            "gate_lufs": -34.21,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P01_04.wav",
+          "audio_sha256": "7008f1b68a16ee4d32d10a4bd43520c4482e375113c899181f3d3ea9b61b5486"
+        },
+        {
+          "chunk_id": "5:8:juli:chunk:1",
+          "start_sample": 472320,
+          "end_sample": 564480,
+          "gain_db": -8.7,
+          "gain": 0.3672823004980847,
+          "input_loudness": {
+            "integrated_lufs": -14.34,
+            "true_peak_dbfs": -1.29,
+            "lra_lu": 0.5,
+            "gate_lufs": -25.89,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "output_loudness": {
+            "integrated_lufs": -23.04,
+            "true_peak_dbfs": -9.99,
+            "lra_lu": 0.5,
+            "gate_lufs": -34.59,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P01_05.wav",
+          "audio_sha256": "5965b7da9fe4b1a29c1a07c398174db3e288be069a9e132fb1491709855e9a99"
+        }
+      ],
+      "pcm_layout_verified": true,
+      "silence_positions_unchanged": true,
+      "duration_seconds": 23.52
+    },
+    {
+      "sample_id": "P02",
+      "source_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/90e522be07bd4c53b206ff80040cbab4/chapter_000005/quality.json",
+      "source_audio_sha256": "32fbc146c0e4c09e197e07cf1d27b5cc7cc1d824e9082a6fb9c79056058cd305",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P02_matched.wav",
+      "audio_sha256": "f2084f818d267e96b5a4271a10871bdfc989b6ae789ef13f233aa4d713b672d7",
+      "assembly": {
+        "sample_rate": 24000,
+        "channels": 1,
+        "total_samples": 380160,
+        "spans": [
+          {
+            "chunk_id": "5:36:bryce_mother:chunk:1",
+            "role_id": "bryce_mother",
+            "start_sample": 0,
+            "end_sample": 49920,
+            "source_start": 0,
+            "source_end": 30,
+            "unit_id": "5:36:bryce_mother",
+            "source_span": {
+              "chapter_index": 5,
+              "start": 3440,
+              "end": 3470
+            },
+            "source_scope": "chapter",
+            "render_sha256": "3471fb7266fe602bcd95548eba068ceb3b9a6502db3cba3812e201c1a66650e1"
+          },
+          {
+            "chunk_id": "5:38:juli:chunk:1",
+            "role_id": "juli",
+            "start_sample": 49920,
+            "end_sample": 134400,
+            "source_start": 0,
+            "source_end": 42,
+            "unit_id": "5:38:juli",
+            "source_span": {
+              "chapter_index": 5,
+              "start": 3471,
+              "end": 3513
+            },
+            "source_scope": "chapter",
+            "render_sha256": "df984c8e066a38aba5a03249ea1894b11337b2dee6ca5876287400e892335fd3"
+          },
+          {
+            "chunk_id": "5:39:narrator:chunk:1",
+            "role_id": "narrator",
+            "start_sample": 134400,
+            "end_sample": 203520,
+            "source_start": 0,
+            "source_end": 46,
+            "unit_id": "5:39:narrator",
+            "source_span": {
+              "chapter_index": 5,
+              "start": 3513,
+              "end": 3559
+            },
+            "source_scope": "chapter",
+            "render_sha256": "30ff0b9203d3e6849f84ed6408e6ef8da0ec28977f2b78281500b800eb8aae6c"
+          },
+          {
+            "chunk_id": "5:40:bryce_mother:chunk:1",
+            "role_id": "bryce_mother",
+            "start_sample": 203520,
+            "end_sample": 280320,
+            "source_start": 0,
+            "source_end": 32,
+            "unit_id": "5:40:bryce_mother",
+            "source_span": {
+              "chapter_index": 5,
+              "start": 3559,
+              "end": 3591
+            },
+            "source_scope": "chapter",
+            "render_sha256": "bf565bb249fce4c83e2a569ef309fefe4c4b4f7ab783ec96eedcf4e83bde8497"
+          },
+          {
+            "chunk_id": "5:41:narrator:chunk:1",
+            "role_id": "narrator",
+            "start_sample": 280320,
+            "end_sample": 357120,
+            "source_start": 0,
+            "source_end": 32,
+            "unit_id": "5:41:narrator",
+            "source_span": {
+              "chapter_index": 5,
+              "start": 3591,
+              "end": 3623
+            },
+            "source_scope": "chapter",
+            "render_sha256": "8481c30f1a8f5274dec9962b439eb2e3cb007b3e03169126ac816f881c1f6658"
+          },
+          {
+            "chunk_id": "5:42:juli:chunk:1",
+            "role_id": "juli",
+            "start_sample": 357120,
+            "end_sample": 380160,
+            "source_start": 0,
+            "source_end": 9,
+            "unit_id": "5:42:juli",
+            "source_span": {
+              "chapter_index": 5,
+              "start": 3623,
+              "end": 3632
+            },
+            "source_scope": "chapter",
+            "render_sha256": "29ac49c6a467e60494e6c5201c21031b5421fa5dafc53eaacf696503251ae543"
+          }
+        ],
+        "boundaries": [
+          {
+            "boundary_id": "5:36:bryce_mother:chunk:1|5:38:juli:chunk:1",
+            "left_chunk_id": "5:36:bryce_mother:chunk:1",
+            "right_chunk_id": "5:38:juli:chunk:1",
+            "start_sample": 49920,
+            "end_sample": 49920,
+            "same_speaker": false,
+            "boundary_kind": "unit_end",
+            "added_silence_samples": 0
+          },
+          {
+            "boundary_id": "5:38:juli:chunk:1|5:39:narrator:chunk:1",
+            "left_chunk_id": "5:38:juli:chunk:1",
+            "right_chunk_id": "5:39:narrator:chunk:1",
+            "start_sample": 134400,
+            "end_sample": 134400,
+            "same_speaker": false,
+            "boundary_kind": "unit_end",
+            "added_silence_samples": 0
+          },
+          {
+            "boundary_id": "5:39:narrator:chunk:1|5:40:bryce_mother:chunk:1",
+            "left_chunk_id": "5:39:narrator:chunk:1",
+            "right_chunk_id": "5:40:bryce_mother:chunk:1",
+            "start_sample": 203520,
+            "end_sample": 203520,
+            "same_speaker": false,
+            "boundary_kind": "unit_end",
+            "added_silence_samples": 0
+          },
+          {
+            "boundary_id": "5:40:bryce_mother:chunk:1|5:41:narrator:chunk:1",
+            "left_chunk_id": "5:40:bryce_mother:chunk:1",
+            "right_chunk_id": "5:41:narrator:chunk:1",
+            "start_sample": 280320,
+            "end_sample": 280320,
+            "same_speaker": false,
+            "boundary_kind": "unit_end",
+            "added_silence_samples": 0
+          },
+          {
+            "boundary_id": "5:41:narrator:chunk:1|5:42:juli:chunk:1",
+            "left_chunk_id": "5:41:narrator:chunk:1",
+            "right_chunk_id": "5:42:juli:chunk:1",
+            "start_sample": 357120,
+            "end_sample": 357120,
+            "same_speaker": false,
+            "boundary_kind": "unit_end",
+            "added_silence_samples": 0
+          }
+        ]
+      },
+      "operations": [
+        {
+          "chunk_id": "5:36:bryce_mother:chunk:1",
+          "start_sample": 0,
+          "end_sample": 49920,
+          "gain_db": -3.1499999999999986,
+          "gain": 0.6958249547006053,
+          "input_loudness": {
+            "integrated_lufs": -19.89,
+            "true_peak_dbfs": -4.01,
+            "lra_lu": 0.0,
+            "gate_lufs": -30.13,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "output_loudness": {
+            "integrated_lufs": -23.04,
+            "true_peak_dbfs": -7.16,
+            "lra_lu": 0.0,
+            "gate_lufs": -33.28,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P02_01.wav",
+          "audio_sha256": "3471fb7266fe602bcd95548eba068ceb3b9a6502db3cba3812e201c1a66650e1"
+        },
+        {
+          "chunk_id": "5:38:juli:chunk:1",
+          "start_sample": 49920,
+          "end_sample": 134400,
+          "gain_db": -9.01,
+          "gain": 0.3544051302809928,
+          "input_loudness": {
+            "integrated_lufs": -14.03,
+            "true_peak_dbfs": 0.22,
+            "lra_lu": 1.3,
+            "gate_lufs": -25.0,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "output_loudness": {
+            "integrated_lufs": -23.05,
+            "true_peak_dbfs": -8.79,
+            "lra_lu": 1.3,
+            "gate_lufs": -34.02,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P02_02.wav",
+          "audio_sha256": "df984c8e066a38aba5a03249ea1894b11337b2dee6ca5876287400e892335fd3"
+        },
+        {
+          "chunk_id": "5:39:narrator:chunk:1",
+          "start_sample": 134400,
+          "end_sample": 203520,
+          "gain_db": -1.6600000000000001,
+          "gain": 0.8260379495771787,
+          "input_loudness": {
+            "integrated_lufs": -21.38,
+            "true_peak_dbfs": -6.42,
+            "lra_lu": 0.0,
+            "gate_lufs": -31.74,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "output_loudness": {
+            "integrated_lufs": -23.04,
+            "true_peak_dbfs": -8.08,
+            "lra_lu": 0.0,
+            "gate_lufs": -33.4,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P02_03.wav",
+          "audio_sha256": "30ff0b9203d3e6849f84ed6408e6ef8da0ec28977f2b78281500b800eb8aae6c"
+        },
+        {
+          "chunk_id": "5:40:bryce_mother:chunk:1",
+          "start_sample": 203520,
+          "end_sample": 280320,
+          "gain_db": -3.6400000000000006,
+          "gain": 0.6576578373554205,
+          "input_loudness": {
+            "integrated_lufs": -19.4,
+            "true_peak_dbfs": -1.95,
+            "lra_lu": 2.0,
+            "gate_lufs": -30.12,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "output_loudness": {
+            "integrated_lufs": -23.04,
+            "true_peak_dbfs": -5.59,
+            "lra_lu": 2.1,
+            "gate_lufs": -33.59,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P02_04.wav",
+          "audio_sha256": "bf565bb249fce4c83e2a569ef309fefe4c4b4f7ab783ec96eedcf4e83bde8497"
+        },
+        {
+          "chunk_id": "5:41:narrator:chunk:1",
+          "start_sample": 280320,
+          "end_sample": 357120,
+          "gain_db": 0.0,
+          "gain": 1.0,
+          "input_loudness": {
+            "integrated_lufs": -24.09,
+            "true_peak_dbfs": -8.74,
+            "lra_lu": 0.2,
+            "gate_lufs": -34.98,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "output_loudness": {
+            "integrated_lufs": -24.09,
+            "true_peak_dbfs": -8.74,
+            "lra_lu": 0.2,
+            "gate_lufs": -34.98,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P02_05.wav",
+          "audio_sha256": "8481c30f1a8f5274dec9962b439eb2e3cb007b3e03169126ac816f881c1f6658"
+        },
+        {
+          "chunk_id": "5:42:juli:chunk:1",
+          "start_sample": 357120,
+          "end_sample": 380160,
+          "gain_db": -8.25,
+          "gain": 0.3868120546330522,
+          "input_loudness": {
+            "integrated_lufs": -14.79,
+            "true_peak_dbfs": -2.92,
+            "lra_lu": 0.0,
+            "gate_lufs": -26.49,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "output_loudness": {
+            "integrated_lufs": -23.01,
+            "true_peak_dbfs": -11.17,
+            "lra_lu": 0.0,
+            "gate_lufs": -34.7,
+            "measurement": "ffmpeg_loudnorm_input_only"
+          },
+          "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_casting_preview_20261017/loudness_comparison/P02_06.wav",
+          "audio_sha256": "29ac49c6a467e60494e6c5201c21031b5421fa5dafc53eaacf696503251ae543"
+        }
+      ],
+      "pcm_layout_verified": true,
+      "silence_positions_unchanged": true,
+      "duration_seconds": 15.84
+    }
+  ]
+}

@@ -1,0 +1,344 @@
+{
+  "processing": "来源绑定的整句恒定衰减，未增益放大，时长和停顿保留；仅本轮试听。",
+  "chapter_gain_operations": [
+    {
+      "kind": "source_measured_constant_utterance_gain",
+      "chunk_id": "1:1:narrator:chunk:1",
+      "gain_db": -4.739999999999998,
+      "gain": 0.5794286964268811,
+      "input_loudness": {
+        "integrated_lufs": -20.67,
+        "true_peak_dbfs": -3.96,
+        "lra_lu": 2.7,
+        "gate_lufs": -31.21,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "input_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/project/rendered/e53c7a6cf7fb370e6e2c7bb2a5d5cf9d4af2e0a242f359cbe3eba055928ffde3.wav",
+      "input_sha256": "35fd3e5fe81932d362df48ef5d158023eab2c5ed2834b1a763b44fa1503c0ba2",
+      "output_sha256": "fee3fef9e514cac3e01f7d3aa40750e25a26c9546bd3c4ac9e2f9848a194b3db",
+      "start_sample": 0,
+      "end_sample": 99840
+    },
+    {
+      "kind": "source_measured_constant_utterance_gain",
+      "chunk_id": "1:2:late:chunk:1",
+      "gain_db": -11.51,
+      "gain": 0.2657663549554311,
+      "input_loudness": {
+        "integrated_lufs": -13.9,
+        "true_peak_dbfs": -1.06,
+        "lra_lu": 1.6,
+        "gate_lufs": -25.22,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "input_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/project/rendered/e2e0ee3f748c34f8db2bdd6fc33bb802300373a75240fdb89c1158ec7bce2ded.wav",
+      "input_sha256": "a8dd6ec03314f3ba4599c94baeefb3a472f3af25ca27c6350b72a68c95c8b502",
+      "output_sha256": "af4d33d1c715903fde4c4080873e277ba04d611ae2f8d62ffa21e27b4b08fd64",
+      "start_sample": 99840,
+      "end_sample": 195840
+    },
+    {
+      "kind": "source_measured_constant_utterance_gain",
+      "chunk_id": "1:3:lead:chunk:1",
+      "gain_db": 0.0,
+      "gain": 1.0,
+      "input_loudness": {
+        "integrated_lufs": -25.41,
+        "true_peak_dbfs": -5.8,
+        "lra_lu": 2.6,
+        "gate_lufs": -35.84,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "input_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/project/rendered/af2e35f6ac3b6a27d2ce5b52acea5af761c7e1d43b668a9c051a7a05f2b122b7.wav",
+      "input_sha256": "4e82d7639df8d6ad0ee4289d0451be682e4b09a7e7e9965a647b20223d618984",
+      "output_sha256": "fb73337fb5e3ebdf0a76169f3a421a14ecf75bfe17ea7493603c3d45715e090e",
+      "start_sample": 195840,
+      "end_sample": 276480
+    },
+    {
+      "kind": "source_measured_constant_utterance_gain",
+      "chunk_id": "1:4:guest:chunk:1",
+      "gain_db": -3.4200000000000017,
+      "gain": 0.6745280276979219,
+      "input_loudness": {
+        "integrated_lufs": -21.99,
+        "true_peak_dbfs": -7.41,
+        "lra_lu": 0.3,
+        "gate_lufs": -31.99,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "input_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/project/rendered/7c1215c9695b56ebba9938d508d285f8843971509b32a7572ee1e5234c256218.wav",
+      "input_sha256": "029bf2cd55883d368f3d9d4f70352bbaf411340f62f202b46d81096b6ac379db",
+      "output_sha256": "161645a703039484babc98d031238a2df9ea248bc0289eb2367fab56d235afdc",
+      "start_sample": 276480,
+      "end_sample": 349440
+    },
+    {
+      "kind": "source_measured_constant_utterance_gain",
+      "chunk_id": "4:1:narrator:chunk:1",
+      "gain_db": -5.739999999999998,
+      "gain": 0.516416369272071,
+      "input_loudness": {
+        "integrated_lufs": -19.67,
+        "true_peak_dbfs": -0.04,
+        "lra_lu": 2.7,
+        "gate_lufs": -30.01,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "input_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/project/rendered/b6305ba92ad24328ac659d42bc869705b8774da14b11980816b5b0d7442d60d8.wav",
+      "input_sha256": "e033b969b010e707d00d516556b890ea35e6f1da5f4cdff70573bb740ec67bfc",
+      "output_sha256": "1abc53fba1a1dc2dfdaa8f136f3f997ae6b6622dd78cf0828646f2227eed1ac1",
+      "start_sample": 0,
+      "end_sample": 88320
+    },
+    {
+      "kind": "source_measured_constant_utterance_gain",
+      "chunk_id": "4:2:late:chunk:1",
+      "gain_db": -8.59,
+      "gain": 0.37196322116195585,
+      "input_loudness": {
+        "integrated_lufs": -16.82,
+        "true_peak_dbfs": -3.63,
+        "lra_lu": 1.7,
+        "gate_lufs": -27.09,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "input_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/project/rendered/2e7d81fbdff0d916d58c80130c7d503dc472044223c1e7ff2275b80cdf32c7fb.wav",
+      "input_sha256": "07abff623d330c55b2874d5d97d940d98944385f9c548e94b85aaf6246b4f82a",
+      "output_sha256": "2dc8ce10d16cbf28d50edd13bc8962d666e7680515673407cc49dde56099bcf5",
+      "start_sample": 88320,
+      "end_sample": 180480
+    },
+    {
+      "kind": "source_measured_constant_utterance_gain",
+      "chunk_id": "4:3:lead:chunk:1",
+      "gain_db": -1.7699999999999996,
+      "gain": 0.8156427871327874,
+      "input_loudness": {
+        "integrated_lufs": -23.64,
+        "true_peak_dbfs": -3.16,
+        "lra_lu": 3.3,
+        "gate_lufs": -34.19,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "input_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/project/rendered/97b0d8c8d60efb0ce4eb62c6c8189f42c869861552b655fcf8487f32b022cc35.wav",
+      "input_sha256": "c90709010d52740e3c6580dfb4199d2043fcf29101f14ca994586dbadee9053f",
+      "output_sha256": "7d3fb96f3d683fe96bac0a3818f90e8b6312ba37deb96e91df437358ac652c5b",
+      "start_sample": 180480,
+      "end_sample": 276480
+    },
+    {
+      "kind": "source_measured_constant_utterance_gain",
+      "chunk_id": "8:1:narrator:chunk:1",
+      "gain_db": -5.260000000000002,
+      "gain": 0.5457578610912709,
+      "input_loudness": {
+        "integrated_lufs": -20.15,
+        "true_peak_dbfs": -5.24,
+        "lra_lu": 2.0,
+        "gate_lufs": -30.59,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "input_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/project/rendered/d52756433c54b2f34edcbe16af81f8b2f2ca7f091956c785cbaf933c6e9c5e00.wav",
+      "input_sha256": "45d22d84d0212589b664fd0c64116f4bab20346b011ea99f6eda68f9d90e3da0",
+      "output_sha256": "5fadbef038121a8980d5c7be431250cfdcacb37f26dad96120beda9102671905",
+      "start_sample": 0,
+      "end_sample": 107520
+    },
+    {
+      "kind": "source_measured_constant_utterance_gain",
+      "chunk_id": "8:2:guest:chunk:1",
+      "gain_db": -4.899999999999999,
+      "gain": 0.5688529308438415,
+      "input_loudness": {
+        "integrated_lufs": -20.51,
+        "true_peak_dbfs": -4.71,
+        "lra_lu": 0.9,
+        "gate_lufs": -31.1,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "input_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/project/rendered/0157653b044f23cd231dd56aed728c3a9bda2b3bcdfc5f3411e1e64b6e519d46.wav",
+      "input_sha256": "df31517f8f28f54d004781d31b51636a5fd9a66fac4d828ab4563848b9dfe20a",
+      "output_sha256": "7f329e13f2abf46a2e18ddc4d524b9e22655a76184751284677d8b8aea0f7e91",
+      "start_sample": 107520,
+      "end_sample": 211200
+    },
+    {
+      "kind": "source_measured_constant_utterance_gain",
+      "chunk_id": "8:3:late:chunk:1",
+      "gain_db": -8.440000000000001,
+      "gain": 0.37844258471709324,
+      "input_loudness": {
+        "integrated_lufs": -16.97,
+        "true_peak_dbfs": -1.37,
+        "lra_lu": 0.9,
+        "gate_lufs": -27.59,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "input_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/project/rendered/b2e3ad6f3a39cc94ecf9097be4c84265b72c98c7388ddc44a775cd2b8867fa25.wav",
+      "input_sha256": "a241fbb8aa753b84743cae802092424756767e65c14fde2559e69bb55551b09d",
+      "output_sha256": "480f87ab2b25dfddf2cbe914b3dad2a099bf06073dde81cca0dd2e72ea72736d",
+      "start_sample": 211440,
+      "end_sample": 288240
+    },
+    {
+      "kind": "source_measured_constant_utterance_gain",
+      "chunk_id": "8:4:lead:chunk:1",
+      "gain_db": -0.7399999999999984,
+      "gain": 0.918332596483581,
+      "input_loudness": {
+        "integrated_lufs": -24.67,
+        "true_peak_dbfs": -8.16,
+        "lra_lu": 3.3,
+        "gate_lufs": -35.29,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "input_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_hybrid_scenes_20261017/project/rendered/a29ea73f409a6bb2d743dc5eb816d33183e6bd2af3dd5ed2a907cec576ad1999.wav",
+      "input_sha256": "394c8427bee1fa0b59859f7a97e35b166c6ea3c6c5de122f599841136aa1f203",
+      "output_sha256": "9ec953daaf24d94a925ab72eb76e1213bbda9e7e775f04d812356226c904eca9",
+      "start_sample": 288240,
+      "end_sample": 399600
+    },
+    {
+      "kind": "reference_playback_only",
+      "role": "lead",
+      "input_sha256": "463636b78897a610327125600879f81da5e99778a51a30005446bf24fc881302",
+      "output_sha256": "affc7d87ae61f7898315be18b4b04d7078a83f85518387a78b0d87c6c520c97a",
+      "gain_db": -3.8900000000000006,
+      "production_reference_unchanged": true
+    },
+    {
+      "kind": "reference_playback_only",
+      "role": "guest",
+      "input_sha256": "ce23b9f895fc93614d3c9dde58e02b51ad1452b9f258698bb5500594f18a0c59",
+      "output_sha256": "db2c4730facb581b5c0b6e25fcedfd2e5e0d02e37402da9fd3c286348d94ea67",
+      "gain_db": -3.3099999999999987,
+      "production_reference_unchanged": true
+    }
+  ],
+  "measured_chunks": [
+    {
+      "chapter": 1,
+      "role": "narrator",
+      "loudness": {
+        "integrated_lufs": -25.42,
+        "true_peak_dbfs": -8.7,
+        "lra_lu": 2.7,
+        "gate_lufs": -35.83,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      }
+    },
+    {
+      "chapter": 1,
+      "role": "late",
+      "loudness": {
+        "integrated_lufs": -25.41,
+        "true_peak_dbfs": -12.57,
+        "lra_lu": 1.6,
+        "gate_lufs": -36.6,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      }
+    },
+    {
+      "chapter": 1,
+      "role": "lead",
+      "loudness": {
+        "integrated_lufs": -25.41,
+        "true_peak_dbfs": -5.8,
+        "lra_lu": 2.6,
+        "gate_lufs": -35.84,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      }
+    },
+    {
+      "chapter": 1,
+      "role": "guest",
+      "loudness": {
+        "integrated_lufs": -25.42,
+        "true_peak_dbfs": -10.83,
+        "lra_lu": 0.2,
+        "gate_lufs": -35.42,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      }
+    },
+    {
+      "chapter": 4,
+      "role": "narrator",
+      "loudness": {
+        "integrated_lufs": -25.39,
+        "true_peak_dbfs": -5.78,
+        "lra_lu": 2.7,
+        "gate_lufs": -35.73,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      }
+    },
+    {
+      "chapter": 4,
+      "role": "late",
+      "loudness": {
+        "integrated_lufs": -25.41,
+        "true_peak_dbfs": -12.22,
+        "lra_lu": 1.7,
+        "gate_lufs": -35.69,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      }
+    },
+    {
+      "chapter": 4,
+      "role": "lead",
+      "loudness": {
+        "integrated_lufs": -25.43,
+        "true_peak_dbfs": -4.93,
+        "lra_lu": 3.2,
+        "gate_lufs": -35.97,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      }
+    },
+    {
+      "chapter": 8,
+      "role": "narrator",
+      "loudness": {
+        "integrated_lufs": -25.41,
+        "true_peak_dbfs": -10.5,
+        "lra_lu": 1.9,
+        "gate_lufs": -35.86,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      }
+    },
+    {
+      "chapter": 8,
+      "role": "guest",
+      "loudness": {
+        "integrated_lufs": -25.41,
+        "true_peak_dbfs": -9.61,
+        "lra_lu": 0.9,
+        "gate_lufs": -35.86,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      }
+    },
+    {
+      "chapter": 8,
+      "role": "late",
+      "loudness": {
+        "integrated_lufs": -25.41,
+        "true_peak_dbfs": -9.81,
+        "lra_lu": 1.0,
+        "gate_lufs": -36.04,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      }
+    },
+    {
+      "chapter": 8,
+      "role": "lead",
+      "loudness": {
+        "integrated_lufs": -25.41,
+        "true_peak_dbfs": -8.9,
+        "lra_lu": 3.3,
+        "gate_lufs": -36.02,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      }
+    }
+  ],
+  "human_review_status": "pending",
+  "requests_sent": 0
+}

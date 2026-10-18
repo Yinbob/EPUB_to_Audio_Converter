@@ -1,0 +1,40 @@
+{
+  "files": [
+    {
+      "path": "focus/F01_scene3_join.wav",
+      "sha256": "7a46094f3e1e061384e571ff73c9a1f0d5300e5277e5a3373c456c3f0ef686aa",
+      "source": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/rendered/pair-958f955be7f27b7de00694d701959c98c55acf270da26186956bb816f9d91a0a.wav"
+    },
+    {
+      "path": "focus/F02_scene3_join.wav",
+      "sha256": "7f03541fd6d05cecf76c737e247f83b6de7ab27fbd4942383564cfe365948ea4",
+      "source": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/rendered/pair-a5af169369a236aa39e106a3305859f3e7ce82406f43b877d56623796f5fee56.wav"
+    },
+    {
+      "path": "focus/F03_scene3_join.wav",
+      "sha256": "2e7be7ff84f5f25ab4f6affbc380b4a8a196f2ebcd2ca00cef86a990eab72891",
+      "source": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/rendered/pair-a388bb260d4be7051ba758c191bf5f6b0b4043fa0d7f02fd573919b663d9bf47.wav"
+    },
+    {
+      "path": "focus/F04_Bring_Chloe.wav",
+      "sha256": "4bcba9da7b43089b27f01e33fc1b76e523331d00f38406af0af481df77ad50fa",
+      "source": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/rendered/41f051fb1ba6ab4e45646a4b7fec8299e7d1c2a19aed0a5a6ffde69f0e12460e.wav"
+    },
+    {
+      "path": "focus/F05_Bring_Mia.wav",
+      "sha256": "b69b0b8f5c1b3f715b20a546cf803ff9288ada70e969d929418ddade7f9b017a",
+      "source": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/rendered/6cc77076248069212ba980f53c3f19b4dadb76528f3bcc59b4157939c1e5a619.wav"
+    },
+    {
+      "path": "focus/F06_Alex_target.wav",
+      "sha256": "de38a4bd262d91611d46bfd3180ba60238422edfbb14117ade5db05fd4b01ce1",
+      "source": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/rendered/1a7699866ade995b048012f1c15a740ea7cdce655b6700a73a35abebd3fd6a7f.wav"
+    },
+    {
+      "path": "focus/F07_Alex_reference.wav",
+      "sha256": "61a99754a4e7a5c5f87988e8d1456ddb1b746126bb3ae1ca820ac06fc3ca35d7",
+      "source": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/rendered/7f903233f4b44ebaf2ab426365374a6bc6a7cd2ab013f30163ee034bff77ac71.wav"
+    }
+  ],
+  "human_review": "pending"
+}

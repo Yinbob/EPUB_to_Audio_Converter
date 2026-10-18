@@ -1,0 +1,35 @@
+[
+  {
+    "review_id": "H01",
+    "chapter": 1,
+    "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/hybrid_mixed_20261017/H01_chapter_01.wav",
+    "audio_sha256": "18d9c41688b3eafd6a26b53d3b133af7b0953125db9bc28c3b518928e59325f7",
+    "stitching_acceptable": null,
+    "content_complete": null,
+    "same_role_consistent": null,
+    "loudness_acceptable": null,
+    "notes": ""
+  },
+  {
+    "review_id": "H02",
+    "chapter": 4,
+    "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/hybrid_mixed_20261017/H02_chapter_04.wav",
+    "audio_sha256": "226ffc2e2177b2034bb069a528bd94b4652c23e83bc7df0389a05bd3ebfc143a",
+    "stitching_acceptable": null,
+    "content_complete": null,
+    "same_role_consistent": null,
+    "loudness_acceptable": null,
+    "notes": ""
+  },
+  {
+    "review_id": "H03",
+    "chapter": 8,
+    "audio_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/hybrid_mixed_20261017/H03_chapter_08.wav",
+    "audio_sha256": "bfc31ab85d8ced364624d945f98d9b14ba690890bdfe67128259893e21bc5dfe",
+    "stitching_acceptable": null,
+    "content_complete": null,
+    "same_role_consistent": null,
+    "loudness_acceptable": null,
+    "notes": ""
+  }
+]

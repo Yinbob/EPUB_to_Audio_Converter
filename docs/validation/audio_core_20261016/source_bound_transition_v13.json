@@ -1,0 +1,30 @@
+{
+  "kind": "actual_mimo_cache_source_binding_validation",
+  "settings": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/examples/audio_core.transition_gain50_100ms.settings.json",
+  "settings_sha256": "3c20f5563988cbf2cae8eca74937491c22cd249dce178957165c84cf299f96a6",
+  "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/c717a701ed0c446d8de0eb90d47d8a03/chapter_000001/quality.json",
+  "report_sha256": "b494824b792e68a2832919eb7ddf211d6e37838c634220736e58186ffda83ea1",
+  "output": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/pipeline_transition_source_bound.wav",
+  "output_sha256": "fb485a53575498708044871adf7f6c5757144fbcf768d51d09f201df92c17b77",
+  "source_group_matches": true,
+  "selected": true,
+  "same_ids_different_text_blocked_before_provider_call": true,
+  "actual_pcm_equal_previous_verified_pipeline_output": true,
+  "reference_evidence": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/annotation/transition_preview_gain50_100ms_v1/pipeline_verification.json",
+  "reference_evidence_sha256": "8bb3bc103015c546c2620db2b7a15ee02ce76f3a72cbfaec5edaf38bb664f44b",
+  "reference_output_sha256": "668fe029b33451c56c0f1eaab2c03d51726be5c7f2c55b1199ed6021cb53a64c",
+  "content_evidence": "exact PCM equality to prior ASR-checked pipeline output; no new ASR inference",
+  "additional_tts_requests": 0,
+  "quality_status": "incomplete",
+  "mismatch_guard_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/69b2643f394c4a47868dee102ca33182/chapter_000001/quality.json",
+  "mismatch_guard_report_sha256": "afbc2fc6c2297f5559006d4d16381db2685d5de8dd78ad7cbae266505fd8bcc1",
+  "mismatch_guard_origin": "deliberately changed text fixture; no synthesized audio or research sample",
+  "full_suite": {
+    "ran": 467,
+    "seconds": 13.144,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/private/tmp/audio_quality_source_binding_full.log"
+  },
+  "new_tests": 3
+}

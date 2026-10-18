@@ -1,0 +1,49 @@
+{
+  "version": "casting_complete_fit_v25",
+  "execution": "completed_offline",
+  "before_bug": {
+    "kind": "synthetic_control_reproduced_before_edit",
+    "missing_candidate": "苏打",
+    "selected_for_both_roles": true,
+    "objective": 0.0
+  },
+  "fix": "提供适配表时完整覆盖角色×候选声音，拒绝缺项／空值，不默认零；保留未启用评分和人工明确零分。",
+  "human_fit_statement": "六项均为0",
+  "human_review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/human_review.fit_confirmed.json",
+  "human_review_sha256": "ac9adb072caef5d52f78aa363d670d22f490af8517d5895d625307de967e912f",
+  "actual_cli_preflight": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_confirmed_20261016/offline_validation.json",
+  "actual_cli_preflight_sha256": "6c25c96c060cb6bccfb5140946b649d3516dd26090f9c9170dc74f55df76ec85",
+  "actual_cli_log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_confirmed_fit_actual_v25.log",
+  "checks": [
+    "完整表经实际英语 cast 入口生成四策略分配",
+    "真实旧空表被拒绝且无输出",
+    "应用分配只改变声音，正文／速度／指令／停顿保持",
+    "原剧本／角色确认／声音库／源正文指纹不变",
+    "客户端初始化禁用，零实际合成",
+    "未写入角色声音锁定",
+    "相同分配合并与请求输入去重"
+  ],
+  "tests": {
+    "ran": 511,
+    "skipped": 30,
+    "status": "OK",
+    "seconds": 15.387,
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_complete_fit_regression_v25.log",
+    "log_sha256": "38072d846c2cc5a3f430709242bd6bbd1d2bc8bd27cf0c1bd44659ba4f689a9a"
+  },
+  "new_tests": 4,
+  "new_tts_requests": 0,
+  "new_audio_generated": false,
+  "human_participants": 0,
+  "scope": "工程与输入完整性验证；未证明选角收益、质量检出率或跨来源泛化",
+  "next_implementation_gaps": [
+    "小规模精确搜索：当前初始分配项导致局部最优，另有已知更低目标分配",
+    "跨场景参考池及全角色辨识覆盖，保留报告与音频来源核验"
+  ],
+  "still_pending": [
+    "E06T 人工试听",
+    "英文数字先导人工核验",
+    "真实边界阳性及独立划分",
+    "实际选角音频和独立听众实验"
+  ]
+}

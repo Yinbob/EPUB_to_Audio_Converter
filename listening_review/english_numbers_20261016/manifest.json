@@ -1,0 +1,162 @@
+{
+  "schema": "audio-quality-human-review-v1",
+  "provider": "mimo",
+  "sample_count": 6,
+  "chunk_count": 4,
+  "boundary_count": 2,
+  "human_reviewed_count": 0,
+  "requests_sent": 0,
+  "audio_files": [
+    {
+      "path": "audio/chapter_000001_full.wav",
+      "sha256": "1a480c76415fcacfad2d6d0e6507a1dd8a9f6f1dedfee663d13312c02502432b",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 364800,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/reports/d67844c3ff2a4675ba92dacf8ef18713/chapter_000001/chapter.wav"
+    },
+    {
+      "path": "audio/C000001_001.wav",
+      "sha256": "e7214dc1e0715f230515e7014d577c6c96b6c17c9718205dfcae654b97803f4b",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 184320,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/rendered/d32cc79aaeded757f172d2ead44996864dcaf60fcde3d3a28d859f666ef530ac.wav"
+    },
+    {
+      "path": "audio/C000001_002.wav",
+      "sha256": "55fc05f2dfa42bbd3aa6dd7106d36c4a294bbbf6a7dd609e70005aa74a6e58ce",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 180480,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/rendered/edcfce64af6467aa101e0fe22c2f4db464f971a30f4a8d3183a0033343f4af6f.wav"
+    },
+    {
+      "path": "audio/B000001_001.wav",
+      "sha256": "518d1bb0baf29e45a98da00efd60bda5d1d55324fe5dfe88f5fce1df648ccc5c",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 96000,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/reports/d67844c3ff2a4675ba92dacf8ef18713/chapter_000001/chapter.wav"
+    },
+    {
+      "path": "audio/chapter_000002_full.wav",
+      "sha256": "0027163b1f9c269bfb1eb096bbc85bc476f458187fa6ea383ce8c6a5a0187b77",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 360960,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/reports/d67844c3ff2a4675ba92dacf8ef18713/chapter_000002/chapter.wav"
+    },
+    {
+      "path": "audio/C000002_001.wav",
+      "sha256": "36a40bfd19d97bb3045588d25ab279e377d845c05cd156c57426010811bf20f0",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 184320,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/rendered/c99e3f26608eb3b3f22a412d4c2e7f167f3cfea0507f2aa370bf982af3522fad.wav"
+    },
+    {
+      "path": "audio/C000002_002.wav",
+      "sha256": "318358bd54a68f4d996f645dbfc3381f44252679cf929ed50799585f4fd8a9ed",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 176640,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/rendered/4e5a0057d4e7c23662c855a2e06a97a9bfd5983e30440cb130c342bdb27793b0.wav"
+    },
+    {
+      "path": "audio/B000002_001.wav",
+      "sha256": "da3a59511cce696dab3e3d08f744affc64b3a8de80b0d5412fd4103331160d5f",
+      "sample_rate": 24000,
+      "channels": 1,
+      "frames": 96000,
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/reports/d67844c3ff2a4675ba92dacf8ef18713/chapter_000002/chapter.wav"
+    }
+  ],
+  "boundary_data_sha256": "ab97ae9274b8bb2cd0050aa73f581a8cb499364b04be945e88f521ccc14f1b43",
+  "review_records": [
+    {
+      "sample_id": "C000001_001",
+      "sample_type": "chunk",
+      "chapter": "1",
+      "role_ids": "narrator",
+      "same_speaker": "",
+      "audio_path": "audio/C000001_001.wav",
+      "full_context_path": "audio/chapter_000001_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": "On October 16, 2026, the report showed an increase of 3.5%.",
+      "expected_tts_text": "On October 16, 2026, the report showed an increase of 3.5%.",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "C000001_002",
+      "sample_type": "chunk",
+      "chapter": "1",
+      "role_ids": "narrator",
+      "same_speaker": "",
+      "audio_path": "audio/C000001_002.wav",
+      "full_context_path": "audio/chapter_000001_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": "The 21st runner carried 24 cards, while the 3rd runner carried 18 cards.",
+      "expected_tts_text": "The 21st runner carried 24 cards, while the 3rd runner carried 18 cards.",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "B000001_001",
+      "sample_type": "boundary",
+      "chapter": "1",
+      "role_ids": "narrator → narrator",
+      "same_speaker": "true",
+      "audio_path": "audio/B000001_001.wav",
+      "full_context_path": "audio/chapter_000001_full.wav",
+      "boundary_at_seconds": "2.0",
+      "source_text": "On October 16, 2026, the report showed an increase of 3.5%. ｜ The 21st runner carried 24 cards, while the 3rd runner carried 18 cards.",
+      "expected_tts_text": "On October 16, 2026, the report showed an increase of 3.5%. ｜ The 21st runner carried 24 cards, while the 3rd runner carried 18 cards.",
+      "scope_kind": "original_boundary",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "C000002_001",
+      "sample_type": "chunk",
+      "chapter": "2",
+      "role_ids": "narrator",
+      "same_speaker": "",
+      "audio_path": "audio/C000002_001.wav",
+      "full_context_path": "audio/chapter_000002_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": "On October 16, 2026, the report showed an increase of 3.5%.",
+      "expected_tts_text": "On October 16, 2026, the report showed an increase of 3.5%.",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "C000002_002",
+      "sample_type": "chunk",
+      "chapter": "2",
+      "role_ids": "narrator",
+      "same_speaker": "",
+      "audio_path": "audio/C000002_002.wav",
+      "full_context_path": "audio/chapter_000002_full.wav",
+      "boundary_at_seconds": "",
+      "source_text": "The 21st runner carried 24 cards, while the 3rd runner carried 18 cards.",
+      "expected_tts_text": "The 21st runner carried 24 cards, while the 3rd runner carried 18 cards.",
+      "scope_kind": "parent_chunk",
+      "parent_chunk_id": ""
+    },
+    {
+      "sample_id": "B000002_001",
+      "sample_type": "boundary",
+      "chapter": "2",
+      "role_ids": "narrator → narrator",
+      "same_speaker": "true",
+      "audio_path": "audio/B000002_001.wav",
+      "full_context_path": "audio/chapter_000002_full.wav",
+      "boundary_at_seconds": "2.0",
+      "source_text": "On October 16, 2026, the report showed an increase of 3.5%. ｜ The 21st runner carried 24 cards, while the 3rd runner carried 18 cards.",
+      "expected_tts_text": "On October 16, 2026, the report showed an increase of 3.5%. ｜ The 21st runner carried 24 cards, while the 3rd runner carried 18 cards.",
+      "scope_kind": "original_boundary",
+      "parent_chunk_id": ""
+    }
+  ]
+}

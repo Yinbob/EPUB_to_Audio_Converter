@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "audiobook_generator/audio_core/listening_player.html"
+        ],
+        "createdAt": "2026-10-17T08:12:27.179Z",
+        "reason": "Agent: detector combines dark-media text #b8b8c0 with light-only #ffffff; actual dark combinations are 7.95:1 on #232326 and 9.17:1 on #161618. All declared body combinations >=4.96:1; disabled opacity removed. Browser visual verification remains pending."
+      }
+    ]
+  }
+}

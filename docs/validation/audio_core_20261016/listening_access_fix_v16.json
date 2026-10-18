@@ -1,0 +1,31 @@
+{
+  "recorded_at": "2026-10-16T19:43:34.335375+08:00",
+  "issue": "VS Code resolved slash-prefixed Markdown link relative to workspace, duplicating absolute path",
+  "observed_wrong_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/...",
+  "original_files_present": true,
+  "readme_fixed": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/README.md",
+  "readme_backup": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/README.before_relative_link_fix.md.bak",
+  "portable_directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/english_20261016",
+  "archive": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/english_20261016.zip",
+  "wav_copies": 6,
+  "chapter_copies": 2,
+  "all_audio_hashes_match": true,
+  "all_markdown_audio_targets_exist": true,
+  "additional_tts_requests": 0,
+  "english_human_review": "pending",
+  "ui_verification": {
+    "application": "Visual Studio Code",
+    "opened_file": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/english_20261016/E06_Milo.wav",
+    "observed_url": "file:///Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/english_20261016/E06_Milo.wav",
+    "observed_controls": [
+      "播放",
+      "音频时间进度条",
+      "volume",
+      "静音"
+    ],
+    "file_size_display": "682.54 KB",
+    "previous_load_error_absent": true,
+    "audio_played_by_assistant": false,
+    "human_review_remains_pending": true
+  }
+}

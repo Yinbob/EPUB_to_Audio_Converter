@@ -86,7 +86,7 @@ class TestRoleScriptUiHelpers(unittest.TestCase):
         )
         self.assertEqual(rows, web_ui._role_table_rows(self.script))
         self.assertIn("校验通过", summary)
-        self.assertEqual(role_update["choices"][0].split(" — ", 1)[0], "narrator")
+        self.assertEqual(role_update["choices"][0][1], "narrator")
 
     def test_voice_catalog_import_callback_saves_and_refreshes_voice_choices(self):
         with tempfile.TemporaryDirectory() as temp_dir, patch.dict(
@@ -187,6 +187,7 @@ class TestRoleScriptUiHelpers(unittest.TestCase):
                 "openai_output_format": "wav",
                 "instructions": "",
                 "enable_stream": False,
+                "audio_core_enabled": True,
                 "role_mode": True,
                 "auto_role_split": True,
                 "role_script_file": self.example_path,
@@ -226,6 +227,8 @@ class TestRoleScriptUiHelpers(unittest.TestCase):
                     web_ui.process_form(**values)
 
         self.assertIn("configs", captured, "服务端确认记录未放行转换")
+        self.assertTrue(captured["configs"][0].audio_core_enabled)
+        self.assertEqual(captured["configs"][0].worker_count, 1)
         warning.assert_not_called()
 
     def test_provider_switch_reports_support_without_changing_role_data(self):
@@ -454,11 +457,11 @@ class TestRoleScriptUiHelpers(unittest.TestCase):
         self.assertNotIn("value", table)
         self.assertIn("原有参数已保留", status)
 
-    def test_role_gate_disables_done_button_until_confirmation(self):
+    def test_role_confirmation_does_not_block_advanced_settings_close(self):
         script = web_ui.HEAD_HTML
         self.assertIn("function syncRoleGate()", script)
-        self.assertIn("doneBtn.disabled = true", script)
-        self.assertIn("doneBtn.classList.add('is-gated')", script)
+        self.assertIn("doneBtn.disabled = false", script)
+        self.assertNotIn("doneBtn.disabled = true", script)
         self.assertIn("aria-disabled", script)
         # 探针必须真实渲染，不能再被 Gradio 的 visible=False 隐藏。
         source = inspect.getsource(web_ui.host_ui)
@@ -598,10 +601,10 @@ class TestRoleScriptUiWiring(unittest.TestCase):
             if str(component.get("props", {}).get("label") or "") == label
         ), None)
 
-    def _component_is_inside_advanced_modal(self, component_id):
+    def _component_is_inside(self, component_id, elem_id="advanced_modal"):
         advanced_modal = next((
             component for component in self._components()
-            if component.get("props", {}).get("elem_id") == "advanced_modal"
+            if component.get("props", {}).get("elem_id") == elem_id
         ), None)
         if advanced_modal is None:
             return False
@@ -627,8 +630,8 @@ class TestRoleScriptUiWiring(unittest.TestCase):
                 return True
         return False
 
-    def test_process_form_last_fifteen_inputs_are_role_parameters(self):
-        signature_names = list(inspect.signature(web_ui.process_form).parameters)[-15:]
+    def test_process_form_role_and_audio_core_inputs_match_components(self):
+        signature_names = list(inspect.signature(web_ui.process_form).parameters)[-23:-4]
         self.assertEqual(
             signature_names,
             [
@@ -647,31 +650,39 @@ class TestRoleScriptUiWiring(unittest.TestCase):
                 "role_quality_deepseek_api_key",
                 "role_quality_deepseek_base_url",
                 "role_quality_deepseek_model",
+                "audio_core_enabled",
+                "audio_core_repair",
+                "audio_core_settings_file",
+                "audio_core_casting_file",
             ],
         )
         process_form = self._dependency("process_form")
         self.assertIsNotNone(process_form)
         inputs = process_form.get("inputs") or []
-        self.assertEqual(len(inputs[-15:]), 15)
+        self.assertEqual(len(inputs), len(inspect.signature(web_ui.process_form).parameters))
         components = {component["id"]: component for component in self._components()}
         expected_labels = [
-            "启用多角色分段模式",
+            "为旁白和人物使用不同声音",
             "上传书籍后自动调用 DeepSeek 拆分角色",
-            "RoleScript JSON",
-            "角色参数表",
+            "导入已有剧本 / 下载当前剧本",
+            "完整人物参数表",
             None,
             None,
             None,
             "允许剧本文本覆盖书籍正文",
             "允许章节标题不匹配",
-            "允许缺失角色回退",
-            "逐段检测语速",
+            "缺失角色回退",
+            "启用旧版逐段测评",
             "中文语速上限",
             "DeepSeek API Key",
-            "DeepSeek Base URL",
-            "DeepSeek Model",
+            "服务地址",
+            "DeepSeek 模型",
+            "MiMo 生成时检查内容、拼接与角色一致性",
+            "按次数与时限自动修复问题片段",
+            "可选：本地模型与资源设置 JSON",
+            "可选：已审查角色选角 JSON",
         ]
-        for component_id, label in zip(inputs[-15:], expected_labels):
+        for component_id, label in zip(inputs[-23:-4], expected_labels):
             if label is None:
                 continue
             actual = str(components[component_id].get("props", {}).get("label") or "")
@@ -680,8 +691,8 @@ class TestRoleScriptUiWiring(unittest.TestCase):
     def test_role_events_are_wired(self):
         auto_split = self._dependency("auto_split_role_script")
         self.assertIsNotNone(auto_split)
-        self.assertEqual(len(auto_split.get("inputs") or []), 15)
-        self.assertEqual(len(auto_split.get("outputs") or []), 10)
+        self.assertEqual(len(auto_split.get("inputs") or []), 19)
+        self.assertEqual(len(auto_split.get("outputs") or []), 12)
 
         upload = self._dependency("manual_role_script_uploaded")
         self.assertIsNotNone(upload)
@@ -693,11 +704,11 @@ class TestRoleScriptUiWiring(unittest.TestCase):
         confirm = self._dependency("confirm_auto_role_script")
         self.assertIsNotNone(confirm)
         self.assertEqual(len(confirm.get("inputs") or []), 5)
-        self.assertEqual(len(confirm.get("outputs") or []), 5)
+        self.assertEqual(len(confirm.get("outputs") or []), 6)
 
         table_change = self._dependency("role_table_changed")
         self.assertIsNotNone(table_change)
-        self.assertEqual(len(table_change.get("inputs") or []), 7)
+        self.assertEqual(len(table_change.get("inputs") or []), 8)
         self.assertEqual(len(table_change.get("outputs") or []), 5)
 
         preview = self._dependency("preview_role_segment")
@@ -717,8 +728,8 @@ class TestRoleScriptUiWiring(unittest.TestCase):
         ), None)
         self.assertIsNotNone(panel, "人工核验面板需要稳定的 elem_id")
         self.assertTrue(
-            self._component_is_inside_advanced_modal(panel["id"]),
-            "人工核验面板应位于高级设置弹窗内",
+            self._component_is_inside(panel["id"], "role_studio"),
+            "人工核验面板应位于独立多角色配音模块内",
         )
 
         script = web_ui.HEAD_HTML
@@ -742,7 +753,7 @@ class TestRoleScriptUiWiring(unittest.TestCase):
         self.assertIn("openAdvancedModal(event)", source)
         self.assertIn("closeAdvancedModal(event)", source)
         self.assertIn('elem_classes="toggle advanced-switch"', source)
-        self.assertEqual(source.count('elem_classes="advanced-section"'), 3)
+        self.assertEqual(source.count('elem_classes="advanced-section"'), 2)
 
         script = web_ui.HEAD_HTML
         self.assertIn("function openAdvancedModal(event)", script)
@@ -757,7 +768,7 @@ class TestRoleScriptUiWiring(unittest.TestCase):
         self.assertIn("var restoreScroll = function", script)
         self.assertIn("var savedScroll = unlockPageScroll();", script)
         self.assertIn("ataUserScrolled", script)
-        self.assertIn("openAdvancedModal();", script)
+        self.assertNotIn("openAdvancedModal();", script)
         self.assertIn("ataRoleVerificationDismissed", script)
         self.assertIn("requestAnimationFrame", script)
 
@@ -804,26 +815,26 @@ class TestRoleScriptUiWiring(unittest.TestCase):
         ):
             self.assertIsNotNone(self._dependency(api_name), api_name)
 
-        for label in ("DeepSeek API Key", "DeepSeek Base URL", "DeepSeek Model"):
+        for label in ("DeepSeek API Key", "服务地址", "DeepSeek 模型"):
             component = self._component_by_label(label)
             self.assertIsNotNone(component, label)
             self.assertTrue(
-                self._component_is_inside_advanced_modal(component["id"]),
-                f"{label} 应位于高级设置弹窗内",
+                self._component_is_inside(component["id"], "role_studio"),
+                f"{label} 应位于独立多角色配音模块内",
             )
 
-    def test_voice_catalog_import_is_wired_inside_advanced_modal(self):
+    def test_voice_catalog_import_is_wired_inside_role_studio(self):
         for label in (
-            "上传 TTS 官网音色说明文档",
-            "或直接粘贴官网音色说明",
-            "文档对应的 TTS Provider",
-            "文档默认语言",
+            "TTS 官网音色说明",
+            "或粘贴音色说明",
+            "对应引擎",
+            "默认语言",
         ):
             component = self._component_by_label(label)
             self.assertIsNotNone(component, label)
             self.assertTrue(
-                self._component_is_inside_advanced_modal(component["id"]),
-                f"{label} 应位于高级设置弹窗内",
+                self._component_is_inside(component["id"], "role_studio"),
+                f"{label} 应位于独立多角色配音模块内",
             )
 
         import_event = self._dependency("import_voice_catalog_document_ui")

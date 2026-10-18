@@ -1,0 +1,39 @@
+{
+  "schema_version": "realbook-preparation-audit-v35",
+  "date": "2026-10-17",
+  "status": "candidate_book_pending_selection_and_role_review",
+  "book_sha256": "5115cb95c9423c497085045a81452764583e92d8a665e4b70314fd65c7c3ea8c",
+  "novel_chapters": 20,
+  "independent_books": 1,
+  "scenes": 10,
+  "units": 40,
+  "candidate_characters": 4816,
+  "checks": {
+    "exact_source_spans": true,
+    "contiguous_units": true,
+    "headings_excluded": true,
+    "balanced_curly_quotation_boundaries": true,
+    "artifact_and_preparation_code_hashes": true
+  },
+  "candidate_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/robinson_realbook_plan_20261017_v3",
+  "readable_review_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/realbook_candidates_20261017/README.md",
+  "new_online_tts_requests": 0,
+  "new_llm_requests": 0,
+  "new_human_audio_labels": 0,
+  "synthesis_ready": false,
+  "prior_candidate_drafts_preserved": [
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/robinson_realbook_plan_20261017",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/robinson_realbook_plan_20261017_v2"
+  ],
+  "limitations": [
+    "不是全书角色归属或声音排名",
+    "未生成真实书籍音频",
+    "未确认说话人",
+    "一个书籍来源不能拆成独立训练与测试书目"
+  ],
+  "validation_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/robinson_realbook_plan_20261017_v3/preparation_validation.json",
+  "validation_sha256": "75f8c3653ade2864cc81e4b8e2ea93bdf769c9938936be19280be1a05e6fddc9",
+  "review_sha256": "1f7cce877aa1c97d7e5428899965c609fc7e7105711e9c621e19eb02ee06dee8",
+  "full_test_rerun": false,
+  "last_full_regression": "v34: 558 run, 528 passed, 30 skipped; no production code changes this turn"
+}

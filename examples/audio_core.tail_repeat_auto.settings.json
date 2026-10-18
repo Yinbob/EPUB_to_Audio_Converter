@@ -1,0 +1,7 @@
+{
+  "tail_repeat_mode": "auto",
+  "max_repairs": 0,
+  "max_repair_characters": 0,
+  "no_asr": false,
+  "asr_model": ".audio_quality_models/SenseVoiceSmall"
+}

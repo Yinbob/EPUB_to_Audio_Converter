@@ -1,0 +1,38 @@
+{
+  "version": "tail-repeat-real-pipeline-replay-v47",
+  "method": "existing_audio_offline_replay_not_online_MiMo_trial",
+  "samples": [
+    {
+      "sample_id": "original_R022",
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/R022.wav",
+      "source_audio_sha256": "da85c0fdc6e3a83362f812e2f8df3ee10e1c1912e18fe7f90ade60aa655c744c",
+      "run_id": "93b5606070f446f69a3248bffe3439b4",
+      "expected_selected": true,
+      "selected": true,
+      "new_requests": 0,
+      "historical_audio_generation_not_claimed_zero": true,
+      "quality_status": "incomplete",
+      "final_pcm_equal": true,
+      "candidate_human_status": "pending_new_cut_not_transferred_from_prior_cut",
+      "output_file": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/tail_repeat_pipeline_replay_20261017/original_R022/candidate.wav",
+      "output_sha256": "4f25afe817e208e54a04ebf72cd52cdc4779a1adb39556314c52b6f37d64be09"
+    },
+    {
+      "sample_id": "clone_R039",
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_bryce_clone_chapter_20261017/audio/R039.wav",
+      "source_audio_sha256": "707782afd9ed12bf56637fbd69dcf787a0de6683660a70edb002d9ff761763c3",
+      "run_id": "dd73083b9c0b4502bfd94956655d5860",
+      "expected_selected": false,
+      "selected": false,
+      "new_requests": 0,
+      "historical_audio_generation_not_claimed_zero": true,
+      "quality_status": "incomplete",
+      "final_pcm_equal": true,
+      "candidate_human_status": "pending_new_cut_not_transferred_from_prior_cut",
+      "output_file": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/tail_repeat_pipeline_replay_20261017/clone_R039/candidate.wav",
+      "output_sha256": "e02bc1d96ec1d012f1050ea37b8cefc590dfb6985927cf77f56211c8eb58c66c"
+    }
+  ],
+  "new_requests": 0,
+  "original_chapters_not_replaced": true
+}

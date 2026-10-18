@@ -1,0 +1,256 @@
+{
+  "mapping": [
+    {
+      "original": 1,
+      "final": 1,
+      "id": "y90nupkv"
+    },
+    {
+      "original": 2,
+      "final": 2,
+      "id": "hwbqtkby"
+    },
+    {
+      "original": 3,
+      "final": 3,
+      "id": "ofy9wn61"
+    },
+    {
+      "original": 4,
+      "final": 4,
+      "id": "jyx0ra1s"
+    },
+    {
+      "original": 5,
+      "final": 6,
+      "id": "i107q5of"
+    },
+    {
+      "original": 6,
+      "final": 7,
+      "id": "x8f69ofe"
+    },
+    {
+      "original": 7,
+      "final": 8,
+      "id": "gnmp4jqx"
+    },
+    {
+      "original": 8,
+      "final": 10,
+      "id": "fu1gfa1s"
+    },
+    {
+      "original": 9,
+      "final": 11,
+      "id": "udsvah03"
+    },
+    {
+      "original": 10,
+      "final": 12,
+      "id": "m90b6t0r"
+    },
+    {
+      "original": 11,
+      "final": 13,
+      "id": "jetc3ut0"
+    },
+    {
+      "original": 12,
+      "final": 14,
+      "id": "8f2psfyx"
+    },
+    {
+      "original": 13,
+      "final": 16,
+      "id": "hgzapcr6"
+    },
+    {
+      "original": 14,
+      "final": 17,
+      "id": "6lsnupw7"
+    },
+    {
+      "original": 15,
+      "final": 19,
+      "id": "vaxsvy10"
+    },
+    {
+      "original": 16,
+      "final": 20,
+      "id": "gny5sjyp"
+    },
+    {
+      "original": 17,
+      "final": 21,
+      "id": "14bup87q"
+    },
+    {
+      "original": 18,
+      "final": 22,
+      "id": "y5wne50z"
+    },
+    {
+      "original": 19,
+      "final": 23,
+      "id": "nid43ytk"
+    },
+    {
+      "original": 20,
+      "final": 24,
+      "id": "zyxsni5k"
+    },
+    {
+      "original": 21,
+      "final": 26,
+      "id": "m1wvqtk3"
+    },
+    {
+      "original": 22,
+      "final": 28,
+      "id": "5onypobq"
+    },
+    {
+      "original": 23,
+      "final": 29,
+      "id": "c7uhcr6t"
+    },
+    {
+      "original": 24,
+      "final": 30,
+      "id": "7qto7e10"
+    },
+    {
+      "original": 25,
+      "final": 31,
+      "id": "69wfm9o7"
+    },
+    {
+      "original": 26,
+      "final": 32,
+      "id": "l0bepsfm"
+    },
+    {
+      "original": 27,
+      "final": 33,
+      "id": "4vyxknqp"
+    },
+    {
+      "original": 28,
+      "final": 34,
+      "id": "3mdove10"
+    },
+    {
+      "original": 29,
+      "final": 35,
+      "id": "i5o3q10v"
+    },
+    {
+      "original": 30,
+      "final": 37,
+      "id": "wnqh07ex"
+    }
+  ],
+  "added": [
+    {
+      "id": "s8d6ly",
+      "index": 5
+    },
+    {
+      "id": "macxjm",
+      "index": 9
+    },
+    {
+      "id": "tah7f0",
+      "index": 15
+    },
+    {
+      "id": "gflyoc",
+      "index": 18
+    },
+    {
+      "id": "hb2323",
+      "index": 25
+    },
+    {
+      "id": "01h1fy",
+      "index": 27
+    },
+    {
+      "id": "fr08y9",
+      "index": 36
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "chapter_full.jpg",
+      "slide": 5,
+      "crop": [
+        90,
+        365,
+        630,
+        310
+      ]
+    },
+    {
+      "file": "narration_full.jpg",
+      "slide": 9,
+      "crop": [
+        85,
+        250,
+        640,
+        510
+      ]
+    },
+    {
+      "file": "role_full.jpg",
+      "slide": 15,
+      "crop": [
+        85,
+        145,
+        640,
+        590
+      ]
+    },
+    {
+      "file": "checks_full.jpg",
+      "slide": 18,
+      "crop": [
+        85,
+        435,
+        640,
+        315
+      ]
+    },
+    {
+      "file": "report_full.jpg",
+      "slide": 25,
+      "crop": [
+        97,
+        410,
+        615,
+        510
+      ]
+    },
+    {
+      "file": "context_full.jpg",
+      "slide": 27,
+      "crop": [
+        100,
+        315,
+        610,
+        330
+      ]
+    },
+    {
+      "file": "library_full.jpg",
+      "slide": 36,
+      "crop": [
+        85,
+        250,
+        640,
+        570
+      ]
+    }
+  ]
+}

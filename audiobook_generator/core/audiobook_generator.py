@@ -126,7 +126,16 @@ class AudiobookGenerator:
             audio_tags = AudioTags(
                 title, book_parser.get_book_author(), book_parser.get_book_title(), idx
             )
-            tts_provider.text_to_speech(text, output_file, audio_tags)
+            if getattr(self.config, "audio_core_enabled", False):
+                from audiobook_generator.role_script.models import ChapterSynthesisPlan, SourceSpan, SynthesisUnit, VoiceProfile
+                from audiobook_generator.role_script.planner import build_default_provider_params
+                profile = VoiceProfile("narrator", "旁白", build_default_provider_params("openai", self.config))
+                unit = SynthesisUnit(f"{idx}:1:narrator", idx, title, 1, 1, "narrator", "旁白", text, profile,
+                                     source_span=SourceSpan(idx, 0, len(text)))
+                plan = ChapterSynthesisPlan(idx, title, (unit,), self.config.output_format or "wav", "openai")
+                self._run_audio_core(plan, tts_provider, output_file, audio_tags)
+            else:
+                tts_provider.text_to_speech(text, output_file, audio_tags)
 
             # Provider 返回不代表已经写出音频，避免空结果被误报为成功。
             if not os.path.isfile(output_file) or os.path.getsize(output_file) == 0:
@@ -143,6 +152,27 @@ class AudiobookGenerator:
         """Wrapper for process_chapter to handle unpacking args for imap."""
         idx, title, text, book_parser = args
         return idx, self.process_chapter(idx, title, text, book_parser)
+
+    def _run_audio_core(self, plan, provider, output_file, tags):
+        from audiobook_generator.audio_core.models import CoreOptions
+        from audiobook_generator.audio_core.pipeline import run_chapter
+        from audiobook_generator.audio_core.store import fingerprint
+        project_root = getattr(self.config, "audio_core_project_root", None)
+        if not project_root:
+            source = getattr(self.config, "input_file", None)
+            book_hash = _sha256_file(source) if source and os.path.isfile(source) else fingerprint(
+                {"title": plan.title, "text": [unit.text for unit in plan.units]})
+            project_root = os.path.join(self.config.output_folder, ".audio_projects", book_hash)
+        if getattr(self.config, "audio_core_casting", None):
+            from audiobook_generator.audio_core.casting import apply_casting, locked_voices_from_script
+            script = self._load_role_script() if self.config.role_script is not None else None
+            plan = apply_casting(plan, self.config.audio_core_casting,
+                                 locked=locked_voices_from_script(script) if script else {},
+                                 language=self.config.language or "auto")
+        return run_chapter(plan, provider, output_file, tags, project_root,
+                           options=CoreOptions.from_config(self.config),
+                           run_id=getattr(self.config, "audio_core_run_id", None),
+                           progress=logger.info)
 
     def process_role_chapter(self, plan, book_author: str, book_title: str):
         """在 spawn worker 内合成一个角色章节。"""
@@ -198,6 +228,10 @@ class AudiobookGenerator:
                 book_title,
                 plan.chapter_index,
             )
+
+            if getattr(self.config, "audio_core_enabled", False):
+                self._run_audio_core(plan, tts_provider, output_file, audio_tags)
+                return plan.chapter_index, True
 
             from audiobook_generator.role_script.audio_pipeline import assemble_chapter_audio
             from audiobook_generator.role_script.progress import role_segment_marker
@@ -383,6 +417,22 @@ class AudiobookGenerator:
     def run(self):
         try:
             logger.info("Starting audiobook generation...")
+            core_mode = bool(getattr(self.config, "audio_core_enabled", False))
+            if core_mode:
+                if self.config.tts != "openai":
+                    raise ValueError("统一质量核心首轮只支持 MiMo（openai），不适配 MiniMax")
+                if (self.config.worker_count or 1) != 1:
+                    raise ValueError("统一质量核心首轮请使用 worker_count=1，以控制模型内存与运行资源")
+                from audiobook_generator.audio_core.models import CoreOptions
+                from audiobook_generator.audio_core.store import ArtifactStore
+                core_options = CoreOptions.from_config(self.config)
+                if self.config.audio_core_casting:
+                    from audiobook_generator.audio_core.casting import validate_casting_file
+                    validate_casting_file(self.config.audio_core_casting)
+                self.config.audio_core_project_root = os.path.join(
+                    self.config.output_folder, ".audio_projects", _sha256_file(self.config.input_file))
+                if not self.config.preview:
+                    self.config.audio_core_run_id = ArtifactStore(self.config.audio_core_project_root).start_run(core_options.limits)
             role_mode = self.config.role_script is not None
             if role_mode and self.config.use_pydub_merge:
                 logger.warning("角色模式使用独立音频管线，已忽略 --use_pydub_merge")
@@ -432,7 +482,9 @@ class AudiobookGenerator:
                 chapters[self.config.chapter_start - 1 : self.config.chapter_end]
             )
             logger.info(f"Total characters in selected book chapters: {total_characters}")
-            if role_mode:
+            if core_mode:
+                logger.info("统一核心按实际请求次数、追加修复和运行时间控制资源，不计算费用。")
+            elif role_mode:
                 logger.info("角色模式费用将在各章节 worker 内按 Provider 配置计算。\n")
             else:
                 rough_price = tts_provider.estimate_cost(total_characters)

@@ -1,0 +1,200 @@
+{
+  "material_passport": {
+    "origin_skill": "academic-research-suite/experiment-agent",
+    "mode": "run",
+    "verification_status": "VERIFIED for execution/integrity only; human quality UNVERIFIED",
+    "version": "english-numeric-pilot-v22"
+  },
+  "run_id": "d67844c3ff2a4675ba92dacf8ef18713",
+  "execution_plan": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/execution_plan.json",
+  "execution_plan_sha256": "7fabf43029647380e6d2ee50005a8d7853d68db947035f187da0d4f92d6af08a",
+  "resources": {
+    "succeeded": {
+      "requests": 4,
+      "characters": 262,
+      "repair_requests": 0
+    }
+  },
+  "actual_requests": [
+    {
+      "id": "f5da1e0029c845dbaecbde9124359faf",
+      "run_id": "d67844c3ff2a4675ba92dacf8ef18713",
+      "request_key": "fd112ec35df2ee487972f8b46412ba4d1b3dcaeec68e030d8a4e8fdd7ab02153",
+      "repair": 0,
+      "status": "succeeded",
+      "started": 1792153583.860298,
+      "finished": 1792153586.2377741,
+      "characters": 59,
+      "artifact": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/raw/fd112ec35df2ee487972f8b46412ba4d1b3dcaeec68e030d8a4e8fdd7ab02153/47f81dd6b31343fd85fc79f496a35f96.wav",
+      "error_type": null
+    },
+    {
+      "id": "f2d29eb2d3af47ed885848a79b5fdae6",
+      "run_id": "d67844c3ff2a4675ba92dacf8ef18713",
+      "request_key": "b97d84e593aee2967068d2e54e66782b4f891db13b6608ede05bd9d21e2a177d",
+      "repair": 0,
+      "status": "succeeded",
+      "started": 1792153592.1625118,
+      "finished": 1792153594.400492,
+      "characters": 72,
+      "artifact": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/raw/b97d84e593aee2967068d2e54e66782b4f891db13b6608ede05bd9d21e2a177d/f899f7983dee4a3cbfdbb7acbd7c7d41.wav",
+      "error_type": null
+    },
+    {
+      "id": "83321a66bac44899a7ad04ba130ddd0c",
+      "run_id": "d67844c3ff2a4675ba92dacf8ef18713",
+      "request_key": "d2a9b34d67766c39dda9e2e04ff07c6cd5b8c513291535565b6f085d7a62010d",
+      "repair": 0,
+      "status": "succeeded",
+      "started": 1792153595.318076,
+      "finished": 1792153597.226336,
+      "characters": 59,
+      "artifact": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/raw/d2a9b34d67766c39dda9e2e04ff07c6cd5b8c513291535565b6f085d7a62010d/3a23d0aa68f041b6969c269667764bf2.wav",
+      "error_type": null
+    },
+    {
+      "id": "4c73a0b6360942f6add16b5a6ac05827",
+      "run_id": "d67844c3ff2a4675ba92dacf8ef18713",
+      "request_key": "e5962ac33751c7f0d31e6b0285d4c1f93d7e3eca858d09d0d13c56a50e55d608",
+      "repair": 0,
+      "status": "succeeded",
+      "started": 1792153597.5249019,
+      "finished": 1792153599.6401012,
+      "characters": 72,
+      "artifact": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/raw/e5962ac33751c7f0d31e6b0285d4c1f93d7e3eca858d09d0d13c56a50e55d608/b84d812c0a404765b88f0cc91404c894.wav",
+      "error_type": null
+    }
+  ],
+  "characters": 262,
+  "additional_repair_requests": 0,
+  "reevaluation_requests": 0,
+  "chapters": [
+    {
+      "voice": "Mia",
+      "chapter": 1,
+      "duration_seconds": 15.2,
+      "original_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/reports/d67844c3ff2a4675ba92dacf8ef18713/chapter_000001/quality.json",
+      "original_report_sha256": "514a8bc1c65f6500d0b22a7bf582aa875a3eb992253fe5af531cb91e524daafc",
+      "reevaluated_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/reevaluated/chapter_01/quality.json",
+      "reevaluated_report_sha256": "6b88fb64dfb46b4996f1cc07913b307bc4aac194190f92b2a8ee47fc70d0de22",
+      "tts_body_unchanged": true,
+      "raw_rendered_pcm_equal": [
+        true,
+        true
+      ],
+      "original_boundary_content": [
+        "incomplete"
+      ],
+      "reevaluated_boundary_content": [
+        "passed"
+      ],
+      "chunk_wer": [
+        0.0,
+        0.0
+      ],
+      "boundary_wer": [
+        0.0
+      ],
+      "final_verification": {
+        "encoding": "passed",
+        "content": "passed"
+      },
+      "quality_status": "incomplete",
+      "sample_hashes": [
+        {
+          "raw": "75c716c7f40e8b40c5428c73c50e626b9896674c12ce3611d85172c367c2b26f",
+          "rendered": "e7214dc1e0715f230515e7014d577c6c96b6c17c9718205dfcae654b97803f4b"
+        },
+        {
+          "raw": "f8ac2c0c0d5ba661db6fe795c872f2ddb84960c02249318a4604ff24e2f9be29",
+          "rendered": "55fc05f2dfa42bbd3aa6dd7106d36c4a294bbbf6a7dd609e70005aa74a6e58ce"
+        }
+      ]
+    },
+    {
+      "voice": "Chloe",
+      "chapter": 2,
+      "duration_seconds": 15.04,
+      "original_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/project/reports/d67844c3ff2a4675ba92dacf8ef18713/chapter_000002/quality.json",
+      "original_report_sha256": "4a6311ebc4a2928639311b4c83638d66f93c4f02319158bb95701782827609c0",
+      "reevaluated_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/reevaluated/chapter_02/quality.json",
+      "reevaluated_report_sha256": "d1c3fe61b397bedb280d8bfc883b502f2d24e56b5783adb824c4dcda281ddcb9",
+      "tts_body_unchanged": true,
+      "raw_rendered_pcm_equal": [
+        true,
+        true
+      ],
+      "original_boundary_content": [
+        "incomplete"
+      ],
+      "reevaluated_boundary_content": [
+        "passed"
+      ],
+      "chunk_wer": [
+        0.0,
+        0.0
+      ],
+      "boundary_wer": [
+        0.0
+      ],
+      "final_verification": {
+        "encoding": "passed",
+        "content": "passed"
+      },
+      "quality_status": "incomplete",
+      "sample_hashes": [
+        {
+          "raw": "f4d7bed8d5f9a7a40935feea302fb270db0f17d569745f29ff7adc3459e83622",
+          "rendered": "36a40bfd19d97bb3045588d25ab279e377d845c05cd156c57426010811bf20f0"
+        },
+        {
+          "raw": "3aee064519c012e1ee4382f685fea1f8aa640f3f88c1142d6448b18a18d290be",
+          "rendered": "318358bd54a68f4d996f645dbfc3381f44252679cf929ed50799585f4fd8a9ed"
+        }
+      ]
+    }
+  ],
+  "distinct_source_groups": 1,
+  "comparison_bug": "Missing space before next English unit made 3.5%.The fail numeric canonicalization. Corrected comparison reference only; existing raw/PCM audio unchanged.",
+  "new_normalization_version": "bilingual-reading-v6",
+  "initial_reports_preserved": true,
+  "new_tests": 3,
+  "tests": {
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q",
+    "ran": 502,
+    "seconds": 14.928,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/english_numeric_join_regression_v22.log",
+    "log_sha256": "fc63259e438714fe86bf7b0349f5ccca4c8a753fdc020d04064b2210b467c043"
+  },
+  "annotation_pack": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/english_numbers_20261016",
+  "annotation_rows": 6,
+  "boundary_rows": 2,
+  "audio_files": 8,
+  "human_reviewed_rows": 0,
+  "review_status": "pending",
+  "e06t_human_review": "pending",
+  "existing_english_bank_changed": false,
+  "html_local_links_validated": 11,
+  "source_files": {
+    "audiobook_generator/audio_core/language.py": "5193fa406e6571dd58d2e62dfe1cf59b97b8bb4279df7ef5bfd126a45fb15b59",
+    "audiobook_generator/audio_core/reading.py": "516fb3707ef6c3b430b86de415ffdd6dbed4519386bf4d07858b09cbeaec75dd",
+    "audiobook_generator/audio_core/__main__.py": "5b23802bbc87d98e3353699a1a8daadde596d6c2ef10b2ea6d63b3178b946379",
+    "tests/audiobook_generator/audio_core/bilingual_test.py": "d9cd3d139adcfdcc296d9c5e77a32436383a6cc2cc9cacae1e88391c9b852dbb",
+    "tests/audiobook_generator/audio_core/english_reading_test.py": "e2c131be9fec8c6b9fd45548a4933fe9eb22d68c293a773108803c5d12a8596c"
+  },
+  "limitations": [
+    "Two common authored texts, two voices; no independent generalization or numerical-reading accuracy estimate",
+    "No human quality verification yet; ASR is not ground truth",
+    "No boundary-positive labels, model training or independent listener experiment completed",
+    "No Qwen or VoxCPM unified-core adaptation in this MiMo-only phase"
+  ],
+  "preflight_correction": {
+    "initial_execution": "Rejected before output directory, ledger, provider construction or network call: chunk_chars=1800 exceeded the CoreOptions cap of 1500.",
+    "correction": "Set chunk_chars=1500 and execute a zero-request preflight before live execution.",
+    "initial_remote_requests": 0,
+    "actual_planned_and_sent_characters": 262,
+    "note": "The network approval text incorrectly said 252 characters; the fixed source plan, preflight and actual ledger all record 262."
+  }
+}

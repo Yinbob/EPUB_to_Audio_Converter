@@ -1,0 +1,58 @@
+{
+  "version": "flipped-local-repair-human-acceptance-v44",
+  "source": "explicit_user_reply",
+  "user_reply": "内容两条正常，四处停顿合适",
+  "accepted_content_samples": [
+    {
+      "sample_id": "R022",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/R022_candidate.wav",
+      "audio_sha256": "911e306726029773b3fb68b3df3f93d0c04ac21360b5cb30f8de0dd9a4bb0ade",
+      "content_complete": true,
+      "extra_suffix_absent": true
+    },
+    {
+      "sample_id": "R049",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/R049_candidate.wav",
+      "audio_sha256": "be961f07450a4e38f65ff8e9c33a6d660c914cd8279e65e41395bafa8d032c0d",
+      "content_complete": true,
+      "extra_suffix_absent": true
+    }
+  ],
+  "accepted_pause_samples": [
+    {
+      "sample_id": "J009",
+      "condition": "after",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/J009_after.wav",
+      "audio_sha256": "a0419821c5d5b3fd4a025dd089892cc8a3273825ca97295e0cd050f77b8d75d2",
+      "pause_seconds": 1.0,
+      "natural": true
+    },
+    {
+      "sample_id": "J013",
+      "condition": "after",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/J013_after.wav",
+      "audio_sha256": "88b83459dfdf41e6054e1f93e7756763b76ef672b806630392c0f8f07d9677bf",
+      "pause_seconds": 1.0,
+      "natural": true
+    },
+    {
+      "sample_id": "J023",
+      "condition": "after",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/J023_after.wav",
+      "audio_sha256": "8ddf41f8f0c21ec512b7bca9d2c4316ad96276b1a7a2d0527fe1c644de538a4b",
+      "pause_seconds": 1.0,
+      "natural": true
+    },
+    {
+      "sample_id": "J076",
+      "condition": "after",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_local_repair_20261017/audio/J076_after.wav",
+      "audio_sha256": "09a2334ddeb23cc38bc8191a194fd1b582c41a19aa9adb6f8e229b46e30f2626",
+      "pause_seconds": 1.0,
+      "natural": true
+    }
+  ],
+  "scope": "two_cropped_utterances_and_four_pause_contexts_only",
+  "whole_chapter_listening_complete": false,
+  "machine_reports_unchanged": true
+}

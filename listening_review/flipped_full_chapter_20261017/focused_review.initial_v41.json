@@ -1,0 +1,3661 @@
+{
+  "version": "flipped-focused-review-v41",
+  "content": [
+    {
+      "sample_id": "R022",
+      "chunk_id": "5:22:juli:chunk:1",
+      "role_id": "juli",
+      "text": "“Oh, my mom knows where I am. She said it was fine.”",
+      "source_span": {
+        "chapter_index": 5,
+        "start": 1728,
+        "end": 1780
+      },
+      "start_seconds": 124.26,
+      "end_seconds": 131.62,
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/R022.wav",
+      "audio_sha256": "da85c0fdc6e3a83362f812e2f8df3ee10e1c1912e18fe7f90ade60aa655c744c",
+      "original_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/4506d619b14d0692e4528081bc2a5d1d19497a28293e57bdec8dbe71431debf4.wav",
+      "original_audio_sha256": "9f9db715b5a696b5358f9f58b847e540a642bd4f9b82decd208b6b3c9a130a63",
+      "gain_db": -5.5699999999999985,
+      "gain": 0.5266232148938975,
+      "input_loudness": {
+        "integrated_lufs": -15.99,
+        "true_peak_dbfs": -1.18,
+        "lra_lu": 3.6,
+        "gate_lufs": -26.35,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "machine_report": {
+        "scope_id": "5:22:juli:chunk:1",
+        "dimensions": {
+          "signal": "passed",
+          "content": "incomplete",
+          "consistency": "incomplete"
+        },
+        "metrics": {
+          "evaluation_models": {
+            "asr": {
+              "kind": "asr",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/SenseVoiceSmall",
+              "state": "local_files",
+              "runtime_version": "1.4.16",
+              "files": [
+                {
+                  "path": "am.mvn",
+                  "bytes": 11203,
+                  "sha256": "29b3c740a2c0cfc6b308126d31d7f265fa2be74f3bb095cd2f143ea970896ae5"
+                },
+                {
+                  "path": "chn_jpn_yue_eng_ko_spectok.bpe.model",
+                  "bytes": 377341,
+                  "sha256": "aa87f86064c3730d799ddf7af3c04659151102cba548bce325cf06ba4da4e6a8"
+                },
+                {
+                  "path": "config.yaml",
+                  "bytes": 1855,
+                  "sha256": "f71e239ba36705564b5bf2d2ffd07eece07b8e3f2bbf6d2c99d8df856339ac19"
+                },
+                {
+                  "path": "configuration.json",
+                  "bytes": 396,
+                  "sha256": "02810a7f8e9e8aee10370a265f7e799728ce25b4c00cdbf4602b303ee395a38e"
+                },
+                {
+                  "path": "model.pt",
+                  "bytes": 936291369,
+                  "sha256": "833ca2dcfdf8ec91bd4f31cfac36d6124e0c459074d5e909aec9cabe6204a3ea"
+                }
+              ],
+              "fingerprint": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6"
+            },
+            "speaker": {
+              "kind": "speaker",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/ecapa",
+              "state": "local_files",
+              "runtime_version": "1.1.1",
+              "files": [
+                {
+                  "path": "classifier.ckpt",
+                  "bytes": 5534328,
+                  "sha256": "fd9e3634fe68bd0a427c95e354c0c677374f62b3f434e45b78599950d860d535"
+                },
+                {
+                  "path": "embedding_model.ckpt",
+                  "bytes": 83316686,
+                  "sha256": "0575cb64845e6b9a10db9bcb74d5ac32b326b8dc90352671d345e2ee3d0126a2"
+                },
+                {
+                  "path": "hyperparams.yaml",
+                  "bytes": 1919,
+                  "sha256": "6f78854fa04ba59e761437b76a2575d3aba5e5016de3e9b69f0c9a5077fb1a41"
+                },
+                {
+                  "path": "label_encoder.ckpt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "label_encoder.txt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "mean_var_norm_emb.ckpt",
+                  "bytes": 1921,
+                  "sha256": "cd70225b05b37be64fc5a95e24395d804231d43f74b2e1e5a513db7b69b34c33"
+                }
+              ],
+              "fingerprint": "9cc19ee039c6ded8c46311e5b94b2595a9c9ff2d11fed1a29fb838ddd7b15f27"
+            }
+          },
+          "duration_seconds": 7.36,
+          "sample_rate": 24000,
+          "samples": 176640,
+          "peak": 0.870086669921875,
+          "clipped_fraction": 0.0,
+          "active_seconds": 4.46,
+          "silence_fraction": 0.3940217391304348,
+          "rms_dbfs": -16.628804901240837,
+          "pitch": {
+            "median_hz": 210.52631578947367,
+            "iqr_hz": 54.8780487804878,
+            "voiced_frames": 185
+          },
+          "language": "en",
+          "reading_unit": "word",
+          "reading_unit_count": 12,
+          "reading_count_basis": "normalized_reference_not_observed_word_timestamps",
+          "articulation_rate_unit": "words_per_second",
+          "rate_threshold": 5.0,
+          "rate_threshold_kind": "uncalibrated_heuristic",
+          "articulation_rate": 2.690582959641256,
+          "overall_rate": 1.6304347826086956,
+          "words_per_minute": 97.82608695652173,
+          "content_alignment": {
+            "error_rate": 0.5,
+            "operations": [
+              {
+                "kind": "insert",
+                "reference_index": 12,
+                "hypothesis_index": 12,
+                "reference": "",
+                "hypothesis": "my"
+              },
+              {
+                "kind": "insert",
+                "reference_index": 12,
+                "hypothesis_index": 13,
+                "reference": "",
+                "hypothesis": "mom"
+              },
+              {
+                "kind": "insert",
+                "reference_index": 12,
+                "hypothesis_index": 14,
+                "reference": "",
+                "hypothesis": "knows"
+              },
+              {
+                "kind": "insert",
+                "reference_index": 12,
+                "hypothesis_index": 15,
+                "reference": "",
+                "hypothesis": "where"
+              },
+              {
+                "kind": "insert",
+                "reference_index": 12,
+                "hypothesis_index": 16,
+                "reference": "",
+                "hypothesis": "i"
+              },
+              {
+                "kind": "insert",
+                "reference_index": 12,
+                "hypothesis_index": 17,
+                "reference": "",
+                "hypothesis": "am"
+              }
+            ],
+            "reference": "oh my mom knows where i am she said it was fine",
+            "hypothesis": "oh my mom knows where i am she said it was fine my mom knows where i am",
+            "reference_tokens": [
+              "oh",
+              "my",
+              "mom",
+              "knows",
+              "where",
+              "i",
+              "am",
+              "she",
+              "said",
+              "it",
+              "was",
+              "fine"
+            ],
+            "hypothesis_tokens": [
+              "oh",
+              "my",
+              "mom",
+              "knows",
+              "where",
+              "i",
+              "am",
+              "she",
+              "said",
+              "it",
+              "was",
+              "fine",
+              "my",
+              "mom",
+              "knows",
+              "where",
+              "i",
+              "am"
+            ],
+            "language": "en",
+            "error_metric": "WER",
+            "alignment_unit": "word",
+            "reference_unit_count": 12,
+            "normalization_version": "bilingual-reading-v6",
+            "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+            "comparison_normalization": {
+              "reference": {
+                "tokens": [
+                  "oh",
+                  "my",
+                  "mom",
+                  "knows",
+                  "where",
+                  "i",
+                  "am",
+                  "she",
+                  "said",
+                  "it",
+                  "was",
+                  "fine"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              },
+              "hypothesis": {
+                "tokens": [
+                  "oh",
+                  "my",
+                  "mom",
+                  "knows",
+                  "where",
+                  "i",
+                  "am",
+                  "she",
+                  "said",
+                  "it",
+                  "was",
+                  "fine",
+                  "my",
+                  "mom",
+                  "knows",
+                  "where",
+                  "i",
+                  "am"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              }
+            },
+            "deletions": 0,
+            "insertions": 6,
+            "substitutions": 0
+          },
+          "rate_policy_version": "reference-rate-content-gate-v1",
+          "rate_estimate_usable_for_heuristics": false,
+          "rate_estimate_status": "unreliable_content_mismatch",
+          "consistency_reference": {
+            "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/0c3a938bd37997029950a1281004171ec7edfcba8eaf51b19104100cf6cc666f.wav",
+            "kind": "human_confirmed_fixed_reference",
+            "sha256": "f090766507f4f113b9fc99b6c280538598110bb288e032bf99a8a91f281c8082"
+          },
+          "rate_reference_unavailable": "current_content_mismatch",
+          "pitch_shift_semitones": -3.5247744366805236,
+          "speaker_unavailable": "ValueError",
+          "evaluation_seconds": 0.20467037498019636,
+          "start_seconds": 124.26,
+          "end_seconds": 131.62
+        },
+        "issues": [
+          {
+            "code": "asr_mismatch",
+            "dimension": "content",
+            "scope_id": "5:22:juli:chunk:1",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "error_rate": 0.5,
+              "operations": [
+                {
+                  "kind": "insert",
+                  "reference_index": 12,
+                  "hypothesis_index": 12,
+                  "reference": "",
+                  "hypothesis": "my"
+                },
+                {
+                  "kind": "insert",
+                  "reference_index": 12,
+                  "hypothesis_index": 13,
+                  "reference": "",
+                  "hypothesis": "mom"
+                },
+                {
+                  "kind": "insert",
+                  "reference_index": 12,
+                  "hypothesis_index": 14,
+                  "reference": "",
+                  "hypothesis": "knows"
+                },
+                {
+                  "kind": "insert",
+                  "reference_index": 12,
+                  "hypothesis_index": 15,
+                  "reference": "",
+                  "hypothesis": "where"
+                },
+                {
+                  "kind": "insert",
+                  "reference_index": 12,
+                  "hypothesis_index": 16,
+                  "reference": "",
+                  "hypothesis": "i"
+                },
+                {
+                  "kind": "insert",
+                  "reference_index": 12,
+                  "hypothesis_index": 17,
+                  "reference": "",
+                  "hypothesis": "am"
+                }
+              ],
+              "reference": "oh my mom knows where i am she said it was fine",
+              "hypothesis": "oh my mom knows where i am she said it was fine my mom knows where i am",
+              "reference_tokens": [
+                "oh",
+                "my",
+                "mom",
+                "knows",
+                "where",
+                "i",
+                "am",
+                "she",
+                "said",
+                "it",
+                "was",
+                "fine"
+              ],
+              "hypothesis_tokens": [
+                "oh",
+                "my",
+                "mom",
+                "knows",
+                "where",
+                "i",
+                "am",
+                "she",
+                "said",
+                "it",
+                "was",
+                "fine",
+                "my",
+                "mom",
+                "knows",
+                "where",
+                "i",
+                "am"
+              ],
+              "language": "en",
+              "error_metric": "WER",
+              "alignment_unit": "word",
+              "reference_unit_count": 12,
+              "normalization_version": "bilingual-reading-v6",
+              "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+              "comparison_normalization": {
+                "reference": {
+                  "tokens": [
+                    "oh",
+                    "my",
+                    "mom",
+                    "knows",
+                    "where",
+                    "i",
+                    "am",
+                    "she",
+                    "said",
+                    "it",
+                    "was",
+                    "fine"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                },
+                "hypothesis": {
+                  "tokens": [
+                    "oh",
+                    "my",
+                    "mom",
+                    "knows",
+                    "where",
+                    "i",
+                    "am",
+                    "she",
+                    "said",
+                    "it",
+                    "was",
+                    "fine",
+                    "my",
+                    "mom",
+                    "knows",
+                    "where",
+                    "i",
+                    "am"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                }
+              },
+              "deletions": 0,
+              "insertions": 6,
+              "substitutions": 0
+            }
+          }
+        ],
+        "version": "audio-core-v1",
+        "status": "incomplete"
+      },
+      "machine_priority": 0,
+      "previously_heard_same_content_and_identity": false,
+      "unavailable_evidence": {
+        "speaker_unavailable": "ValueError"
+      },
+      "whole_chapter_review_status": "pending"
+    },
+    {
+      "sample_id": "R049",
+      "chunk_id": "5:46:bryce_mother:chunk:1",
+      "role_id": "bryce_mother",
+      "text": "“Go on.”",
+      "source_span": {
+        "chapter_index": 5,
+        "start": 3969,
+        "end": 3977
+      },
+      "start_seconds": 282.58,
+      "end_seconds": 289.94,
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/R049.wav",
+      "audio_sha256": "9df474c3136146d052e002f1131158c46948e4e3f0390527d543e1450d5040fd",
+      "original_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/ad54dadeb2579b8b33986780547e05b2e951f7c5f69060b014d5f0e236d9bf32.wav",
+      "original_audio_sha256": "ac08a7a155b3e71ae1e8394b1b12423be0e86b734db0c0b91549d5e00b4495ef",
+      "gain_db": -0.04999999999999716,
+      "gain": 0.994260073952957,
+      "input_loudness": {
+        "integrated_lufs": -21.51,
+        "true_peak_dbfs": -3.36,
+        "lra_lu": 4.3,
+        "gate_lufs": -32.76,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "machine_report": {
+        "scope_id": "5:46:bryce_mother:chunk:1",
+        "dimensions": {
+          "signal": "passed",
+          "content": "incomplete",
+          "consistency": "incomplete"
+        },
+        "metrics": {
+          "evaluation_models": {
+            "asr": {
+              "kind": "asr",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/SenseVoiceSmall",
+              "state": "local_files",
+              "runtime_version": "1.4.16",
+              "files": [
+                {
+                  "path": "am.mvn",
+                  "bytes": 11203,
+                  "sha256": "29b3c740a2c0cfc6b308126d31d7f265fa2be74f3bb095cd2f143ea970896ae5"
+                },
+                {
+                  "path": "chn_jpn_yue_eng_ko_spectok.bpe.model",
+                  "bytes": 377341,
+                  "sha256": "aa87f86064c3730d799ddf7af3c04659151102cba548bce325cf06ba4da4e6a8"
+                },
+                {
+                  "path": "config.yaml",
+                  "bytes": 1855,
+                  "sha256": "f71e239ba36705564b5bf2d2ffd07eece07b8e3f2bbf6d2c99d8df856339ac19"
+                },
+                {
+                  "path": "configuration.json",
+                  "bytes": 396,
+                  "sha256": "02810a7f8e9e8aee10370a265f7e799728ce25b4c00cdbf4602b303ee395a38e"
+                },
+                {
+                  "path": "model.pt",
+                  "bytes": 936291369,
+                  "sha256": "833ca2dcfdf8ec91bd4f31cfac36d6124e0c459074d5e909aec9cabe6204a3ea"
+                }
+              ],
+              "fingerprint": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6"
+            },
+            "speaker": {
+              "kind": "speaker",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/ecapa",
+              "state": "local_files",
+              "runtime_version": "1.1.1",
+              "files": [
+                {
+                  "path": "classifier.ckpt",
+                  "bytes": 5534328,
+                  "sha256": "fd9e3634fe68bd0a427c95e354c0c677374f62b3f434e45b78599950d860d535"
+                },
+                {
+                  "path": "embedding_model.ckpt",
+                  "bytes": 83316686,
+                  "sha256": "0575cb64845e6b9a10db9bcb74d5ac32b326b8dc90352671d345e2ee3d0126a2"
+                },
+                {
+                  "path": "hyperparams.yaml",
+                  "bytes": 1919,
+                  "sha256": "6f78854fa04ba59e761437b76a2575d3aba5e5016de3e9b69f0c9a5077fb1a41"
+                },
+                {
+                  "path": "label_encoder.ckpt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "label_encoder.txt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "mean_var_norm_emb.ckpt",
+                  "bytes": 1921,
+                  "sha256": "cd70225b05b37be64fc5a95e24395d804231d43f74b2e1e5a513db7b69b34c33"
+                }
+              ],
+              "fingerprint": "9cc19ee039c6ded8c46311e5b94b2595a9c9ff2d11fed1a29fb838ddd7b15f27"
+            }
+          },
+          "duration_seconds": 7.36,
+          "sample_rate": 24000,
+          "samples": 176640,
+          "peak": 0.679290771484375,
+          "clipped_fraction": 0.0,
+          "active_seconds": 3.14,
+          "silence_fraction": 0.5733695652173914,
+          "rms_dbfs": -23.81953539949974,
+          "pitch": {
+            "median_hz": 228.57142857142858,
+            "iqr_hz": 141.02564102564102,
+            "voiced_frames": 105
+          },
+          "language": "en",
+          "reading_unit": "word",
+          "reading_unit_count": 2,
+          "reading_count_basis": "normalized_reference_not_observed_word_timestamps",
+          "articulation_rate_unit": "words_per_second",
+          "rate_threshold": 5.0,
+          "rate_threshold_kind": "uncalibrated_heuristic",
+          "articulation_rate": null,
+          "overall_rate": 0.2717391304347826,
+          "words_per_minute": 16.304347826086957,
+          "content_alignment": {
+            "error_rate": 3.0,
+            "operations": [
+              {
+                "kind": "insert",
+                "reference_index": 0,
+                "hypothesis_index": 0,
+                "reference": "",
+                "hypothesis": "go"
+              },
+              {
+                "kind": "insert",
+                "reference_index": 0,
+                "hypothesis_index": 1,
+                "reference": "",
+                "hypothesis": "on"
+              },
+              {
+                "kind": "insert",
+                "reference_index": 0,
+                "hypothesis_index": 2,
+                "reference": "",
+                "hypothesis": "don't"
+              },
+              {
+                "kind": "insert",
+                "reference_index": 0,
+                "hypothesis_index": 3,
+                "reference": "",
+                "hypothesis": "just"
+              },
+              {
+                "kind": "insert",
+                "reference_index": 0,
+                "hypothesis_index": 4,
+                "reference": "",
+                "hypothesis": "so"
+              },
+              {
+                "kind": "insert",
+                "reference_index": 0,
+                "hypothesis_index": 5,
+                "reference": "",
+                "hypothesis": "placed"
+              }
+            ],
+            "reference": "go on",
+            "hypothesis": "go on don't just so placed go on",
+            "reference_tokens": [
+              "go",
+              "on"
+            ],
+            "hypothesis_tokens": [
+              "go",
+              "on",
+              "don't",
+              "just",
+              "so",
+              "placed",
+              "go",
+              "on"
+            ],
+            "language": "en",
+            "error_metric": "WER",
+            "alignment_unit": "word",
+            "reference_unit_count": 2,
+            "normalization_version": "bilingual-reading-v6",
+            "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+            "comparison_normalization": {
+              "reference": {
+                "tokens": [
+                  "go",
+                  "on"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              },
+              "hypothesis": {
+                "tokens": [
+                  "go",
+                  "on",
+                  "don't",
+                  "just",
+                  "so",
+                  "placed",
+                  "go",
+                  "on"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              }
+            },
+            "deletions": 0,
+            "insertions": 6,
+            "substitutions": 0
+          },
+          "rate_policy_version": "reference-rate-content-gate-v1",
+          "rate_estimate_usable_for_heuristics": false,
+          "rate_estimate_status": "unreliable_content_mismatch",
+          "consistency_reference": {
+            "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/adb14dc3cecea34ae8cb3140794190090c84a54b1a3b3b95f9683227ce5c51f2.wav",
+            "kind": "human_confirmed_fixed_reference",
+            "sha256": "373b63978c17460c4d65e5c32463853131de05152b7f135d404513534151f938"
+          },
+          "rate_reference_unavailable": "current_content_mismatch",
+          "pitch_shift_semitones": -0.5018421083355228,
+          "speaker_unavailable": "ValueError",
+          "evaluation_seconds": 0.21074708318337798,
+          "start_seconds": 282.58,
+          "end_seconds": 289.94
+        },
+        "issues": [
+          {
+            "code": "asr_mismatch",
+            "dimension": "content",
+            "scope_id": "5:46:bryce_mother:chunk:1",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "error_rate": 3.0,
+              "operations": [
+                {
+                  "kind": "insert",
+                  "reference_index": 0,
+                  "hypothesis_index": 0,
+                  "reference": "",
+                  "hypothesis": "go"
+                },
+                {
+                  "kind": "insert",
+                  "reference_index": 0,
+                  "hypothesis_index": 1,
+                  "reference": "",
+                  "hypothesis": "on"
+                },
+                {
+                  "kind": "insert",
+                  "reference_index": 0,
+                  "hypothesis_index": 2,
+                  "reference": "",
+                  "hypothesis": "don't"
+                },
+                {
+                  "kind": "insert",
+                  "reference_index": 0,
+                  "hypothesis_index": 3,
+                  "reference": "",
+                  "hypothesis": "just"
+                },
+                {
+                  "kind": "insert",
+                  "reference_index": 0,
+                  "hypothesis_index": 4,
+                  "reference": "",
+                  "hypothesis": "so"
+                },
+                {
+                  "kind": "insert",
+                  "reference_index": 0,
+                  "hypothesis_index": 5,
+                  "reference": "",
+                  "hypothesis": "placed"
+                }
+              ],
+              "reference": "go on",
+              "hypothesis": "go on don't just so placed go on",
+              "reference_tokens": [
+                "go",
+                "on"
+              ],
+              "hypothesis_tokens": [
+                "go",
+                "on",
+                "don't",
+                "just",
+                "so",
+                "placed",
+                "go",
+                "on"
+              ],
+              "language": "en",
+              "error_metric": "WER",
+              "alignment_unit": "word",
+              "reference_unit_count": 2,
+              "normalization_version": "bilingual-reading-v6",
+              "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+              "comparison_normalization": {
+                "reference": {
+                  "tokens": [
+                    "go",
+                    "on"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                },
+                "hypothesis": {
+                  "tokens": [
+                    "go",
+                    "on",
+                    "don't",
+                    "just",
+                    "so",
+                    "placed",
+                    "go",
+                    "on"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                }
+              },
+              "deletions": 0,
+              "insertions": 6,
+              "substitutions": 0
+            }
+          }
+        ],
+        "version": "audio-core-v1",
+        "status": "incomplete"
+      },
+      "machine_priority": 0,
+      "previously_heard_same_content_and_identity": false,
+      "unavailable_evidence": {
+        "speaker_unavailable": "ValueError"
+      },
+      "whole_chapter_review_status": "pending"
+    }
+  ],
+  "long_pause_context": [
+    {
+      "sample_id": "J009",
+      "boundary_id": "5:7:narrator:chunk:1|5:8:juli:chunk:1",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/J009.wav",
+      "audio_sha256": "8e5f1767f4e0424b8475d733488d47a96211d9cf696992db08cf6e07579072da",
+      "chapter_seconds": 63.68,
+      "boundary_at_seconds": 1.8,
+      "left_text": " She glanced my way. ",
+      "right_text": "“It sure looks like you need it.”",
+      "left_role": "narrator",
+      "right_role": "juli",
+      "machine_report_on_original": {
+        "scope_id": "5:7:narrator:chunk:1|5:8:juli:chunk:1",
+        "dimensions": {
+          "stitching": "incomplete",
+          "content": "incomplete"
+        },
+        "metrics": {
+          "features": {
+            "sample_jump": 0.004456780385226011,
+            "rms_jump_db": 54.34170203484144,
+            "spectral_distance": 1.0961421728134155,
+            "left_speech_edge": 0.0,
+            "right_speech_edge": 1.0,
+            "left_tail_silence": 1.9,
+            "right_head_silence": 0.0,
+            "planned_pause_seconds": 0.2,
+            "same_speaker": 0.0
+          },
+          "threshold_kind": "heuristic",
+          "content_alignment": {
+            "error_rate": 0.18181818181818182,
+            "operations": [
+              {
+                "kind": "replace",
+                "reference_index": 4,
+                "hypothesis_index": 4,
+                "reference": "it",
+                "hypothesis": "here"
+              },
+              {
+                "kind": "replace",
+                "reference_index": 5,
+                "hypothesis_index": 5,
+                "reference": "sure",
+                "hypothesis": "charlie"
+              }
+            ],
+            "reference": "she glanced my way it sure looks like you need it",
+            "hypothesis": "she glanced my way here charlie looks like you need it",
+            "reference_tokens": [
+              "she",
+              "glanced",
+              "my",
+              "way",
+              "it",
+              "sure",
+              "looks",
+              "like",
+              "you",
+              "need",
+              "it"
+            ],
+            "hypothesis_tokens": [
+              "she",
+              "glanced",
+              "my",
+              "way",
+              "here",
+              "charlie",
+              "looks",
+              "like",
+              "you",
+              "need",
+              "it"
+            ],
+            "language": "en",
+            "error_metric": "WER",
+            "alignment_unit": "word",
+            "reference_unit_count": 11,
+            "normalization_version": "bilingual-reading-v6",
+            "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+            "comparison_normalization": {
+              "reference": {
+                "tokens": [
+                  "she",
+                  "glanced",
+                  "my",
+                  "way",
+                  "it",
+                  "sure",
+                  "looks",
+                  "like",
+                  "you",
+                  "need",
+                  "it"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              },
+              "hypothesis": {
+                "tokens": [
+                  "she",
+                  "glanced",
+                  "my",
+                  "way",
+                  "here",
+                  "charlie",
+                  "looks",
+                  "like",
+                  "you",
+                  "need",
+                  "it"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              }
+            },
+            "deletions": 0,
+            "insertions": 0,
+            "substitutions": 2
+          },
+          "evaluation_seconds": 0.0024235418532043695,
+          "preview_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/pair-b66f3ac1f67b164b0cd8ec08dcb032c7dd168806f1c20ebf8b1050f977ad8158.wav",
+          "start_seconds": 63.68,
+          "end_seconds": 63.68
+        },
+        "issues": [
+          {
+            "code": "unexpected_gap",
+            "dimension": "stitching",
+            "scope_id": "5:7:narrator:chunk:1|5:8:juli:chunk:1",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "features": {
+                "sample_jump": 0.004456780385226011,
+                "rms_jump_db": 54.34170203484144,
+                "spectral_distance": 1.0961421728134155,
+                "left_speech_edge": 0.0,
+                "right_speech_edge": 1.0,
+                "left_tail_silence": 1.9,
+                "right_head_silence": 0.0,
+                "planned_pause_seconds": 0.2,
+                "same_speaker": 0.0
+              },
+              "threshold_kind": "heuristic"
+            }
+          },
+          {
+            "code": "boundary_content_mismatch",
+            "dimension": "content",
+            "scope_id": "5:7:narrator:chunk:1|5:8:juli:chunk:1",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "error_rate": 0.18181818181818182,
+              "operations": [
+                {
+                  "kind": "replace",
+                  "reference_index": 4,
+                  "hypothesis_index": 4,
+                  "reference": "it",
+                  "hypothesis": "here"
+                },
+                {
+                  "kind": "replace",
+                  "reference_index": 5,
+                  "hypothesis_index": 5,
+                  "reference": "sure",
+                  "hypothesis": "charlie"
+                }
+              ],
+              "reference": "she glanced my way it sure looks like you need it",
+              "hypothesis": "she glanced my way here charlie looks like you need it",
+              "reference_tokens": [
+                "she",
+                "glanced",
+                "my",
+                "way",
+                "it",
+                "sure",
+                "looks",
+                "like",
+                "you",
+                "need",
+                "it"
+              ],
+              "hypothesis_tokens": [
+                "she",
+                "glanced",
+                "my",
+                "way",
+                "here",
+                "charlie",
+                "looks",
+                "like",
+                "you",
+                "need",
+                "it"
+              ],
+              "language": "en",
+              "error_metric": "WER",
+              "alignment_unit": "word",
+              "reference_unit_count": 11,
+              "normalization_version": "bilingual-reading-v6",
+              "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+              "comparison_normalization": {
+                "reference": {
+                  "tokens": [
+                    "she",
+                    "glanced",
+                    "my",
+                    "way",
+                    "it",
+                    "sure",
+                    "looks",
+                    "like",
+                    "you",
+                    "need",
+                    "it"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                },
+                "hypothesis": {
+                  "tokens": [
+                    "she",
+                    "glanced",
+                    "my",
+                    "way",
+                    "here",
+                    "charlie",
+                    "looks",
+                    "like",
+                    "you",
+                    "need",
+                    "it"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                }
+              },
+              "deletions": 0,
+              "insertions": 0,
+              "substitutions": 2
+            }
+          }
+        ],
+        "version": "audio-core-v1",
+        "status": "incomplete"
+      },
+      "review_status": "pending",
+      "focused_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/J009_pause_context.wav",
+      "focused_audio_sha256": "76d6abda528aec275df92c9fa9d12098ff19396b4c52db23210b629b41f97957",
+      "context_start_seconds": 60.88,
+      "pause_hint_seconds": 1.9,
+      "duration_seconds": 4.0
+    },
+    {
+      "sample_id": "J013",
+      "boundary_id": "5:11:narrator:chunk:1|5:12:bryce_father:chunk:1",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/J013.wav",
+      "audio_sha256": "404d90945dd6f18ac40610dfc3b51efb50a1f62052a042c91d006b9057725ccf",
+      "chapter_seconds": 81.44,
+      "boundary_at_seconds": 1.8,
+      "left_text": " he warned her. ",
+      "right_text": "“There are some really valuable things in that box.”",
+      "left_role": "narrator",
+      "right_role": "bryce_father",
+      "machine_report_on_original": {
+        "scope_id": "5:11:narrator:chunk:1|5:12:bryce_father:chunk:1",
+        "dimensions": {
+          "stitching": "incomplete",
+          "content": "passed"
+        },
+        "metrics": {
+          "features": {
+            "sample_jump": 0.001330690924078226,
+            "rms_jump_db": 32.1532760425781,
+            "spectral_distance": 1.073054313659668,
+            "left_speech_edge": 0.0,
+            "right_speech_edge": 0.0,
+            "left_tail_silence": 2.18,
+            "right_head_silence": 0.16,
+            "planned_pause_seconds": 0.2,
+            "same_speaker": 0.0
+          },
+          "threshold_kind": "heuristic",
+          "content_alignment": {
+            "error_rate": 0.0,
+            "operations": [],
+            "reference": "he warned her there are some really valuable things in that box",
+            "hypothesis": "he warned her there are some really valuable things in that box",
+            "reference_tokens": [
+              "he",
+              "warned",
+              "her",
+              "there",
+              "are",
+              "some",
+              "really",
+              "valuable",
+              "things",
+              "in",
+              "that",
+              "box"
+            ],
+            "hypothesis_tokens": [
+              "he",
+              "warned",
+              "her",
+              "there",
+              "are",
+              "some",
+              "really",
+              "valuable",
+              "things",
+              "in",
+              "that",
+              "box"
+            ],
+            "language": "en",
+            "error_metric": "WER",
+            "alignment_unit": "word",
+            "reference_unit_count": 12,
+            "normalization_version": "bilingual-reading-v6",
+            "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+            "comparison_normalization": {
+              "reference": {
+                "tokens": [
+                  "he",
+                  "warned",
+                  "her",
+                  "there",
+                  "are",
+                  "some",
+                  "really",
+                  "valuable",
+                  "things",
+                  "in",
+                  "that",
+                  "box"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              },
+              "hypothesis": {
+                "tokens": [
+                  "he",
+                  "warned",
+                  "her",
+                  "there",
+                  "are",
+                  "some",
+                  "really",
+                  "valuable",
+                  "things",
+                  "in",
+                  "that",
+                  "box"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              }
+            },
+            "deletions": 0,
+            "insertions": 0,
+            "substitutions": 0
+          },
+          "evaluation_seconds": 0.14795187511481345,
+          "preview_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/pair-6c75d9594ef1189261bf17b2fdd3af0a7f7974fbc6a7627b0ac4897fbbb0fa43.wav",
+          "start_seconds": 81.44,
+          "end_seconds": 81.44
+        },
+        "issues": [
+          {
+            "code": "unexpected_gap",
+            "dimension": "stitching",
+            "scope_id": "5:11:narrator:chunk:1|5:12:bryce_father:chunk:1",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "features": {
+                "sample_jump": 0.001330690924078226,
+                "rms_jump_db": 32.1532760425781,
+                "spectral_distance": 1.073054313659668,
+                "left_speech_edge": 0.0,
+                "right_speech_edge": 0.0,
+                "left_tail_silence": 2.18,
+                "right_head_silence": 0.16,
+                "planned_pause_seconds": 0.2,
+                "same_speaker": 0.0
+              },
+              "threshold_kind": "heuristic"
+            }
+          }
+        ],
+        "version": "audio-core-v1",
+        "status": "incomplete"
+      },
+      "review_status": "pending",
+      "focused_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/J013_pause_context.wav",
+      "focused_audio_sha256": "daa730d898390dff7f702490bd4a19a308cbc0a0d9c1b36c260e2e6287cafa29",
+      "context_start_seconds": 78.56,
+      "pause_hint_seconds": 2.3400000000000003,
+      "duration_seconds": 4.24
+    },
+    {
+      "sample_id": "J023",
+      "boundary_id": "5:23:narrator:chunk:1|5:24:juli:chunk:1",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/J023.wav",
+      "audio_sha256": "2c630293234796f6d17d48c8557a61c6f2816c617c16183cccd4b5c5cfec396c",
+      "chapter_seconds": 136.1,
+      "boundary_at_seconds": 1.8,
+      "left_text": " Then she points across the street and says, ",
+      "right_text": "“We just live right over there.”",
+      "left_role": "narrator",
+      "right_role": "juli",
+      "machine_report_on_original": {
+        "scope_id": "5:23:narrator:chunk:1|5:24:juli:chunk:1",
+        "dimensions": {
+          "stitching": "incomplete",
+          "content": "passed"
+        },
+        "metrics": {
+          "features": {
+            "sample_jump": 0.004020377062261105,
+            "rms_jump_db": 50.56674669000164,
+            "spectral_distance": 1.1651036739349365,
+            "left_speech_edge": 0.0,
+            "right_speech_edge": 1.0,
+            "left_tail_silence": 2.2,
+            "right_head_silence": 0.0,
+            "planned_pause_seconds": 0.2,
+            "same_speaker": 0.0
+          },
+          "threshold_kind": "heuristic",
+          "content_alignment": {
+            "error_rate": 0.0,
+            "operations": [],
+            "reference": "then she points across the street and says we just live right over there",
+            "hypothesis": "then she points across the street and says we just live right over there",
+            "reference_tokens": [
+              "then",
+              "she",
+              "points",
+              "across",
+              "the",
+              "street",
+              "and",
+              "says",
+              "we",
+              "just",
+              "live",
+              "right",
+              "over",
+              "there"
+            ],
+            "hypothesis_tokens": [
+              "then",
+              "she",
+              "points",
+              "across",
+              "the",
+              "street",
+              "and",
+              "says",
+              "we",
+              "just",
+              "live",
+              "right",
+              "over",
+              "there"
+            ],
+            "language": "en",
+            "error_metric": "WER",
+            "alignment_unit": "word",
+            "reference_unit_count": 14,
+            "normalization_version": "bilingual-reading-v6",
+            "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+            "comparison_normalization": {
+              "reference": {
+                "tokens": [
+                  "then",
+                  "she",
+                  "points",
+                  "across",
+                  "the",
+                  "street",
+                  "and",
+                  "says",
+                  "we",
+                  "just",
+                  "live",
+                  "right",
+                  "over",
+                  "there"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              },
+              "hypothesis": {
+                "tokens": [
+                  "then",
+                  "she",
+                  "points",
+                  "across",
+                  "the",
+                  "street",
+                  "and",
+                  "says",
+                  "we",
+                  "just",
+                  "live",
+                  "right",
+                  "over",
+                  "there"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              }
+            },
+            "deletions": 0,
+            "insertions": 0,
+            "substitutions": 0
+          },
+          "evaluation_seconds": 0.15560208400711417,
+          "preview_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/pair-d4613e0d5890c9a616d3587b3f5075ee797a1611d5f1cceaec8171d1811ff868.wav",
+          "start_seconds": 136.1,
+          "end_seconds": 136.1
+        },
+        "issues": [
+          {
+            "code": "unexpected_gap",
+            "dimension": "stitching",
+            "scope_id": "5:23:narrator:chunk:1|5:24:juli:chunk:1",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "features": {
+                "sample_jump": 0.004020377062261105,
+                "rms_jump_db": 50.56674669000164,
+                "spectral_distance": 1.1651036739349365,
+                "left_speech_edge": 0.0,
+                "right_speech_edge": 1.0,
+                "left_tail_silence": 2.2,
+                "right_head_silence": 0.0,
+                "planned_pause_seconds": 0.2,
+                "same_speaker": 0.0
+              },
+              "threshold_kind": "heuristic"
+            }
+          }
+        ],
+        "version": "audio-core-v1",
+        "status": "incomplete"
+      },
+      "review_status": "pending",
+      "focused_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/J023_pause_context.wav",
+      "focused_audio_sha256": "295e264fc5a3d64dc18e3042dc250af23fced3571241dd8cd839fc5821457112",
+      "context_start_seconds": 133.0,
+      "pause_hint_seconds": 2.2,
+      "duration_seconds": 4.3
+    },
+    {
+      "sample_id": "J076",
+      "boundary_id": "5:60:classmates:chunk:1|5:61:narrator:chunk:1",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/J076.wav",
+      "audio_sha256": "52246b8da62aa04810f6157f364c532ae0c33dea7db9fd332744fb8d9d24e597",
+      "chapter_seconds": 584.38,
+      "boundary_at_seconds": 1.8,
+      "left_text": "“Are you married yet, Bryce?”",
+      "right_text": " And then when she chased me around at recess and tried to lay kisses on me, the whole school started singing, ",
+      "left_role": "classmates",
+      "right_role": "narrator",
+      "machine_report_on_original": {
+        "scope_id": "5:60:classmates:chunk:1|5:61:narrator:chunk:1",
+        "dimensions": {
+          "stitching": "incomplete",
+          "content": "incomplete"
+        },
+        "metrics": {
+          "features": {
+            "sample_jump": 2.083544313791208e-05,
+            "rms_jump_db": 1.0437637110141198,
+            "spectral_distance": 0.39124730229377747,
+            "left_speech_edge": 0.0,
+            "right_speech_edge": 0.0,
+            "left_tail_silence": 1.86,
+            "right_head_silence": 0.06,
+            "planned_pause_seconds": 0.2,
+            "same_speaker": 0.0
+          },
+          "threshold_kind": "heuristic",
+          "content_alignment": {
+            "error_rate": 0.07692307692307693,
+            "operations": [
+              {
+                "kind": "replace",
+                "reference_index": 3,
+                "hypothesis_index": 3,
+                "reference": "yet",
+                "hypothesis": "de"
+              },
+              {
+                "kind": "replace",
+                "reference_index": 4,
+                "hypothesis_index": 4,
+                "reference": "bryce",
+                "hypothesis": "bce"
+              }
+            ],
+            "reference": "are you married yet bryce and then when she chased me around at recess and tried to lay kisses on me the whole school started singing",
+            "hypothesis": "are you married de bce and then when she chased me around at recess and tried to lay kisses on me the whole school started singing",
+            "reference_tokens": [
+              "are",
+              "you",
+              "married",
+              "yet",
+              "bryce",
+              "and",
+              "then",
+              "when",
+              "she",
+              "chased",
+              "me",
+              "around",
+              "at",
+              "recess",
+              "and",
+              "tried",
+              "to",
+              "lay",
+              "kisses",
+              "on",
+              "me",
+              "the",
+              "whole",
+              "school",
+              "started",
+              "singing"
+            ],
+            "hypothesis_tokens": [
+              "are",
+              "you",
+              "married",
+              "de",
+              "bce",
+              "and",
+              "then",
+              "when",
+              "she",
+              "chased",
+              "me",
+              "around",
+              "at",
+              "recess",
+              "and",
+              "tried",
+              "to",
+              "lay",
+              "kisses",
+              "on",
+              "me",
+              "the",
+              "whole",
+              "school",
+              "started",
+              "singing"
+            ],
+            "language": "en",
+            "error_metric": "WER",
+            "alignment_unit": "word",
+            "reference_unit_count": 26,
+            "normalization_version": "bilingual-reading-v6",
+            "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+            "comparison_normalization": {
+              "reference": {
+                "tokens": [
+                  "are",
+                  "you",
+                  "married",
+                  "yet",
+                  "bryce",
+                  "and",
+                  "then",
+                  "when",
+                  "she",
+                  "chased",
+                  "me",
+                  "around",
+                  "at",
+                  "recess",
+                  "and",
+                  "tried",
+                  "to",
+                  "lay",
+                  "kisses",
+                  "on",
+                  "me",
+                  "the",
+                  "whole",
+                  "school",
+                  "started",
+                  "singing"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              },
+              "hypothesis": {
+                "tokens": [
+                  "are",
+                  "you",
+                  "married",
+                  "de",
+                  "bce",
+                  "and",
+                  "then",
+                  "when",
+                  "she",
+                  "chased",
+                  "me",
+                  "around",
+                  "at",
+                  "recess",
+                  "and",
+                  "tried",
+                  "to",
+                  "lay",
+                  "kisses",
+                  "on",
+                  "me",
+                  "the",
+                  "whole",
+                  "school",
+                  "started",
+                  "singing"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              }
+            },
+            "deletions": 0,
+            "insertions": 0,
+            "substitutions": 2
+          },
+          "evaluation_seconds": 0.16786816692911088,
+          "preview_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/pair-ad1f07c9a4493639c943354b9f32f7bb53f9b9cf9a8b8a3988373a4a3cf81f7e.wav",
+          "start_seconds": 584.38,
+          "end_seconds": 584.38
+        },
+        "issues": [
+          {
+            "code": "unexpected_gap",
+            "dimension": "stitching",
+            "scope_id": "5:60:classmates:chunk:1|5:61:narrator:chunk:1",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "features": {
+                "sample_jump": 2.083544313791208e-05,
+                "rms_jump_db": 1.0437637110141198,
+                "spectral_distance": 0.39124730229377747,
+                "left_speech_edge": 0.0,
+                "right_speech_edge": 0.0,
+                "left_tail_silence": 1.86,
+                "right_head_silence": 0.06,
+                "planned_pause_seconds": 0.2,
+                "same_speaker": 0.0
+              },
+              "threshold_kind": "heuristic"
+            }
+          },
+          {
+            "code": "boundary_content_mismatch",
+            "dimension": "content",
+            "scope_id": "5:60:classmates:chunk:1|5:61:narrator:chunk:1",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "error_rate": 0.07692307692307693,
+              "operations": [
+                {
+                  "kind": "replace",
+                  "reference_index": 3,
+                  "hypothesis_index": 3,
+                  "reference": "yet",
+                  "hypothesis": "de"
+                },
+                {
+                  "kind": "replace",
+                  "reference_index": 4,
+                  "hypothesis_index": 4,
+                  "reference": "bryce",
+                  "hypothesis": "bce"
+                }
+              ],
+              "reference": "are you married yet bryce and then when she chased me around at recess and tried to lay kisses on me the whole school started singing",
+              "hypothesis": "are you married de bce and then when she chased me around at recess and tried to lay kisses on me the whole school started singing",
+              "reference_tokens": [
+                "are",
+                "you",
+                "married",
+                "yet",
+                "bryce",
+                "and",
+                "then",
+                "when",
+                "she",
+                "chased",
+                "me",
+                "around",
+                "at",
+                "recess",
+                "and",
+                "tried",
+                "to",
+                "lay",
+                "kisses",
+                "on",
+                "me",
+                "the",
+                "whole",
+                "school",
+                "started",
+                "singing"
+              ],
+              "hypothesis_tokens": [
+                "are",
+                "you",
+                "married",
+                "de",
+                "bce",
+                "and",
+                "then",
+                "when",
+                "she",
+                "chased",
+                "me",
+                "around",
+                "at",
+                "recess",
+                "and",
+                "tried",
+                "to",
+                "lay",
+                "kisses",
+                "on",
+                "me",
+                "the",
+                "whole",
+                "school",
+                "started",
+                "singing"
+              ],
+              "language": "en",
+              "error_metric": "WER",
+              "alignment_unit": "word",
+              "reference_unit_count": 26,
+              "normalization_version": "bilingual-reading-v6",
+              "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+              "comparison_normalization": {
+                "reference": {
+                  "tokens": [
+                    "are",
+                    "you",
+                    "married",
+                    "yet",
+                    "bryce",
+                    "and",
+                    "then",
+                    "when",
+                    "she",
+                    "chased",
+                    "me",
+                    "around",
+                    "at",
+                    "recess",
+                    "and",
+                    "tried",
+                    "to",
+                    "lay",
+                    "kisses",
+                    "on",
+                    "me",
+                    "the",
+                    "whole",
+                    "school",
+                    "started",
+                    "singing"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                },
+                "hypothesis": {
+                  "tokens": [
+                    "are",
+                    "you",
+                    "married",
+                    "de",
+                    "bce",
+                    "and",
+                    "then",
+                    "when",
+                    "she",
+                    "chased",
+                    "me",
+                    "around",
+                    "at",
+                    "recess",
+                    "and",
+                    "tried",
+                    "to",
+                    "lay",
+                    "kisses",
+                    "on",
+                    "me",
+                    "the",
+                    "whole",
+                    "school",
+                    "started",
+                    "singing"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                }
+              },
+              "deletions": 0,
+              "insertions": 0,
+              "substitutions": 2
+            }
+          }
+        ],
+        "version": "audio-core-v1",
+        "status": "incomplete"
+      },
+      "review_status": "pending",
+      "focused_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/J076_pause_context.wav",
+      "focused_audio_sha256": "54fb1253a092a33dd0453a91f65e52719283fc10a1cfe11cf024849274a2c321",
+      "context_start_seconds": 581.62,
+      "pause_hint_seconds": 1.9200000000000002,
+      "duration_seconds": 4.02
+    }
+  ],
+  "voice_sampling": [
+    {
+      "sample_id": "R001",
+      "chunk_id": "5:1:narrator:chunk:1",
+      "role_id": "narrator",
+      "text": "Diving Under All I've ever wanted is for Juli Baker to leave me alone. For her to back off — you know, just give me some space. It all started the summer before second grade when our moving van pulled into her neighborhood.",
+      "source_span": {
+        "chapter_index": 5,
+        "start": 0,
+        "end": 223
+      },
+      "start_seconds": 0.0,
+      "end_seconds": 14.24,
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/R001.wav",
+      "audio_sha256": "0ef58edb31d5bb0f3a5111f1d36e6afb9ba9da022627ce11f446072bed912a14",
+      "original_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/41eeb0c853b983897bf02ef30996728578fe2478491f2e276398599185a5bee8.wav",
+      "original_audio_sha256": "e86df886c8ae0714dc1f32ef65fe640d592785e7a2a4662392131cf49c8b1a9e",
+      "gain_db": 0.0,
+      "gain": 1.0,
+      "input_loudness": {
+        "integrated_lufs": -23.25,
+        "true_peak_dbfs": -5.48,
+        "lra_lu": 3.4,
+        "gate_lufs": -33.71,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "machine_report": {
+        "scope_id": "5:1:narrator:chunk:1",
+        "dimensions": {
+          "signal": "passed",
+          "content": "incomplete",
+          "consistency": "incomplete"
+        },
+        "metrics": {
+          "evaluation_models": {
+            "asr": {
+              "kind": "asr",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/SenseVoiceSmall",
+              "state": "local_files",
+              "runtime_version": "1.4.16",
+              "files": [
+                {
+                  "path": "am.mvn",
+                  "bytes": 11203,
+                  "sha256": "29b3c740a2c0cfc6b308126d31d7f265fa2be74f3bb095cd2f143ea970896ae5"
+                },
+                {
+                  "path": "chn_jpn_yue_eng_ko_spectok.bpe.model",
+                  "bytes": 377341,
+                  "sha256": "aa87f86064c3730d799ddf7af3c04659151102cba548bce325cf06ba4da4e6a8"
+                },
+                {
+                  "path": "config.yaml",
+                  "bytes": 1855,
+                  "sha256": "f71e239ba36705564b5bf2d2ffd07eece07b8e3f2bbf6d2c99d8df856339ac19"
+                },
+                {
+                  "path": "configuration.json",
+                  "bytes": 396,
+                  "sha256": "02810a7f8e9e8aee10370a265f7e799728ce25b4c00cdbf4602b303ee395a38e"
+                },
+                {
+                  "path": "model.pt",
+                  "bytes": 936291369,
+                  "sha256": "833ca2dcfdf8ec91bd4f31cfac36d6124e0c459074d5e909aec9cabe6204a3ea"
+                }
+              ],
+              "fingerprint": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6"
+            },
+            "speaker": {
+              "kind": "speaker",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/ecapa",
+              "state": "local_files",
+              "runtime_version": "1.1.1",
+              "files": [
+                {
+                  "path": "classifier.ckpt",
+                  "bytes": 5534328,
+                  "sha256": "fd9e3634fe68bd0a427c95e354c0c677374f62b3f434e45b78599950d860d535"
+                },
+                {
+                  "path": "embedding_model.ckpt",
+                  "bytes": 83316686,
+                  "sha256": "0575cb64845e6b9a10db9bcb74d5ac32b326b8dc90352671d345e2ee3d0126a2"
+                },
+                {
+                  "path": "hyperparams.yaml",
+                  "bytes": 1919,
+                  "sha256": "6f78854fa04ba59e761437b76a2575d3aba5e5016de3e9b69f0c9a5077fb1a41"
+                },
+                {
+                  "path": "label_encoder.ckpt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "label_encoder.txt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "mean_var_norm_emb.ckpt",
+                  "bytes": 1921,
+                  "sha256": "cd70225b05b37be64fc5a95e24395d804231d43f74b2e1e5a513db7b69b34c33"
+                }
+              ],
+              "fingerprint": "9cc19ee039c6ded8c46311e5b94b2595a9c9ff2d11fed1a29fb838ddd7b15f27"
+            }
+          },
+          "duration_seconds": 14.24,
+          "sample_rate": 24000,
+          "samples": 341760,
+          "peak": 0.52972412109375,
+          "clipped_fraction": 0.0,
+          "active_seconds": 10.0,
+          "silence_fraction": 0.297752808988764,
+          "rms_dbfs": -23.51617792246875,
+          "pitch": {
+            "median_hz": 125.0,
+            "iqr_hz": 24.408848207475216,
+            "voiced_frames": 349
+          },
+          "language": "en",
+          "reading_unit": "word",
+          "reading_unit_count": 42,
+          "reading_count_basis": "normalized_reference_not_observed_word_timestamps",
+          "articulation_rate_unit": "words_per_second",
+          "rate_threshold": 5.0,
+          "rate_threshold_kind": "uncalibrated_heuristic",
+          "articulation_rate": 4.2,
+          "overall_rate": 2.9494382022471908,
+          "words_per_minute": 176.96629213483143,
+          "content_alignment": {
+            "error_rate": 0.023809523809523808,
+            "operations": [
+              {
+                "kind": "replace",
+                "reference_index": 8,
+                "hypothesis_index": 8,
+                "reference": "juli",
+                "hypothesis": "holy"
+              }
+            ],
+            "reference": "diving under all i've ever wanted is for juli baker to leave me alone for her to back off you know just give me some space it all started the summer before second grade when our moving van pulled into her neighborhood",
+            "hypothesis": "diving under all i've ever wanted is for holy baker to leave me alone for her to back off you know just give me some space it all started the summer before second grade when our moving van pulled into her neighborhood",
+            "reference_tokens": [
+              "diving",
+              "under",
+              "all",
+              "i've",
+              "ever",
+              "wanted",
+              "is",
+              "for",
+              "juli",
+              "baker",
+              "to",
+              "leave",
+              "me",
+              "alone",
+              "for",
+              "her",
+              "to",
+              "back",
+              "off",
+              "you",
+              "know",
+              "just",
+              "give",
+              "me",
+              "some",
+              "space",
+              "it",
+              "all",
+              "started",
+              "the",
+              "summer",
+              "before",
+              "second",
+              "grade",
+              "when",
+              "our",
+              "moving",
+              "van",
+              "pulled",
+              "into",
+              "her",
+              "neighborhood"
+            ],
+            "hypothesis_tokens": [
+              "diving",
+              "under",
+              "all",
+              "i've",
+              "ever",
+              "wanted",
+              "is",
+              "for",
+              "holy",
+              "baker",
+              "to",
+              "leave",
+              "me",
+              "alone",
+              "for",
+              "her",
+              "to",
+              "back",
+              "off",
+              "you",
+              "know",
+              "just",
+              "give",
+              "me",
+              "some",
+              "space",
+              "it",
+              "all",
+              "started",
+              "the",
+              "summer",
+              "before",
+              "second",
+              "grade",
+              "when",
+              "our",
+              "moving",
+              "van",
+              "pulled",
+              "into",
+              "her",
+              "neighborhood"
+            ],
+            "language": "en",
+            "error_metric": "WER",
+            "alignment_unit": "word",
+            "reference_unit_count": 42,
+            "normalization_version": "bilingual-reading-v6",
+            "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+            "comparison_normalization": {
+              "reference": {
+                "tokens": [
+                  "diving",
+                  "under",
+                  "all",
+                  "i've",
+                  "ever",
+                  "wanted",
+                  "is",
+                  "for",
+                  "juli",
+                  "baker",
+                  "to",
+                  "leave",
+                  "me",
+                  "alone",
+                  "for",
+                  "her",
+                  "to",
+                  "back",
+                  "off",
+                  "you",
+                  "know",
+                  "just",
+                  "give",
+                  "me",
+                  "some",
+                  "space",
+                  "it",
+                  "all",
+                  "started",
+                  "the",
+                  "summer",
+                  "before",
+                  "second",
+                  "grade",
+                  "when",
+                  "our",
+                  "moving",
+                  "van",
+                  "pulled",
+                  "into",
+                  "her",
+                  "neighborhood"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              },
+              "hypothesis": {
+                "tokens": [
+                  "diving",
+                  "under",
+                  "all",
+                  "i've",
+                  "ever",
+                  "wanted",
+                  "is",
+                  "for",
+                  "holy",
+                  "baker",
+                  "to",
+                  "leave",
+                  "me",
+                  "alone",
+                  "for",
+                  "her",
+                  "to",
+                  "back",
+                  "off",
+                  "you",
+                  "know",
+                  "just",
+                  "give",
+                  "me",
+                  "some",
+                  "space",
+                  "it",
+                  "all",
+                  "started",
+                  "the",
+                  "summer",
+                  "before",
+                  "second",
+                  "grade",
+                  "when",
+                  "our",
+                  "moving",
+                  "van",
+                  "pulled",
+                  "into",
+                  "her",
+                  "neighborhood"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              }
+            },
+            "deletions": 0,
+            "insertions": 0,
+            "substitutions": 1
+          },
+          "rate_policy_version": "reference-rate-content-gate-v1",
+          "rate_estimate_usable_for_heuristics": false,
+          "rate_estimate_status": "unreliable_content_mismatch",
+          "consistency_reference": {
+            "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_bryce_candidates_20261017/project/raw/6cee1c732df89a9e09342ce32e60cc6dcc0b744722d8e7b2a47f801598b84bbc/41769d912c934b58aba4ff190a3c53b2.wav",
+            "kind": "human_confirmed_fixed_reference",
+            "sha256": "8d0cd3ea2cb6b37b4b83dd421196d5ea45f95f21cfb122b7a819e931d5b8b57f"
+          },
+          "rate_reference_unavailable": "current_content_mismatch",
+          "pitch_shift_semitones": 1.0495540950040727,
+          "speaker_distance": 0.3994520576510212,
+          "speaker_threshold_kind": "uncalibrated",
+          "evaluation_seconds": 4.7687025419436395,
+          "start_seconds": 0.0,
+          "end_seconds": 14.24
+        },
+        "issues": [
+          {
+            "code": "asr_mismatch",
+            "dimension": "content",
+            "scope_id": "5:1:narrator:chunk:1",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "error_rate": 0.023809523809523808,
+              "operations": [
+                {
+                  "kind": "replace",
+                  "reference_index": 8,
+                  "hypothesis_index": 8,
+                  "reference": "juli",
+                  "hypothesis": "holy"
+                }
+              ],
+              "reference": "diving under all i've ever wanted is for juli baker to leave me alone for her to back off you know just give me some space it all started the summer before second grade when our moving van pulled into her neighborhood",
+              "hypothesis": "diving under all i've ever wanted is for holy baker to leave me alone for her to back off you know just give me some space it all started the summer before second grade when our moving van pulled into her neighborhood",
+              "reference_tokens": [
+                "diving",
+                "under",
+                "all",
+                "i've",
+                "ever",
+                "wanted",
+                "is",
+                "for",
+                "juli",
+                "baker",
+                "to",
+                "leave",
+                "me",
+                "alone",
+                "for",
+                "her",
+                "to",
+                "back",
+                "off",
+                "you",
+                "know",
+                "just",
+                "give",
+                "me",
+                "some",
+                "space",
+                "it",
+                "all",
+                "started",
+                "the",
+                "summer",
+                "before",
+                "second",
+                "grade",
+                "when",
+                "our",
+                "moving",
+                "van",
+                "pulled",
+                "into",
+                "her",
+                "neighborhood"
+              ],
+              "hypothesis_tokens": [
+                "diving",
+                "under",
+                "all",
+                "i've",
+                "ever",
+                "wanted",
+                "is",
+                "for",
+                "holy",
+                "baker",
+                "to",
+                "leave",
+                "me",
+                "alone",
+                "for",
+                "her",
+                "to",
+                "back",
+                "off",
+                "you",
+                "know",
+                "just",
+                "give",
+                "me",
+                "some",
+                "space",
+                "it",
+                "all",
+                "started",
+                "the",
+                "summer",
+                "before",
+                "second",
+                "grade",
+                "when",
+                "our",
+                "moving",
+                "van",
+                "pulled",
+                "into",
+                "her",
+                "neighborhood"
+              ],
+              "language": "en",
+              "error_metric": "WER",
+              "alignment_unit": "word",
+              "reference_unit_count": 42,
+              "normalization_version": "bilingual-reading-v6",
+              "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+              "comparison_normalization": {
+                "reference": {
+                  "tokens": [
+                    "diving",
+                    "under",
+                    "all",
+                    "i've",
+                    "ever",
+                    "wanted",
+                    "is",
+                    "for",
+                    "juli",
+                    "baker",
+                    "to",
+                    "leave",
+                    "me",
+                    "alone",
+                    "for",
+                    "her",
+                    "to",
+                    "back",
+                    "off",
+                    "you",
+                    "know",
+                    "just",
+                    "give",
+                    "me",
+                    "some",
+                    "space",
+                    "it",
+                    "all",
+                    "started",
+                    "the",
+                    "summer",
+                    "before",
+                    "second",
+                    "grade",
+                    "when",
+                    "our",
+                    "moving",
+                    "van",
+                    "pulled",
+                    "into",
+                    "her",
+                    "neighborhood"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                },
+                "hypothesis": {
+                  "tokens": [
+                    "diving",
+                    "under",
+                    "all",
+                    "i've",
+                    "ever",
+                    "wanted",
+                    "is",
+                    "for",
+                    "holy",
+                    "baker",
+                    "to",
+                    "leave",
+                    "me",
+                    "alone",
+                    "for",
+                    "her",
+                    "to",
+                    "back",
+                    "off",
+                    "you",
+                    "know",
+                    "just",
+                    "give",
+                    "me",
+                    "some",
+                    "space",
+                    "it",
+                    "all",
+                    "started",
+                    "the",
+                    "summer",
+                    "before",
+                    "second",
+                    "grade",
+                    "when",
+                    "our",
+                    "moving",
+                    "van",
+                    "pulled",
+                    "into",
+                    "her",
+                    "neighborhood"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                }
+              },
+              "deletions": 0,
+              "insertions": 0,
+              "substitutions": 1
+            }
+          },
+          {
+            "code": "speaker_drift",
+            "dimension": "consistency",
+            "scope_id": "5:1:narrator:chunk:1",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "distance": 0.3994520576510212,
+              "threshold": 0.35,
+              "threshold_kind": "heuristic"
+            }
+          }
+        ],
+        "version": "audio-core-v1",
+        "status": "incomplete"
+      },
+      "machine_priority": 0,
+      "previously_heard_same_content_and_identity": false,
+      "unavailable_evidence": {},
+      "whole_chapter_review_status": "pending"
+    },
+    {
+      "sample_id": "R051",
+      "chunk_id": "5:47:narrator:chunk:2",
+      "role_id": "narrator",
+      "text": " I didn't exactly give her a tour. I locked myself in the bathroom instead. And after about ten minutes of yelling back at her that no, I wasn't coming out anytime soon, things got quiet out in the hall. Another ten minutes went by before I got the nerve to peek out the door. No Juli.",
+      "source_span": {
+        "chapter_index": 5,
+        "start": 4262,
+        "end": 4547
+      },
+      "start_seconds": 306.58,
+      "end_seconds": 324.18,
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/R051.wav",
+      "audio_sha256": "56073bafb91b538aa92fc80452fddfd5026ff2ab943c8867038a5a095cf2cfd5",
+      "original_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/0d12543962b67b509f35f8fc2f109784b320f2366d36d7044e4e15f56e17adc9.wav",
+      "original_audio_sha256": "f99f40b093b60b2c123acc8e3a219b382496d7d031e4cbd6bf9ad6d2cd1aa643",
+      "gain_db": 0.0,
+      "gain": 1.0,
+      "input_loudness": {
+        "integrated_lufs": -22.45,
+        "true_peak_dbfs": -4.08,
+        "lra_lu": 4.5,
+        "gate_lufs": -32.75,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "machine_report": {
+        "scope_id": "5:47:narrator:chunk:2",
+        "dimensions": {
+          "signal": "passed",
+          "content": "incomplete",
+          "consistency": "incomplete"
+        },
+        "metrics": {
+          "evaluation_models": {
+            "asr": {
+              "kind": "asr",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/SenseVoiceSmall",
+              "state": "local_files",
+              "runtime_version": "1.4.16",
+              "files": [
+                {
+                  "path": "am.mvn",
+                  "bytes": 11203,
+                  "sha256": "29b3c740a2c0cfc6b308126d31d7f265fa2be74f3bb095cd2f143ea970896ae5"
+                },
+                {
+                  "path": "chn_jpn_yue_eng_ko_spectok.bpe.model",
+                  "bytes": 377341,
+                  "sha256": "aa87f86064c3730d799ddf7af3c04659151102cba548bce325cf06ba4da4e6a8"
+                },
+                {
+                  "path": "config.yaml",
+                  "bytes": 1855,
+                  "sha256": "f71e239ba36705564b5bf2d2ffd07eece07b8e3f2bbf6d2c99d8df856339ac19"
+                },
+                {
+                  "path": "configuration.json",
+                  "bytes": 396,
+                  "sha256": "02810a7f8e9e8aee10370a265f7e799728ce25b4c00cdbf4602b303ee395a38e"
+                },
+                {
+                  "path": "model.pt",
+                  "bytes": 936291369,
+                  "sha256": "833ca2dcfdf8ec91bd4f31cfac36d6124e0c459074d5e909aec9cabe6204a3ea"
+                }
+              ],
+              "fingerprint": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6"
+            },
+            "speaker": {
+              "kind": "speaker",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/ecapa",
+              "state": "local_files",
+              "runtime_version": "1.1.1",
+              "files": [
+                {
+                  "path": "classifier.ckpt",
+                  "bytes": 5534328,
+                  "sha256": "fd9e3634fe68bd0a427c95e354c0c677374f62b3f434e45b78599950d860d535"
+                },
+                {
+                  "path": "embedding_model.ckpt",
+                  "bytes": 83316686,
+                  "sha256": "0575cb64845e6b9a10db9bcb74d5ac32b326b8dc90352671d345e2ee3d0126a2"
+                },
+                {
+                  "path": "hyperparams.yaml",
+                  "bytes": 1919,
+                  "sha256": "6f78854fa04ba59e761437b76a2575d3aba5e5016de3e9b69f0c9a5077fb1a41"
+                },
+                {
+                  "path": "label_encoder.ckpt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "label_encoder.txt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "mean_var_norm_emb.ckpt",
+                  "bytes": 1921,
+                  "sha256": "cd70225b05b37be64fc5a95e24395d804231d43f74b2e1e5a513db7b69b34c33"
+                }
+              ],
+              "fingerprint": "9cc19ee039c6ded8c46311e5b94b2595a9c9ff2d11fed1a29fb838ddd7b15f27"
+            }
+          },
+          "duration_seconds": 17.6,
+          "sample_rate": 24000,
+          "samples": 422400,
+          "peak": 0.616363525390625,
+          "clipped_fraction": 0.0,
+          "active_seconds": 12.98,
+          "silence_fraction": 0.26249999999999996,
+          "rms_dbfs": -22.529714839372534,
+          "pitch": {
+            "median_hz": 109.58904109589041,
+            "iqr_hz": 13.75095492742551,
+            "voiced_frames": 374
+          },
+          "language": "en",
+          "reading_unit": "word",
+          "reading_unit_count": 56,
+          "reading_count_basis": "normalized_reference_not_observed_word_timestamps",
+          "articulation_rate_unit": "words_per_second",
+          "rate_threshold": 5.0,
+          "rate_threshold_kind": "uncalibrated_heuristic",
+          "articulation_rate": 4.314329738058552,
+          "overall_rate": 3.1818181818181817,
+          "words_per_minute": 190.9090909090909,
+          "content_alignment": {
+            "error_rate": 0.05357142857142857,
+            "operations": [
+              {
+                "kind": "insert",
+                "reference_index": 30,
+                "hypothesis_index": 30,
+                "reference": "",
+                "hypothesis": "any"
+              },
+              {
+                "kind": "replace",
+                "reference_index": 30,
+                "hypothesis_index": 31,
+                "reference": "anytime",
+                "hypothesis": "time"
+              },
+              {
+                "kind": "replace",
+                "reference_index": 55,
+                "hypothesis_index": 56,
+                "reference": "juli",
+                "hypothesis": "julie"
+              }
+            ],
+            "reference": "i didn't exactly give her a tour i locked myself in the bathroom instead and after about ten minutes of yelling back at her that no i wasn't coming out anytime soon things got quiet out in the hall another ten minutes went by before i got the nerve to peek out the door no juli",
+            "hypothesis": "i didn't exactly give her a tour i locked myself in the bathroom instead and after about ten minutes of yelling back at her that no i wasn't coming out any time soon things got quiet out in the hall another ten minutes went by before i got the nerve to peek out the door no julie",
+            "reference_tokens": [
+              "i",
+              "didn't",
+              "exactly",
+              "give",
+              "her",
+              "a",
+              "tour",
+              "i",
+              "locked",
+              "myself",
+              "in",
+              "the",
+              "bathroom",
+              "instead",
+              "and",
+              "after",
+              "about",
+              "ten",
+              "minutes",
+              "of",
+              "yelling",
+              "back",
+              "at",
+              "her",
+              "that",
+              "no",
+              "i",
+              "wasn't",
+              "coming",
+              "out",
+              "anytime",
+              "soon",
+              "things",
+              "got",
+              "quiet",
+              "out",
+              "in",
+              "the",
+              "hall",
+              "another",
+              "ten",
+              "minutes",
+              "went",
+              "by",
+              "before",
+              "i",
+              "got",
+              "the",
+              "nerve",
+              "to",
+              "peek",
+              "out",
+              "the",
+              "door",
+              "no",
+              "juli"
+            ],
+            "hypothesis_tokens": [
+              "i",
+              "didn't",
+              "exactly",
+              "give",
+              "her",
+              "a",
+              "tour",
+              "i",
+              "locked",
+              "myself",
+              "in",
+              "the",
+              "bathroom",
+              "instead",
+              "and",
+              "after",
+              "about",
+              "ten",
+              "minutes",
+              "of",
+              "yelling",
+              "back",
+              "at",
+              "her",
+              "that",
+              "no",
+              "i",
+              "wasn't",
+              "coming",
+              "out",
+              "any",
+              "time",
+              "soon",
+              "things",
+              "got",
+              "quiet",
+              "out",
+              "in",
+              "the",
+              "hall",
+              "another",
+              "ten",
+              "minutes",
+              "went",
+              "by",
+              "before",
+              "i",
+              "got",
+              "the",
+              "nerve",
+              "to",
+              "peek",
+              "out",
+              "the",
+              "door",
+              "no",
+              "julie"
+            ],
+            "language": "en",
+            "error_metric": "WER",
+            "alignment_unit": "word",
+            "reference_unit_count": 56,
+            "normalization_version": "bilingual-reading-v6",
+            "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+            "comparison_normalization": {
+              "reference": {
+                "tokens": [
+                  "i",
+                  "didn't",
+                  "exactly",
+                  "give",
+                  "her",
+                  "a",
+                  "tour",
+                  "i",
+                  "locked",
+                  "myself",
+                  "in",
+                  "the",
+                  "bathroom",
+                  "instead",
+                  "and",
+                  "after",
+                  "about",
+                  "ten",
+                  "minutes",
+                  "of",
+                  "yelling",
+                  "back",
+                  "at",
+                  "her",
+                  "that",
+                  "no",
+                  "i",
+                  "wasn't",
+                  "coming",
+                  "out",
+                  "anytime",
+                  "soon",
+                  "things",
+                  "got",
+                  "quiet",
+                  "out",
+                  "in",
+                  "the",
+                  "hall",
+                  "another",
+                  "ten",
+                  "minutes",
+                  "went",
+                  "by",
+                  "before",
+                  "i",
+                  "got",
+                  "the",
+                  "nerve",
+                  "to",
+                  "peek",
+                  "out",
+                  "the",
+                  "door",
+                  "no",
+                  "juli"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              },
+              "hypothesis": {
+                "tokens": [
+                  "i",
+                  "didn't",
+                  "exactly",
+                  "give",
+                  "her",
+                  "a",
+                  "tour",
+                  "i",
+                  "locked",
+                  "myself",
+                  "in",
+                  "the",
+                  "bathroom",
+                  "instead",
+                  "and",
+                  "after",
+                  "about",
+                  "ten",
+                  "minutes",
+                  "of",
+                  "yelling",
+                  "back",
+                  "at",
+                  "her",
+                  "that",
+                  "no",
+                  "i",
+                  "wasn't",
+                  "coming",
+                  "out",
+                  "any",
+                  "time",
+                  "soon",
+                  "things",
+                  "got",
+                  "quiet",
+                  "out",
+                  "in",
+                  "the",
+                  "hall",
+                  "another",
+                  "ten",
+                  "minutes",
+                  "went",
+                  "by",
+                  "before",
+                  "i",
+                  "got",
+                  "the",
+                  "nerve",
+                  "to",
+                  "peek",
+                  "out",
+                  "the",
+                  "door",
+                  "no",
+                  "julie"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [
+                  {
+                    "kind": "english_number",
+                    "input_start": 91,
+                    "input_end": 93,
+                    "before": "10",
+                    "after": "ten",
+                    "version": "en-comparison-v1",
+                    "status": "normalized",
+                    "reason": null
+                  },
+                  {
+                    "kind": "english_number",
+                    "input_start": 212,
+                    "input_end": 214,
+                    "before": "10",
+                    "after": "ten",
+                    "version": "en-comparison-v1",
+                    "status": "normalized",
+                    "reason": null
+                  }
+                ],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              }
+            },
+            "deletions": 0,
+            "insertions": 1,
+            "substitutions": 2
+          },
+          "rate_policy_version": "reference-rate-content-gate-v1",
+          "rate_estimate_usable_for_heuristics": false,
+          "rate_estimate_status": "unreliable_content_mismatch",
+          "consistency_reference": {
+            "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_bryce_candidates_20261017/project/raw/6cee1c732df89a9e09342ce32e60cc6dcc0b744722d8e7b2a47f801598b84bbc/41769d912c934b58aba4ff190a3c53b2.wav",
+            "kind": "human_confirmed_fixed_reference",
+            "sha256": "8d0cd3ea2cb6b37b4b83dd421196d5ea45f95f21cfb122b7a819e931d5b8b57f"
+          },
+          "rate_reference_unavailable": "current_content_mismatch",
+          "pitch_shift_semitones": -1.2283406115561328,
+          "speaker_distance": 0.32158070847061326,
+          "speaker_threshold_kind": "uncalibrated",
+          "evaluation_seconds": 0.40657608304172754,
+          "start_seconds": 306.58,
+          "end_seconds": 324.18
+        },
+        "issues": [
+          {
+            "code": "asr_mismatch",
+            "dimension": "content",
+            "scope_id": "5:47:narrator:chunk:2",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "error_rate": 0.05357142857142857,
+              "operations": [
+                {
+                  "kind": "insert",
+                  "reference_index": 30,
+                  "hypothesis_index": 30,
+                  "reference": "",
+                  "hypothesis": "any"
+                },
+                {
+                  "kind": "replace",
+                  "reference_index": 30,
+                  "hypothesis_index": 31,
+                  "reference": "anytime",
+                  "hypothesis": "time"
+                },
+                {
+                  "kind": "replace",
+                  "reference_index": 55,
+                  "hypothesis_index": 56,
+                  "reference": "juli",
+                  "hypothesis": "julie"
+                }
+              ],
+              "reference": "i didn't exactly give her a tour i locked myself in the bathroom instead and after about ten minutes of yelling back at her that no i wasn't coming out anytime soon things got quiet out in the hall another ten minutes went by before i got the nerve to peek out the door no juli",
+              "hypothesis": "i didn't exactly give her a tour i locked myself in the bathroom instead and after about ten minutes of yelling back at her that no i wasn't coming out any time soon things got quiet out in the hall another ten minutes went by before i got the nerve to peek out the door no julie",
+              "reference_tokens": [
+                "i",
+                "didn't",
+                "exactly",
+                "give",
+                "her",
+                "a",
+                "tour",
+                "i",
+                "locked",
+                "myself",
+                "in",
+                "the",
+                "bathroom",
+                "instead",
+                "and",
+                "after",
+                "about",
+                "ten",
+                "minutes",
+                "of",
+                "yelling",
+                "back",
+                "at",
+                "her",
+                "that",
+                "no",
+                "i",
+                "wasn't",
+                "coming",
+                "out",
+                "anytime",
+                "soon",
+                "things",
+                "got",
+                "quiet",
+                "out",
+                "in",
+                "the",
+                "hall",
+                "another",
+                "ten",
+                "minutes",
+                "went",
+                "by",
+                "before",
+                "i",
+                "got",
+                "the",
+                "nerve",
+                "to",
+                "peek",
+                "out",
+                "the",
+                "door",
+                "no",
+                "juli"
+              ],
+              "hypothesis_tokens": [
+                "i",
+                "didn't",
+                "exactly",
+                "give",
+                "her",
+                "a",
+                "tour",
+                "i",
+                "locked",
+                "myself",
+                "in",
+                "the",
+                "bathroom",
+                "instead",
+                "and",
+                "after",
+                "about",
+                "ten",
+                "minutes",
+                "of",
+                "yelling",
+                "back",
+                "at",
+                "her",
+                "that",
+                "no",
+                "i",
+                "wasn't",
+                "coming",
+                "out",
+                "any",
+                "time",
+                "soon",
+                "things",
+                "got",
+                "quiet",
+                "out",
+                "in",
+                "the",
+                "hall",
+                "another",
+                "ten",
+                "minutes",
+                "went",
+                "by",
+                "before",
+                "i",
+                "got",
+                "the",
+                "nerve",
+                "to",
+                "peek",
+                "out",
+                "the",
+                "door",
+                "no",
+                "julie"
+              ],
+              "language": "en",
+              "error_metric": "WER",
+              "alignment_unit": "word",
+              "reference_unit_count": 56,
+              "normalization_version": "bilingual-reading-v6",
+              "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+              "comparison_normalization": {
+                "reference": {
+                  "tokens": [
+                    "i",
+                    "didn't",
+                    "exactly",
+                    "give",
+                    "her",
+                    "a",
+                    "tour",
+                    "i",
+                    "locked",
+                    "myself",
+                    "in",
+                    "the",
+                    "bathroom",
+                    "instead",
+                    "and",
+                    "after",
+                    "about",
+                    "ten",
+                    "minutes",
+                    "of",
+                    "yelling",
+                    "back",
+                    "at",
+                    "her",
+                    "that",
+                    "no",
+                    "i",
+                    "wasn't",
+                    "coming",
+                    "out",
+                    "anytime",
+                    "soon",
+                    "things",
+                    "got",
+                    "quiet",
+                    "out",
+                    "in",
+                    "the",
+                    "hall",
+                    "another",
+                    "ten",
+                    "minutes",
+                    "went",
+                    "by",
+                    "before",
+                    "i",
+                    "got",
+                    "the",
+                    "nerve",
+                    "to",
+                    "peek",
+                    "out",
+                    "the",
+                    "door",
+                    "no",
+                    "juli"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                },
+                "hypothesis": {
+                  "tokens": [
+                    "i",
+                    "didn't",
+                    "exactly",
+                    "give",
+                    "her",
+                    "a",
+                    "tour",
+                    "i",
+                    "locked",
+                    "myself",
+                    "in",
+                    "the",
+                    "bathroom",
+                    "instead",
+                    "and",
+                    "after",
+                    "about",
+                    "ten",
+                    "minutes",
+                    "of",
+                    "yelling",
+                    "back",
+                    "at",
+                    "her",
+                    "that",
+                    "no",
+                    "i",
+                    "wasn't",
+                    "coming",
+                    "out",
+                    "any",
+                    "time",
+                    "soon",
+                    "things",
+                    "got",
+                    "quiet",
+                    "out",
+                    "in",
+                    "the",
+                    "hall",
+                    "another",
+                    "ten",
+                    "minutes",
+                    "went",
+                    "by",
+                    "before",
+                    "i",
+                    "got",
+                    "the",
+                    "nerve",
+                    "to",
+                    "peek",
+                    "out",
+                    "the",
+                    "door",
+                    "no",
+                    "julie"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [
+                    {
+                      "kind": "english_number",
+                      "input_start": 91,
+                      "input_end": 93,
+                      "before": "10",
+                      "after": "ten",
+                      "version": "en-comparison-v1",
+                      "status": "normalized",
+                      "reason": null
+                    },
+                    {
+                      "kind": "english_number",
+                      "input_start": 212,
+                      "input_end": 214,
+                      "before": "10",
+                      "after": "ten",
+                      "version": "en-comparison-v1",
+                      "status": "normalized",
+                      "reason": null
+                    }
+                  ],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                }
+              },
+              "deletions": 0,
+              "insertions": 1,
+              "substitutions": 2
+            }
+          }
+        ],
+        "version": "audio-core-v1",
+        "status": "incomplete"
+      },
+      "machine_priority": 0,
+      "previously_heard_same_content_and_identity": false,
+      "unavailable_evidence": {},
+      "whole_chapter_review_status": "pending"
+    },
+    {
+      "sample_id": "R100",
+      "chunk_id": "5:63:narrator:chunk:22",
+      "role_id": "narrator",
+      "text": " It would be a world with too many people to worry about ever seeing Juli Baker again. It was finally, finally going to be over.",
+      "source_span": {
+        "chapter_index": 5,
+        "start": 14183,
+        "end": 14311
+      },
+      "start_seconds": 923.3,
+      "end_seconds": 931.94,
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/R100.wav",
+      "audio_sha256": "efdfeb57d8d3f18cd674d61b2747d04176b4f7c30a1ac153a5b7a43dd17d656f",
+      "original_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/deae643ca238bc327fab0f9df187fadff7065dacea32d9308d464a3b8ef07cbc.wav",
+      "original_audio_sha256": "a460d3eca6a56a2098d581ca91287df942f9355179cc0e640f4d5ef63e40d884",
+      "gain_db": -0.629999999999999,
+      "gain": 0.9300365147539603,
+      "input_loudness": {
+        "integrated_lufs": -20.93,
+        "true_peak_dbfs": -4.11,
+        "lra_lu": 4.3,
+        "gate_lufs": -31.56,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "machine_report": {
+        "scope_id": "5:63:narrator:chunk:22",
+        "dimensions": {
+          "signal": "passed",
+          "content": "incomplete",
+          "consistency": "incomplete"
+        },
+        "metrics": {
+          "evaluation_models": {
+            "asr": {
+              "kind": "asr",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/SenseVoiceSmall",
+              "state": "local_files",
+              "runtime_version": "1.4.16",
+              "files": [
+                {
+                  "path": "am.mvn",
+                  "bytes": 11203,
+                  "sha256": "29b3c740a2c0cfc6b308126d31d7f265fa2be74f3bb095cd2f143ea970896ae5"
+                },
+                {
+                  "path": "chn_jpn_yue_eng_ko_spectok.bpe.model",
+                  "bytes": 377341,
+                  "sha256": "aa87f86064c3730d799ddf7af3c04659151102cba548bce325cf06ba4da4e6a8"
+                },
+                {
+                  "path": "config.yaml",
+                  "bytes": 1855,
+                  "sha256": "f71e239ba36705564b5bf2d2ffd07eece07b8e3f2bbf6d2c99d8df856339ac19"
+                },
+                {
+                  "path": "configuration.json",
+                  "bytes": 396,
+                  "sha256": "02810a7f8e9e8aee10370a265f7e799728ce25b4c00cdbf4602b303ee395a38e"
+                },
+                {
+                  "path": "model.pt",
+                  "bytes": 936291369,
+                  "sha256": "833ca2dcfdf8ec91bd4f31cfac36d6124e0c459074d5e909aec9cabe6204a3ea"
+                }
+              ],
+              "fingerprint": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6"
+            },
+            "speaker": {
+              "kind": "speaker",
+              "directory": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/.audio_quality_models/ecapa",
+              "state": "local_files",
+              "runtime_version": "1.1.1",
+              "files": [
+                {
+                  "path": "classifier.ckpt",
+                  "bytes": 5534328,
+                  "sha256": "fd9e3634fe68bd0a427c95e354c0c677374f62b3f434e45b78599950d860d535"
+                },
+                {
+                  "path": "embedding_model.ckpt",
+                  "bytes": 83316686,
+                  "sha256": "0575cb64845e6b9a10db9bcb74d5ac32b326b8dc90352671d345e2ee3d0126a2"
+                },
+                {
+                  "path": "hyperparams.yaml",
+                  "bytes": 1919,
+                  "sha256": "6f78854fa04ba59e761437b76a2575d3aba5e5016de3e9b69f0c9a5077fb1a41"
+                },
+                {
+                  "path": "label_encoder.ckpt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "label_encoder.txt",
+                  "bytes": 128619,
+                  "sha256": "e13c3a167bb4112685670ee896d20e2b565af16b3a4ceeaa8689fa4d22adb8b9"
+                },
+                {
+                  "path": "mean_var_norm_emb.ckpt",
+                  "bytes": 1921,
+                  "sha256": "cd70225b05b37be64fc5a95e24395d804231d43f74b2e1e5a513db7b69b34c33"
+                }
+              ],
+              "fingerprint": "9cc19ee039c6ded8c46311e5b94b2595a9c9ff2d11fed1a29fb838ddd7b15f27"
+            }
+          },
+          "duration_seconds": 8.64,
+          "sample_rate": 24000,
+          "samples": 207360,
+          "peak": 0.623077392578125,
+          "clipped_fraction": 0.0,
+          "active_seconds": 6.22,
+          "silence_fraction": 0.28009259259259256,
+          "rms_dbfs": -20.930488933758813,
+          "pitch": {
+            "median_hz": 108.10810810810811,
+            "iqr_hz": 13.37792642140468,
+            "voiced_frames": 196
+          },
+          "language": "en",
+          "reading_unit": "word",
+          "reading_unit_count": 25,
+          "reading_count_basis": "normalized_reference_not_observed_word_timestamps",
+          "articulation_rate_unit": "words_per_second",
+          "rate_threshold": 5.0,
+          "rate_threshold_kind": "uncalibrated_heuristic",
+          "articulation_rate": 4.019292604501608,
+          "overall_rate": 2.893518518518518,
+          "words_per_minute": 173.6111111111111,
+          "content_alignment": {
+            "error_rate": 0.04,
+            "operations": [
+              {
+                "kind": "replace",
+                "reference_index": 14,
+                "hypothesis_index": 14,
+                "reference": "juli",
+                "hypothesis": "holy"
+              }
+            ],
+            "reference": "it would be a world with too many people to worry about ever seeing juli baker again it was finally finally going to be over",
+            "hypothesis": "it would be a world with too many people to worry about ever seeing holy baker again it was finally finally going to be over",
+            "reference_tokens": [
+              "it",
+              "would",
+              "be",
+              "a",
+              "world",
+              "with",
+              "too",
+              "many",
+              "people",
+              "to",
+              "worry",
+              "about",
+              "ever",
+              "seeing",
+              "juli",
+              "baker",
+              "again",
+              "it",
+              "was",
+              "finally",
+              "finally",
+              "going",
+              "to",
+              "be",
+              "over"
+            ],
+            "hypothesis_tokens": [
+              "it",
+              "would",
+              "be",
+              "a",
+              "world",
+              "with",
+              "too",
+              "many",
+              "people",
+              "to",
+              "worry",
+              "about",
+              "ever",
+              "seeing",
+              "holy",
+              "baker",
+              "again",
+              "it",
+              "was",
+              "finally",
+              "finally",
+              "going",
+              "to",
+              "be",
+              "over"
+            ],
+            "language": "en",
+            "error_metric": "WER",
+            "alignment_unit": "word",
+            "reference_unit_count": 25,
+            "normalization_version": "bilingual-reading-v6",
+            "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+            "comparison_normalization": {
+              "reference": {
+                "tokens": [
+                  "it",
+                  "would",
+                  "be",
+                  "a",
+                  "world",
+                  "with",
+                  "too",
+                  "many",
+                  "people",
+                  "to",
+                  "worry",
+                  "about",
+                  "ever",
+                  "seeing",
+                  "juli",
+                  "baker",
+                  "again",
+                  "it",
+                  "was",
+                  "finally",
+                  "finally",
+                  "going",
+                  "to",
+                  "be",
+                  "over"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              },
+              "hypothesis": {
+                "tokens": [
+                  "it",
+                  "would",
+                  "be",
+                  "a",
+                  "world",
+                  "with",
+                  "too",
+                  "many",
+                  "people",
+                  "to",
+                  "worry",
+                  "about",
+                  "ever",
+                  "seeing",
+                  "holy",
+                  "baker",
+                  "again",
+                  "it",
+                  "was",
+                  "finally",
+                  "finally",
+                  "going",
+                  "to",
+                  "be",
+                  "over"
+                ],
+                "language": "en",
+                "unit": "word",
+                "english_events": [],
+                "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+              }
+            },
+            "deletions": 0,
+            "insertions": 0,
+            "substitutions": 1
+          },
+          "rate_policy_version": "reference-rate-content-gate-v1",
+          "rate_estimate_usable_for_heuristics": false,
+          "rate_estimate_status": "unreliable_content_mismatch",
+          "consistency_reference": {
+            "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_bryce_candidates_20261017/project/raw/6cee1c732df89a9e09342ce32e60cc6dcc0b744722d8e7b2a47f801598b84bbc/41769d912c934b58aba4ff190a3c53b2.wav",
+            "kind": "human_confirmed_fixed_reference",
+            "sha256": "8d0cd3ea2cb6b37b4b83dd421196d5ea45f95f21cfb122b7a819e931d5b8b57f"
+          },
+          "rate_reference_unavailable": "current_content_mismatch",
+          "pitch_shift_semitones": -1.4638862925433236,
+          "speaker_distance": 0.43412734056680047,
+          "speaker_threshold_kind": "uncalibrated",
+          "evaluation_seconds": 0.2301159999333322,
+          "start_seconds": 923.3,
+          "end_seconds": 931.94
+        },
+        "issues": [
+          {
+            "code": "asr_mismatch",
+            "dimension": "content",
+            "scope_id": "5:63:narrator:chunk:22",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "error_rate": 0.04,
+              "operations": [
+                {
+                  "kind": "replace",
+                  "reference_index": 14,
+                  "hypothesis_index": 14,
+                  "reference": "juli",
+                  "hypothesis": "holy"
+                }
+              ],
+              "reference": "it would be a world with too many people to worry about ever seeing juli baker again it was finally finally going to be over",
+              "hypothesis": "it would be a world with too many people to worry about ever seeing holy baker again it was finally finally going to be over",
+              "reference_tokens": [
+                "it",
+                "would",
+                "be",
+                "a",
+                "world",
+                "with",
+                "too",
+                "many",
+                "people",
+                "to",
+                "worry",
+                "about",
+                "ever",
+                "seeing",
+                "juli",
+                "baker",
+                "again",
+                "it",
+                "was",
+                "finally",
+                "finally",
+                "going",
+                "to",
+                "be",
+                "over"
+              ],
+              "hypothesis_tokens": [
+                "it",
+                "would",
+                "be",
+                "a",
+                "world",
+                "with",
+                "too",
+                "many",
+                "people",
+                "to",
+                "worry",
+                "about",
+                "ever",
+                "seeing",
+                "holy",
+                "baker",
+                "again",
+                "it",
+                "was",
+                "finally",
+                "finally",
+                "going",
+                "to",
+                "be",
+                "over"
+              ],
+              "language": "en",
+              "error_metric": "WER",
+              "alignment_unit": "word",
+              "reference_unit_count": 25,
+              "normalization_version": "bilingual-reading-v6",
+              "normalization_policy": "bounded_english_numeric_date_equivalence_ambiguous_identifiers_and_abbreviations_unchanged",
+              "comparison_normalization": {
+                "reference": {
+                  "tokens": [
+                    "it",
+                    "would",
+                    "be",
+                    "a",
+                    "world",
+                    "with",
+                    "too",
+                    "many",
+                    "people",
+                    "to",
+                    "worry",
+                    "about",
+                    "ever",
+                    "seeing",
+                    "juli",
+                    "baker",
+                    "again",
+                    "it",
+                    "was",
+                    "finally",
+                    "finally",
+                    "going",
+                    "to",
+                    "be",
+                    "over"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                },
+                "hypothesis": {
+                  "tokens": [
+                    "it",
+                    "would",
+                    "be",
+                    "a",
+                    "world",
+                    "with",
+                    "too",
+                    "many",
+                    "people",
+                    "to",
+                    "worry",
+                    "about",
+                    "ever",
+                    "seeing",
+                    "holy",
+                    "baker",
+                    "again",
+                    "it",
+                    "was",
+                    "finally",
+                    "finally",
+                    "going",
+                    "to",
+                    "be",
+                    "over"
+                  ],
+                  "language": "en",
+                  "unit": "word",
+                  "english_events": [],
+                  "event_coordinate_scope": "NFKC_and_explicit_dictionary_comparison_input"
+                }
+              },
+              "deletions": 0,
+              "insertions": 0,
+              "substitutions": 1
+            }
+          },
+          {
+            "code": "speaker_drift",
+            "dimension": "consistency",
+            "scope_id": "5:63:narrator:chunk:22",
+            "severity": "warning",
+            "certainty": "suspected",
+            "start_seconds": null,
+            "end_seconds": null,
+            "evidence": {
+              "distance": 0.43412734056680047,
+              "threshold": 0.35,
+              "threshold_kind": "heuristic"
+            }
+          }
+        ],
+        "version": "audio-core-v1",
+        "status": "incomplete"
+      },
+      "machine_priority": 0,
+      "previously_heard_same_content_and_identity": false,
+      "unavailable_evidence": {},
+      "whole_chapter_review_status": "pending"
+    }
+  ],
+  "whole_chapter_review": "pending",
+  "content_defects_confirmed": false,
+  "requests_sent": 0,
+  "notes": "按机器插入／重复词提示优先核验两句；其余专名及短词ASR差异仍完整保留。首中末抽查不能替代全章一致性验收。"
+}

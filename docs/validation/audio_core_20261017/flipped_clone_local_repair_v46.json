@@ -1,0 +1,64 @@
+{
+  "version": "flipped-clone-local-repair-validation-v46",
+  "manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/assembly_manifest.json",
+  "manifest_sha256": "967f1bdd25cf1e0da22a51fcdccc6643b9ab11355f1ca43f6ed797d5dc26fa23",
+  "quality_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/quality.json",
+  "quality_report_sha256": "a44eb383ac3ba171f50d18a5561a89d1412efa139bc61151e0f7ad7b62f2197f",
+  "standard_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/bc16494e0d524eacba962dc1c3c303a4/chapter_000005/quality.json",
+  "standard_report_sha256": "ecc1ea01d479ae014a7bcafee53af889daafbc4a450811f7a4f07e8f942c0757",
+  "chunks_unchanged": 97,
+  "chunks_changed": 3,
+  "boundaries_rechecked": 6,
+  "standard_preview_count": 200,
+  "pcm_layout_verified": true,
+  "decoded_pcm_equal": true,
+  "source_audio_unchanged": true,
+  "duration_seconds": 1058.28,
+  "j076_pause_seconds": 1.0,
+  "new_requests": 0,
+  "prior_clone_run_requests_unchanged": 67,
+  "human_review_status": "pending_three_local_edits",
+  "overall_project_complete": false,
+  "reference_text_audit": {
+    "method": "reference_audio_aligned_with_its_own_source_text",
+    "reference_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_full_chapter_20261017/audio/R001.wav",
+    "reference_audio_sha256": "0ef58edb31d5bb0f3a5111f1d36e6afb9ba9da022627ce11f446072bed912a14",
+    "reference_text": "Diving Under All I've ever wanted is for Juli Baker to leave me alone. For her to back off — you know, just give me some space. It all started the summer before second grade when our moving van pulled into her neighborhood.",
+    "changed_audio_files": 0,
+    "recomputed_consistency_reports": [
+      "R039"
+    ],
+    "prior_diagnostics_preserved": [
+      {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/quality.before_reference_text_audit_v46.json",
+        "sha256": "11d3be10eea73fb8d9784db3d0aea28985a1be1b854ed5b3bdc6c3a36c46ee7f"
+      },
+      {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/bc16494e0d524eacba962dc1c3c303a4/chapter_000005/quality.before_reference_text_audit_v46.json",
+        "sha256": "f241a26693991f1378ea5da8650a2f47c0aee0ab0f732b6e45d6e81cdce5f02a"
+      },
+      {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261017/flipped_clone_local_repair_v46.before_reference_text_audit_v46.json",
+        "sha256": "18c1dcafde75ff49071e20cd6c24c21116266af11d2ad11dfeb58cd14598f5bd"
+      }
+    ],
+    "requests_sent": 0,
+    "role_anchor_audit": "R076 classmates reference preserved; only narrator R039 reference text recomputed"
+  },
+  "all_100_reports_reference_roles_verified": true,
+  "final_loudness": {
+    "integrated_lufs": -22.2,
+    "true_peak_dbfs": -0.68,
+    "lra_lu": 5.3,
+    "gate_lufs": -32.76,
+    "measurement": "ffmpeg_loudnorm_input_only"
+  },
+  "warning_counts": {
+    "asr_mismatch": 58,
+    "pitch_drift": 1,
+    "rate_drift": 1,
+    "boundary_content_mismatch": 75
+  },
+  "speaker_unavailable_count": 34,
+  "asr_unavailable_count": 0
+}

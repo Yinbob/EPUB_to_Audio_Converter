@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; media-src 'self' file:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>角色声音辨识</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f5f7;--surface:#fff;--text:#1d1d1f;--muted:#52525a;--line:#8b8b95;--accent:#0068d0;--selected:#e8f1fd;--danger:#b32020}
+@media(prefers-color-scheme:dark){:root{--bg:#161618;--surface:#232326;--text:#f5f5f7;--muted:#b8b8c0;--line:#777780;--accent:#81baff;--selected:#1b3859;--danger:#ff9999}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:780px;margin:36px auto;padding:0 24px 40px}h1{font-size:1.75rem;line-height:1.3;margin:0 0 12px;letter-spacing:-.02em}h2{font-size:1.2rem;margin:0 0 12px}p{margin:8px 0;max-width:72ch}.muted{color:var(--muted)}
+.setup{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:24px 0 12px}.setup label{display:grid;gap:5px;flex:1;min-width:200px}input[type=text]{font:inherit;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);caret-color:var(--accent)}
+button{font:inherit;min-height:44px;padding:8px 16px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);cursor:pointer}button:hover:not(:disabled){border-color:var(--accent)}button:active:not(:disabled){background:var(--selected)}button:disabled{cursor:default;color:var(--muted);background:var(--surface)}.primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}.primary:active:not(:disabled){background:var(--text);color:var(--bg)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}::selection{background:var(--selected);color:var(--text)}
+.status{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:26px 0 8px;font-variant-numeric:tabular-nums}progress{width:100%;height:8px;accent-color:var(--accent)}
+.target{padding:22px 0;margin:14px 0 0;border-bottom:1px solid var(--line)}audio{display:block;width:100%;height:44px}fieldset{border:0;padding:0;margin:24px 0 0}legend{font-weight:600;padding:0;margin-bottom:14px}.references{display:grid;gap:16px}.reference{display:grid;grid-template-columns:108px 1fr;gap:16px;align-items:center}.choice{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px;border-radius:8px}.choice:has(input:checked){background:var(--selected)}input[type=radio]{width:20px;height:20px;margin:0;accent-color:var(--accent)}
+.navigation{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:26px}.export{margin-top:30px;padding-top:22px;border-top:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap}.notice{min-height:26px;color:var(--muted);margin-top:12px}.notice[data-error=true]{color:var(--danger)}footer{margin-top:22px;color:var(--muted);font-size:.875rem}[hidden]{display:none!important}
+@media(max-width:520px){main{margin:24px auto;padding:0 18px 28px}.setup button{width:100%}.reference{grid-template-columns:1fr;gap:4px}.choice{padding-left:0}.navigation button{flex:1;padding:8px 10px}.export button{width:100%}}
+</style>
+<main>
+  <h1>角色声音辨识</h1>
+  <p class="muted">先听目标，再与下方参考声音比较，选择最接近的角色。只判断声音身份，不评价角色喜好；无法判断时可以留空。</p>
+  <div class="setup"><label for="participant">参与者编号（无需姓名）<input id="participant" type="text" maxlength="64" autocomplete="off" spellcheck="false" placeholder="例如 P01" aria-describedby="participant-help"></label><button id="start" type="button">开始填写</button></div>
+  <p id="participant-help" class="muted">编号使用字母、数字、下划线或短横线。每名听众独立填写；更换听众前请先导出，再清空本机回答。</p>
+  <div class="status"><span id="position"></span><span id="answered" role="status" aria-live="polite"></span></div>
+  <progress id="progress" value="0" aria-label="已回答进度"></progress>
+  <section class="target" aria-labelledby="target-heading"><h2 id="target-heading">目标声音</h2><audio id="target" controls preload="none" aria-label="目标声音"></audio></section>
+  <fieldset id="choices" disabled><legend>目标属于哪位角色？</legend><div id="references" class="references"></div></fieldset>
+  <nav class="navigation" aria-label="题目切换"><button id="previous" type="button">上一题</button><button id="skip" type="button">留空并继续</button><button id="next" type="button">下一题</button></nav>
+  <div class="export"><button id="download" class="primary" type="button" disabled>导出回答 CSV</button><button id="clear" type="button">清空本机回答</button></div>
+  <p id="notice" class="notice" role="alert"></p>
+  <footer><p>无自动评分、无联网提交。回答仅暂存在当前浏览器会话中；关闭浏览器前请导出 CSV，并将文件交回实验者。此页面需要与 audio 文件夹放在一起。</p><p id="storage-warning" hidden>浏览器不支持会话暂存：刷新会丢失本次回答，请及时导出 CSV。</p></footer>
+  <noscript><p>此页面需要启用 JavaScript；也可按 trials.json 试听并手动填写 responses.csv。</p></noscript>
+</main>
+<script id="trial-data" type="application/json">__LISTENING_PAYLOAD__</script>
+<script>
+'use strict';
+const data=JSON.parse(document.getElementById('trial-data').textContent);
+const trials=data.trials, byId=new Map(trials.map(t=>[t.trial_id,t]));
+const storageKey='role-listening:'+data.pack_id;
+const el=id=>document.getElementById(id);
+let participant='',responses={},position=0,started=false;
+function notify(message='',isError=false){el('notice').textContent=message;el('notice').setAttribute('data-error',String(isError));}
+function persist(){
+  try{sessionStorage.setItem(storageKey,JSON.stringify({participant,responses,position,started}));}
+  catch(error){el('storage-warning').hidden=false;}
+}
+function pauseAudio(){document.querySelectorAll('audio').forEach(audio=>audio.pause());}
+function updateProgress(){
+  const count=Object.keys(responses).length;
+  el('answered').textContent=`已回答 ${count} / ${trials.length}`;
+  el('progress').max=trials.length;el('progress').value=count;
+}
+function render(){
+  pauseAudio();
+  const trial=trials[position];
+  el('position').textContent=`第 ${position+1} / ${trials.length} 题`;
+  updateProgress();
+  el('target').src=trial.audio;
+  el('choices').disabled=!started;
+  el('references').replaceChildren();
+  for(const [role,path] of Object.entries(trial.reference_voices)){
+    const row=document.createElement('div');row.className='reference';
+    const label=document.createElement('label');label.className='choice';
+    const input=document.createElement('input');input.type='radio';input.name='response';input.value=role;input.checked=responses[trial.trial_id]===role;
+    input.addEventListener('change',()=>{responses[trial.trial_id]=role;persist();notify();updateProgress();});
+    label.append(input,document.createTextNode(role));
+    const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=path;audio.setAttribute('aria-label',role+'参考声音');
+    row.append(label,audio);el('references').append(row);
+  }
+  el('previous').disabled=position===0;el('next').disabled=position===trials.length-1;
+  el('skip').disabled=!started;
+  el('download').disabled=!started;
+  el('participant').value=participant;el('participant').readOnly=started;
+  el('start').disabled=started;el('start').textContent=started?'正在填写':'开始填写';
+}
+try{
+  const saved=JSON.parse(sessionStorage.getItem(storageKey));
+  if(saved && /^[A-Za-z0-9_-]{1,64}$/.test(saved.participant) && saved.started===true){
+    participant=saved.participant;started=true;
+    for(const [id,role] of Object.entries(saved.responses||{})){
+      if(byId.has(id) && Object.hasOwn(byId.get(id).reference_voices,role))responses[id]=role;
+    }
+    if(Number.isInteger(saved.position) && saved.position>=0 && saved.position<trials.length)position=saved.position;
+  }
+}catch(error){el('storage-warning').hidden=false;}
+el('start').addEventListener('click',()=>{
+  const value=el('participant').value.trim();
+  if(!/^[A-Za-z0-9_-]{1,64}$/.test(value)){notify('请填写有效编号，例如 P01。只使用字母、数字、下划线或短横线。',true);el('participant').focus();return;}
+  participant=value;started=true;persist();notify();render();
+});
+el('participant').addEventListener('keydown',event=>{if(event.key==='Enter' && !started)el('start').click();});
+el('previous').addEventListener('click',()=>{if(position>0)position--;persist();notify();render();});
+el('next').addEventListener('click',()=>{if(position<trials.length-1)position++;persist();notify();render();});
+el('skip').addEventListener('click',()=>{delete responses[trials[position].trial_id];if(position<trials.length-1)position++;persist();notify();render();});
+el('clear').addEventListener('click',()=>{
+  if(!confirm('清空此材料在本机暂存的回答？尚未导出的回答将丢失。'))return;
+  participant='';responses={};position=0;started=false;
+  try{sessionStorage.removeItem(storageKey);}catch(error){el('storage-warning').hidden=false;}
+  notify();render();el('participant').focus();
+});
+function csvCell(value){return '"'+String(value).replaceAll('"','""')+'"';}
+el('download').addEventListener('click',()=>{
+  if(!started)return;
+  const count=Object.keys(responses).length;
+  if(count<trials.length && !confirm(`已回答 ${count} / ${trials.length} 题。导出当前回答并保留其余空白？`))return;
+  const rows=[['participant_id','trial_id','response_role'],...trials.map(trial=>{
+    const response=responses[trial.trial_id]||'';
+    return [response?participant:'',trial.trial_id,response];
+  })];
+  const blob=new Blob(['\ufeff'+rows.map(row=>row.map(csvCell).join(',')).join('\r\n')+'\r\n'],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob),link=document.createElement('a');
+  link.href=url;link.download=`responses_${participant}.csv`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  notify('已请求下载回答 CSV；请确认文件已保存，再关闭页面。');
+});
+document.addEventListener('play',event=>{if(event.target.tagName==='AUDIO')document.querySelectorAll('audio').forEach(audio=>{if(audio!==event.target)audio.pause();});},true);
+document.addEventListener('error',event=>{if(event.target.tagName==='AUDIO')notify('无法读取音频。请确认完整保留 audio 文件夹，并联系实验者检查材料。',true);},true);
+render();
+</script>
+</html>

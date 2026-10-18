@@ -1,0 +1,59 @@
+{
+  "version": "flipped-human-feedback-v42",
+  "source": "explicit_user_reply",
+  "user_replies": {
+    "content": "R022确认重复My mom knows where I am；R049朗读内容是go on don't just so placed（不确定单词） go on，前后都有go on；",
+    "pauses": "都有些过长，停顿在1秒左右合适",
+    "voice": "R51和R100的比较像同一个人，但我更喜欢R001的音色（更年轻），更贴合角色",
+    "parents": "两条均完整，声音一致"
+  },
+  "content_defects": [
+    {
+      "sample_id": "R022",
+      "audio_sha256": "da85c0fdc6e3a83362f812e2f8df3ee10e1c1912e18fe7f90ade60aa655c744c",
+      "confirmed_extra_suffix": true
+    },
+    {
+      "sample_id": "R049",
+      "audio_sha256": "9df474c3136146d052e002f1131158c46948e4e3f0390527d543e1450d5040fd",
+      "confirmed_extra_suffix": true
+    }
+  ],
+  "long_pauses": [
+    {
+      "sample_id": "J009",
+      "audio_sha256": "8e5f1767f4e0424b8475d733488d47a96211d9cf696992db08cf6e07579072da",
+      "target_seconds": 1.0
+    },
+    {
+      "sample_id": "J013",
+      "audio_sha256": "404d90945dd6f18ac40610dfc3b51efb50a1f62052a042c91d006b9057725ccf",
+      "target_seconds": 1.0
+    },
+    {
+      "sample_id": "J023",
+      "audio_sha256": "2c630293234796f6d17d48c8557a61c6f2816c617c16183cccd4b5c5cfec396c",
+      "target_seconds": 1.0
+    },
+    {
+      "sample_id": "J076",
+      "audio_sha256": "52246b8da62aa04810f6157f364c532ae0c33dea7db9fd332744fb8d9d24e597",
+      "target_seconds": 1.0
+    }
+  ],
+  "preferred_Bryce_reference": "R001",
+  "R051_R100_pair_similar": true,
+  "R001_vs_others_same_identity": "not_explicitly_confirmed",
+  "parent_confirmed_samples": [
+    {
+      "sample_id": "R020",
+      "audio_sha256": "b71f5dd65eb8eaf4843a0c205acc271aa724732b650959b4807a2772212b5737"
+    },
+    {
+      "sample_id": "R068",
+      "audio_sha256": "9edcdc0bccfe89a05c9bda7afbf280eea0a62a61edbc91b2c63bea9c61f580ad"
+    }
+  ],
+  "unheard_other_samples_judged": false,
+  "new_repair_candidates_accepted": false
+}

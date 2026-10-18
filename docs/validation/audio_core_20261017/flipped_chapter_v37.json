@@ -1,0 +1,73 @@
+{
+  "schema_version": "flipped-chapter-validation-v37",
+  "date": "2026-10-17",
+  "book_sha256": "e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011",
+  "original_book_unchanged": true,
+  "scope": "one_novel_chapter_conversion_index_5",
+  "source_characters": 14311,
+  "confirmed_quotes": 37,
+  "confirmed_segments": 75,
+  "confirmed_roles": 5,
+  "source_spans_and_coverage_exact": true,
+  "registry_complete": false,
+  "chapter_tts_requests": 0,
+  "unvoiced_script_expected_missing_voice_errors": 5,
+  "external_transfer_consent_record": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_chapter_pilot_20261017/human_role_confirmation_v37.json",
+  "deepseek_actual_requests": [
+    {
+      "receipt": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_chapter_pilot_20261017/llm_requests/001.json",
+      "sha256": "52c7bb82ef16c9ddc9659268998a0053837d7655e233f138f622a116087d1ab2",
+      "status": "succeeded",
+      "chapter_text_characters": 5964,
+      "response_finish_reason": "stop"
+    },
+    {
+      "receipt": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_chapter_pilot_20261017/llm_requests/002.json",
+      "sha256": "842a45a13971d679a555bb675d9d5dbbeeddc4577817931f43a83d963c343370",
+      "status": "succeeded",
+      "chapter_text_characters": 5988,
+      "response_finish_reason": "stop"
+    },
+    {
+      "receipt": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_chapter_pilot_20261017/llm_requests/003.json",
+      "sha256": "3aaff155c0cedefcd0fbc0b5ccc60830654160b4db86f5aeeafa28b98954ab9b",
+      "status": "succeeded",
+      "chapter_text_characters": 2357,
+      "response_finish_reason": "stop"
+    }
+  ],
+  "automatic_role_draft_adopted": false,
+  "bryce_candidates": {
+    "manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_bryce_candidates_20261017/probes.json",
+    "manifest_sha256": "cadf53f9c64545601c64668f072f797fe5c0650dfcd50a360cd57388f91f777b",
+    "quality_sha256": "d6e2a540ab4e571975cce8b9ba56a3934dec93132533035bea82713c3e5c1a32",
+    "resources": {
+      "succeeded": {
+        "requests": 6,
+        "characters": 520,
+        "repair_requests": 0
+      }
+    },
+    "samples": 6,
+    "total_seconds": 32.0,
+    "asr_all_wer_zero": true,
+    "human_review_status": "pending",
+    "reference_created": false,
+    "same_identity_confirmed": false,
+    "speaker_issues_uncalibrated": true
+  },
+  "production_code_changes_this_round": false,
+  "last_production_regression": {
+    "evidence": "hybrid_locks_v36.json",
+    "run": 560,
+    "passed": 530,
+    "skipped": 30,
+    "errors": 0,
+    "failures": 0
+  },
+  "limits": [
+    "单章不能证明全书排名或长篇稳定性",
+    "声音适配和组内一致性等待人工试听",
+    "机器疑似提示不自动改为确诊或消除"
+  ]
+}

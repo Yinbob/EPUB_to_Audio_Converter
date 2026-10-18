@@ -1,0 +1,12 @@
+{
+  "control": "synthetic_all_negative_not_real_training",
+  "before": "returned_model",
+  "training_rows": 4,
+  "thresholds_ready": false,
+  "ready_labels": [
+    false,
+    false,
+    false,
+    false
+  ]
+}

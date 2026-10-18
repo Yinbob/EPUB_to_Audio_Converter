@@ -1,0 +1,107 @@
+{
+  "version": "casting-common-gain-whole-chapter-review-v1",
+  "status": "pending",
+  "protocol": {
+    "Mia": 0,
+    "Chloe": -5
+  },
+  "chapters": [
+    {
+      "chapter": 1,
+      "condition": "interaction+random",
+      "scene": 1,
+      "duration_seconds": 28.48,
+      "audio": "audio/chapter_000001_full.wav",
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_01/scene_01/quality.json",
+      "report_sha256": "e52df8edd3c56b36c29e6c2c90d8b3faac656532f5d0158fd8ff9e6e1eac1294",
+      "human_status": "pending"
+    },
+    {
+      "chapter": 2,
+      "condition": "interaction+random",
+      "scene": 2,
+      "duration_seconds": 26.08,
+      "audio": "audio/chapter_000002_full.wav",
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_01/scene_02/quality.json",
+      "report_sha256": "9b19edf764d3605e7dd53cd8d6e0b5932eec9fc99599ca474b89bb3c68604a0d",
+      "human_status": "pending"
+    },
+    {
+      "chapter": 3,
+      "condition": "interaction+random",
+      "scene": 3,
+      "duration_seconds": 29.44,
+      "audio": "audio/chapter_000003_full.wav",
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_01/scene_03/quality.json",
+      "report_sha256": "3221e0acc0f4e0259af13678e1f43cf80034d8caeeaec3c08faf8b73d248ee2d",
+      "human_status": "pending"
+    },
+    {
+      "chapter": 4,
+      "condition": "global",
+      "scene": 1,
+      "duration_seconds": 28.48,
+      "audio": "audio/chapter_000004_full.wav",
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_02/scene_01/quality.json",
+      "report_sha256": "b84569dce85afd800acaa72b73e59f93b2fe1b6b7b2c1d52b5b6d97669180bde",
+      "human_status": "pending"
+    },
+    {
+      "chapter": 5,
+      "condition": "global",
+      "scene": 2,
+      "duration_seconds": 26.08,
+      "audio": "audio/chapter_000005_full.wav",
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_02/scene_02/quality.json",
+      "report_sha256": "8e464016c29308580015e09203223537a28310df57eb69747b258ed84c5179f4",
+      "human_status": "pending"
+    },
+    {
+      "chapter": 6,
+      "condition": "global",
+      "scene": 3,
+      "duration_seconds": 30.4,
+      "audio": "audio/chapter_000006_full.wav",
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_02/scene_03/quality.json",
+      "report_sha256": "c586f0b604f79cd0151c423a76095e13f0179e12a7d787425968e7ec7385e60f",
+      "human_status": "pending"
+    },
+    {
+      "chapter": 7,
+      "condition": "fit",
+      "scene": 1,
+      "duration_seconds": 28.48,
+      "audio": "audio/chapter_000007_full.wav",
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_03/scene_01/quality.json",
+      "report_sha256": "c87febc915e2417c00ab06a8781656de1215fa048a50fd8ea5273ee35aac544e",
+      "human_status": "pending"
+    },
+    {
+      "chapter": 8,
+      "condition": "fit",
+      "scene": 2,
+      "duration_seconds": 25.6,
+      "audio": "audio/chapter_000008_full.wav",
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_03/scene_02/quality.json",
+      "report_sha256": "e6264050dac7a4173972654adc919a44ef4b1946d3ef5771ec85c156a2b29923",
+      "human_status": "pending"
+    },
+    {
+      "chapter": 9,
+      "condition": "fit",
+      "scene": 3,
+      "duration_seconds": 30.4,
+      "audio": "audio/chapter_000009_full.wav",
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_03/scene_03/quality.json",
+      "report_sha256": "0a56d88927b00267ffede1da38e6486d712fb0e534e8585782a23a82f2bcd4c0",
+      "human_status": "pending"
+    }
+  ],
+  "previous_F01_range_retained_sample_exact": true,
+  "previous_human_results_not_auto_transferred": true,
+  "reviewer": null,
+  "reviewed_at": null,
+  "whole_chapter_issues": null,
+  "verbatim": null,
+  "new_tts_requests": 0
+}

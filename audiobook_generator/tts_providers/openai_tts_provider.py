@@ -42,7 +42,7 @@ def get_openai_supported_voices():
 
 
 def get_openai_supported_models():
-    return ["mimo-v2.5-tts"]
+    return ["mimo-v2.5-tts", "mimo-v2.5-tts-voicedesign"]
 
 
 def get_openai_instructions_example():
@@ -102,89 +102,26 @@ class OpenAITTSProvider(BaseTTSProvider):
             chunk_id = f"chapter-{audio_tags.idx}_{audio_tags.title}_chunk_{i}_of_{len(text_chunks)}"
             logger.info(f"Processing {chunk_id}, length={len(chunk)}")
 
-            if self.config.model_name == "mimo-v2.5-tts":
-                messages = []
-                if self.config.instructions:
-                    messages.append({
-                        "role": "user",
-                        "content": self.config.instructions
-                    })
-                else:
-                    messages.append({
-                        "role": "user",
-                        "content": "Read the text in a natural and clear audiobook voice."
-                    })
-
-                messages.append({
-                    "role": "assistant",
-                    "content": chunk
-                })
-
-                if self.config.stream:
-                    # ── 流式调用：收集 PCM16 分片后合成 WAV ──
-                    logger.info(f"Streaming mode enabled for chunk {chunk_id}")
-                    completion = self.client.chat.completions.create(
-                        model=self.config.model_name,
-                        messages=messages,
-                        audio={
-                            "format": "pcm16",
-                            "voice": self.config.voice_name
-                        },
-                        stream=True
-                    )
-
-                    collected_pcm = np.array([], dtype=np.float32)
-                    for stream_chunk in completion:
-                        if not stream_chunk.choices:
-                            continue
-                        delta = stream_chunk.choices[0].delta
-                        audio = getattr(delta, "audio", None)
-                        if audio is not None and isinstance(audio, dict) and "data" in audio:
-                            pcm_bytes = base64.b64decode(audio["data"])
-                            np_pcm = np.frombuffer(pcm_bytes, dtype=np.int16).astype(np.float32) / 32768.0
-                            collected_pcm = np.concatenate((collected_pcm, np_pcm))
-
-                    if len(collected_pcm) == 0:
-                        logger.warning(f"No audio data received for {chunk_id}")
-                        continue
-
-                    # 将 PCM float32 写入 WAV 格式的 BytesIO
-                    wav_buffer = io.BytesIO()
-                    sf.write(wav_buffer, collected_pcm, samplerate=24000, format="WAV")
-                    wav_buffer.seek(0)
-                    audio_content = wav_buffer.read()
-                    logger.info(f"Stream collected {len(collected_pcm)} samples ({len(audio_content)} bytes WAV)")
-                else:
-                    # ── 非流式调用（原有逻辑） ──
-                    completion = self.client.chat.completions.create(
-                        model=self.config.model_name,
-                        messages=messages,
-                        audio={
-                            "format": self.config.output_format,
-                            "voice": self.config.voice_name
-                        }
-                    )
-
-                    message = completion.choices[0].message
-                    audio_content = base64.b64decode(message.audio.data)
-
-            else:
-                response = self.client.audio.speech.create(
-                    model=self.config.model_name,
-                    voice=self.config.voice_name,
-                    speed=self.config.speed,
-                    input=chunk,
-                    response_format=self.config.output_format,
-                )
-                audio_content = response.content
-
+            route = self.resolve_voice()
+            audio_content = self._request_mimo_chunk(chunk, voice=route['voice'],
+                instructions=route['instructions'], request=route)
             logger.debug(f"Remote server response: size={len(audio_content)} bytes")
             audio_segments.append(io.BytesIO(audio_content))
             chunk_ids.append(chunk_id)
 
-        merge_audio_segments(audio_segments, output_file, self.config.output_format, chunk_ids,
-                             self.config.use_pydub_merge)
+        if self.resolve_voice()['mode'] in {'design', 'clone'}:
+            combined = AudioSegment.empty()
+            for segment in audio_segments:
+                combined += AudioSegment.from_file(segment, format='wav')
+            atomic_export_audio(combined, output_file, format=self.config.output_format)
+        else:
+            merge_audio_segments(audio_segments, output_file, self.config.output_format, chunk_ids,
+                                 self.config.use_pydub_merge)
         set_audio_tags(output_file, audio_tags)
+
+    def resolve_voice(self, params=None, *, tone=None):
+        from .mimo_voice import resolve_voice
+        return resolve_voice(self.config, params, tone=tone)
 
     def _request_mimo_chunk(
         self,
@@ -192,7 +129,19 @@ class OpenAITTSProvider(BaseTTSProvider):
         *,
         voice: str,
         instructions: str | None,
+        client=None,
+        request=None,
     ) -> bytes:
+        client = self.client if client is None else client
+        route = request or self.resolve_voice({'voice': voice, 'instructions': instructions})
+        audio_options = {'format': 'pcm16' if route['stream'] else route['format']}
+        if route['mode'] == 'preset':
+            audio_options['voice'] = voice
+        elif route['mode'] == 'clone':
+            from .mimo_reference import clone_reference_data_uri
+            audio_options['voice'] = clone_reference_data_uri(route)
+        else:
+            audio_options['optimize_text_preview'] = False
         messages = []
         messages.append({
             "role": "user",
@@ -200,11 +149,11 @@ class OpenAITTSProvider(BaseTTSProvider):
         })
         messages.append({"role": "assistant", "content": chunk})
 
-        if self.config.stream:
-            completion = self.client.chat.completions.create(
-                model=self.config.model_name,
+        if route['stream']:
+            completion = client.chat.completions.create(
+                model=route['model'],
                 messages=messages,
-                audio={"format": "pcm16", "voice": voice},
+                audio=audio_options,
                 stream=True,
             )
             collected_pcm = np.array([], dtype=np.float32)
@@ -223,13 +172,10 @@ class OpenAITTSProvider(BaseTTSProvider):
             sf.write(wav_buffer, collected_pcm, samplerate=24000, format="WAV")
             return wav_buffer.getvalue()
 
-        completion = self.client.chat.completions.create(
-            model=self.config.model_name,
+        completion = client.chat.completions.create(
+            model=route['model'],
             messages=messages,
-            audio={
-                "format": self.config.output_format,
-                "voice": voice,
-            },
+            audio=audio_options,
         )
         message = completion.choices[0].message
         audio_data = getattr(getattr(message, "audio", None), "data", None)
@@ -237,49 +183,47 @@ class OpenAITTSProvider(BaseTTSProvider):
             raise RuntimeError("MiMo 响应没有音频数据")
         return base64.b64decode(audio_data)
 
+    def synthesize_observed_chunk(self, text, profile, store, run_id, *, resample=False, repair=False):
+        """统一核心的一次可观测请求；无隐藏分块、重试、合并或本地变速。"""
+        from audiobook_generator.audio_core.store import fingerprint
+
+        if not text.strip() or len(text) > 1800:
+            raise ValueError("MiMo 可观测块必须非空且不超过 1800 字符")
+        route = self.resolve_voice(profile.provider_params, tone=getattr(profile, 'tone', None))
+        voice, instructions, extension = route['voice'], route['instructions'], route['format']
+        key = fingerprint({'adapter': 'mimo-observed-v2', 'request': route,
+                           'endpoint': str(self.client.base_url), 'text': text})
+        cached = None if resample else store.cached(key)
+        if cached:
+            return cached
+        request_id = store.reserve(run_id, key, len(text), repair=repair)
+        try:
+            # 单次传输即单次账本事件，避免 SDK 自动重试掩盖请求次数。
+            client = self.client.with_options(max_retries=0, timeout=max(0.1, min(120.0, store.remaining_seconds(run_id))))
+            data = self._request_mimo_chunk(text, voice=voice, instructions=instructions, client=client, request=route)
+            decoded = AudioSegment.from_file(io.BytesIO(data), format=extension)
+            if not len(decoded):
+                raise RuntimeError("MiMo 返回空音频")
+            path = store.save_sample(key, data, extension)
+            store.write_json(f'requests/{request_id}.json', {'request_id': request_id, 'run_id': run_id,
+                'text': text, 'request': route, 'audio_path': path, 'resample': resample})
+            store.settle(request_id, artifact=path)
+            return path
+        except Exception as exc:
+            store.settle(request_id, error=exc)
+            raise
+
     def synthesize_segment(self, text, profile, work_dir, progress=None):
         """在单个 segment 内分块、重试并缓存，speed 由章节音频管线统一后处理。"""
         from audiobook_generator.role_script.audio_pipeline import build_audio_artifact
 
         params = dict(profile.provider_params)
-        voice = str(params.get("voice") or self.config.voice_name or "mimo_default")
-        instructions = params.get("instructions", self.config.instructions)
-        tone = getattr(profile, "tone", None) or profile.provider_params.get("_tone")
-        effective_instructions = instructions
-        if tone:
-            tone_instruction = (
-                f"Tone requirement: {tone}"
-                if str(getattr(self.config, "language", "") or "").lower().startswith("en")
-                else f"语气要求：{tone}"
-            )
-            effective_instructions = (
-                f"{instructions}\n{tone_instruction}" if instructions else tone_instruction
-            )
-
-        # 音色与情绪不应隐式决定快慢；明确的用户快慢要求仍保留。
-        pace_instruction = (
-            "Unless an explicit pace is requested above, use a steady, moderate audiobook "
-            "pace. Keep the pace consistent across voices and emotions; avoid drawn-out "
-            "syllables and excessive pauses. Read only the supplied text."
-            if str(self.config.language or "").lower().startswith("en")
-            else "除非上文明确要求快慢，否则使用稳定、适中的有声书语速。"
-            "不同音色和情绪保持一致的朗读节奏，不拖长字音或添加过长停顿，只朗读所给正文。"
-        )
-        effective_instructions = "\n".join(filter(None, [effective_instructions, pace_instruction]))
-
-        actual_extension = "wav" if self.config.stream else self.config.output_format
-        cache_key = segment_cache_key(
-            provider="openai",
-            model=self.config.model_name,
-            # speed 在后处理阶段生效，调倍率可以复用原音频；缓存必须包含实际请求指令。
-            provider_params={"voice": voice, "instructions": effective_instructions},
-            tone=tone,
-            text=text,
-            request_options={
-                "stream": bool(self.config.stream),
-                "output_format": self.config.output_format,
-            },
-        )
+        tone = getattr(profile, 'tone', None) or params.get('_tone')
+        route = self.resolve_voice(params, tone=tone)
+        voice, effective_instructions, actual_extension = route['voice'], route['instructions'], route['format']
+        cache_key = segment_cache_key(provider='openai', model=route['model'],
+            provider_params=route, tone=tone, text=text,
+            request_options={'endpoint': str(self.client.base_url)})
         cache_dir = os.path.join(work_dir, "segment_cache")
         os.makedirs(cache_dir, exist_ok=True)
         cache_file = os.path.join(cache_dir, f"{cache_key}.{actual_extension}")
@@ -308,6 +252,7 @@ class OpenAITTSProvider(BaseTTSProvider):
                             chunk,
                             voice=voice,
                             instructions=effective_instructions,
+                            request=route,
                         )
                     )
                 if len(generated) == 1:
@@ -336,6 +281,9 @@ class OpenAITTSProvider(BaseTTSProvider):
         return self.config.output_format
 
     def validate_config(self):
+        if self.config.model_name not in get_openai_supported_models():
+            raise ValueError('不支持的 MiMo 模型')
+        self.resolve_voice()
         if self.config.output_format not in get_openai_supported_output_formats():
             raise ValueError(f"OpenAI: Unsupported output format: {self.config.output_format}")
         if self.config.speed < 0.25 or self.config.speed > 4.0:

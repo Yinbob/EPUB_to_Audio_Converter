@@ -1,0 +1,37 @@
+{
+  "version": "flipped-cmon-local-human-acceptance-v49",
+  "source": "explicit_user_reply",
+  "user_reply": "只读一次，发音与接缝均正常",
+  "recorded_at": "2026-10-17T15:17:43.439020+08:00",
+  "source_manifest": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/assembly_manifest.json",
+    "sha256": "cad0a3720c2ff8a6f6c63f1ed0db8719530435029811f97971f3728bca2dd059"
+  },
+  "source_chapter": {
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/chapter_05.bryce_clone.cmon_repair.wav",
+    "sha256": "3784dc6b798d0e2ea99e5ebfbdb6767c5ec73e6575cd693fc0cfe2dc01e1358f"
+  },
+  "accepted_content_sample": {
+    "sample_id": "R034",
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/audio/R034.wav",
+    "audio_sha256": "0b0fea7e2546b7eb598063593f24e5dbea02ce36b0e83b3cb0bbcfa0a63ee47e",
+    "source_text": "“C'mon!”",
+    "tts_text": "“Come on!”",
+    "content_complete": true,
+    "no_additions": true,
+    "pronunciation_acceptable": true
+  },
+  "accepted_contexts": [
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/audio/R034_after_context.wav",
+      "sha256": "2e48c346d50744b2dc9a9f61002f4c98b04f4f0571a7be202eed032dd7c66380",
+      "target_at_seconds": 3.5,
+      "adjacent_joins_natural": true
+    }
+  ],
+  "identity_accepted": null,
+  "signal_separately_rated": null,
+  "scope": "R034_single_reading_pronunciation_and_adjacent_joins_only",
+  "whole_chapter_listening_complete": false,
+  "machine_reports_unchanged": true
+}

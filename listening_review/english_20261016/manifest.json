@@ -1,0 +1,96 @@
+{
+  "scope": "byte-identical listening copies, no new TTS calls",
+  "source_manifest_sha256": "42def93b0d88d58c47bf60f0eb22ffb4344ae455e0fa641bf443efe2e1f3ab96",
+  "samples": [
+    {
+      "sample_id": "E01",
+      "voice": "Mia",
+      "text": "Morning sunlight fell across the quiet desk. She opened the old book and began to read.",
+      "file": "E01_Mia.wav",
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/raw/e9cd1a706c7c42339e1f9b33ab21c305c81e7b0ab81111764e00cb1a93881b0f/446fc4ce3444488c96f715910264e54d.wav",
+      "sha256": "73a87c3b59bfb4d922e01a332d612aadf5dd56633f209a0f9b6add5fbcc998eb",
+      "duration_seconds": 7.04,
+      "human_review_status": "accepted"
+    },
+    {
+      "sample_id": "E02",
+      "voice": "Mia",
+      "text": "Do you remember where we agreed to meet? Please wait beside the bridge until I arrive.",
+      "file": "E02_Mia.wav",
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/raw/57527527612cbed58bd5418a1992d4b693f400dacfcc24420198b3b9a8a9bc57/824b4496611c4f23913ed74165fb045e.wav",
+      "sha256": "c7398c95bec78b095730e9cdea44650e5d43c5b390ac2dfc08dce9a04fe1482c",
+      "duration_seconds": 7.04,
+      "human_review_status": "accepted"
+    },
+    {
+      "sample_id": "E03",
+      "voice": "Chloe",
+      "text": "Morning sunlight fell across the quiet desk. She opened the old book and began to read.",
+      "file": "E03_Chloe.wav",
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/raw/6e8635d95416d97f9c362f739777229dbca9395c1753f1f39fd10ccc7078a57e/fbf2de89237d4c479fb2091234987c74.wav",
+      "sha256": "28c564290e72913e29112ad41f2cc83c259728d4ee8123feb5e74825ce24a6e6",
+      "duration_seconds": 7.36,
+      "human_review_status": "accepted"
+    },
+    {
+      "sample_id": "E04",
+      "voice": "Chloe",
+      "text": "Do you remember where we agreed to meet? Please wait beside the bridge until I arrive.",
+      "file": "E04_Chloe.wav",
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/raw/96d34de62d559121776f65d2f635f7136cabcbb6388c9a7ff0b0c43221613cca/cd7e4be93ded4b38967a2574f9c987d5.wav",
+      "sha256": "639cfc69c1345072a230952fb5e108fbacd59f4648c897448c8174afc54f80ed",
+      "duration_seconds": 6.88,
+      "human_review_status": "accepted"
+    },
+    {
+      "sample_id": "E05",
+      "voice": "Milo",
+      "text": "Morning sunlight fell across the quiet desk. She opened the old book and began to read.",
+      "file": "E05_Milo.wav",
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/raw/c1a3e922e67e868004665426657635ec98dfa8cd0ea869b1ee8399469df91952/0a9a6667ee7a48e389e5a74ba2d08c3b.wav",
+      "sha256": "9b1237962d8836222f785f2c4b870ff19419f5f442d88c41714870edb141acc2",
+      "duration_seconds": 6.56,
+      "human_review_status": "accepted"
+    },
+    {
+      "sample_id": "E06",
+      "voice": "Milo",
+      "text": "Do you remember where we agreed to meet? Please wait beside the bridge until I arrive.",
+      "file": "E06_Milo.wav",
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/raw/8a6bac1aa28e941c3fc563cb3f1825e4e2d236003859f9becf664cb9c56aa506/a9298ea13c584e0b92f105028a69f938.wav",
+      "sha256": "140dd76c47c41ec35615f7ca4c26b89a7c507c0e1d7344c653692daa123dd00b",
+      "duration_seconds": 14.56,
+      "human_review_status": "rejected_content"
+    }
+  ],
+  "human_review_source": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/human_review.json",
+  "human_review_sha256": "2da19d9d66ebb23ea9680f4ce8268daf544262ec11a66faf9489002440aee047",
+  "repair_candidates": [
+    {
+      "sample_id": "E06R",
+      "file": "E06R_Milo_diagnostic.wav",
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_e06_repair_connected_20261016/E06_pipeline_candidate.wav",
+      "source_run_id": "759d6ab5b35f4be1984aa7eea40a9444",
+      "sha256": "a851502b0d43c0bf62f79a33e62a950b386de5506d8011a7ea98839610cd155e",
+      "duration_seconds": 12.96,
+      "human_review_status": "rejected_content",
+      "automatic_content_status": "mismatch_suspected",
+      "approved_replacement": false,
+      "human_review_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_e06_repair_connected_20261016/human_review.json",
+      "human_review_sha256": "9092a60241f83bbc3b3f717bb149f14f0b28aecf151b21fe4cef5f8363d87369"
+    },
+    {
+      "sample_id": "E06T",
+      "parent_sample_id": "E06R",
+      "file": "E06T_Milo_tail_preview.wav",
+      "source_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_e06r_tail_preview_20261016/E06T_Milo_tail_preview.wav",
+      "sha256": "76ee4224091b2a1b29698029152325ddff671a58851876c347dac7088bcd2843",
+      "duration_seconds": 8.74,
+      "operation": "source_bound_manual_repeated_tail_preview",
+      "source_original_sha256": "a851502b0d43c0bf62f79a33e62a950b386de5506d8011a7ea98839610cd155e",
+      "human_review_status": "pending",
+      "automatic_content_status": "no_asr_difference",
+      "approved_replacement": false
+    }
+  ]
+}

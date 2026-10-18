@@ -1,0 +1,12 @@
+[
+  {
+    "entry": "listening_source",
+    "error_type": "ValueError",
+    "reason": "章节 PCM 缺失或与编码保留检查的来源不一致"
+  },
+  {
+    "entry": "annotation_export",
+    "error_type": "LibsndfileError",
+    "reason": "Error opening '/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_numbers_pilot_20261016/d67844c3ff2a4675ba92dacf8ef18713/chapter_000001/chapter.wav': System error."
+  }
+]

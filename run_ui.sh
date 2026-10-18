@@ -1,6 +1,7 @@
 #!/bin/bash
 # 启动 WebUI（Apple 风格，默认监听 0.0.0.0:7862，适合后台/服务器运行）
-# 若存在 venv_chatterbox/，main_ui.py 会自动切换到该环境以支持 Chatterbox。
+# main_ui.py 优先使用已配置的 venv_audio_quality/，没有时回退 venv_chatterbox/。
+# 已激活其他环境时尊重当前解释器。
 # 用法:
 #   ./run_ui.sh
 #   ./run_ui.sh --host 127.0.0.1 --port 8080

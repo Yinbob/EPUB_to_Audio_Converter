@@ -1,0 +1,27 @@
+{
+  "scope_id": "chapter:encoded",
+  "dimensions": {
+    "encoding": "passed",
+    "content": "passed"
+  },
+  "metrics": {
+    "check_scope": "preservation_of_selected_pcm",
+    "checks": [],
+    "encoded_sha256": "3784dc6b798d0e2ea99e5ebfbdb6767c5ec73e6575cd693fc0cfe2dc01e1358f",
+    "reference_pcm_sha256": "3784dc6b798d0e2ea99e5ebfbdb6767c5ec73e6575cd693fc0cfe2dc01e1358f",
+    "reference_pcm_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/chapter_05.bryce_clone.cmon_repair.wav",
+    "decoded_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_cmon_repair_20261017/encoded_checks/decoded.wav",
+    "decoded_samples": 25298880,
+    "expected_samples": 25298880,
+    "sample_count_delta": 0,
+    "sample_tolerance": 3600,
+    "pcm_equal": true,
+    "peak": 0.925018310546875,
+    "clipped_fraction": 0.0,
+    "content_method": "exact_pcm_equivalence",
+    "evaluation_seconds": 0.21968979109078646
+  },
+  "issues": [],
+  "version": "audio-core-v1",
+  "status": "passed"
+}

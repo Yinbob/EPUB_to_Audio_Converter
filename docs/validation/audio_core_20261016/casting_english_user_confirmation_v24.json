@@ -1,0 +1,21 @@
+{
+  "version": "casting_english_v24_user_role_confirmation",
+  "human_statement": "保留草稿的角色设定和逐句归属",
+  "confirmed_roles": 3,
+  "confirmed_utterance_ownerships": 12,
+  "source_kind": "assistant_authored_stimulus",
+  "confirmed_script": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/role_script.confirmed.json",
+  "confirmed_script_sha256": "738c0c1926fd66e5a279da8ee5d435028f1bef81efda00e4f599e6ee2b6fdb25",
+  "review_record": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/human_review.confirmed_roles.json",
+  "fit_ratings": "pending_all_null",
+  "audio_quality": "not_evaluated_no_audio_generated",
+  "voice_locks_changed": false,
+  "new_tts_requests": 0,
+  "prior_draft_hashes": {
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/role_script.proposed.json": "0e02939d3d0555b2e53386e0bc00c6292d7351efe38b4bcfa79136aea3b39e10",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/human_review.pending.json": "802d2d153e1fc921af03747088862be15b2e8e731838ca9bfb640917db5630f9",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/source_chapters.json": "1b7c00f6f0a1ada8864e42346945125e985bffbaab155af07f58e27985f225aa",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/offline_validation.json": "6ed1fd4e1e58b89b052687c1d7119de0e530b32570a8a7eb71f8dcc4341b2d2c"
+  },
+  "validation": "strict_load_source_coverage_and_hashes_passed"
+}

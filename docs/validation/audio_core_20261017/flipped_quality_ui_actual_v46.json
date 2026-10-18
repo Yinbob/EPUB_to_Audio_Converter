@@ -1,0 +1,14 @@
+{
+  "version": "flipped-real-gradio-quality-api-v46",
+  "gradio_version": "5.50.0",
+  "report_path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/bc16494e0d524eacba962dc1c3c303a4/chapter_000005/quality.json",
+  "report_sha256": "ecc1ea01d479ae014a7bcafee53af889daafbc4a450811f7a4f07e8f942c0757",
+  "requests_sent": 0,
+  "no_browser_visual_review": true,
+  "checks": [
+    "actual_refresh_callback_discovers_repaired_report",
+    "actual_show_callback_preserves_pending_and_resource_history",
+    "downloaded_report_matches_source_sha256",
+    "actual_audio_callbacks_return_exact_R018_R039_J076"
+  ]
+}

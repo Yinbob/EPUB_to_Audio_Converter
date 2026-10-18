@@ -1,0 +1,25 @@
+{
+  "whole_chapter_spoken_chunks": 100,
+  "whole_chapter_source_characters": 14311,
+  "whole_chapter_tts_characters": 14307,
+  "cached_chunks_verified": 14,
+  "cache_hit_chunk_ids": [
+    "5:4:bryce_father:chunk:1",
+    "5:5:narrator:chunk:1",
+    "5:6:juli:chunk:1",
+    "5:7:narrator:chunk:1",
+    "5:8:juli:chunk:1",
+    "5:36:bryce_mother:chunk:1",
+    "5:38:juli:chunk:1",
+    "5:39:narrator:chunk:1",
+    "5:40:bryce_mother:chunk:1",
+    "5:41:narrator:chunk:1",
+    "5:42:juli:chunk:1",
+    "5:58:classmates:chunk:1",
+    "5:60:classmates:chunk:1",
+    "5:62:classmates:chunk:1"
+  ],
+  "remaining_requests_if_parameters_unchanged": 86,
+  "status": "offline_cache_check_only",
+  "whole_chapter_generated": false
+}

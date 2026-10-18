@@ -1,0 +1,309 @@
+{
+  "version": "flipped-speaker-readiness-v41",
+  "min_effective_seconds": 3,
+  "references": {
+    "narrator": {
+      "effective_seconds": 3.94,
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_bryce_candidates_20261017/project/raw/6cee1c732df89a9e09342ce32e60cc6dcc0b744722d8e7b2a47f801598b84bbc/41769d912c934b58aba4ff190a3c53b2.wav",
+      "speaker_ready": true
+    },
+    "bryce_father": {
+      "effective_seconds": 2.42,
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/f246190bac3af1000628167a7a4fee4c6daa24a83339a29e2c970725c0146a11.wav",
+      "speaker_ready": false
+    },
+    "juli": {
+      "effective_seconds": 1.28,
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/0c3a938bd37997029950a1281004171ec7edfcba8eaf51b19104100cf6cc666f.wav",
+      "speaker_ready": false
+    },
+    "bryce_mother": {
+      "effective_seconds": 1.52,
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/rendered/adb14dc3cecea34ae8cb3140794190090c84a54b1a3b3b95f9683227ce5c51f2.wav",
+      "speaker_ready": false
+    },
+    "classmates": {
+      "effective_seconds": 3.88,
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/raw/bb659daefc53c1e7599b698fffa66de9d61aa900dfb7ccfb4ea9b62fb612f975/8f0dda52310643cfa3a1758bd7afd8a8.wav",
+      "speaker_ready": true
+    }
+  },
+  "unavailable_samples": [
+    {
+      "sample_id": "R004",
+      "current_effective_seconds": 0.38,
+      "reference_effective_seconds": 2.42,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R005",
+      "current_effective_seconds": 2.2600000000000002,
+      "reference_effective_seconds": 3.94,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R009",
+      "current_effective_seconds": 0.92,
+      "reference_effective_seconds": 3.94,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R010",
+      "current_effective_seconds": 2.42,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R012",
+      "current_effective_seconds": 1.1,
+      "reference_effective_seconds": 2.42,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R013",
+      "current_effective_seconds": 0.62,
+      "reference_effective_seconds": 3.94,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R014",
+      "current_effective_seconds": 3.52,
+      "reference_effective_seconds": 2.42,
+      "current_too_short": false,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R015",
+      "current_effective_seconds": 1.76,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R017",
+      "current_effective_seconds": 1.74,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R018",
+      "current_effective_seconds": 4.1,
+      "reference_effective_seconds": 2.42,
+      "current_too_short": false,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R019",
+      "current_effective_seconds": 2.34,
+      "reference_effective_seconds": 3.94,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R020",
+      "current_effective_seconds": 4.0600000000000005,
+      "reference_effective_seconds": 2.42,
+      "current_too_short": false,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R022",
+      "current_effective_seconds": 4.46,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": false,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R023",
+      "current_effective_seconds": 2.0,
+      "reference_effective_seconds": 3.94,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R024",
+      "current_effective_seconds": 1.92,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R025",
+      "current_effective_seconds": 1.94,
+      "reference_effective_seconds": 3.94,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R026",
+      "current_effective_seconds": 0.92,
+      "reference_effective_seconds": 2.42,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R027",
+      "current_effective_seconds": 1.78,
+      "reference_effective_seconds": 3.94,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R028",
+      "current_effective_seconds": 3.8000000000000003,
+      "reference_effective_seconds": 2.42,
+      "current_too_short": false,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R034",
+      "current_effective_seconds": 1.8,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R036",
+      "current_effective_seconds": 1.08,
+      "reference_effective_seconds": 1.52,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R037",
+      "current_effective_seconds": 0.9,
+      "reference_effective_seconds": 3.94,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R038",
+      "current_effective_seconds": 0.68,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R041",
+      "current_effective_seconds": 2.38,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R042",
+      "current_effective_seconds": 2.2800000000000002,
+      "reference_effective_seconds": 3.94,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R043",
+      "current_effective_seconds": 1.86,
+      "reference_effective_seconds": 1.52,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R044",
+      "current_effective_seconds": 1.62,
+      "reference_effective_seconds": 3.94,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R045",
+      "current_effective_seconds": 0.56,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R047",
+      "current_effective_seconds": 3.5,
+      "reference_effective_seconds": 1.52,
+      "current_too_short": false,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R049",
+      "current_effective_seconds": 3.14,
+      "reference_effective_seconds": 1.52,
+      "current_too_short": false,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R053",
+      "current_effective_seconds": 1.48,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R054",
+      "current_effective_seconds": 2.72,
+      "reference_effective_seconds": 3.94,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R055",
+      "current_effective_seconds": 1.4000000000000001,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R068",
+      "current_effective_seconds": 3.98,
+      "reference_effective_seconds": 1.52,
+      "current_too_short": false,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R071",
+      "current_effective_seconds": 0.62,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R072",
+      "current_effective_seconds": 0.96,
+      "reference_effective_seconds": 3.94,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R073",
+      "current_effective_seconds": 0.8200000000000001,
+      "reference_effective_seconds": 1.28,
+      "current_too_short": true,
+      "reference_too_short": true
+    },
+    {
+      "sample_id": "R075",
+      "current_effective_seconds": 1.46,
+      "reference_effective_seconds": 3.88,
+      "current_too_short": true,
+      "reference_too_short": false
+    },
+    {
+      "sample_id": "R076",
+      "current_effective_seconds": 1.12,
+      "reference_effective_seconds": 3.88,
+      "current_too_short": true,
+      "reference_too_short": false
+    }
+  ],
+  "actual_failures_confirmed": false,
+  "original_reports_unchanged": true,
+  "requests_sent": 0
+}

@@ -5,12 +5,38 @@ from audiobook_generator.role_script.models import (
     CharacterEntity, RoleDefinition, SpeakerDecision,
 )
 from audiobook_generator.role_script.review import (
-    confirm_segment_speaker, lock_entity_voice, merge_entities, pending_segments,
+    assign_chapter_narrator, confirm_segment_speaker, lock_entity_voice, merge_entities, pending_segments,
 )
 from tests.audiobook_generator.role_script.v2_io_test import _script
 
 
 class ReviewTest(unittest.TestCase):
+    def test_chapter_narrator_changes_only_identified_narration_and_can_be_reassigned(self):
+        script, _ = _script()
+        chapter = script.chapters[0]
+        first = replace(chapter, segments=(replace(chapter.segments[0], text_kind='narration'),
+                                         replace(chapter.segments[1], text_kind='dialogue')))
+        other = replace(first, chapter_index=2)
+        script = replace(script, chapters=(first, other))
+        updated, count = assign_chapter_narrator(script, 1, 'char_1')
+        self.assertEqual(count, 1)
+        self.assertEqual(updated.chapters[0].segments[0].role_id, 'char_1')
+        self.assertEqual(updated.chapters[0].segments[0].speaker.confidence_kind, 'human')
+        self.assertEqual(updated.chapters[0].segments[1], first.segments[1])
+        self.assertEqual(updated.chapters[1], other)
+        self.assertEqual(updated.roles, script.roles)
+        self.assertEqual([(s.text, s.source_span, s.segment_id) for s in updated.chapters[0].segments],
+                         [(s.text, s.source_span, s.segment_id) for s in first.segments])
+        reassigned, _ = assign_chapter_narrator(updated, 1, 'narrator')
+        self.assertEqual(reassigned.chapters[0].segments[0].role_id, 'narrator')
+        self.assertEqual(script.chapters[0], first)
+
+    def test_narrator_assignment_rejects_legacy_chapters_and_invalid_targets(self):
+        script, _ = _script()
+        for chapter, entity in [(1, 'char_1'), (2, 'char_1'), (True, 'char_1'), (1, 'missing')]:
+            with self.assertRaises(ValueError):
+                assign_chapter_narrator(script, chapter, entity)
+
     def test_confirm_segment_and_voice_lock(self):
         script, _ = _script()
         self.assertEqual(len(pending_segments(script)), 1)

@@ -74,7 +74,7 @@ def parse_role_script_v2(raw: Any, report: ValidationReport) -> Optional[RoleScr
             continue
         clean_chapter = {key: chapter.get(key) for key in ("chapter_index", "title")}
         clean_chapter["segments"] = [
-            {key: segment[key] for key in ("role_id", "text", "tone", "pause_after_ms") if key in segment}
+            {key: segment[key] for key in ("role_id", "text", "tone", "pause_after_ms", "text_kind") if key in segment}
             if isinstance(segment, dict) else segment
             for segment in segments
         ]
@@ -134,7 +134,7 @@ def parse_role_script_v2(raw: Any, report: ValidationReport) -> Optional[RoleScr
         segments = []
         for segment_pos, (segment, item) in enumerate(zip(chapter.segments, chapter_raw["segments"])):
             path = f"$.chapters[{chapter_pos}].segments[{segment_pos}]"
-            _fields(item, {"role_id", "text", "tone", "pause_after_ms", "segment_id", "source_span", "speaker"},
+            _fields(item, {"role_id", "text", "tone", "pause_after_ms", "segment_id", "source_span", "speaker", "text_kind"},
                     {"role_id", "text", "segment_id", "source_span", "speaker"}, path, report)
             span = _span(item.get("source_span"), f"{path}.source_span", report)
             speaker_raw = item.get("speaker")
@@ -178,7 +178,8 @@ def parse_role_script_v2(raw: Any, report: ValidationReport) -> Optional[RoleScr
             if not isinstance(item.get("segment_id"), str) or not item["segment_id"]:
                 report.error("invalid_segment_id", f"{path}.segment_id", "段落 ID 必须是非空字符串")
             segments.append(SegmentScript(segment.role_id, segment.text, segment.tone,
-                                          segment.pause_after_ms, item.get("segment_id"), span, speaker))
+                                          segment.pause_after_ms, item.get("segment_id"), span, speaker,
+                                          text_kind=segment.text_kind))
         chapters.append(ChapterScript(chapter.chapter_index, chapter.title, tuple(segments)))
 
     hashes = raw.get("chapter_hashes", {})

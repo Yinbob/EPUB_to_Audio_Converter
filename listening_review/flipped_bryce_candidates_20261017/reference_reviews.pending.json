@@ -1,0 +1,62 @@
+[
+  {
+    "sample_id": "bryce_a_1",
+    "role_id": "bryce_a",
+    "voice_version": "13c49b6103ab1dabef5ddc07c116c5d3bd578b5b752b13dc9eeb0ae0f12d40cd",
+    "audio_sha256": "8d0cd3ea2cb6b37b4b83dd421196d5ea45f95f21cfb122b7a819e931d5b8b57f",
+    "content_complete": null,
+    "signal_acceptable": null,
+    "identity_accepted": null,
+    "notes": ""
+  },
+  {
+    "sample_id": "bryce_a_2",
+    "role_id": "bryce_a",
+    "voice_version": "13c49b6103ab1dabef5ddc07c116c5d3bd578b5b752b13dc9eeb0ae0f12d40cd",
+    "audio_sha256": "0acac62e6e8abbd5d1b5f7a2cfc1efbc828429a728d8db0bdde9d34838256e70",
+    "content_complete": null,
+    "signal_acceptable": null,
+    "identity_accepted": null,
+    "notes": ""
+  },
+  {
+    "sample_id": "bryce_a_3",
+    "role_id": "bryce_a",
+    "voice_version": "13c49b6103ab1dabef5ddc07c116c5d3bd578b5b752b13dc9eeb0ae0f12d40cd",
+    "audio_sha256": "9b5756f120091a2cf2ac2c38121394a27134f88289195734ba542cba1ba724c4",
+    "content_complete": null,
+    "signal_acceptable": null,
+    "identity_accepted": null,
+    "notes": ""
+  },
+  {
+    "sample_id": "bryce_b_1",
+    "role_id": "bryce_b",
+    "voice_version": "ca1e9167d6df2bb1dc1c10b2227db207c54969717bfb68189eba75a0a99745c6",
+    "audio_sha256": "03abf58a3561e2551e00de025ec77ade9da91878551c0f6e748514d299ddda79",
+    "content_complete": null,
+    "signal_acceptable": null,
+    "identity_accepted": null,
+    "notes": ""
+  },
+  {
+    "sample_id": "bryce_b_2",
+    "role_id": "bryce_b",
+    "voice_version": "ca1e9167d6df2bb1dc1c10b2227db207c54969717bfb68189eba75a0a99745c6",
+    "audio_sha256": "b057e62c4da3c99e5a5c7d5d9f867ef8808f307c160088f2538748b22db535df",
+    "content_complete": null,
+    "signal_acceptable": null,
+    "identity_accepted": null,
+    "notes": ""
+  },
+  {
+    "sample_id": "bryce_b_3",
+    "role_id": "bryce_b",
+    "voice_version": "ca1e9167d6df2bb1dc1c10b2227db207c54969717bfb68189eba75a0a99745c6",
+    "audio_sha256": "c40b0237a7f67a9ce76bb385924de74d4bc73757532e80873f55f322bea5e4db",
+    "content_complete": null,
+    "signal_acceptable": null,
+    "identity_accepted": null,
+    "notes": ""
+  }
+]

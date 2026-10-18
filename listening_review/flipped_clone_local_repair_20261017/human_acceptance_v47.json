@@ -1,0 +1,36 @@
+{
+  "version": "flipped-clone-local-repair-human-acceptance-v47",
+  "source": "explicit_user_reply",
+  "user_reply": "三处均正常",
+  "source_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/assembly_manifest.json",
+  "source_manifest_sha256": "967f1bdd25cf1e0da22a51fcdccc6643b9ab11355f1ca43f6ed797d5dc26fa23",
+  "accepted_content_samples": [
+    {
+      "sample_id": "R018",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/audio/R018.wav",
+      "audio_sha256": "347ed59a1e5d167e66146dab22d32e5009534557b1ea668c530d0374ac1c1970",
+      "content_complete": true,
+      "extra_suffix_absent": true,
+      "ending_and_adjacent_joins_acceptable": true
+    },
+    {
+      "sample_id": "R039",
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/audio/R039.wav",
+      "audio_sha256": "219f71e6dc68e8dbe85b84f379c8b4373116b72fa38f8cf48079186489e3c1e3",
+      "content_complete": true,
+      "extra_suffix_absent": true,
+      "ending_and_adjacent_joins_acceptable": true
+    }
+  ],
+  "accepted_pause_context": {
+    "sample_id": "J076",
+    "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/audio/J076.wav",
+    "audio_sha256": "15d97dab3e111525fcccceea2a64f0a0ed3f64b6701ccfb9d78486dd1c3f758c",
+    "estimated_pause_seconds": 1.0,
+    "natural": true,
+    "speech_complete": true
+  },
+  "scope": "three_local_edits_only",
+  "whole_chapter_listening_complete": false,
+  "machine_reports_unchanged": true
+}

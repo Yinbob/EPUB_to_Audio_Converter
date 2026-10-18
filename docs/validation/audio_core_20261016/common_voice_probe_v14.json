@@ -1,0 +1,40 @@
+{
+  "kind": "actual_mimo_common_prompt_probe_pilot_pending_human_review",
+  "run_id": "eda33a084b364644875fa57fe06c260a",
+  "root": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_voice_probe_pilot_20261016",
+  "manifest_sha256": "39715b9efc7f0f6d2711fa26c06d913fd78090354dc1001c990202de17f800fc",
+  "automatic_checks_sha256": "982746e313b56d13ef02a7947bdf226929c8184e7dabfae0b6e5214539fdb7d1",
+  "human_review_template_sha256": "ae8e4343ac5102fab96a7f28bdcfcb80c0f4df5488099551676c9a58dd57e117",
+  "voices": [
+    "冰糖",
+    "茉莉",
+    "苏打"
+  ],
+  "samples": 12,
+  "prompts_per_voice": 4,
+  "resources": {
+    "succeeded": {
+      "requests": 12,
+      "characters": 330,
+      "repair_requests": 0
+    }
+  },
+  "asr_equal": 12,
+  "signal_threshold_clear": 12,
+  "total_duration_seconds": 77.28,
+  "asr_model_fingerprint": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6",
+  "speaker_model_fingerprint": "9cc19ee039c6ded8c46311e5b94b2595a9c9ff2d11fed1a29fb838ddd7b15f27",
+  "human_verified_samples": 0,
+  "pending_samples": 12,
+  "within_voice_checks_pending": 3,
+  "unreviewed_bank_build_rejected": true,
+  "verified_voice_bank_created": false,
+  "listener_experiment_executed": false,
+  "model_trained": false,
+  "code_changes_this_step": false,
+  "limitations": [
+    "同一模型每个声音每条文本只有一次合成，不能据此估计生成方差。",
+    "ASR 一致不等于发音与听感正确；声纹距离不等于听众辨识率。",
+    "原始探针不应用章节接缝渐强方案，保持共同测量条件。"
+  ]
+}

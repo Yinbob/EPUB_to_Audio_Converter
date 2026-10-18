@@ -1,6 +1,7 @@
 import json
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 from audiobook_generator.role_script.deepseek_splitter import role_script_to_dict
@@ -72,6 +73,22 @@ class RoleScriptV2IOTest(unittest.TestCase):
         self.assertTrue(report.ok)
         result = validate_role_script(loaded, chapters=[("第一章", source)])
         self.assertIn("unknown_entity", [item.code for item in result.report.errors])
+
+    def test_confidence_kind_validation_agrees_with_reload(self):
+        script, source = _script()
+        chapter = script.chapters[0]
+        segment = chapter.segments[0]
+        for kind in ("human", "uncalibrated", "calibrated", "human_confirmed", None, 12, []):
+            with self.subTest(kind=kind):
+                updated = replace(script, chapters=(replace(chapter, segments=(
+                    replace(segment, speaker=replace(segment.speaker, confidence_kind=kind)),
+                    *chapter.segments[1:])),))
+                valid = isinstance(kind, str) and kind in {"human", "uncalibrated", "calibrated"}
+                result = validate_role_script(updated, chapters=[("第一章", source)])
+                self.assertEqual(result.ok, valid, result.report.to_dict())
+                loaded, report = self._load(role_script_to_dict(updated))
+                self.assertEqual(report.ok, valid, report.to_dict())
+                self.assertEqual(loaded is not None, valid)
 
 
 if __name__ == "__main__":

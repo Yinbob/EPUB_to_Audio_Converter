@@ -1,0 +1,44 @@
+{
+  "version": "flipped-cmon-repair-plan-v48",
+  "source_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/flipped_clone_local_repair_20261017/assembly_manifest.json",
+  "source_manifest_sha256": "967f1bdd25cf1e0da22a51fcdccc6643b9ab11355f1ca43f6ed797d5dc26fa23",
+  "sample_id": "R034",
+  "original_text": "“C'mon!”",
+  "tts_text": "“Come on!”",
+  "profile": {
+    "voice_mode": "preset",
+    "voice": "Chloe",
+    "voice_language": "en",
+    "instructions": "Read in clear, natural American English at a steady, moderate audiobook pace. Keep the same voice identity and do not overact.",
+    "voice_version": "d8d50765bd410eeee4bc9a123d09410125672d1b6762ed626d30af7774509301",
+    "voice_profile_id": "flipped_juli_preset_candidate_v1"
+  },
+  "request": {
+    "version": "mimo-role-request-v2",
+    "mode": "preset",
+    "model": "mimo-v2.5-tts",
+    "voice": "Chloe",
+    "instructions": "Read in clear, natural American English at a steady, moderate audiobook pace. Keep the same voice identity and do not overact.\nUnless an explicit pace is requested above, use a steady, moderate audiobook pace. Keep the voice identity consistent. Read only the supplied text without omissions, additions or repeats.",
+    "stream": false,
+    "format": "wav",
+    "voice_profile_id": "flipped_juli_preset_candidate_v1",
+    "voice_version": "d8d50765bd410eeee4bc9a123d09410125672d1b6762ed626d30af7774509301",
+    "language": "en",
+    "optimize_text_preview": null
+  },
+  "project": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/flipped_casting_preview_20261017/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011",
+  "endpoint": "https://api.xiaomimimo.com/v1/",
+  "max_requests": 1,
+  "max_characters": 10,
+  "sdk_retries": 0,
+  "audio_reference_upload": false,
+  "other_chapters_allowed": false,
+  "authorization": {
+    "source": "explicit_user_request_to_repair_this_occurrence",
+    "user_reply": "3分59处原文有一个难发音的单词c'mon,在完整章节候选音频中的3:59-4:04位置，tts模型尝试发了2-3次音，这个应该也属于尾部重复问题吧，请修正",
+    "prior_scope": "Flipped first chapter MiMo synthesis authorized",
+    "spoken_expansion": "implementation_choice_for_this_occurrence_only"
+  },
+  "original_source_text_and_span_unchanged": true,
+  "automatic_additional_requests": false
+}

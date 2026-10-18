@@ -1,0 +1,15 @@
+{
+  "version": "asr-adjudication-engineering-v49",
+  "tests_run": 597,
+  "tests_passed": 567,
+  "tests_skipped": 30,
+  "failures": 0,
+  "errors": 0,
+  "elapsed_seconds": 18.467,
+  "log": "/tmp/asr_adjudication_v49_full_release.log",
+  "actual_evidence": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261017/asr_adjudication_actual_v49.json",
+  "actual_evidence_sha256": "03784fa02c1ae9c48f12e25fd7e6308168deb674f8971fb9336d968430121a13",
+  "new_tts_requests": 0,
+  "new_llm_requests": 0,
+  "overall_project_complete": false
+}

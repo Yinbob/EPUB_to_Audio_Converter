@@ -1,0 +1,165 @@
+{
+  "kind": "existing_real_audio_annotation_and_origin_audit",
+  "new_tts_requests": 0,
+  "annotation_export": {
+    "sample_count": 6,
+    "boundary_count": 2,
+    "audio_files": 8,
+    "reviewed_boundaries": 0,
+    "all_statuses_pending": true,
+    "requests_sent": 0,
+    "source_reports": [
+      "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/6f40a0049eaa4ba8a54c0c41283537f4/chapter_000001/quality.json",
+      "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/6f40a0049eaa4ba8a54c0c41283537f4/chapter_000002/quality.json"
+    ],
+    "check_scope": "streamed_PCM_layout_and_pending_pack_round_trip",
+    "temporary_pack_removed_after_check": true
+  },
+  "resource_provenance": {
+    "version": "request-provenance-v1",
+    "project_database": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/project.sqlite",
+    "actual_run": {
+      "run_id": "f0aec2f0883549efa8a19815cfd57037",
+      "scope": "cumulative_run",
+      "request_events": [],
+      "summary": {}
+    },
+    "selected_sources": [
+      {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/raw/3c80fd21eb392ca5d866843d674239634ee51b66446c27680eefc8052c365eee/691374725ade495b89ed0b180b8a1dc3.wav",
+        "request_key": "3c80fd21eb392ca5d866843d674239634ee51b66446c27680eefc8052c365eee",
+        "sample_id": "691374725ade495b89ed0b180b8a1dc3",
+        "sha256": "e564002c46181d965484fc75429e5264cfec2d88d4408e498f9433ac2b5b8386",
+        "origin_status": "recorded",
+        "origin_request_ids": [
+          "f9770c732fe94b66acacb1ac3488b3e3"
+        ]
+      },
+      {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/raw/4f1fd7be4fc3eab958a59d55b8e85ca4e239301e3f4a180660caf90868ca4936/c5221fa371554a35b362e5875cd0478f.wav",
+        "request_key": "4f1fd7be4fc3eab958a59d55b8e85ca4e239301e3f4a180660caf90868ca4936",
+        "sample_id": "c5221fa371554a35b362e5875cd0478f",
+        "sha256": "8bdb931793c2fdc082045290de081f0c4efe0214800a53cd37509bb162cf2c2b",
+        "origin_status": "recorded",
+        "origin_request_ids": [
+          "ab8e2db553e8481ba89093c019edf1ed"
+        ]
+      },
+      {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/raw/76ba3c5d76305a9e06e679394dc83b4fb278bf2dc50158dd2b0f8f0aa04a02a4/04024b238e15401da0232b773f044f17.wav",
+        "request_key": "76ba3c5d76305a9e06e679394dc83b4fb278bf2dc50158dd2b0f8f0aa04a02a4",
+        "sample_id": "04024b238e15401da0232b773f044f17",
+        "sha256": "846e362b429e332dc77f1573c6d7fe57ac41f84803b71867ca69a14b1f0800f6",
+        "origin_status": "recorded",
+        "origin_request_ids": [
+          "9daed42737c545b2bd01268d171c1e5c"
+        ]
+      },
+      {
+        "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/raw/c724e046453ae0fbdfd9b2feaae683aa80d7d44fee8da34ca6cbaf6be404d5ad/45aa1b8e0e0f4970a7a6f0b6010adf5d.wav",
+        "request_key": "c724e046453ae0fbdfd9b2feaae683aa80d7d44fee8da34ca6cbaf6be404d5ad",
+        "sample_id": "45aa1b8e0e0f4970a7a6f0b6010adf5d",
+        "sha256": "f8bcfe5b28c1e5663d6ac181ca0f1f8c7044f9bbafa09ed7db1a24ecfc2a4965",
+        "origin_status": "recorded",
+        "origin_request_ids": [
+          "6cf6d87452c9466fa39d709cec40bbb6"
+        ]
+      }
+    ],
+    "recorded_generation": {
+      "scope": "selected_sources_and_observed_candidate_lineage",
+      "request_events": [
+        {
+          "id": "ab8e2db553e8481ba89093c019edf1ed",
+          "run_id": "6f40a0049eaa4ba8a54c0c41283537f4",
+          "request_key": "4f1fd7be4fc3eab958a59d55b8e85ca4e239301e3f4a180660caf90868ca4936",
+          "repair": 0,
+          "status": "succeeded",
+          "started": 1792117946.158188,
+          "finished": 1792117949.079371,
+          "characters": 37,
+          "artifact": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/raw/4f1fd7be4fc3eab958a59d55b8e85ca4e239301e3f4a180660caf90868ca4936/c5221fa371554a35b362e5875cd0478f.wav",
+          "error_type": null
+        },
+        {
+          "id": "6cf6d87452c9466fa39d709cec40bbb6",
+          "run_id": "6f40a0049eaa4ba8a54c0c41283537f4",
+          "request_key": "c724e046453ae0fbdfd9b2feaae683aa80d7d44fee8da34ca6cbaf6be404d5ad",
+          "repair": 0,
+          "status": "succeeded",
+          "started": 1792117949.795475,
+          "finished": 1792117952.443582,
+          "characters": 42,
+          "artifact": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/raw/c724e046453ae0fbdfd9b2feaae683aa80d7d44fee8da34ca6cbaf6be404d5ad/45aa1b8e0e0f4970a7a6f0b6010adf5d.wav",
+          "error_type": null
+        },
+        {
+          "id": "f9770c732fe94b66acacb1ac3488b3e3",
+          "run_id": "6f40a0049eaa4ba8a54c0c41283537f4",
+          "request_key": "3c80fd21eb392ca5d866843d674239634ee51b66446c27680eefc8052c365eee",
+          "repair": 0,
+          "status": "succeeded",
+          "started": 1792117952.658963,
+          "finished": 1792117954.5705888,
+          "characters": 35,
+          "artifact": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/raw/3c80fd21eb392ca5d866843d674239634ee51b66446c27680eefc8052c365eee/691374725ade495b89ed0b180b8a1dc3.wav",
+          "error_type": null
+        },
+        {
+          "id": "9daed42737c545b2bd01268d171c1e5c",
+          "run_id": "6f40a0049eaa4ba8a54c0c41283537f4",
+          "request_key": "76ba3c5d76305a9e06e679394dc83b4fb278bf2dc50158dd2b0f8f0aa04a02a4",
+          "repair": 0,
+          "status": "succeeded",
+          "started": 1792117954.66215,
+          "finished": 1792117956.277007,
+          "characters": 38,
+          "artifact": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/raw/76ba3c5d76305a9e06e679394dc83b4fb278bf2dc50158dd2b0f8f0aa04a02a4/04024b238e15401da0232b773f044f17.wav",
+          "error_type": null
+        }
+      ],
+      "summary": {
+        "succeeded": {
+          "requests": 4,
+          "characters": 152,
+          "repair_requests": 0
+        }
+      },
+      "chunks": [
+        {
+          "chunk_id": "1:1:narrator:chunk:1",
+          "request_ids": [
+            "ab8e2db553e8481ba89093c019edf1ed"
+          ],
+          "history_incomplete": true
+        },
+        {
+          "chunk_id": "1:2:narrator:chunk:1",
+          "request_ids": [
+            "6cf6d87452c9466fa39d709cec40bbb6"
+          ],
+          "history_incomplete": true
+        },
+        {
+          "chunk_id": "2:1:hero:chunk:1",
+          "request_ids": [
+            "f9770c732fe94b66acacb1ac3488b3e3"
+          ],
+          "history_incomplete": true
+        },
+        {
+          "chunk_id": "2:2:other:chunk:1",
+          "request_ids": [
+            "9daed42737c545b2bd01268d171c1e5c"
+          ],
+          "history_incomplete": true
+        }
+      ],
+      "history_incomplete": true,
+      "missing_request_ids": [],
+      "unknown_source_paths": [],
+      "note": "历史记录不全时保留未知；本次零请求不等于这些音频的生成资源为零。"
+    }
+  },
+  "interpretation": "来源查询保留原始四次请求；本次未合成。原始策略全部候选历史未追溯，保留 incomplete。"
+}

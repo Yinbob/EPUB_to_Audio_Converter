@@ -11,6 +11,28 @@ class GeneralConfig:
         self.worker_count = getattr(args, 'worker_count', None)
         self.use_pydub_merge = getattr(args, 'use_pydub_merge', None)
 
+        # 统一质量核心首轮仅 MiMo；限制计算与重试，不使用费用预算。
+        self.audio_core_enabled = getattr(args, 'audio_core_enabled', False)
+        self.audio_core_repair = getattr(args, 'audio_core_repair', False)
+        self.audio_core_max_english_wpm = getattr(args, 'audio_core_max_english_wpm', 300.0)
+        self.audio_core_chunk_chars = getattr(args, 'audio_core_chunk_chars', 300)
+        self.audio_core_max_requests = getattr(args, 'audio_core_max_requests', 1000)
+        self.audio_core_max_repairs = getattr(args, 'audio_core_max_repairs', 24)
+        self.audio_core_max_repair_characters = getattr(args, 'audio_core_max_repair_characters', None)
+        self.audio_core_max_seconds = getattr(args, 'audio_core_max_seconds', 3600)
+        self.audio_core_no_asr = getattr(args, 'audio_core_no_asr', False)
+        self.audio_core_no_speaker = getattr(args, 'audio_core_no_speaker', False)
+        self.audio_core_vad = getattr(args, 'audio_core_vad', False)
+        self.audio_core_asr_model = getattr(args, 'audio_core_asr_model', None)
+        self.audio_core_speaker_model = getattr(args, 'audio_core_speaker_model', None)
+        self.audio_core_boundary_model = getattr(args, 'audio_core_boundary_model', None)
+        self.audio_core_role_references = getattr(args, "audio_core_role_references", None)
+        self.audio_core_tail_repeat_mode = getattr(args, 'audio_core_tail_repeat_mode', 'review')
+        self.audio_core_casting = getattr(args, 'audio_core_casting', None)
+        self.audio_core_reading_dictionary = getattr(args, 'audio_core_reading_dictionary', None)
+        self.audio_core_transition_boundaries = getattr(args, 'audio_core_transition_boundaries', [])
+        self.audio_core_transition_source_group = getattr(args, 'audio_core_transition_source_group', None)
+
         # Multi-role script mode. CLI stores a path; WebUI stores a parsed,
         # pickle-safe RoleScriptV1/V2 instance.
         self.role_script = getattr(args, 'role_script', None)

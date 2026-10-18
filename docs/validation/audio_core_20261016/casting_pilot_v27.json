@@ -1,0 +1,193 @@
+{
+  "version": "casting_pilot_v27",
+  "source": "actual_mimo_authored_pilot",
+  "requests": 22,
+  "characters": 2151,
+  "unique_raw_samples": 22,
+  "raw_total_duration_seconds": 154.56,
+  "assembly_requests": 0,
+  "selected_chunk_checks": 36,
+  "all_selected_chunk_asr_WER": 0,
+  "all_selected_raw_and_rendered_pcm_equal": true,
+  "all_nine_final_wav_pcm_equal": true,
+  "joint_pcm_reconstruction_checks": 27,
+  "flagged": [
+    {
+      "chapter": 2,
+      "scope": "chunk",
+      "scope_index": 4,
+      "code": "rate_drift"
+    },
+    {
+      "chapter": 3,
+      "scope": "boundary",
+      "scope_index": 1,
+      "code": "boundary_content_mismatch"
+    },
+    {
+      "chapter": 6,
+      "scope": "boundary",
+      "scope_index": 1,
+      "code": "boundary_content_mismatch"
+    },
+    {
+      "chapter": 8,
+      "scope": "chunk",
+      "scope_index": 4,
+      "code": "rate_drift"
+    },
+    {
+      "chapter": 9,
+      "scope": "boundary",
+      "scope_index": 1,
+      "code": "boundary_content_mismatch"
+    }
+  ],
+  "joint_cache_audio_hashes_are_distinct": true,
+  "listener_pack_rejection": "角色辨识材料存在已检出问题或内容未完成检查，请先复核",
+  "no_listener_pack_published": true,
+  "review_rows": 63,
+  "reviewed_rows": 0,
+  "report_hashes_unchanged": true,
+  "human_focus_review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focused_review.md",
+  "quality_overall": "incomplete",
+  "real_listener_results": null,
+  "production_code_changed": false,
+  "full_tests_rerun": false,
+  "latest_full_regression": {
+    "ran": 519,
+    "skipped": 30,
+    "status": "OK",
+    "log": "casting_exact_scene_regression_v26.log"
+  },
+  "generation_run": "b3254ef8dbaa4d149da939174fc995f6",
+  "assembly_run": "250125d631df416896b600175272657b",
+  "chapter_count": 9,
+  "distinct_source_groups": 1,
+  "distinct_voice_assignments": 3,
+  "human_fit_statement": "六项均为0",
+  "human_quality_review": "pending_not_implied_by_fit",
+  "checks": {
+    "raw_hashes_verified": 22,
+    "focus_source_hashes_verified": 7,
+    "review_rows_all_pending": 63,
+    "html_audio_players": 16,
+    "checked_local_links": 125
+  },
+  "human_focus_review_file": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focused_human_review.json",
+  "prior_plan_readme": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/README.before_actual_audio_v27.md",
+  "prior_plan_readme_sha256": "a7cf5df83e40c79c3f7d1069f29fe32e74fa0447f310a63db152754cd691c6e6",
+  "limitations": [
+    "尚无人确认本批质量",
+    "机器语速／内容提示未经人工裁决",
+    "单一自编来源",
+    "无真实听众结果",
+    "真实边界阳性及独立来源划分尚缺"
+  ],
+  "artifacts": [
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/synthesis_summary.json",
+      "sha256": "a16747117fe5bab96ff0741a45ff216750549aa32aaf7c81961de668a7584953"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/validation_summary.json",
+      "sha256": "ee176d504795315a5532989f5d0a535d82c378d16ec1c8d94f5dcb410b55fd28"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/quality_verification.json",
+      "sha256": "28e7f8a22fddc9534a58ed97c5fead06b41aa22ecd7377ae150cb07ba6eb0d12"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/raw_inventory.json",
+      "sha256": "8196be17d7d45a1c55ca9ed0f7d2c2187d2d94849c8fa877928885e3c725fad4"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/execution_plan.json",
+      "sha256": "543008680fae9296fb7e8c956cdf24272c57e66398df455098829f9194c2db85"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/driver.py",
+      "sha256": "5abb3f9623acae6c81263464a71fe54c8c7292bed7e0164cd7ec937cfff9d5a8"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/review_driver.py",
+      "sha256": "36cbbf3106aed67511af86ad0fcdb31302535bafe19055243fb390b885e594e8"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/listening_conditions.json",
+      "sha256": "f374a682975f9c5001ce2dcca51ea98241ea86e7e5bc46c57bfd667a63b25604"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_pilot_preflight_v27.json",
+      "sha256": "ea914eca260bb9d99742ed7cc62d05ad98dc86b9b1049d6380a1610e5817f35d"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_pilot_synthesis_v27.log",
+      "sha256": "d250f2cf97ef9cc9268b1e689d1506ef6cce087ae137ee3663937648550b9796"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_pilot_assembly_v27.log",
+      "sha256": "9e40eb15ae8429c6c9dd6ce234e99d165385c32ae328383b149a8331a857213d"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_pilot_verification_v27.log",
+      "sha256": "d4a25dadd0edaeefeddaef9864cbb594668be6b651b3a3dc461b46493683a0ad"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/annotation.csv",
+      "sha256": "794c5986606f6de3029f4fc718fa352f6e0ce5dffb2c827e46c2bb2f9478db22"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focus_manifest.json",
+      "sha256": "9f30b3d21a0c166b725b1614412832d022f1730aceb74c59019e1aafb876c38d"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focused_human_review.json",
+      "sha256": "8d34258d22922be9cb55ba01e8206453d1e0cb42e33ff030bafdbea1089f078b"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/focused_review.md",
+      "sha256": "41834f66c3004238e3b8ad8fa6571747be915865b69a912e917416b10c0155c8"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_audio_20261016/index.html",
+      "sha256": "9d6b9209c095147fe5607cbafe2ca43069f8c72177317fb5b8c1663553640d26"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000001/quality.json",
+      "sha256": "59a20aa2a433abbc30b29c40180da2ea91537ac0150ea92e52e28c12a1ba153a"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000002/quality.json",
+      "sha256": "4514627455512fa628c827b7413de5ae7b852af114c3a774517d00124bc68e59"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000003/quality.json",
+      "sha256": "a770392261b866eb0085afaba006e822e659d543294a1bfc78ced0cd41e9ea24"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000004/quality.json",
+      "sha256": "dc1d78dadd8ed27cee6b6edf33ffd4d1067142bd09e4134e83afca0b916cc0d8"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000005/quality.json",
+      "sha256": "2c770c2dc59684be19d3be6ade9c97e0ca276a456bf6d4c4a8ceed217bf69255"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000006/quality.json",
+      "sha256": "85e81a1b0cb19da1d2689dea7e4f781936765532370c770a33ab10f6d08d2d65"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000007/quality.json",
+      "sha256": "3dcd8db46aca83624b0325660bf0a65c14dc857406bda3d059817c1cec5d81f6"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000008/quality.json",
+      "sha256": "d02d5f94488016603ca1f333a124fe898188961863337a036e68f797e74a3d5f"
+    },
+    {
+      "path": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_pilot_20261016/project/reports/250125d631df416896b600175272657b/chapter_000009/quality.json",
+      "sha256": "ec8f79a287aa8b6ca21c23edaf0b394defe0cfff27394135e2aac1dc81d076c3"
+    }
+  ]
+}

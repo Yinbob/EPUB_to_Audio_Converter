@@ -1,0 +1,771 @@
+{
+  "version": "casting_common_gain_v31",
+  "protocol": {
+    "Mia": 0,
+    "Chloe": -5
+  },
+  "protocol_file": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_common_gain_protocol_v31.json",
+  "calibration_receipt": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_loudness_20261016/human_acceptance_v30.json",
+  "calibration_receipt_sha256": "74161cf773d5d2a552819a287d4ad5bf68c8cf56769b226a5d4133474f157193",
+  "protocol_scope": "development setting from F01, not independent validation or general optimum",
+  "conditions": 3,
+  "chapters": 9,
+  "chunks": 36,
+  "exact_final_pairs": 27,
+  "loudness": [
+    {
+      "chapter": 1,
+      "chunk": 0,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -21.13,
+        "true_peak_dbfs": -4.84,
+        "lra_lu": 1.8,
+        "gate_lufs": -31.64,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -21.13,
+        "true_peak_dbfs": -4.84,
+        "lra_lu": 1.8,
+        "gate_lufs": -31.64,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 1,
+      "chunk": 1,
+      "voice": "Chloe",
+      "before": {
+        "integrated_lufs": -15.56,
+        "true_peak_dbfs": 0.49,
+        "lra_lu": 3.2,
+        "gate_lufs": -26.08,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -20.56,
+        "true_peak_dbfs": -4.51,
+        "lra_lu": 3.2,
+        "gate_lufs": -31.08,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": -5.0
+    },
+    {
+      "chapter": 1,
+      "chunk": 2,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -20.83,
+        "true_peak_dbfs": -2.89,
+        "lra_lu": 5.1,
+        "gate_lufs": -31.37,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -20.83,
+        "true_peak_dbfs": -2.89,
+        "lra_lu": 5.1,
+        "gate_lufs": -31.37,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 1,
+      "chunk": 3,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -19.06,
+        "true_peak_dbfs": -0.9,
+        "lra_lu": 2.7,
+        "gate_lufs": -29.52,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -19.06,
+        "true_peak_dbfs": -0.9,
+        "lra_lu": 2.7,
+        "gate_lufs": -29.52,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 2,
+      "chunk": 0,
+      "voice": "Chloe",
+      "before": {
+        "integrated_lufs": -15.96,
+        "true_peak_dbfs": -0.89,
+        "lra_lu": 1.7,
+        "gate_lufs": -26.38,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -20.96,
+        "true_peak_dbfs": -5.89,
+        "lra_lu": 1.7,
+        "gate_lufs": -31.38,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": -5.0
+    },
+    {
+      "chapter": 2,
+      "chunk": 1,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -23.23,
+        "true_peak_dbfs": -4.22,
+        "lra_lu": 2.3,
+        "gate_lufs": -33.6,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -23.23,
+        "true_peak_dbfs": -4.22,
+        "lra_lu": 2.3,
+        "gate_lufs": -33.6,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 2,
+      "chunk": 2,
+      "voice": "Chloe",
+      "before": {
+        "integrated_lufs": -17.63,
+        "true_peak_dbfs": -3.21,
+        "lra_lu": 1.9,
+        "gate_lufs": -28.1,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -22.63,
+        "true_peak_dbfs": -8.21,
+        "lra_lu": 1.9,
+        "gate_lufs": -33.1,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": -5.0
+    },
+    {
+      "chapter": 2,
+      "chunk": 3,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -20.19,
+        "true_peak_dbfs": -4.04,
+        "lra_lu": 0.5,
+        "gate_lufs": -30.57,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -20.19,
+        "true_peak_dbfs": -4.04,
+        "lra_lu": 0.5,
+        "gate_lufs": -30.57,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 3,
+      "chunk": 0,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -22.44,
+        "true_peak_dbfs": -4.73,
+        "lra_lu": 5.8,
+        "gate_lufs": -32.85,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -22.44,
+        "true_peak_dbfs": -4.73,
+        "lra_lu": 5.8,
+        "gate_lufs": -32.85,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 3,
+      "chunk": 1,
+      "voice": "Chloe",
+      "before": {
+        "integrated_lufs": -17.44,
+        "true_peak_dbfs": -0.91,
+        "lra_lu": 2.3,
+        "gate_lufs": -27.89,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -22.44,
+        "true_peak_dbfs": -5.91,
+        "lra_lu": 2.3,
+        "gate_lufs": -32.89,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": -5.0
+    },
+    {
+      "chapter": 3,
+      "chunk": 2,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -19.97,
+        "true_peak_dbfs": -1.4,
+        "lra_lu": 4.1,
+        "gate_lufs": -30.35,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -19.97,
+        "true_peak_dbfs": -1.4,
+        "lra_lu": 4.1,
+        "gate_lufs": -30.35,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 3,
+      "chunk": 3,
+      "voice": "Chloe",
+      "before": {
+        "integrated_lufs": -18.97,
+        "true_peak_dbfs": -1.95,
+        "lra_lu": 2.8,
+        "gate_lufs": -29.35,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -23.97,
+        "true_peak_dbfs": -6.95,
+        "lra_lu": 2.8,
+        "gate_lufs": -34.35,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": -5.0
+    },
+    {
+      "chapter": 4,
+      "chunk": 0,
+      "voice": "Chloe",
+      "before": {
+        "integrated_lufs": -17.64,
+        "true_peak_dbfs": -0.55,
+        "lra_lu": 0.5,
+        "gate_lufs": -28.25,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -22.64,
+        "true_peak_dbfs": -5.55,
+        "lra_lu": 0.5,
+        "gate_lufs": -33.25,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": -5.0
+    },
+    {
+      "chapter": 4,
+      "chunk": 1,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -20.21,
+        "true_peak_dbfs": -4.27,
+        "lra_lu": 1.2,
+        "gate_lufs": -30.75,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -20.21,
+        "true_peak_dbfs": -4.27,
+        "lra_lu": 1.2,
+        "gate_lufs": -30.75,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 4,
+      "chunk": 2,
+      "voice": "Chloe",
+      "before": {
+        "integrated_lufs": -17.45,
+        "true_peak_dbfs": -2.73,
+        "lra_lu": 4.7,
+        "gate_lufs": -28.05,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -22.45,
+        "true_peak_dbfs": -7.73,
+        "lra_lu": 4.7,
+        "gate_lufs": -33.05,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": -5.0
+    },
+    {
+      "chapter": 4,
+      "chunk": 3,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -19.06,
+        "true_peak_dbfs": -0.9,
+        "lra_lu": 2.7,
+        "gate_lufs": -29.52,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -19.06,
+        "true_peak_dbfs": -0.9,
+        "lra_lu": 2.7,
+        "gate_lufs": -29.52,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 5,
+      "chunk": 0,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -20.46,
+        "true_peak_dbfs": -3.84,
+        "lra_lu": 2.3,
+        "gate_lufs": -30.76,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -20.46,
+        "true_peak_dbfs": -3.84,
+        "lra_lu": 2.3,
+        "gate_lufs": -30.76,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 5,
+      "chunk": 1,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -23.23,
+        "true_peak_dbfs": -4.22,
+        "lra_lu": 2.3,
+        "gate_lufs": -33.6,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -23.23,
+        "true_peak_dbfs": -4.22,
+        "lra_lu": 2.3,
+        "gate_lufs": -33.6,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 5,
+      "chunk": 2,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -22.02,
+        "true_peak_dbfs": -5.64,
+        "lra_lu": 3.2,
+        "gate_lufs": -32.57,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -22.02,
+        "true_peak_dbfs": -5.64,
+        "lra_lu": 3.2,
+        "gate_lufs": -32.57,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 5,
+      "chunk": 3,
+      "voice": "Chloe",
+      "before": {
+        "integrated_lufs": -15.44,
+        "true_peak_dbfs": 0.01,
+        "lra_lu": 1.0,
+        "gate_lufs": -25.6,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -20.44,
+        "true_peak_dbfs": -4.99,
+        "lra_lu": 1.0,
+        "gate_lufs": -30.6,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": -5.0
+    },
+    {
+      "chapter": 6,
+      "chunk": 0,
+      "voice": "Chloe",
+      "before": {
+        "integrated_lufs": -17.84,
+        "true_peak_dbfs": -1.72,
+        "lra_lu": 4.4,
+        "gate_lufs": -28.27,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -22.84,
+        "true_peak_dbfs": -6.72,
+        "lra_lu": 4.4,
+        "gate_lufs": -33.27,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": -5.0
+    },
+    {
+      "chapter": 6,
+      "chunk": 1,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -21.15,
+        "true_peak_dbfs": -3.89,
+        "lra_lu": 3.3,
+        "gate_lufs": -31.71,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -21.15,
+        "true_peak_dbfs": -3.89,
+        "lra_lu": 3.3,
+        "gate_lufs": -31.71,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 6,
+      "chunk": 2,
+      "voice": "Chloe",
+      "before": {
+        "integrated_lufs": -16.03,
+        "true_peak_dbfs": -0.83,
+        "lra_lu": 2.5,
+        "gate_lufs": -26.58,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -21.03,
+        "true_peak_dbfs": -5.83,
+        "lra_lu": 2.5,
+        "gate_lufs": -31.58,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": -5.0
+    },
+    {
+      "chapter": 6,
+      "chunk": 3,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -21.21,
+        "true_peak_dbfs": -3.01,
+        "lra_lu": 1.7,
+        "gate_lufs": -31.47,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -21.21,
+        "true_peak_dbfs": -3.01,
+        "lra_lu": 1.7,
+        "gate_lufs": -31.47,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 7,
+      "chunk": 0,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -21.13,
+        "true_peak_dbfs": -4.84,
+        "lra_lu": 1.8,
+        "gate_lufs": -31.64,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -21.13,
+        "true_peak_dbfs": -4.84,
+        "lra_lu": 1.8,
+        "gate_lufs": -31.64,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 7,
+      "chunk": 1,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -20.21,
+        "true_peak_dbfs": -4.27,
+        "lra_lu": 1.2,
+        "gate_lufs": -30.75,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -20.21,
+        "true_peak_dbfs": -4.27,
+        "lra_lu": 1.2,
+        "gate_lufs": -30.75,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 7,
+      "chunk": 2,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -20.83,
+        "true_peak_dbfs": -2.89,
+        "lra_lu": 5.1,
+        "gate_lufs": -31.37,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -20.83,
+        "true_peak_dbfs": -2.89,
+        "lra_lu": 5.1,
+        "gate_lufs": -31.37,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 7,
+      "chunk": 3,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -19.06,
+        "true_peak_dbfs": -0.9,
+        "lra_lu": 2.7,
+        "gate_lufs": -29.52,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -19.06,
+        "true_peak_dbfs": -0.9,
+        "lra_lu": 2.7,
+        "gate_lufs": -29.52,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 8,
+      "chunk": 0,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -20.46,
+        "true_peak_dbfs": -3.84,
+        "lra_lu": 2.3,
+        "gate_lufs": -30.76,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -20.46,
+        "true_peak_dbfs": -3.84,
+        "lra_lu": 2.3,
+        "gate_lufs": -30.76,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 8,
+      "chunk": 1,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -23.23,
+        "true_peak_dbfs": -4.22,
+        "lra_lu": 2.3,
+        "gate_lufs": -33.6,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -23.23,
+        "true_peak_dbfs": -4.22,
+        "lra_lu": 2.3,
+        "gate_lufs": -33.6,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 8,
+      "chunk": 2,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -22.02,
+        "true_peak_dbfs": -5.64,
+        "lra_lu": 3.2,
+        "gate_lufs": -32.57,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -22.02,
+        "true_peak_dbfs": -5.64,
+        "lra_lu": 3.2,
+        "gate_lufs": -32.57,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 8,
+      "chunk": 3,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -20.19,
+        "true_peak_dbfs": -4.04,
+        "lra_lu": 0.5,
+        "gate_lufs": -30.57,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -20.19,
+        "true_peak_dbfs": -4.04,
+        "lra_lu": 0.5,
+        "gate_lufs": -30.57,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 9,
+      "chunk": 0,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -22.44,
+        "true_peak_dbfs": -4.73,
+        "lra_lu": 5.8,
+        "gate_lufs": -32.85,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -22.44,
+        "true_peak_dbfs": -4.73,
+        "lra_lu": 5.8,
+        "gate_lufs": -32.85,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 9,
+      "chunk": 1,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -21.15,
+        "true_peak_dbfs": -3.89,
+        "lra_lu": 3.3,
+        "gate_lufs": -31.71,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -21.15,
+        "true_peak_dbfs": -3.89,
+        "lra_lu": 3.3,
+        "gate_lufs": -31.71,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 9,
+      "chunk": 2,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -19.97,
+        "true_peak_dbfs": -1.4,
+        "lra_lu": 4.1,
+        "gate_lufs": -30.35,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -19.97,
+        "true_peak_dbfs": -1.4,
+        "lra_lu": 4.1,
+        "gate_lufs": -30.35,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    },
+    {
+      "chapter": 9,
+      "chunk": 3,
+      "voice": "Mia",
+      "before": {
+        "integrated_lufs": -21.21,
+        "true_peak_dbfs": -3.01,
+        "lra_lu": 1.7,
+        "gate_lufs": -31.47,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "after": {
+        "integrated_lufs": -21.21,
+        "true_peak_dbfs": -3.01,
+        "lra_lu": 1.7,
+        "gate_lufs": -31.47,
+        "measurement": "ffmpeg_loudnorm_input_only"
+      },
+      "gain_db": 0.0
+    }
+  ],
+  "flags": [
+    {
+      "chapter": 6,
+      "scope": "boundary",
+      "index": 0,
+      "code": "boundary_content_mismatch"
+    },
+    {
+      "chapter": 9,
+      "scope": "boundary",
+      "index": 0,
+      "code": "boundary_content_mismatch"
+    }
+  ],
+  "source_originals_unchanged": true,
+  "new_tts_requests": 0,
+  "source_generation_requests_still": 22,
+  "review_pack": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_common_gain_20261016",
+  "reports": [
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_01/scene_01/quality.json",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_01/scene_02/quality.json",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_01/scene_03/quality.json",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_02/scene_01/quality.json",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_02/scene_02/quality.json",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_02/scene_03/quality.json",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_03/scene_01/quality.json",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_03/scene_02/quality.json",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_casting_english_common_gain_20261016/condition_03/scene_03/quality.json"
+  ],
+  "listener_pack_rejection": "角色辨识材料存在已检出问题或内容未完成检查，请先复核",
+  "listener_pack_published": false,
+  "full_chapter_human_verified": false,
+  "machine_quality_complete": false,
+  "formal_listener_results": null
+}

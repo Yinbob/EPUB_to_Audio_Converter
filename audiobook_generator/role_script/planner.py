@@ -164,6 +164,8 @@ def build_synthesis_plans(
                     tone=segment.tone,
                     pause_after_ms=pause,
                     is_fallback=is_fallback,
+                    source_span=segment.source_span,
+                    segment_id=segment.segment_id,
                 )
             )
         plans.append(

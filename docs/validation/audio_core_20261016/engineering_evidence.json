@@ -1,0 +1,1160 @@
+{
+  "date": "2026-10-16",
+  "scope": "MiMo first phase; engineering evidence, research effects not established",
+  "tests": {
+    "ran": 536,
+    "skipped": 30,
+    "seconds": 17.513,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_common_gain_regression_v31.log",
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q"
+  },
+  "transport_smoke": {
+    "kind": "real_mimo_transport_and_assembly_smoke",
+    "source": "authored_test_text",
+    "run_id": "6f40a0049eaa4ba8a54c0c41283537f4",
+    "results": [
+      {
+        "chapter": 1,
+        "streaming": false,
+        "quality_status": "incomplete",
+        "duration_seconds": 19.36,
+        "chunks": 2,
+        "boundaries": 1
+      },
+      {
+        "chapter": 2,
+        "streaming": true,
+        "quality_status": "incomplete",
+        "duration_seconds": 13.76,
+        "chunks": 2,
+        "boundaries": 1
+      }
+    ],
+    "model_quality_validation": "requires_models_and_human_validation",
+    "execution_status": "completed",
+    "resources": {
+      "succeeded": {
+        "requests": 4,
+        "characters": 152,
+        "repair_requests": 0
+      }
+    }
+  },
+  "pretrained_reevaluation": [
+    {
+      "chapter": 1,
+      "quality_status": "incomplete",
+      "chunk_asr_cer": [
+        0.0,
+        0.0
+      ],
+      "boundary_asr_cer": [
+        0.0
+      ],
+      "source_report": "audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/pretrained_reevaluation/chapter_000001/quality.json"
+    },
+    {
+      "chapter": 2,
+      "quality_status": "incomplete",
+      "chunk_asr_cer": [
+        0.0,
+        0.0
+      ],
+      "boundary_asr_cer": [
+        0.0
+      ],
+      "source_report": "audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/pretrained_reevaluation/chapter_000002/quality.json"
+    }
+  ],
+  "zero_request_local_repair": [
+    {
+      "chapter": 1,
+      "run_id": "c1203ab8b4d242049fdb21a939f9d5de",
+      "requests": {},
+      "selected_repairs": [
+        {
+          "action": {
+            "kind": "local_speed",
+            "reason": "too_fast",
+            "speed_factor": 0.9523809523809523
+          },
+          "before_rate": 4.523809523809524,
+          "after_rate": 4.341864716636197
+        }
+      ],
+      "quality_status": "incomplete"
+    },
+    {
+      "chapter": 2,
+      "run_id": "db37702ab209472a9c016e817f7f9bb8",
+      "requests": {},
+      "selected_repairs": [
+        {
+          "action": {
+            "kind": "local_speed",
+            "reason": "too_fast",
+            "speed_factor": 0.9523809523809523
+          },
+          "before_rate": 5.86080586080586,
+          "after_rate": 5.5983205038488455
+        },
+        {
+          "action": {
+            "kind": "local_speed",
+            "reason": "too_fast",
+            "speed_factor": 0.9523809523809523
+          },
+          "before_rate": 5.573770491803279,
+          "after_rate": 5.349276274386407
+        }
+      ],
+      "quality_status": "incomplete"
+    }
+  ],
+  "ui": {
+    "report_choices": 6,
+    "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/db37702ab209472a9c016e817f7f9bb8/chapter_000002/quality.json",
+    "summary": "第 2 章：incomplete；音频已导出；请按报告核验。",
+    "issue_rows": 3,
+    "preview_returned": true
+  },
+  "annotation_import_preflight": {
+    "reviewed_boundaries": 0,
+    "total_samples": 6,
+    "skipped": [
+      {
+        "sample_id": "C01_01",
+        "reason": "pending"
+      },
+      {
+        "sample_id": "C01_02",
+        "reason": "pending"
+      },
+      {
+        "sample_id": "B01_01",
+        "reason": "pending"
+      },
+      {
+        "sample_id": "C02_01",
+        "reason": "pending"
+      },
+      {
+        "sample_id": "C02_02",
+        "reason": "pending"
+      },
+      {
+        "sample_id": "B02_01",
+        "reason": "pending"
+      }
+    ],
+    "requests_sent": 0,
+    "training_sufficiency": "not_assessed"
+  },
+  "annotation_export_verified": {
+    "samples": 6,
+    "boundaries": 2,
+    "audio_files": 8,
+    "new_tts_requests": 0
+  },
+  "limitations": [
+    "No human reviewed labels yet",
+    "No validated real-defect boundary model",
+    "No common-text verified voice probe bank or real listener benefit experiment",
+    "Safe gap/click repairs verified with constructed fixtures, not independent real defects",
+    "Post encoding ASR is an engineering preservation check, not independent human quality gold",
+    "Remaining plan items listed in completion audit",
+    "Content repair tested with constructed oracle, no human verified real repair benefit"
+  ],
+  "previous_regression": {
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q",
+    "ran": 426,
+    "seconds": 12.631,
+    "skipped": 30,
+    "status": "OK",
+    "permission": "normal local execution; sandbox native subprocess limitation",
+    "log": "/private/tmp/audio_quality_regression_final_v6.log"
+  },
+  "reading_validation": {
+    "normalization_version": "zh-reading-v3",
+    "source_text": "API报告显示，重量3.50千克，长度0.08米。版本v3.5和编号0012保持原样。",
+    "tts_text": "应用程序接口报告显示，重量三点五零千克，长度零点零八米。版本v3.5和编号0012保持原样。",
+    "dictionary": {
+      "API": "应用程序接口"
+    },
+    "edits": [
+      {
+        "kind": "user_dictionary",
+        "source_start": 0,
+        "source_end": 3,
+        "tts_start": 0,
+        "tts_end": 6,
+        "before": "API",
+        "after": "应用程序接口",
+        "version": "zh-reading-v3",
+        "confirmation": "user_configured"
+      },
+      {
+        "kind": "quantity_decimal",
+        "source_start": 10,
+        "source_end": 14,
+        "tts_start": 13,
+        "tts_end": 17,
+        "before": "3.50",
+        "after": "三点五零",
+        "version": "zh-reading-v3",
+        "unit": "千克"
+      },
+      {
+        "kind": "quantity_decimal",
+        "source_start": 19,
+        "source_end": 23,
+        "tts_start": 22,
+        "tts_end": 26,
+        "before": "0.08",
+        "after": "零点零八",
+        "version": "zh-reading-v3",
+        "unit": "米"
+      }
+    ],
+    "source_coverage_verified": true,
+    "chunk_count": 3,
+    "requests_sent": 0,
+    "acoustic_pronunciation_validation": "not_performed"
+  },
+  "post_encoding_reevaluation": [
+    {
+      "chapter": 1,
+      "quality_status": "incomplete",
+      "final_verification_status": "passed",
+      "sample_count_delta": 0,
+      "pcm_equal": false,
+      "encoded_sha256": "8dc3c8a3120a2cc3f003c17cd76575dfd24c5967f0f9f7e2035ed215d0421d5e",
+      "asr_cer": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "source_report": "audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/post_encoding_reevaluation/chapter_000001/quality.json"
+    },
+    {
+      "chapter": 2,
+      "quality_status": "incomplete",
+      "final_verification_status": "passed",
+      "sample_count_delta": 0,
+      "pcm_equal": false,
+      "encoded_sha256": "d6223cbd3a9378e3828b273ce2126c13e53eae9d3067656124b3e98f753062a5",
+      "asr_cer": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "source_report": "audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/post_encoding_reevaluation/chapter_000002/quality.json"
+    }
+  ],
+  "zero_request_local_repair_v2": [
+    {
+      "chapter": 1,
+      "run_id": "0b68846ce9c34b27a757a1a4b4b2ed29",
+      "resource_summary": {},
+      "selected_repairs": [
+        {
+          "chunk_id": "1:2:narrator:chunk:1",
+          "action": {
+            "kind": "local_speed",
+            "reason": "too_fast",
+            "speed_factor": 0.9523809523809523,
+            "edge": "",
+            "keep_silence_ms": 20.0
+          },
+          "rate_before": 4.523809523809524,
+          "rate_after": 4.341864716636197,
+          "cer_after": 0.0
+        },
+        {
+          "chunk_id": "1:2:narrator:chunk:1",
+          "action": {
+            "kind": "local_speed",
+            "reason": "too_fast",
+            "speed_factor": 0.9900990099009901,
+            "edge": "",
+            "keep_silence_ms": 20.0
+          },
+          "rate_before": 4.341864716636197,
+          "rate_after": 4.2947558770343575,
+          "cer_after": 0.0
+        }
+      ],
+      "final_verification_status": "passed",
+      "post_encoding_cer": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "quality_status": "incomplete"
+    },
+    {
+      "chapter": 2,
+      "run_id": "a665c1c6884646eb899fd4cdade66d64",
+      "resource_summary": {},
+      "selected_repairs": [
+        {
+          "chunk_id": "2:2:other:chunk:1",
+          "action": {
+            "kind": "local_speed",
+            "reason": "too_fast",
+            "speed_factor": 0.9523809523809523,
+            "edge": "",
+            "keep_silence_ms": 20.0
+          },
+          "rate_before": 5.573770491803279,
+          "rate_after": 5.349276274386407,
+          "cer_after": 0.0
+        },
+        {
+          "chunk_id": "2:2:other:chunk:1",
+          "action": {
+            "kind": "local_speed",
+            "reason": "too_fast",
+            "speed_factor": 0.9523809523809523,
+            "edge": "",
+            "keep_silence_ms": 20.0
+          },
+          "rate_before": 5.349276274386407,
+          "rate_after": 5.221130221130221,
+          "cer_after": 0.0
+        }
+      ],
+      "final_verification_status": "passed",
+      "post_encoding_cer": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "quality_status": "incomplete"
+    }
+  ],
+  "ui_v3": {
+    "report_choices": 10,
+    "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/a665c1c6884646eb899fd4cdade66d64/chapter_000002/quality.json",
+    "summary": "第 2 章：incomplete；音频已导出；请按报告核验。",
+    "issue_rows": 3,
+    "preview_scopes": 7,
+    "encoded_preview_scopes": 3,
+    "encoded_preview_returned": true,
+    "new_tts_requests": 0,
+    "temporary_server_stopped": true
+  },
+  "content_repair_validation": {
+    "tests": 8,
+    "kind": "constructed_provider_and_oracle_only",
+    "new_real_tts_requests": 0,
+    "verified": [
+      "fixed_prompt_preserves_body_and_voice",
+      "safe_two_part_source_mapping",
+      "per_child_request_accounting",
+      "one_request_fallback",
+      "internal_join_regression_rejected",
+      "missing_internal_content_check_rejected",
+      "partial_transport_failure_preserves_original",
+      "selected_compound_restored_without_requests",
+      "corrupt_child_and_compound_derived_files_rebuilt",
+      "offline_internal_reports_recomputed",
+      "unregistered_or_corrupt_raw_rejected",
+      "newly_repaired_chunk_can_establish_anchor"
+    ],
+    "real_repair_effectiveness": "not_established",
+    "limitation": "no further local crop/speed transform on resegmented compound in this first phase"
+  },
+  "pronunciation_review_validation": {
+    "tests": 3,
+    "kind": "non_exhaustive_text_review_hints",
+    "new_real_tts_requests": 0,
+    "audio_pronunciation_verified": false,
+    "ui_validation": "data_layer_regression_only_for_new_hints_and_internal_previews"
+  },
+  "annotation_pending_check_v4": {
+    "check_only": true,
+    "reviewed_boundaries": 0,
+    "total_samples": 6,
+    "all_review_statuses": "pending",
+    "requests_sent": 0,
+    "output_written": false,
+    "training_sufficiency": "not_assessed"
+  },
+  "internal_boundary_annotation_validation": {
+    "constructed_tests": 3,
+    "actual_new_tts_requests": 0,
+    "verified": [
+      "internal_join_and_subchunks_exported",
+      "actual_chapter_sample_offset",
+      "same_original_group",
+      "pending_labels_retained",
+      "internal_annotation_round_trip",
+      "stale_coordinates_rejected",
+      "corrupt_child_rejected",
+      "same_duration_changed_PCM_rejected",
+      "nonzero_planned_pause_rejected"
+    ],
+    "real_audio_export": "six_pending_rows_two_boundaries_eight_files",
+    "source": "annotation_and_provenance_v5.json",
+    "original_user_annotation_pack_unchanged": true
+  },
+  "resource_provenance_validation": {
+    "constructed_tests": 5,
+    "actual_new_tts_requests": 0,
+    "actual_origin_lookup": {
+      "selected_samples": 4,
+      "recorded_succeeded_requests": 4,
+      "recorded_characters": 152,
+      "current_run_requests": 0,
+      "historical_strategy_lineage_incomplete": true
+    },
+    "verified": [
+      "cached_origin_not_counted_as_zero_generation",
+      "observed_failed_candidates_retained_after_restart",
+      "origin_event_deduplicated_across_reports",
+      "missing_history_explicitly_unknown",
+      "running_requests_counted"
+    ],
+    "source": "annotation_and_provenance_v5.json",
+    "ui_new_summary_validation": "data_layer_regression_only"
+  },
+  "ui_v6": {
+    "kind": "actual_gradio_api_validation",
+    "new_real_tts_requests": 0,
+    "constructed_case_is_research_data": false,
+    "temporary_server_stopped": true,
+    "constructed_case": {
+      "report_choices": 2,
+      "summary": "第 1 章：incomplete；音频已导出；请按报告核验。\n\n本次运行累计 0 次合成请求（修复 0 次）。生成来源与候选历史已记录 5 次请求。两项可能重叠，不相加。",
+      "issue_rows": 8,
+      "pronunciation_hint_rows": 2,
+      "preview_scopes": 7,
+      "internal_preview_returned": true,
+      "internal_preview_samples": 64000,
+      "actual_run_requests": 0,
+      "recorded_constructed_origin_requests": 5,
+      "provider_fixture_calls": 5
+    },
+    "existing_real_report": {
+      "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/6f40a0049eaa4ba8a54c0c41283537f4/chapter_000001/quality.json",
+      "summary": "第 1 章：incomplete；音频已导出；请按报告核验。\n\n本次运行累计 2 次合成请求（修复 0 次）。历史生成请求数未知。",
+      "issue_rows": 3,
+      "preview_scopes": 3,
+      "audio_returned": true,
+      "source_modified": false
+    },
+    "temporary_server_exit_code": -15,
+    "constructed_fixture_directory_removed_after_check": true
+  },
+  "model_identity_validation": {
+    "constructed_tests": 8,
+    "new_tts_requests": 0,
+    "verified": [
+      "same_path_content_changes_invalidate_transcripts_and_embeddings",
+      "configuration_changes_invalidate_identity",
+      "same_size_replacement_with_restored_mtime_detected",
+      "damaged_or_empty_transcript_cache_recomputed",
+      "unversioned_custom_transcribers_isolated",
+      "mid_inference_model_change_rejected",
+      "SenseVoice_and_ECAPA_reload_when_revision_changes",
+      "role_anchor_invalidates_on_same_path_model_change"
+    ],
+    "actual_pretrained_inference": {
+      "kind": "real_pretrained_offline_inference_after_content_versioning",
+      "new_tts_requests": 0,
+      "source_report": "audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/6f40a0049eaa4ba8a54c0c41283537f4/chapter_000001/quality.json",
+      "content_status": "passed",
+      "asr_cer": 0.0,
+      "speaker_dimensions": 192,
+      "speaker_norm": 1.0,
+      "in_memory_embedding_reuse_equal": true,
+      "model_fingerprints": {
+        "asr": "ee1ee3328bc8cc8e82abf070214a70faa2a64de38237c19cc11ee8b30f1024a6",
+        "speaker": "9cc19ee039c6ded8c46311e5b94b2595a9c9ff2d11fed1a29fb838ddd7b15f27"
+      },
+      "model_file_counts": {
+        "asr": 5,
+        "speaker": 6
+      },
+      "runtime_seconds": 6.236539040924981,
+      "interpretation": "Existing authored sample only; no human defect accuracy or real repair benefit established"
+    }
+  },
+  "casting_constraints_validation_v7": {
+    "kind": "constructed_vector_fixture_only",
+    "new_real_tts_requests": 0,
+    "listener_effectiveness": "not_established",
+    "constraint_tests": 8,
+    "exhaustive_lock_combinations_checked": 27,
+    "voice_bank_metadata_tests": 3,
+    "voice_bank_metadata_origin": "constructed_audio_and_encoder_only",
+    "checks": [
+      "exclusive_narrator_all_strategies",
+      "hard_locks_preserved",
+      "capacity_failure_explained",
+      "scarce_character_voices_can_share",
+      "tampered_or_partial_casting_cannot_bypass_constraint",
+      "V2_CLI_casting_preserves_voice_lock",
+      "actual_boolean_verification_required",
+      "audio_hash_metrics_rate_and_model_provenance_retained",
+      "mid_build_model_or_audio_change_rejected"
+    ],
+    "results": [
+      {
+        "schema_version": "mimo-casting-v1",
+        "provider": "openai",
+        "roles": {
+          "a": "冰糖",
+          "narrator": "苏打",
+          "b": "茉莉",
+          "c": "冰糖"
+        },
+        "locked_voices": {
+          "a": "冰糖"
+        },
+        "objective": 0.30030987165268586,
+        "shared_voices": {
+          "冰糖": [
+            "a",
+            "c"
+          ]
+        },
+        "edges": [
+          {
+            "left": "a",
+            "right": "b",
+            "weight": 10
+          },
+          {
+            "left": "b",
+            "right": "c",
+            "weight": 3
+          }
+        ],
+        "metric_kind": "embedding_proxy_not_listener_probability",
+        "strategy": "interaction",
+        "seed": 7,
+        "voice_bank_model": null,
+        "voice_bank_speaker_fingerprint": null,
+        "constraints": {
+          "narrator_exclusive": true
+        },
+        "constraint_status": {
+          "narrator_exclusive": "satisfied"
+        }
+      },
+      {
+        "schema_version": "mimo-casting-v1",
+        "provider": "openai",
+        "roles": {
+          "a": "冰糖",
+          "narrator": "苏打",
+          "b": "茉莉",
+          "c": "茉莉"
+        },
+        "locked_voices": {
+          "a": "冰糖"
+        },
+        "objective": 2.1284102070466604,
+        "shared_voices": {
+          "茉莉": [
+            "b",
+            "c"
+          ]
+        },
+        "edges": [
+          {
+            "left": "a",
+            "right": "b",
+            "weight": 1.0
+          },
+          {
+            "left": "a",
+            "right": "c",
+            "weight": 1.0
+          },
+          {
+            "left": "a",
+            "right": "narrator",
+            "weight": 1.0
+          },
+          {
+            "left": "b",
+            "right": "c",
+            "weight": 1.0
+          },
+          {
+            "left": "b",
+            "right": "narrator",
+            "weight": 1.0
+          },
+          {
+            "left": "c",
+            "right": "narrator",
+            "weight": 1.0
+          }
+        ],
+        "metric_kind": "embedding_proxy_not_listener_probability",
+        "strategy": "global",
+        "seed": 7,
+        "voice_bank_model": null,
+        "voice_bank_speaker_fingerprint": null,
+        "constraints": {
+          "narrator_exclusive": true
+        },
+        "constraint_status": {
+          "narrator_exclusive": "satisfied"
+        }
+      },
+      {
+        "schema_version": "mimo-casting-v1",
+        "provider": "openai",
+        "roles": {
+          "a": "冰糖",
+          "narrator": "茉莉",
+          "b": "冰糖",
+          "c": "冰糖"
+        },
+        "locked_voices": {
+          "a": "冰糖"
+        },
+        "objective": 0.05,
+        "shared_voices": {
+          "冰糖": [
+            "a",
+            "b",
+            "c"
+          ]
+        },
+        "edges": [],
+        "metric_kind": "embedding_proxy_not_listener_probability",
+        "strategy": "fit",
+        "seed": 7,
+        "voice_bank_model": null,
+        "voice_bank_speaker_fingerprint": null,
+        "constraints": {
+          "narrator_exclusive": true
+        },
+        "constraint_status": {
+          "narrator_exclusive": "satisfied"
+        }
+      },
+      {
+        "schema_version": "mimo-casting-v1",
+        "provider": "openai",
+        "roles": {
+          "a": "冰糖",
+          "narrator": "茉莉",
+          "b": "苏打",
+          "c": "苏打"
+        },
+        "locked_voices": {
+          "a": "冰糖"
+        },
+        "objective": 13.147944695827935,
+        "shared_voices": {
+          "苏打": [
+            "b",
+            "c"
+          ]
+        },
+        "edges": [
+          {
+            "left": "a",
+            "right": "b",
+            "weight": 10
+          },
+          {
+            "left": "b",
+            "right": "c",
+            "weight": 3
+          }
+        ],
+        "metric_kind": "embedding_proxy_not_listener_probability",
+        "strategy": "random",
+        "seed": 7,
+        "voice_bank_model": null,
+        "voice_bank_speaker_fingerprint": null,
+        "constraints": {
+          "narrator_exclusive": true
+        },
+        "constraint_status": {
+          "narrator_exclusive": "satisfied"
+        }
+      }
+    ]
+  },
+  "character_budget_and_annotation_v8": {
+    "evidence": "character_budget_and_annotation_v8.json",
+    "new_tests": 8,
+    "additional_real_tts_requests": 0,
+    "pending_annotations": 6
+  },
+  "repair_blind_review_v9": {
+    "evidence": "repair_blind_review_v9.json",
+    "new_tests": 5,
+    "trials": 2,
+    "audio_files": 4,
+    "reviewed": 0,
+    "additional_real_tts_requests": 0
+  },
+  "human_pilot_20261016": {
+    "evidence": "human_pilot_20261016.json",
+    "reviewed_annotation_rows": 6,
+    "reviewed_boundary_rows": 2,
+    "reviewed_ab_trials": 2,
+    "participants": 1,
+    "independent_blinded_validation": false,
+    "training_performed": false,
+    "additional_tts_requests": 0
+  },
+  "transition_preview_v10": {
+    "evidence": "transition_preview_v10.json",
+    "variants": 4,
+    "source_boundaries": 1,
+    "new_tests": 6,
+    "human_preference": null,
+    "automatically_applied": false,
+    "additional_tts_requests": 0
+  },
+  "transition_preview_gain40_v11": {
+    "evidence": "transition_preview_gain40_v11.json",
+    "variants": 3,
+    "source_boundaries": 1,
+    "new_tests": 1,
+    "previous_duration_preference": "400ms slightly better; differences small",
+    "new_candidate_human_preference": null,
+    "automatically_applied": false,
+    "additional_tts_requests": 0
+  },
+  "reviewed_transition_policy_v12": {
+    "evidence": "reviewed_transition_policy_v12.json",
+    "preset": "onset-gain50-100ms-v1",
+    "reviewed_boundaries": 1,
+    "new_tests": 7,
+    "additional_tts_requests": 0,
+    "selected": true,
+    "general_effectiveness_established": false
+  },
+  "source_bound_transition_v13": {
+    "evidence": "source_bound_transition_v13.json",
+    "new_tests": 3,
+    "additional_tts_requests": 0,
+    "same_ids_different_text_rejected_before_synthesis": true,
+    "actual_pcm_equal_previous_verified_pipeline_output": true
+  },
+  "common_voice_probe_v14": {
+    "evidence": "common_voice_probe_v14.json",
+    "voices": 3,
+    "samples": 12,
+    "actual_tts_requests": 12,
+    "body_characters": 330,
+    "asr_equal": 12,
+    "signal_threshold_clear": 12,
+    "human_verified_samples": 0,
+    "verified_voice_bank_created": false,
+    "listener_experiment_executed": false
+  },
+  "bilingual_english_priority_v15": {
+    "evidence": "bilingual_english_priority_v15.json",
+    "chinese_bank_verified_voices": 3,
+    "english_generated_samples": 6,
+    "english_human_review": "pending",
+    "english_suspected_extra_reading": "E06",
+    "new_successful_requests": 6,
+    "characters": 519,
+    "chapter_replay_requests": 0
+  },
+  "listening_access_fix_v16": {
+    "evidence": "listening_access_fix_v16.json",
+    "scope": "listening artifact access only; no synthesis or evaluator changes",
+    "original_readme_links_fixed": true,
+    "portable_samples": 6,
+    "portable_chapters": 2,
+    "audio_hashes_unchanged": true,
+    "vscode_audio_controls_loaded": true,
+    "additional_tts_requests": 0
+  },
+  "english_reading_equivalence_v17": {
+    "evidence": "english_reading_equivalence_v17.json",
+    "additional_tts_requests": 0,
+    "new_tests": 9,
+    "real_unchanged_audio_regression": 18,
+    "zero_alignment_error": 17,
+    "suspected_mismatch": "E06",
+    "english_human_review": "pending"
+  },
+  "e06_extra_reading_diagnosis_v18": {
+    "evidence": "e06_extra_reading_diagnosis_v18.json",
+    "summary": "E06额外朗读原因核查.md",
+    "new_tts_requests": 0,
+    "accepted_english_samples": 5,
+    "rejected_english_samples": [
+      "E06"
+    ],
+    "raw_response_defect_human_confirmed": true,
+    "all_six_request_keys_reconstructed": true,
+    "historical_server_response_id_available": false,
+    "english_voice_bank_created": false
+  },
+  "english_content_repair_and_rate_gate_v19": {
+    "evidence": "english_content_repair_and_rate_gate_v19.json",
+    "request_attempts": 2,
+    "connection_failed": 1,
+    "successful_requests": 1,
+    "successful_body_characters": 86,
+    "candidate_content_passed": false,
+    "candidate_human_review": "pending",
+    "verified_english_voices": [
+      "Mia",
+      "Chloe"
+    ],
+    "rate_gate_tests_added": 5
+  },
+  "e06_repetition_and_tail_preview_v20": {
+    "evidence": "e06_repetition_and_tail_preview_v20.json",
+    "e06r_human_content_passed": false,
+    "successful_new_requests": 2,
+    "characters": 86,
+    "resegmented_candidate_selected": false,
+    "manual_tail_preview_asr_equal": true,
+    "manual_tail_preview_human_review": "pending",
+    "manual_tail_preview_auto_applied": false,
+    "source_code_modified": false
+  },
+  "previous_regression_v19": {
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q",
+    "ran": 492,
+    "seconds": 13.917,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/english_content_rate_regression_v19.log",
+    "log_sha256": "4276b625992681e88e79079f04114966de9e0ed722a9d178c9d83d088b8aadb1"
+  },
+  "listening_material_integrity_v21": {
+    "evidence": "listening_material_integrity_v21.json",
+    "new_tests": 7,
+    "real_problem_reports_rejected": 2,
+    "additional_tts_requests": 0,
+    "listener_experiment_executed": false,
+    "e06t_human_review": "pending"
+  },
+  "previous_regression_v21": {
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q",
+    "ran": 499,
+    "seconds": 14.473,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/listening_material_integrity_v21.log",
+    "log_sha256": "a060cd1ee5816e6c417927abe16d2767840c366718610cc6f96b40099c8970d8"
+  },
+  "english_numeric_pilot_and_join_fix_v22": {
+    "evidence": "english_numeric_pilot_and_join_fix_v22.json",
+    "new_requests": 4,
+    "characters": 262,
+    "new_tests": 3,
+    "chunk_wer_zero": 4,
+    "boundary_wer_zero_after_comparison_fix": 2,
+    "human_review": "pending",
+    "distinct_source_groups": 1
+  },
+  "previous_regression_v22": {
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q",
+    "ran": 502,
+    "seconds": 14.928,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/english_numeric_join_regression_v22.log",
+    "log_sha256": "fc63259e438714fe86bf7b0349f5ccca4c8a753fdc020d04064b2210b467c043"
+  },
+  "reevaluation_source_binding_v23": {
+    "evidence": "reevaluation_source_binding_v23.json",
+    "new_tests": 5,
+    "additional_tts_requests": 0,
+    "real_legacy_reports_reused": 2,
+    "same_parent_preview_isolation_verified": true,
+    "human_review": "pending"
+  },
+  "casting_english_materials_v24": {
+    "version": "casting_english_materials_v24",
+    "execution": "completed_offline_only",
+    "purpose": "准备选角先导正文及分配，检查真实已核验英语声音库上的分配与约束",
+    "summary": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/offline_validation.json",
+    "summary_sha256": "6ed1fd4e1e58b89b052687c1d7119de0e530b32570a8a7eb71f8dcc4341b2d2c",
+    "review_readme": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/README.md",
+    "artifact_manifest": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/artifact_hashes.json",
+    "artifact_manifest_sha256": "8c74ecbd937534bde2c041bd26f659830cd23755997262b4d24b3f05f48863fc",
+    "checks": {
+      "source_spans_and_hashes": true,
+      "three_conditions_fixed_nonvoice_variables": true,
+      "roles_proposed_not_confirmed": true,
+      "human_answers_and_fit_table_blank": true,
+      "all_review_links_resolve": true,
+      "verified_bank_unchanged": true,
+      "client_constructor_disabled_during_preparation": true
+    },
+    "text_word_counts_not_measured_audio_durations": [
+      18,
+      20,
+      20,
+      19,
+      18,
+      19,
+      19,
+      19,
+      20,
+      20,
+      18,
+      20
+    ],
+    "observed_result": "互动图与 seed=42 随机分配相同；全局互换两种声音，共享角色关系和公共代理值相同；未展示策略优势。",
+    "participant_count": 0,
+    "new_tts_requests": 0,
+    "audio_generated": false,
+    "synthetic_lock_check_not_user_lock": true,
+    "new_training_data": false,
+    "production_code_changed": false,
+    "full_test_suite_rerun": false,
+    "latest_existing_full_regression": {
+      "ran": 507,
+      "skipped": 30,
+      "status": "OK",
+      "log": "reevaluation_source_regression_v23.log"
+    },
+    "source_code_sha256": {
+      "audiobook_generator/audio_core/casting.py": "97a1823dc0e90bcff8b5d6480822044538848751c717a185a7d212f00987c73a",
+      "audiobook_generator/role_script/planner.py": "28008f7ca27b7e2a143d45ac2a70f75a370a449315a5782f8930b0698f6b6496"
+    },
+    "pending": [
+      "正文与角色归属人工审查",
+      "人工声音适配表",
+      "E06T 人工试听确认；Milo 仍未入库",
+      "英文数字先导人工核验",
+      "更多独立来源、质量合格音频和听众辨识实验",
+      "真实边界阳性与独立划分；不得用本材料训练或证明质量检出效果"
+    ]
+  },
+  "casting_english_user_confirmation_v24": {
+    "version": "casting_english_v24_user_role_confirmation",
+    "human_statement": "保留草稿的角色设定和逐句归属",
+    "confirmed_roles": 3,
+    "confirmed_utterance_ownerships": 12,
+    "source_kind": "assistant_authored_stimulus",
+    "confirmed_script": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/role_script.confirmed.json",
+    "confirmed_script_sha256": "738c0c1926fd66e5a279da8ee5d435028f1bef81efda00e4f599e6ee2b6fdb25",
+    "review_record": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/human_review.confirmed_roles.json",
+    "fit_ratings": "pending_all_null",
+    "audio_quality": "not_evaluated_no_audio_generated",
+    "voice_locks_changed": false,
+    "new_tts_requests": 0,
+    "prior_draft_hashes": {
+      "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/role_script.proposed.json": "0e02939d3d0555b2e53386e0bc00c6292d7351efe38b4bcfa79136aea3b39e10",
+      "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/human_review.pending.json": "802d2d153e1fc921af03747088862be15b2e8e731838ca9bfb640917db5630f9",
+      "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/source_chapters.json": "1b7c00f6f0a1ada8864e42346945125e985bffbaab155af07f58e27985f225aa",
+      "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/offline_validation.json": "6ed1fd4e1e58b89b052687c1d7119de0e530b32570a8a7eb71f8dcc4341b2d2c"
+    },
+    "validation": "strict_load_source_coverage_and_hashes_passed"
+  },
+  "casting_complete_fit_v25": {
+    "version": "casting_complete_fit_v25",
+    "execution": "completed_offline",
+    "before_bug": {
+      "kind": "synthetic_control_reproduced_before_edit",
+      "missing_candidate": "苏打",
+      "selected_for_both_roles": true,
+      "objective": 0.0
+    },
+    "fix": "提供适配表时完整覆盖角色×候选声音，拒绝缺项／空值，不默认零；保留未启用评分和人工明确零分。",
+    "human_fit_statement": "六项均为0",
+    "human_review": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/human_review.fit_confirmed.json",
+    "human_review_sha256": "ac9adb072caef5d52f78aa363d670d22f490af8517d5895d625307de967e912f",
+    "actual_cli_preflight": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_confirmed_20261016/offline_validation.json",
+    "actual_cli_preflight_sha256": "6c25c96c060cb6bccfb5140946b649d3516dd26090f9c9170dc74f55df76ec85",
+    "actual_cli_log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_confirmed_fit_actual_v25.log",
+    "checks": [
+      "完整表经实际英语 cast 入口生成四策略分配",
+      "真实旧空表被拒绝且无输出",
+      "应用分配只改变声音，正文／速度／指令／停顿保持",
+      "原剧本／角色确认／声音库／源正文指纹不变",
+      "客户端初始化禁用，零实际合成",
+      "未写入角色声音锁定",
+      "相同分配合并与请求输入去重"
+    ],
+    "tests": {
+      "ran": 511,
+      "skipped": 30,
+      "status": "OK",
+      "seconds": 15.387,
+      "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_complete_fit_regression_v25.log",
+      "log_sha256": "38072d846c2cc5a3f430709242bd6bbd1d2bc8bd27cf0c1bd44659ba4f689a9a"
+    },
+    "new_tests": 4,
+    "new_tts_requests": 0,
+    "new_audio_generated": false,
+    "human_participants": 0,
+    "scope": "工程与输入完整性验证；未证明选角收益、质量检出率或跨来源泛化",
+    "next_implementation_gaps": [
+      "小规模精确搜索：当前初始分配项导致局部最优，另有已知更低目标分配",
+      "跨场景参考池及全角色辨识覆盖，保留报告与音频来源核验"
+    ],
+    "still_pending": [
+      "E06T 人工试听",
+      "英文数字先导人工核验",
+      "真实边界阳性及独立划分",
+      "实际选角音频和独立听众实验"
+    ]
+  },
+  "casting_exact_scene_v26": {
+    "version": "casting_exact_scene_v26",
+    "execution": "completed_engineering_and_real_bank_offline",
+    "exact_search": {
+      "limit": 4096,
+      "scope": "硬约束后的组合；只保证当前代理目标",
+      "random_changed": false,
+      "large_search_optimality": "not_proven"
+    },
+    "listening": {
+      "new_input": "每条件有序 report_paths；单 report_path 继续支持",
+      "all_roles_required": true,
+      "cross_scene_reference_provenance": true,
+      "quality_and_pcm_gate_preserved": true,
+      "public_answers_hidden": true,
+      "synthetic_fixture_trials": 16,
+      "synthetic_fixture_conditions": 2,
+      "synthetic_fixture_roles": 3,
+      "real_listener_results": null
+    },
+    "real_bank_verification": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_exact_20261016/offline_validation.json",
+    "real_bank_verification_sha256": "7279eae737a0b03f6388c64bc692162017e26dd2c0fed7babfd54ad1690e0dd5",
+    "real_input_hashes": {
+      "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/role_script.confirmed.json": "738c0c1926fd66e5a279da8ee5d435028f1bef81efda00e4f599e6ee2b6fdb25",
+      "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_plan_20261016/source_chapters.json": "1b7c00f6f0a1ada8864e42346945125e985bffbaab155af07f58e27985f225aa",
+      "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_confirmed_20261016/fit_penalties.confirmed.json": "b6580e78352fc8f7b22824a0db9b4efa1f82e60315ce520c841db9ae9b9a50ee",
+      "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/casting_english_confirmed_20261016/offline_validation.json": "6c25c96c060cb6bccfb5140946b649d3516dd26090f9c9170dc74f55df76ec85",
+      "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/mimo_english_probe_pilot_20261016/voice_bank.en.mia_chloe.json": "efc122113c3a08c325c1e92e815eeb153b03b00bd4da3a6a075d0a0fc6082117",
+      "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/listening_review/casting_english_plan_20261016/human_review.fit_confirmed.json": "ac9adb072caef5d52f78aa363d670d22f490af8517d5895d625307de967e912f"
+    },
+    "old_interaction_objective": 1.630143880644932,
+    "new_interaction_objective": 1.580143880644932,
+    "planned_unique_requests": 22,
+    "planned_input_characters": 2151,
+    "tests": {
+      "ran": 519,
+      "skipped": 30,
+      "seconds": 15.458,
+      "status": "OK",
+      "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_exact_scene_regression_v26.log",
+      "log_sha256": "d6798792e801b150047988f77a6135270a2c8626842c7c202c37873c1d67ffaf"
+    },
+    "new_test_methods": 8,
+    "new_tts_requests": 0,
+    "new_audio_generated": false,
+    "human_participants": 0,
+    "remaining": [
+      "实际英语对白合成、音频质量和三秒参考检验",
+      "人工试听和独立听众辨识实验",
+      "E06T 与英文数字人工核验",
+      "真实边界阳性与独立来源划分"
+    ],
+    "source_code_sha256": {
+      "audiobook_generator/audio_core/casting.py": "5ea88f170b2b2aecefee5a68bc3ebc114bf7f329eb1b2a812441d16ecfc2ec74",
+      "audiobook_generator/audio_core/listening.py": "a88feed622c2c421c9fe1abf1a9a32827e3d6bbf41e951d74f2f0fbecfe2346e"
+    }
+  },
+  "casting_pilot_v27": {
+    "evidence": "casting_pilot_v27.json",
+    "new_tts_requests": 22,
+    "characters": 2151,
+    "unique_raw_samples": 22,
+    "chapter_count": 9,
+    "assembly_requests": 0,
+    "single_chunk_wer_zero": 36,
+    "joint_content_warnings": 3,
+    "rate_warnings_same_audio_reused": 2,
+    "human_review": "pending",
+    "listener_pack_published": false,
+    "listener_results": null,
+    "production_code_changed": false,
+    "full_regression_rerun": false
+  },
+  "previous_regression_v26": {
+    "ran": 519,
+    "skipped": 30,
+    "seconds": 15.458,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_exact_scene_regression_v26.log",
+    "log_sha256": "d6798792e801b150047988f77a6135270a2c8626842c7c202c37873c1d67ffaf",
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q"
+  },
+  "boundary_training_guard_v28": {
+    "evidence": "boundary_training_guard_v28.json",
+    "new_tests": 4,
+    "new_tts_requests": 0,
+    "real_training_performed": false,
+    "class_support_saved": true,
+    "no_ready_class_rejected": true
+  },
+  "previous_regression_v28": {
+    "ran": 523,
+    "seconds": 15.264,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/boundary_training_guard_regression_v28.log",
+    "log_sha256": "ac32c9ceecc80c68c86930aa9aa2dca0d421594d9a91c6bfe4048ea9b3c5440d",
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q"
+  },
+  "casting_feedback_loudness_v29": {
+    "evidence": "casting_feedback_loudness_v29.json",
+    "new_tests": 4,
+    "new_tts_requests": 0,
+    "F03_actual_voices": [
+      "Mia",
+      "Mia"
+    ],
+    "F01_right_attenuation_db": 5.0,
+    "human_scope": "F02接缝正常；F06/F07一致性可接受；F01偏响及F03难辨认另存",
+    "preview_human_preference": null,
+    "formal_listener_results": null
+  },
+  "previous_regression_v29": {
+    "ran": 527,
+    "skipped": 30,
+    "seconds": 15.451,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/casting_feedback_loudness_regression_v29.log",
+    "log_sha256": "a44b13948e8487c00e2f0e30348b8adefe556f61b6fb8604a2dc56a5c24be96a",
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q"
+  },
+  "quality_adjudication_v30": {
+    "evidence": "quality_adjudication_v30.json",
+    "new_tests": 5,
+    "new_tts_requests": 0,
+    "selected_preview_accepted": true,
+    "Bring_reviewed_complete": 3,
+    "derived_reports": 5,
+    "whole_chapter_human_verified": false,
+    "listener_pack_published": false
+  },
+  "previous_regression_v30": {
+    "ran": 532,
+    "skipped": 30,
+    "seconds": 15.327,
+    "status": "OK",
+    "log": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/docs/validation/audio_core_20261016/quality_adjudication_regression_v30.log",
+    "log_sha256": "a2f6a53e4bfc15b8ed86821faf42d120b86a3d06ababd887b655ec3cf1d1bcfb",
+    "command": "HF_HUB_OFFLINE=1 MODELSCOPE_OFFLINE=1 GRADIO_ANALYTICS_ENABLED=False OMP_NUM_THREADS=1 KMP_USE_SHM=0 ./venv_audio_quality/bin/python -m unittest discover -s tests -t . -p '*_test.py' -q"
+  },
+  "casting_common_gain_v31": {
+    "evidence": "casting_common_gain_v31.json",
+    "conditions": 3,
+    "chapters": 9,
+    "chunks": 36,
+    "new_tts_requests": 0,
+    "F01_accepted_pair_exactly_retained": true,
+    "full_chapter_human_verified": false,
+    "listener_pack_published": false,
+    "new_test_methods": 4
+  }
+}

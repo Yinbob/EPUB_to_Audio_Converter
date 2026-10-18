@@ -1,0 +1,100 @@
+{
+  "recorded_at": "2026-10-16T18:35:58+08:00",
+  "kind": "actual_single_reviewer_pilot_no_effectiveness_inference",
+  "input_files": {
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/annotation/review_pack_v1/annotation.csv": "3a196a5cbc22239a599fc4d2f52d3ae35befabfedbec834647ebed27becf2dda",
+    "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/annotation/repair_blind_review_v1/public/responses.csv": "fcb3708cdfac2b8b7d88701b9746c22955bebf24ebc026a145d12184ab5b002e"
+  },
+  "annotation_rows": 6,
+  "reviewed_annotation_rows": 6,
+  "boundary_label_rows": 2,
+  "positive_boundary_rows_in_current_four_classes": 0,
+  "other_issue": {
+    "sample_id": "B01_01",
+    "kind": "transition_naturalness_outside_current_labels",
+    "chapter_seconds_approx": 9.28,
+    "overall_normal": false,
+    "evidence": "User confirmed abrupt entry in chapter 1; no cutoff/gap/click/overlap or consistency/content error reported."
+  },
+  "listening_score": {
+    "analysis_kind": "descriptive_blind_repair_pilot",
+    "reviewed": 2,
+    "skipped": 0,
+    "participants": 1,
+    "source_groups": 2,
+    "dimension_preferences": {
+      "stitching": {
+        "baseline": 0,
+        "candidate": 1,
+        "tie": 1,
+        "uncertain": 0,
+        "not_applicable": 0
+      },
+      "consistency": {
+        "baseline": 0,
+        "candidate": 0,
+        "tie": 2,
+        "uncertain": 0,
+        "not_applicable": 0
+      },
+      "content": {
+        "baseline": 0,
+        "candidate": 0,
+        "tie": 2,
+        "uncertain": 0,
+        "not_applicable": 0
+      },
+      "signal": {
+        "baseline": 0,
+        "candidate": 0,
+        "tie": 2,
+        "uncertain": 0,
+        "not_applicable": 0
+      }
+    },
+    "status": "descriptive_only",
+    "requests_sent": 0,
+    "note": "偏好票数不是缺陷修复率；未做重复测量或来源聚类推断，不据此声称显著改善。"
+  },
+  "trials": [
+    {
+      "trial_id": "T001",
+      "preferences": {
+        "stitching": "A",
+        "consistency": "tie",
+        "content": "tie",
+        "signal": "tie"
+      },
+      "notes": "两段听感相近，但衔接部分都仍稍显突兀，A衔接部分会好一点",
+      "arms": {
+        "A": "candidate",
+        "B": "baseline"
+      },
+      "same_raw_sources": true
+    },
+    {
+      "trial_id": "T002",
+      "preferences": {
+        "stitching": "tie",
+        "consistency": "tie",
+        "content": "tie",
+        "signal": "tie"
+      },
+      "notes": "更偏好 A 的音色，听起来更温和，尤其是拼接的后半段，更自然，符合语境",
+      "arms": {
+        "A": "baseline",
+        "B": "candidate"
+      },
+      "same_raw_sources": true
+    }
+  ],
+  "additional_tts_requests": 0,
+  "dataset_written": false,
+  "split_assigned": false,
+  "training_performed": false,
+  "limitations": [
+    "One reviewer; two source chapters; no positive examples of current four boundary classes.",
+    "The reviewer had already heard and annotated the original audio, so this is not an independent blinded validation.",
+    "A/B preference does not establish defect repair rate, statistical significance, fade-in efficacy, or an optimal voice."
+  ]
+}

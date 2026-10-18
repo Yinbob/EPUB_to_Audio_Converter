@@ -1,0 +1,53 @@
+{
+  "schema_version": "flipped-reading-preflight-validation-v38",
+  "date": "2026-10-17",
+  "status": "progress_pending_voice_human_review",
+  "fixed_issues": [
+    "人工确认类型与严格读取器枚举不一致",
+    "75段核验稿未合并导致正式规划113块与预演104块不一致"
+  ],
+  "new_artifacts": {
+    "chapter_05.roles.confirmed_unvoiced.v38.json": "8a018599fb5a1cf098c2433347798d35646feddb91c2753f8841127d8cc96a71",
+    "chapter_05.reading.confirmed_unvoiced.json": "dacb50d985b987341875e54d25a680d3b24ef1c92b6a663b7b6072c2f5fd83a7",
+    "reading_segment_mapping_v38.json": "16a99f54fecda52f4da070ae02ae879e48d6aa6d3d18c25c2172d617137272fa",
+    "reading_dryrun_v38.json": "a38544f27bd26e805473669f812ebcc691f0e15de9ca41af6aef60811445dbac",
+    "formal_planner_check_v38.json": "e045eb46481b199f2d28c070e5844847718dbbe7b5e767162e30699ea076461e"
+  },
+  "checks": {
+    "all_confirmed_attributions_unchanged": true,
+    "original_proofing_preserved": true,
+    "both_corrected_json_reload_passed": true,
+    "source_characters": 14311,
+    "quote_mapping_count": 37,
+    "proofing_segments": 75,
+    "reading_units": 63,
+    "reading_chunks": 104,
+    "known_boundaries": 103,
+    "chapter_pcm_sample_positions_available": false,
+    "voices_selected": false,
+    "whole_book_registry_complete": false
+  },
+  "regression": {
+    "run": 561,
+    "passed": 531,
+    "skipped": 30,
+    "seconds": 16.989,
+    "failures": 0,
+    "errors": 0,
+    "log_sha256": "c2ac2f1f069cb33c685a1391e17acf90d7e55b0c8c2367f57c8c4849202ff54f"
+  },
+  "sources": {
+    "audiobook_generator/role_script/validator.py": "77d26c98257a9571c0dbc3dd5847ba52c5dafbbcea045309272b8ee7b7a0ecd1",
+    "tests/audiobook_generator/role_script/v2_io_test.py": "1528bf2d2e9021719edf54441e4fb68d2e5e4bdb560888cec61f56964f9cb137",
+    "docs/validation/audio_core_20261017/prepare_flipped_reading_v38.py": "1854243546a22cfeb0812acf08f424608567c90aafdfd032d570eb4d5e5047bc"
+  },
+  "tts_requests": 0,
+  "llm_requests": 0,
+  "new_human_labels": 0,
+  "remaining": [
+    "Bryce候选A/B的内容、同人稳定性、角色适配等待用户试听",
+    "其他角色声音选择与实际混合试听",
+    "首章正式合成、接缝与内容质检",
+    "原方案真实边界阳性与独立来源划分、独立听众实验尚未完成"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "kind": "actual_gradio_api_validation",
+  "new_real_tts_requests": 0,
+  "constructed_case_is_research_data": false,
+  "temporary_server_stopped": true,
+  "constructed_case": {
+    "report_choices": 2,
+    "summary": "第 1 章：incomplete；音频已导出；请按报告核验。\n\n本次运行累计 0 次合成请求（修复 0 次）。生成来源与候选历史已记录 5 次请求。两项可能重叠，不相加。",
+    "issue_rows": 8,
+    "pronunciation_hint_rows": 2,
+    "preview_scopes": 7,
+    "internal_preview_returned": true,
+    "internal_preview_samples": 64000,
+    "actual_run_requests": 0,
+    "recorded_constructed_origin_requests": 5,
+    "provider_fixture_calls": 5
+  },
+  "existing_real_report": {
+    "report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/6f40a0049eaa4ba8a54c0c41283537f4/chapter_000001/quality.json",
+    "summary": "第 1 章：incomplete；音频已导出；请按报告核验。\n\n本次运行累计 2 次合成请求（修复 0 次）。历史生成请求数未知。",
+    "issue_rows": 3,
+    "preview_scopes": 3,
+    "audio_returned": true,
+    "source_modified": false
+  },
+  "temporary_server_exit_code": -15,
+  "constructed_fixture_directory_removed_after_check": true
+}

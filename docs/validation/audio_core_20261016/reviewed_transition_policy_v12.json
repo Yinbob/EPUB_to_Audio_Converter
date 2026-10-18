@@ -1,0 +1,32 @@
+{
+  "kind": "reviewed_single_boundary_onset_policy",
+  "preset": "onset-gain50-100ms-v1",
+  "initial_gain": 0.5,
+  "final_gain": 1.0,
+  "ramp_ms": 100,
+  "human_feedback": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/annotation/transition_preview_gain50_100ms_v1/human_preference_accepted_20261016.json",
+  "human_feedback_sha256": "509883fb7d873ef1d3c5d919ed8af1935468bbcf9c2b106c1ba157aa1d8f93de",
+  "approved_preview_audio": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/annotation/transition_preview_gain50_100ms_v1/audio/onset_gain_100ms.wav",
+  "approved_preview_audio_sha256": "05a2a99291c45ebd87af44aa3f01b6130f11eea3842323b970f5b2605288723d",
+  "settings": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/examples/audio_core.transition_gain50_100ms.settings.json",
+  "pipeline_report": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/.audio_projects/authored_smoke/reports/0ec7c1c855484125b915092e28491220/chapter_000001/quality.json",
+  "pipeline_output": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/pipeline_transition_gain50_100ms.wav",
+  "pipeline_verification": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/audio_core_validation_20261016/annotation/transition_preview_gain50_100ms_v1/pipeline_verification.json",
+  "additional_tts_requests": 0,
+  "selected": true,
+  "pipeline_quality_status": "incomplete",
+  "full_suite": {
+    "ran": 464,
+    "seconds": 13.719,
+    "skipped": 30,
+    "status": "OK",
+    "log": "/private/tmp/audio_quality_transition_policy_full.log"
+  },
+  "new_tests": 7,
+  "limitations": [
+    "Only explicitly configured joins are processed; no inference from a single-boundary preference to all joins.",
+    "Compound repaired chunks require separate review and are skipped with a recorded reason.",
+    "Pipeline render uses original MiMo PCM; approved preview uses decoded original MP3. Same parameters do not imply byte-identical artifacts.",
+    "ASR preservation and encoding checks do not establish general perceptual improvement."
+  ]
+}
