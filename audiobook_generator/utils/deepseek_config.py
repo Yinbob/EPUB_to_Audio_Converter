@@ -15,7 +15,16 @@ logger = logging.getLogger(__name__)
 
 CONFIG_FILE = Path(__file__).parent.parent.parent / "deepseek_config.json"
 DEFAULT_BASE_URL = "https://api.deepseek.com"
-DEFAULT_MODEL = "deepseek-chat"
+DEFAULT_MODEL = "deepseek-flash"
+
+
+def deepseek_completion_options(model: str | None) -> dict:
+    """当前官方模型默认开启思考；结构化拆分显式使用非思考模式。"""
+    selected = (model or DEFAULT_MODEL).strip() or DEFAULT_MODEL
+    options = {"model": selected}
+    if selected in {'deepseek-flash', 'deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-v4-flash-vision-exp'}:
+        options['extra_body'] = {'thinking': {'type': 'disabled'}}
+    return options
 
 
 def load_deepseek_config() -> dict:
@@ -87,9 +96,10 @@ def test_deepseek_connection(api_key: str, base_url: str, model: str) -> tuple[b
             api_key=api_key.strip(),
             base_url=(base_url or DEFAULT_BASE_URL).strip() or DEFAULT_BASE_URL,
             max_retries=0,
+            timeout=20.0,
         )
         client.chat.completions.create(
-            model=(model or DEFAULT_MODEL).strip() or DEFAULT_MODEL,
+            **deepseek_completion_options(model),
             messages=[{"role": "user", "content": "请只回复 OK"}],
             max_tokens=4,
             temperature=0,

@@ -45,19 +45,19 @@ class RoleSplitFeedbackTest(unittest.TestCase):
         for success in (True, False):
             with self.subTest(success=success), patch.object(web_ui, 'auto_split_role_script', return_value=self.result(success)):
                 frames = list(web_ui.auto_split_role_script_ui(*self.values()))
-            self.assertTrue(all(len(frame) == 12 for frame in frames))
+            self.assertTrue(all(len(frame) == 13 for frame in frames))
             self.assertEqual(frames[0][6:9], (False, False, ''))
-            self.assertFalse(frames[0][-1]['interactive'])
-            self.assertTrue(frames[-1][-1]['interactive'])
-            self.assertIn('data-state="done"' if success else 'data-state="failed"', frames[-1][-2])
-            self.assertNotIn('role-split-spinner', frames[-1][-2])
+            self.assertFalse(frames[0][-2]['interactive'])
+            self.assertTrue(frames[-1][-2]['interactive'])
+            self.assertIn('data-state="done"' if success else 'data-state="failed"', frames[-1][-3])
+            self.assertNotIn('role-split-spinner', frames[-1][-3])
 
     def test_unexpected_worker_error_is_visible_and_controls_recover(self):
         with patch.object(web_ui, 'auto_split_role_script', side_effect=RuntimeError('离线测试错误')):
             frames = list(web_ui.split_role_script_now_ui(*self.values()))
-        self.assertIn('离线测试错误', frames[-1][-2])
-        self.assertIn('data-state="failed"', frames[-1][-2])
-        self.assertTrue(frames[-1][-1]['interactive'])
+        self.assertIn('离线测试错误', frames[-1][-3])
+        self.assertIn('data-state="failed"', frames[-1][-3])
+        self.assertTrue(frames[-1][-2]['interactive'])
         self.assertFalse(frames[-1][6])
 
     def test_disabled_automatic_split_never_flashes_running(self):
@@ -68,7 +68,7 @@ class RoleSplitFeedbackTest(unittest.TestCase):
                 frames = list(web_ui.auto_split_role_script_ui(*values))
             generate.assert_not_called()
             self.assertEqual(len(frames), 1)
-            self.assertIn('data-state="idle"', frames[0][-2])
+            self.assertIn('data-state="idle"', frames[0][-3])
 
     def test_stage_queues_are_isolated(self):
         def run(name, progress):
@@ -172,7 +172,7 @@ class RoleSplitFeedbackTest(unittest.TestCase):
             values = self.values()
             values[0] = str(book)
             with patch.object(web_ui, 'auto_split_role_script', side_effect=RuntimeError('offline failure')):
-                self.assertIn('offline failure', list(web_ui.auto_split_role_script_ui(*values))[-1][-2])
+                self.assertIn('offline failure', list(web_ui.auto_split_role_script_ui(*values))[-1][-3])
             key = web_ui._begin_role_split(str(book))
             web_ui._end_role_split(key)
 

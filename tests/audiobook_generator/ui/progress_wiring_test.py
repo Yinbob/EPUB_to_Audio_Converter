@@ -233,7 +233,7 @@ class TestProgressWiring(unittest.TestCase):
         self.assertIn("z-index: 999 !important", scrim_rule)
 
     def test_open_dropdown_escapes_sibling_card_stacking_context(self):
-        """展开的下拉不能被后续卡片盖住：只提升含展开选项的直接子包装层。"""
+        """展开菜单的完整包装链高于悬浮标题，同时跨过后续卡片。"""
         css = self.web_ui.CUSTOM_CSS
         selectors = (
             ".app-card > *:has(ul.options:not([inert]))",
@@ -243,8 +243,11 @@ class TestProgressWiring(unittest.TestCase):
             self.assertIn(selector, css, f"缺少展开下拉的层叠修复：{selector}")
         rule_start = css.index(selectors[0])
         rule_body = css[rule_start:css.index("}", rule_start)]
-        self.assertIn("z-index: 2 !important", rule_body,
-                      "展开下拉的包装层必须高于后续卡片的 z-index:1")
+        self.assertIn("z-index: calc(var(--layer-top, 100) + 1) !important", rule_body,
+                      "包装链必须高于 Gradio 标题层，不能只高于普通卡片文字")
+        menu_start = css.index('.gradio-container ul.options {')
+        menu_rule = css[menu_start:css.index('}', menu_start)]
+        self.assertIn('z-index: calc(var(--layer-top, 100) + 2) !important', menu_rule)
 
     def test_advanced_modal_scrollbar_keeps_rounded_corners(self):
         """弹窗自带的滚动条不能把右上/右下圆角盖成直角。"""

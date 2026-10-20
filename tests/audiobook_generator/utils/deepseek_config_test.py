@@ -9,6 +9,40 @@ from audiobook_generator.utils import deepseek_config
 
 
 class DeepSeekConfigTest(unittest.TestCase):
+    def test_current_official_models_explicitly_disable_thinking(self):
+        for model in (None, '', '  ', 'deepseek-flash', 'deepseek-v4-pro'):
+            with self.subTest(model=model):
+                options = deepseek_config.deepseek_completion_options(model)
+                self.assertEqual(options['model'], (model or '').strip() or 'deepseek-flash')
+                self.assertEqual(options['extra_body'], {'thinking': {'type': 'disabled'}})
+        self.assertEqual(deepseek_config.deepseek_completion_options(' custom-model '), {'model': 'custom-model'})
+
+    def test_connection_probe_uses_current_model_without_thinking(self):
+        with patch('openai.OpenAI') as client:
+            ok, _ = deepseek_config.test_deepseek_connection('dummy', '', '')
+        self.assertTrue(ok)
+        self.assertEqual(client.call_args.kwargs['base_url'], 'https://api.deepseek.com')
+        self.assertEqual(client.call_args.kwargs['timeout'], 20.0)
+        params = client.return_value.chat.completions.create.call_args.kwargs
+        self.assertEqual(params['model'], 'deepseek-flash')
+        self.assertEqual(params['extra_body'], {'thinking': {'type': 'disabled'}})
+
+    def test_all_script_requests_use_current_model_options(self):
+        from types import SimpleNamespace
+        from unittest.mock import MagicMock
+        from audiobook_generator.role_script import deepseek_splitter, narration, v2_generation
+        client = MagicMock()
+        create = client.chat.completions.create
+        for run, content in (
+            (lambda: deepseek_splitter._request_chunk(client, '', 1, 'chapter', 'text', 'openai'), '{}'),
+            (lambda: narration.request_narration_context(client, '', 1, 'chapter', 'text', []), '{"perspective":"unknown","narrators":[]}'),
+            (lambda: v2_generation._request_character_chunk(client, '', 1, 'text', {}), '{"characters":[]}'),
+        ):
+            create.return_value = SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=content))])
+            run()
+            self.assertEqual(create.call_args.kwargs['model'], 'deepseek-flash')
+            self.assertEqual(create.call_args.kwargs['extra_body'], {'thinking': {'type': 'disabled'}})
+
     def test_save_and_load_round_trip(self):
         with tempfile.TemporaryDirectory() as root:
             config_path = Path(root) / "deepseek_config.json"

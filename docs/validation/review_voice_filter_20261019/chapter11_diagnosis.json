@@ -1,0 +1,87 @@
+{
+  "scope": "当前项目配置与已生成阅读计划，不是音频声纹检测",
+  "project_sha256": "1a66a86590d53e57c33cc71cc45b91f9f3a0d83d37913c3d5a7bd5ccb1cafe7a",
+  "chapter_index": 11,
+  "chapter_title": "Get_a_Grip_Man",
+  "roles": [
+    {
+      "role_id": "char_4bcf63d73f27",
+      "display_name": "Bryce",
+      "segment_count": 69,
+      "voice": null,
+      "voice_mode": "clone"
+    },
+    {
+      "role_id": "char_74ad157777b8",
+      "display_name": "Juli Baker",
+      "segment_count": 9,
+      "voice": "Chloe",
+      "voice_mode": "preset"
+    },
+    {
+      "role_id": "char_4c18c3c47573",
+      "display_name": "Grandfather",
+      "segment_count": 38,
+      "voice": "Dean",
+      "voice_mode": "preset"
+    },
+    {
+      "role_id": "char_84ad48311413",
+      "display_name": "Mother",
+      "segment_count": 5,
+      "voice": "Mia",
+      "voice_mode": "preset"
+    },
+    {
+      "role_id": "char_f820fafad2a3",
+      "display_name": "Father",
+      "segment_count": 21,
+      "voice": "Dean",
+      "voice_mode": "preset"
+    },
+    {
+      "role_id": "narrator",
+      "display_name": "Narrator",
+      "segment_count": 32,
+      "voice": "Chloe",
+      "voice_mode": "preset"
+    }
+  ],
+  "default_narrator_segment_ids": [
+    "ch000011_s00021",
+    "ch000011_s00023",
+    "ch000011_s00025",
+    "ch000011_s00030",
+    "ch000011_s00106",
+    "ch000011_s00108",
+    "ch000011_s00111",
+    "ch000011_s00113",
+    "ch000011_s00116",
+    "ch000011_s00118",
+    "ch000011_s00120",
+    "ch000011_s00122",
+    "ch000011_s00124",
+    "ch000011_s00127",
+    "ch000011_s00131",
+    "ch000011_s00133",
+    "ch000011_s00135",
+    "ch000011_s00138",
+    "ch000011_s00140",
+    "ch000011_s00147",
+    "ch000011_s00149",
+    "ch000011_s00151",
+    "ch000011_s00153",
+    "ch000011_s00155",
+    "ch000011_s00157",
+    "ch000011_s00159",
+    "ch000011_s00161",
+    "ch000011_s00163",
+    "ch000011_s00165",
+    "ch000011_s00168",
+    "ch000011_s00170",
+    "ch000011_s00172"
+  ],
+  "reading_plan": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/Flipped/.audio_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011/reports/31bb934e47f84e38886002ddb0cb5e0e/chapter_000011/reading_plan.json",
+  "generated_default_narrator_unit_count": 32,
+  "project_or_audio_modified": false
+}

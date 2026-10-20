@@ -14,7 +14,8 @@ from .models import (
 from .normalization import normalize_coverage_text
 from .project_store import chapter_hashes
 from .validator import validate_role_script
-from .narration import ground_narration_segments
+from .narration import ground_narration_segments, grounded_entities, name_in_source
+from audiobook_generator.utils.deepseek_config import deepseek_completion_options
 
 ProgressCallback = Optional[Callable[[str], None]]
 
@@ -69,7 +70,7 @@ def _request_character_chunk(client: Any, model: str, chapter_index: int, text: 
         + f"\n章节：{chapter_index}\n原文：\n{text}"
     )
     response = client.chat.completions.create(
-        model=(model or "deepseek-chat").strip() or "deepseek-chat",
+        **deepseek_completion_options(model),
         messages=[{"role": "system", "content": "你是小说人物索引器，只返回 JSON。"},
                   {"role": "user", "content": prompt}],
         response_format={"type": "json_object"}, temperature=0, max_tokens=4096,
@@ -96,6 +97,7 @@ def build_book_registry(
     client = splitter._create_client(api_key, base_url)
     entities = dict(previous.entities) if previous else {}
     entities.setdefault("narrator", CharacterEntity("旁白", voice_profile_id="voice_narrator", voice_locked=True))
+    prompt_cards = grounded_entities(entities, chapters)
     for chapter_index in range(chapter_start, chapter_end + 1):
         _title, text = chapters[chapter_index - 1]
         cursor = 0
@@ -106,7 +108,7 @@ def build_book_registry(
                 continue
             if progress:
                 progress(f"正在建立人物表：第 {chapter_index} 章（范围 {chapter_start}～{chapter_end}）")
-            for raw in _request_character_chunk(client, model, chapter_index, part, entities):
+            for raw in _request_character_chunk(client, model, chapter_index, part, prompt_cards):
                 name = raw.get("name")
                 if not isinstance(name, str) or not name.strip() or name not in part:
                     continue
@@ -135,6 +137,7 @@ def build_book_registry(
                 if isinstance(quote, str) and quote and quote not in part:
                     continue
                 entities[entity_id] = replace(entity, aliases=tuple(old_aliases.values()))
+                prompt_cards[entity_id] = entities[entity_id]
     return entities
 
 
@@ -166,6 +169,39 @@ def _segment_evidence(segment: SegmentScript, span: SourceSpan, source: str) -> 
     return tuple(found)
 
 
+def revalidate_cached_assignments(script: RoleScriptV2, chapters: Sequence[tuple[str, str]]):
+    """旧章节也校验叙述身份；撤回串章人物的自动归属，不覆盖人工确认。"""
+    changed = []
+    output = []
+    for chapter in script.chapters:
+        source = chapters[chapter.chapter_index - 1][1]
+        rejected = set()
+        for segment in chapter.segments:
+            speaker = segment.speaker
+            if speaker and speaker.status == 'confirmed' and speaker.confidence_kind == 'human':
+                continue
+            identity = segment.text_kind == 'narration' or bool(speaker and any(
+                ev.kind == 'narrator_identity' for ev in speaker.evidence))
+            entity = script.entities.get(segment.role_id)
+            if not identity or segment.role_id == 'narrator' or not entity:
+                continue
+            names = [entity.canonical_name] + [a.text for a in entity.aliases if a.status == 'confirmed']
+            if not any(name_in_source(name, source) for name in names):
+                rejected.add(segment.role_id)
+        segments = []
+        for segment in chapter.segments:
+            speaker = segment.speaker
+            human = speaker and speaker.status == 'confirmed' and speaker.confidence_kind == 'human'
+            if segment.role_id in rejected and not human:
+                # 同一错误叙述人物的对白也会继承错误身份，不能只撤回叙述段。
+                segment = replace(segment, role_id='narrator', speaker=SpeakerDecision(
+                    'narrator', 'needs_review', 0.0, (), speaker.model if speaker else None, 'uncalibrated'))
+                changed.append(segment.segment_id)
+            segments.append(segment)
+        output.append(replace(chapter, segments=tuple(segments)))
+    return replace(script, chapters=tuple(output)), tuple(changed)
+
+
 def upgrade_generated_script(
     generated: RoleScriptV1, chapters: Sequence[tuple[str, str]],
     entities: dict[str, CharacterEntity], *, parser_fingerprint: str,
@@ -173,12 +209,19 @@ def upgrade_generated_script(
 ) -> RoleScriptV2:
     """将已对齐的 V1 提议转为含稳定实体 ID、原文区间与证据的 V2。"""
     roles = dict(previous.roles) if previous else {}
+    supported = grounded_entities(entities, chapters)
+    rejected = set()
     mapping = {"narrator": "narrator"}
     roles["narrator"] = roles.get("narrator", generated.roles["narrator"])
     for raw_id, role in generated.roles.items():
         if raw_id == "narrator":
             continue
-        matches = _known_name_matches(entities, role.display_name)
+        matches = _known_name_matches(supported, role.display_name)
+        if not matches and not any(name_in_source(role.display_name, text) for _title, text in chapters):
+            # 真实引文不能证明一个虚构姓名；不将其写回人物表或选角结果。
+            mapping[raw_id] = 'narrator'
+            rejected.add(raw_id)
+            continue
         entity_id = matches[0] if len(matches) == 1 else _new_entity_id()
         if entity_id not in entities:
             entities[entity_id] = CharacterEntity(role.display_name)
@@ -194,14 +237,33 @@ def upgrade_generated_script(
     for chapter in generated.chapters:
         source = chapters[chapter.chapter_index - 1][1]
         segments = []
+        unsupported_chapter_roles = set()
+        for item in chapter.segments:
+            entity = entities.get(mapping.get(item.role_id))
+            identity = item.text_kind == 'narration' or any(
+                kind == 'narrator_identity' for _quote, kind in item.evidence_candidates)
+            if identity and entity and item.role_id != 'narrator':
+                names = [entity.canonical_name] + [a.text for a in entity.aliases if a.status == 'confirmed']
+                if not any(name_in_source(name, source) for name in names):
+                    unsupported_chapter_roles.add(item.role_id)
         grounded_segments = ground_narration_segments(chapter.segments, source)
         for offset, (segment, span) in enumerate(_exact_segments(source, grounded_segments, chapter.chapter_index), 1):
             entity_id = mapping[segment.role_id]
+            if segment.role_id in unsupported_chapter_roles:
+                entity_id = 'narrator'
+            identity_segment = segment.text_kind == 'narration' or (
+                segment.text_kind == 'unknown' and any(kind == 'narrator_identity' for _quote, kind in segment.evidence_candidates))
+            entity = entities.get(entity_id)
+            if identity_segment and entity_id != 'narrator' and entity:
+                names = [entity.canonical_name] + [alias.text for alias in entity.aliases if alias.status == 'confirmed']
+                if not any(name_in_source(name, source) for name in names):
+                    entity_id = 'narrator'
             evidence = _segment_evidence(segment, span, source)
             quoted_unknown = segment.role_id == "narrator" and (
                 "“" in segment.text or '"' in segment.text or "「" in segment.text
             )
-            narration_unknown = segment.text_kind in ('narration', 'unknown') and entity_id == 'narrator'
+            narration_unknown = (segment.role_id in rejected or segment.role_id in unsupported_chapter_roles or
+                                 (segment.text_kind in ('narration', 'unknown') and entity_id == 'narrator'))
             if narration_unknown:
                 status, speaker_id, raw_score = 'needs_review', 'narrator', 0.0
             else:
@@ -235,6 +297,7 @@ def upgrade_generated_script(
         parser_fingerprint=parser_fingerprint, chapter_hashes=chapter_hashes(chapters),
         registry_complete=registry_complete,
     )
+    result, _ = revalidate_cached_assignments(result, chapters)
     validation = validate_role_script(
         result, chapters=chapters, expected_book_sha256=generated.book_sha256,
         chapter_start=generated.chapters[0].chapter_index,
@@ -279,12 +342,16 @@ def generate_v2_for_book(
                                        model=model, previous=baseline, progress=progress,
                                        chapter_start=1 if index_full_book else chapter_start,
                                        chapter_end=len(chapters) if index_full_book else chapter_end)
+    supported = grounded_entities(entities, chapters)
+    rejected_names = len(entities) - len(supported)
+    if rejected_names and progress:
+        progress(f'已隔离 {rejected_names} 个在本书原文中找不到姓名或已确认别名的旧人物，不再作为模型提示')
     generated = splitter.split_chapters_with_deepseek(
         list(chapters), chapter_start, chapter_end, provider, book_sha256,
         api_key, base_url, model, progress=progress, analyze_narration=True,
         known_characters=[{'role_id': entity_id, 'display_name': entity.canonical_name,
                            'aliases': [alias.text for alias in entity.aliases if alias.status == 'confirmed']}
-                          for entity_id, entity in list(entities.items())[-30:] if entity_id != 'narrator'],
+                          for entity_id, entity in list(supported.items())[-30:] if entity_id != 'narrator'],
     )
     if previous and previous.provider != provider:
         previous = replace(previous, roles={}, entities={

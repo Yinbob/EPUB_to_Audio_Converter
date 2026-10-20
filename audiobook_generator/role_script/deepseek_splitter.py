@@ -20,6 +20,7 @@ from audiobook_generator.tts_providers.voice_catalog import get_role_voice_pools
 from .normalization import is_semantic_whitespace, normalize_gender
 from .validator import validate_role_script
 from .narration import request_narration_context, ground_narration_segments
+from audiobook_generator.utils.deepseek_config import DEFAULT_BASE_URL, deepseek_completion_options
 
 logger = logging.getLogger(__name__)
 
@@ -824,11 +825,15 @@ Source text:
 
 
 def _create_client(api_key: str, base_url: str):
+    from .split_control import controlled_client
+    cancellable = controlled_client(api_key.strip(), (base_url or DEFAULT_BASE_URL).strip() or DEFAULT_BASE_URL)
+    if cancellable is not None:
+        return cancellable
     from openai import OpenAI
 
     return OpenAI(
         api_key=api_key.strip(),
-        base_url=(base_url or "https://api.deepseek.com").strip() or "https://api.deepseek.com",
+        base_url=(base_url or DEFAULT_BASE_URL).strip() or DEFAULT_BASE_URL,
         timeout=120.0,
         max_retries=0,
     )
@@ -846,7 +851,7 @@ def _request_chunk(
 ) -> Dict[str, Any]:
     language_key = normalize_script_language(language) or detect_text_language(text)
     response = client.chat.completions.create(
-        model=(model or "deepseek-chat").strip() or "deepseek-chat",
+        **deepseek_completion_options(model),
         messages=[
             {
                 "role": "system",
@@ -961,12 +966,14 @@ def split_chapters_with_deepseek(
             raise DeepSeekSplitError(f"第 {chapter_index} 章正文为空，无法拆分")
         chapter_segments: List[SegmentScript] = []
         # 每章独立分析，禁止沿用上章的第一人称身份；候选不直接覆盖任何段落。
-        narration_context = {'known_characters': known_characters or []}
+        from .narration import local_character_hint
+        chapter_characters = [person for person in (known_characters or []) if local_character_hint(person, source_text)]
+        narration_context = {'known_characters': chapter_characters}
         if analyze_narration:
             _report_progress(progress, f"DeepSeek 正在识别第 {chapter_index} 章的叙述者")
             try:
                 narration_context['chapter_narration'] = request_narration_context(
-                    client, model, chapter_index, title, source_text, known_characters or [])
+                    client, model, chapter_index, title, source_text, chapter_characters)
             except Exception as exc:
                 reports.warn('narrator_analysis_failed', f'$.chapters[{chapter_index}]',
                              f'本章叙述者预分析失败，继续逐段识别并保留默认旁白待复核：{exc}')
@@ -984,6 +991,7 @@ def split_chapters_with_deepseek(
             last_raw_segments: Optional[List[Dict[str, Any]]] = None
             for attempt in range(1, MAX_ATTEMPTS_PER_CHUNK + 1):
                 try:
+                    _report_progress(progress, f'正在拆分第 {chapter_index} 章第 {part_index}/{len(chapter_parts)} 块（尝试 {attempt}/{MAX_ATTEMPTS_PER_CHUNK}）')
                     payload = _request_chunk(
                         client,
                         model,
@@ -997,12 +1005,22 @@ def split_chapters_with_deepseek(
                     raw_roles, raw_segments = _raw_segments(payload)
                     if analyze_narration:
                         # 模型引用了上下文人物 ID 却漏写 roles 时，仍保留其真实名称。
-                        hints = list(known_characters or []) + narration_context.get('chapter_narration', {}).get('narrators', [])
+                        hints = chapter_characters + narration_context.get('chapter_narration', {}).get('narrators', [])
                         used_ids = [item.get('role_id') for item in raw_segments]
                         raw_roles = dict(raw_roles)
                         for hint in hints:
                             if hint.get('role_id') in used_ids:
-                                raw_roles.setdefault(hint['role_id'], hint)
+                                existing_meta = raw_roles.get(hint['role_id'])
+                                if not isinstance(existing_meta, dict):
+                                    raw_roles[hint['role_id']] = dict(hint)
+                                    continue
+                                # 分段模型常返回角色但省略性别；不能因此丢掉章级已识别信息。
+                                merged_meta = dict(existing_meta)
+                                if not str(merged_meta.get('display_name') or '').strip():
+                                    merged_meta['display_name'] = hint.get('display_name')
+                                if not normalize_gender(merged_meta.get('gender')) and normalize_gender(hint.get('gender')):
+                                    merged_meta['gender'] = hint['gender']
+                                raw_roles[hint['role_id']] = merged_meta
                     last_raw_segments = raw_segments
                     for role_id, role_meta in raw_roles.items():
                         if not isinstance(role_id, str):

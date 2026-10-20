@@ -1,0 +1,204 @@
+{
+  "project": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/.role_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011.json",
+  "backup": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/.role_projects/backups/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011.before_cached_identity_20261019_204238.json",
+  "before_sha256": "bfece568f7083eaef5e1aa6bf9c1cf82611dbd28bd1d09138d9e0a3608b83f3f",
+  "after_sha256": "1a66a86590d53e57c33cc71cc45b91f9f3a0d83d37913c3d5a7bd5ccb1cafe7a",
+  "book_sha256": "e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011",
+  "book_source": "/Users/yinzh/Desktop/Flipped.epub",
+  "name_occurrence_file": "FLIPPED_split_018.html",
+  "name_occurrence_excerpt": "Caleb Hughes was up next",
+  "changes": [
+    {
+      "chapter_index": 5,
+      "segment_id": "ch000005_s00028",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 5,
+      "segment_id": "ch000005_s00051",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 5,
+      "segment_id": "ch000005_s00053",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 5,
+      "segment_id": "ch000005_s00055",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 5,
+      "segment_id": "ch000005_s00057",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 5,
+      "segment_id": "ch000005_s00059",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 5,
+      "segment_id": "ch000005_s00060",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 5,
+      "segment_id": "ch000005_s00061",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 5,
+      "segment_id": "ch000005_s00063",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00002",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00004",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00006",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00008",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00009",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00011",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00013",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00015",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00016",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00017",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00018",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00021",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00022",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00023",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00025",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00027",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    },
+    {
+      "chapter_index": 7,
+      "segment_id": "ch000007_s00029",
+      "old_role_id": "char_2aabde8a6946",
+      "new_role_id": "narrator",
+      "new_status": "needs_review"
+    }
+  ],
+  "preserved": [
+    "原文",
+    "段落位置",
+    "段落类型",
+    "角色声音",
+    "全书人物索引",
+    "人工确认",
+    "已有音频"
+  ],
+  "reason": "旧章节未复核章内叙述身份，跨章角色还被继承用于对白；撤回自动归属，保持待核对，不擅自指认其他人物。"
+}

@@ -28,6 +28,31 @@ def narrator(role_id, name, quote, gender='unknown'):
 
 
 class NarrationTest(unittest.TestCase):
+    def test_present_role_with_unknown_gender_keeps_female_chapter_identity(self):
+        source = 'I am Juli. I waited for Bryce.'
+        client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=Mock(
+            return_value=response(narrator('juli', 'Juli', 'I am Juli.', 'female'))))))
+        # 角色已存在于分段结果时，原先 setdefault 不会补回女性信息。
+        payload = {'roles': {'other': {'display_name': 'Other'},
+                             'juli': {'display_name': 'Juli', 'gender': 'unknown'}},
+                   'segments': [{'role_id': 'juli', 'text_kind': 'narration', 'text': source}]}
+        with patch.object(splitter, '_create_client', return_value=client), \
+             patch.object(splitter, '_request_chunk', return_value=payload):
+            result = splitter.split_chapters_with_deepseek([('Two', source)], 1, 1, 'openai',
+                'a' * 64, 'dummy', 'https://example.invalid', 'test', analyze_narration=True)
+        self.assertEqual(result.roles['juli'].gender, 'female')
+        self.assertIn(result.roles['juli'].provider_params['voice'], ('Chloe', 'Mia'))
+        self.assertEqual(result.chapters[0].segments[0].role_id, 'juli')
+        self.assertEqual(client.chat.completions.create.call_count, 1)
+        upgraded = upgrade_generated_script(result, [('Two', source)], {
+            'narrator': CharacterEntity('Narrator'), 'stable_juli': CharacterEntity('Juli')},
+            parser_fingerprint='parser', model='test')
+        plans = build_synthesis_plans(upgraded, [('Two', source)], expected_book_sha256='a' * 64,
+            provider='openai', chapter_start=1, chapter_end=1, output_format='wav')
+        self.assertTrue(plans.ok)
+        self.assertEqual(plans.plans[0].units[0].role_id, 'stable_juli')
+        self.assertIn(plans.plans[0].units[0].profile.provider_params['voice'], ('Chloe', 'Mia'))
+
     def test_missing_kind_uses_existing_retry_budget_and_keeps_character_identity(self):
         source = 'I am Alex. He walked away.'
         client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=Mock(

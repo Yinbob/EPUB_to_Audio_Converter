@@ -692,7 +692,7 @@ class TestRoleScriptUiWiring(unittest.TestCase):
         auto_split = self._dependency("auto_split_role_script")
         self.assertIsNotNone(auto_split)
         self.assertEqual(len(auto_split.get("inputs") or []), 19)
-        self.assertEqual(len(auto_split.get("outputs") or []), 12)
+        self.assertEqual(len(auto_split.get("outputs") or []), 13)
 
         upload = self._dependency("manual_role_script_uploaded")
         self.assertIsNotNone(upload)

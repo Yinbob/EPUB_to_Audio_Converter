@@ -38,9 +38,146 @@ class TestWorkflowWiring(unittest.TestCase):
     def component(self, elem_id):
         return next(c for c in self.config['components'] if c['props'].get('elem_id') == elem_id)
 
+    def test_shared_chapter_and_whole_book_scope_are_wired(self):
+        chapter = self.component('role_narration_chapter')['id']
+        toggle = self.component('role_show_all_people')
+        self.assertFalse(toggle['props']['value'])
+        person = self.component('role_review_person_filter')['id']
+        event = next(d for d in self.config['dependencies'] if (person, 'input') in d['targets'])
+        self.assertIn(chapter, event['inputs'])
+        self.assertIn(toggle['id'], event['inputs'])
+        confirm = self.component('role_review_save')['id']
+        save = next(d for d in self.config['dependencies'] if (confirm, 'click') in d['targets'])
+        self.assertIn(chapter, save['inputs'])
+        self.assertIn(toggle['id'], save['inputs'])
+        self.assertTrue(any((chapter, 'change') in d['targets'] for d in self.config['dependencies']))
+        self.assertTrue(any((toggle['id'], 'input') in d['targets'] for d in self.config['dependencies']))
+        def ancestors(node, target, path=()):
+            if node['id'] == target:
+                return path
+            for child in node.get('children', []):
+                found = ancestors(child, target, path + (node['id'],))
+                if found is not None:
+                    return found
+        parents = ancestors(self.config['layout'], chapter)
+        self.assertNotIn(self.component('role_narration_panel')['id'], parents)
+        self.assertNotIn(self.component('role_segment_panel')['id'], parents)
+
+    def test_merge_lists_share_scope_and_refresh_with_scope_changes(self):
+        source = self.component('role_merge_source')['id']
+        target = self.component('role_merge_target')['id']
+        chapter = self.component('role_narration_chapter')['id']
+        toggle = self.component('role_show_all_people')['id']
+        for trigger, name in ((chapter, 'change'), (toggle, 'input')):
+            event = next(d for d in self.config['dependencies'] if (trigger, name) in d['targets'])
+            chain = [event]
+            while True:
+                next_event = next((d for d in self.config['dependencies'] if d.get('trigger_after') == chain[-1]['id']), None)
+                if next_event is None:
+                    break
+                chain.append(next_event)
+            refresh = next(d for d in chain if source in d['outputs'] and target in d['outputs'])
+            self.assertIn(chapter, refresh['inputs'])
+            self.assertIn(toggle, refresh['inputs'])
+        for fn in self.ui.fns.values():
+            if fn.fn and fn.fn.__name__ == 'load_role_review':
+                self.assertIn(chapter, [c._id for c in fn.inputs])
+                self.assertIn(toggle, [c._id for c in fn.inputs])
+
+    def test_review_chapter_tracks_generation_start_on_change_and_script_load(self):
+        start = self.component('chapter_start')['id']
+        chapter = self.component('role_narration_chapter')['id']
+        event = next(d for d in self.config['dependencies'] if (start, 'change') in d['targets'] and chapter in d['outputs'])
+        self.assertIn(start, event['inputs'])
+        self.assertNotIn(chapter, event['inputs'])
+        file_id = next(c['id'] for c in self.config['components'] if c['type'] == 'file'
+                       and c['props'].get('label') == '导入已有剧本 / 下载当前剧本（JSON）')
+        self.assertIn((file_id, 'change'), event['targets'])
+        # 手动核对其他已保存章节仍保留，不反向改变生成范围。
+        manual = next(d for d in self.config['dependencies'] if (chapter, 'change') in d['targets'])
+        self.assertNotIn(start, manual['outputs'])
+
     def test_role_voice_picker_contains_saved_young_male(self):
         choices = self.component('role_voice_preset')['props']['choices']
         self.assertIn(['青年男声 · Bryce（英语）', 'saved_bryce_young_en'], [list(choice) for choice in choices])
+
+    def test_person_name_search_updates_segments_and_context(self):
+        person = self.component('role_review_person_filter')
+        self.assertTrue(person['props']['filterable'])
+        self.assertIn('输入姓名', person['props']['info'])
+        event = next(d for d in self.config['dependencies'] if (person['id'], 'input') in d['targets'])
+        self.assertIn(self.component('role_review_segment')['id'], event['outputs'])
+        self.assertIn(self.component('role_review_details')['id'], event['outputs'])
+
+    def test_voice_search_is_combined_and_refreshed_after_edits(self):
+        voice = self.component('role_review_voice_filter')
+        self.assertTrue(voice['props']['filterable'])
+        event = next(d for d in self.config['dependencies'] if (voice['id'], 'input') in d['targets'])
+        self.assertIn(self.component('role_review_person_filter')['id'], event['inputs'])
+        self.assertIn(self.component('role_review_segment')['id'], event['outputs'])
+        self.assertIn(voice['id'], event['outputs'])
+        # 保存下一段必须携带音色，避免保存后跳出当前声音。
+        confirm = self.component('role_review_save')['id']
+        confirm_event = next(d for d in self.config['dependencies'] if (confirm, 'click') in d['targets'])
+        self.assertIn(voice['id'], confirm_event['inputs'])
+
+    def test_all_dropdowns_share_menu_layering_not_role_only(self):
+        """新章节控件和未来新增下拉都必须处于共用菜单路径内。"""
+        components = {c['id']: c for c in self.config['components']}
+        paths = {}
+        def walk(node, path=()):
+            paths[node['id']] = path
+            for child in node.get('children', []):
+                walk(child, path + (node['id'],))
+        walk(self.config['layout'])
+        dropdowns = [c for c in components.values() if c['type'] == 'dropdown']
+        for control in dropdowns:
+            covered = False
+            for parent in paths[control['id']]:
+                props = components.get(parent, {}).get('props', {})
+                raw_classes = props.get('elem_classes') or []
+                if isinstance(raw_classes, str):
+                    raw_classes = [raw_classes]
+                classes = ' '.join(raw_classes).split()
+                covered |= 'app-card' in classes or props.get('elem_id') == 'advanced_modal'
+            self.assertTrue(covered, control['props'].get('label'))
+        css = web_ui.CUSTOM_CSS
+        layers = css[css.index('/* 卡片内容要盖在玻璃层之上 */'):css.index('/* 下拉选项面板同样是')]
+        self.assertIn('.gradio-container ul.options', layers)
+        self.assertIn('calc(var(--layer-top, 100) + 1)', layers)
+        self.assertIn('calc(var(--layer-top, 100) + 2)', layers)
+        self.assertNotRegex(layers, r'z-index:\s*2\s*!important')
+        self.assertIn('body:not(.modal-open)', layers)
+
+    def test_attribution_has_separate_tools_and_one_final_confirmation(self):
+        components = {c['id']: c for c in self.config['components']}
+        def parents(node, target, path=()):
+            if node['id'] == target:
+                return path
+            for child in node.get('children', []):
+                found = parents(child, target, path + (node['id'],))
+                if found is not None:
+                    return found
+        confirm = self.component('role_confirm_btn')
+        path = parents(self.config['layout'], confirm['id'])
+        self.assertIn('3 · 复核与确认', [components[i]['props'].get('label') for i in path if i in components])
+        self.assertEqual(sum(c['props'].get('elem_id') == 'role_confirm_btn' for c in components.values()), 1)
+        self.assertEqual(self.component('role_workspace_tabs')['props']['selected'], 'role_attribution')
+        self.assertTrue(self.component('role_narration_panel')['props']['visible'])
+        self.assertFalse(self.component('role_segment_panel')['props']['visible'])
+        self.assertFalse(self.component('role_merge_panel')['props']['visible'])
+        self.assertFalse(self.component('role_merge_btn')['props']['interactive'])
+        tool = self.component('role_attribution_tool')['id']
+        fn = next(fn for fn in self.ui.fns.values() if (tool, 'change') in fn.targets)
+        self.assertEqual([value['visible'] for value in fn.fn('merge')], [False, False, True])
+        details = self.component('role_review_details')['id']
+        merge_feedback = self.component('role_merge_feedback')['id']
+        merge_event = next(d for d in self.config['dependencies'] if (self.component('role_merge_btn')['id'], 'click') in d['targets'])
+        self.assertIn(merge_feedback, merge_event['outputs'])
+        self.assertNotIn(details, merge_event['outputs'])
+        self.assertTrue(merge_event['types']['generator'])
+        next_event = next(fn for fn in self.ui.fns.values() if (self.component('role_to_ready')['id'], 'click') in fn.targets)
+        self.assertEqual(next_event.fn()['selected'], 'role_ready')
 
     def test_readiness_follows_books_provider_confirmation_and_parse_only(self):
         fn = self.callback('update_generation_summary')
@@ -123,6 +260,10 @@ class TestWorkflowWiring(unittest.TestCase):
             self.assertEqual(control['type'], 'dropdown')
             self.assertFalse(control['props']['interactive'])
             self.assertTrue(control['props']['filterable'])
+            # 独立标题配合大选择面，隐藏原浮动标题但保留控件可访问名称。
+            self.assertFalse(control['props']['show_label'])
+            self.assertIn(control['props']['label'], ('起始章节', '结束章节'))
+            self.assertIn('chapter-endpoint-picker', control['props']['elem_classes'])
         start, end = event['outputs'][3:5]
         self.assertEqual(components[start]['type'], 'number')
         self.assertEqual(components[end]['type'], 'number')
@@ -166,7 +307,7 @@ class TestWorkflowWiring(unittest.TestCase):
         self.assertEqual(len(events), 3)
         for event in events:
             self.assertEqual(event['show_progress'], 'hidden')
-            self.assertEqual(event['outputs'][-2:], [status, self.component('role_split_btn')['id']])
+            self.assertEqual(event['outputs'][-3:], [status, self.component('role_split_btn')['id'], self.component('role_split_stop_btn')['id']])
             self.assertTrue(event['types']['generator'])
             self.assertEqual(event['trigger_mode'], 'once')
         self.assertEqual(self.component('role_split_status')['type'], 'html')
@@ -203,10 +344,45 @@ class TestWorkflowWiring(unittest.TestCase):
         with patch.object(web_ui, 'auto_split_role_script', side_effect=run):
             frames = asyncio.run(exercise())
         self.assertEqual(len(frames), 3)
-        self.assertIn('正在准备剧本', frames[0][-2])
-        self.assertIn('DeepSeek 正在拆分第 1 章', frames[1][-2])
-        self.assertIn('剧本已准备好', frames[-1][-2])
-        self.assertTrue(frames[-1][-1]['interactive'])
+        self.assertIn('正在准备剧本', frames[0][-3])
+        self.assertIn('DeepSeek 正在拆分第 1 章', frames[1][-3])
+        self.assertIn('剧本已准备好', frames[-1][-3])
+        self.assertTrue(frames[-1][-2]['interactive'])
+
+    def test_split_stop_uses_independent_queue_and_cancels_all_split_entrypoints(self):
+        button = self.component('role_split_stop_btn')
+        self.assertFalse(button['props']['interactive'])
+        stop = next(fn for fn in self.ui.fns.values() if fn.fn and fn.fn.__name__ == 'stop_role_split')
+        self.assertEqual(stop.concurrency_id, 'role-script-stop')
+        split_ids = {i for i, fn in self.ui.fns.items() if fn.fn and fn.fn.__name__ in
+                     ('auto_split_role_script_ui', 'split_role_script_now_ui')}
+        cancel_event = next(d for d in self.config['dependencies'] if d.get('cancels'))
+        self.assertEqual(set(cancel_event['cancels']), split_ids)
+
+    def test_registered_split_injects_session_owner_for_stop(self):
+        fn = next(fn for fn in self.ui.fns.values() if fn.fn and fn.fn.__name__ == 'split_role_script_now_ui')
+        values = [None, True, False, 'Mimo', 1, 1, 'auto', 'double', False, False,
+                  None, 'dummy', 'https://example.invalid', 'model', False, None, None, None, None]
+        async def exercise():
+            from gradio.state_holder import SessionState
+            state = SessionState(self.ui)
+            for component, value in zip(fn.inputs, values):
+                if component.stateful:
+                    state[component._id] = value
+            with patch.object(self.ui, 'preprocess_data', return_value=values):
+                first = await self.ui.process_api(fn, values, state=state,
+                            request=gr.Request(session_hash='offline-owner'), session_hash='offline-owner', simple_format=True)
+            self.assertEqual(web_ui._ROLE_SPLIT_CONTROLS[key].owner, 'offline-owner')
+            first['iterator'].aclose()
+        with tempfile.TemporaryDirectory() as folder, patch.object(web_ui, 'get_output_dir', return_value=folder):
+            book = Path(folder) / 'book.epub'
+            book.write_bytes(b'offline owner fixture')
+            values[0] = [str(book)]
+            key = str(web_ui.project_path(folder, web_ui._sha256_file_ui(str(book))).resolve())
+            with patch.object(web_ui, 'auto_split_role_script') as run:
+                asyncio.run(exercise())
+            run.assert_not_called()
+            self.assertNotIn(key, web_ui._ROLE_SPLITTING_PROJECTS)
 
     def test_old_confirmed_snapshot_cannot_enable_start_while_resplitting(self):
         fn = self.callback('update_generation_summary')
@@ -235,7 +411,7 @@ class TestWorkflowWiring(unittest.TestCase):
         self.assertEqual(narration['inputs'][-2:], [self.component('role_narration_chapter')['id'],
                                                   self.component('role_narration_entity')['id']])
         self.assertEqual(len(narration['inputs']), 4)
-        for name in ('apply_chapter_narration', 'confirm_auto_role_script_ui'):
+        for name in ('apply_chapter_narration_ui', 'confirm_auto_role_script_ui'):
             binding = next(fn for fn in self.ui.fns.values() if fn.fn and fn.fn.__name__ == name)
             self.assertEqual(binding.concurrency_id, 'role-project-review')
             self.assertEqual(binding.concurrency_limit, 1)
@@ -264,3 +440,27 @@ class TestWorkflowWiring(unittest.TestCase):
                 session_hash='offline-confirm-motion', simple_format=True)
         with patch.object(web_ui, 'confirm_auto_role_script', return_value=result) as confirm:
             asyncio.run(exercise(confirm))
+
+    def test_registered_merge_stream_delivers_separate_feedback_and_button_state(self):
+        from gradio.state_holder import SessionState
+        button = self.component('role_merge_btn')['id']
+        fn = next(fn for fn in self.ui.fns.values() if (button, 'click') in fn.targets)
+        values = [None, None, None, None, None, {'data': [], 'headers': web_ui.ROLE_TABLE_HEADERS}]
+        result = (gr.skip(), gr.skip(), '已保存复核：source 已并入 target。',
+                  False, '', gr.update(value=web_ui._role_confirmation_probe(False, '', gate=True)))
+        async def exercise(save):
+            state = SessionState(self.ui)
+            first = await self.ui.process_api(fn, values, state=state,
+                session_hash='offline-attribution', simple_format=True)
+            save.assert_not_called()
+            self.assertIn('data-state="pending"', first['data'][2])
+            self.assertFalse(first['data'][-1]['interactive'])
+            second = await self.ui.process_api(fn, [], state=state, iterator=first['iterator'],
+                session_hash='offline-attribution', simple_format=True)
+            self.assertIn('data-state="success"', second['data'][2])
+            self.assertTrue(second['data'][-1]['interactive'])
+            self.assertEqual(save.call_args.args[1], 'merge')
+            await self.ui.process_api(fn, [], state=state, iterator=second['iterator'],
+                session_hash='offline-attribution', simple_format=True)
+        with patch.object(web_ui, 'apply_role_review', return_value=result) as save:
+            asyncio.run(exercise(save))

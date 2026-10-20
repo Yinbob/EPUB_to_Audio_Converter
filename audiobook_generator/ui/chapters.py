@@ -43,12 +43,29 @@ CHAPTER_OVERVIEW_HTML = '''<div class="chapter-overview" aria-live="polite" aria
 
 CHAPTER_CSS = '''
 #chapter_catalog_panel { gap: 14px; }
-#chapter_named_range { gap: 16px; }
-#chapter_named_range > .form { flex: 1; min-width: 0; }
-#chapter_named_range input { text-overflow: ellipsis; }
+#chapter_named_range { gap: 24px; align-items: flex-start; }
+#chapter_named_range .chapter-endpoint { gap: 10px; min-width: 0; }
+#chapter_named_range .chapter-endpoint-label,
+#chapter_named_range .chapter-endpoint-label .html-container { padding: 0 !important; min-height: 0 !important; }
+#chapter_named_range .chapter-endpoint-title { margin: 0; color: var(--apple-text); font-size: 1rem; font-weight: 600; line-height: 1.5; }
+#chapter_named_range .chapter-endpoint-picker { padding: 0 !important; border-radius: 16px !important; }
+#chapter_named_range .chapter-endpoint-picker .wrap {
+  border: 1px solid var(--apple-border) !important; border-radius: 16px !important;
+  background-color: var(--ata-glass-soft) !important;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+#chapter_named_range .chapter-endpoint-picker .wrap:focus-within { border-color: var(--apple-blue) !important; outline: 2px solid var(--apple-blue); outline-offset: 3px; }
+#chapter_named_range .chapter-endpoint-picker .wrap-inner { min-height: 72px; box-sizing: border-box; padding: 14px 18px !important; }
+#chapter_named_range .chapter-endpoint-picker .secondary-wrap { min-width: 0; }
+#chapter_named_range .chapter-endpoint-picker input {
+  min-width: 0; min-height: 40px; margin: 0 !important; padding: 0 30px 0 0 !important;
+  text-overflow: ellipsis; font-size: 1rem !important; font-weight: 600; line-height: 1.5;
+  color: var(--apple-text); caret-color: var(--apple-blue);
+}
+#chapter_named_range .chapter-endpoint-picker:has(input:disabled) { opacity: .6; }
 #chapter_named_range .wrap { min-width: 0; }
 #chapter_named_range ul.options { max-height: 310px; }
-#chapter_named_range ul.options li { white-space: normal; overflow-wrap: anywhere; line-height: 1.5; }
+#chapter_named_range ul.options li { min-height: 44px; box-sizing: border-box; white-space: normal; overflow-wrap: anywhere; line-height: 1.5; }
 #chapter_range_state { display: none !important; }
 .chapter-overview { padding: 16px 0 2px; color: var(--apple-text); }
 .chapter-overview-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
@@ -59,6 +76,7 @@ CHAPTER_CSS = '''
 .chapter-overview p { margin: 0; color: var(--apple-text-2); font-size: .85rem; line-height: 1.6; overflow-wrap: anywhere; }
 @media (max-width: 600px) {
   #chapter_named_range { flex-direction: column; }
+  #chapter_named_range .chapter-endpoint { width: 100%; flex-basis: auto !important; }
   .chapter-overview-top { flex-wrap: wrap; gap: 4px 12px; }
 }
 '''

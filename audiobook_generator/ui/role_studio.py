@@ -4,6 +4,7 @@ import json
 import queue
 import threading
 import time
+from audiobook_generator.role_script.split_control import SplitAborted, split_control_scope
 
 ROLE_STUDIO_CSS = """
 #role_studio { --role-field-radius: 18px; }
@@ -11,6 +12,20 @@ ROLE_STUDIO_CSS = """
 #role_studio .role-section-title p { margin: 0; color: var(--apple-text-2); line-height: 1.65; font-size: .88rem; }
 #role_studio .role-section-title { padding: 20px 0 12px; }
 #role_studio .role-workflow-hint { color: var(--apple-text-2); margin: 8px 0 16px; line-height: 1.65; }
+#role_studio .role-attribution-layout { gap: 28px; align-items: flex-start; }
+#role_studio .role-tool-nav { min-width: 0; }
+#role_studio .role-tool-nav .wrap { flex-direction: column; gap: 10px; }
+#role_studio .role-tool-nav label { min-height: 48px; padding: 12px; border-radius: 12px; }
+#role_studio .role-attribution-work { min-width: 0; border-left: 1px solid var(--apple-border-soft); padding-left: 28px; }
+#role_studio .role-task-panel { gap: 16px; }
+#role_studio .role-task-panel .role-section-title { padding-top: 0; }
+#role_studio .role-review-notice { border: 1px solid var(--apple-border); border-radius: 14px; padding: 16px 18px; background-color: var(--ata-glass-soft); color: var(--apple-text); line-height: 1.65; overflow-wrap: anywhere; }
+#role_studio .role-review-notice strong { display: block; margin-bottom: 4px; }
+#role_studio .role-review-notice[data-state="success"] { border-color: var(--apple-green); }
+#role_studio .role-review-notice[data-state="error"] { border-color: var(--apple-red); }
+#role_studio .role-merge-preview { padding: 16px; border-radius: 14px; border: 1px solid var(--apple-border); color: var(--apple-text); background-color: var(--ata-glass-soft); line-height: 1.7; overflow-wrap: anywhere; }
+#role_studio .role-merge-preview p { margin: 6px 0 0; }
+#role_studio .role-next-step { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--apple-border-soft); }
 #role_studio .role-setup-tabs, #role_studio .role-workspace-tabs { border: 0; background-color: transparent; }
 #role_studio .tab-nav { gap: 4px; padding: 4px; border: 0; border-radius: 16px; background-color: var(--ata-glass-soft); }
 #role_studio .tab-nav button { min-height: 44px; flex: 1 1 auto; border-radius: 12px; white-space: normal; line-height: 1.4; }
@@ -23,14 +38,20 @@ ROLE_STUDIO_CSS = """
 #role_studio textarea { line-height: 1.65; }
 #role_studio ::placeholder { color: var(--apple-text-2); opacity: 1; }
 #role_studio .role-field:focus-within { outline: 2px solid var(--apple-blue); outline-offset: 2px; }
+/* 展开菜单层级由全站共用规则处理，角色区只设置外观。 */
 #role_studio ul.options { border-radius: 14px; }
+#role_studio .role-segment-context { margin-top: 20px; border-top: 1px solid var(--apple-border-soft); padding-top: 12px; }
+#role_studio .role-segment-context summary { cursor: pointer; padding: 10px 0; color: var(--apple-blue); font-weight: 600; }
+#role_studio .role-segment-context summary:focus-visible { outline: 2px solid var(--apple-blue); outline-offset: 3px; border-radius: 8px; }
+#role_studio .role-segment-context p { color: var(--apple-text-2); line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+#role_studio .role-segment-context strong { color: var(--apple-text); margin-inline: 6px; }
 #role_studio .role-voice-columns { gap: 28px; align-items: flex-start; }
 #role_studio .role-voice-columns > .column { min-width: 0; }
 #role_studio .role-listen-pane { border-left: 1px solid var(--apple-border-soft); padding-left: 28px; }
 #role_studio .role-action-row { gap: 10px; align-items: stretch; }
 #role_studio .role-action-row button { min-height: 44px; white-space: normal; }
-#role_studio #role_split_btn { min-height: 48px; margin-top: 8px; }
-#role_studio #role_split_status { min-height: 148px; padding: 0; border-radius: 18px; background-color: transparent; }
+#role_studio #role_split_btn, #role_studio #role_split_stop_btn { min-height: 48px; margin-top: 8px; }
+#role_studio #role_split_status { min-height: 148px; margin-top: 16px !important; padding: 0; border-radius: 18px; background-color: transparent; }
 #role_studio #role_split_status p { margin: 0; line-height: 1.65; color: var(--apple-text-2); }
 #role_studio #role_split_status .generating { border-radius: 18px; }
 #role_split_status .role-split-activity { position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: 16px 20px; padding: 22px; border: 1px solid var(--apple-border); border-radius: 18px; background-color: var(--ata-glass-soft); }
@@ -86,6 +107,9 @@ ROLE_STUDIO_CSS = """
 }
 @keyframes role-workspace-reveal { from { opacity: .35; } to { opacity: 1; } }
 @media (max-width: 760px) {
+  #role_studio .role-attribution-layout { flex-direction: column; gap: 20px; }
+  #role_studio .role-attribution-layout > .column { width: 100%; flex-basis: auto !important; }
+  #role_studio .role-attribution-work { border-left: 0; border-top: 1px solid var(--apple-border-soft); padding: 20px 0 0; }
   #role_studio .role-voice-columns { flex-direction: column; gap: 12px; }
   #role_studio .role-voice-columns > .column { width: 100%; flex-basis: auto !important; }
   #role_studio .role-listen-pane { border-left: 0; border-top: 1px solid var(--apple-border-soft); padding: 16px 0 0; }
@@ -99,6 +123,15 @@ ROLE_STUDIO_CSS = """
   #role_studio #role_preview_audio { margin-top: 20px !important; }
 }
 """
+
+
+def review_notice(message, state='idle'):
+    titles = {'idle': '当前操作', 'pending': '正在保存修改…',
+              'success': '修改已保存', 'error': '未能保存修改'}
+    if state not in titles:
+        state = 'idle'
+    return (f'<div class="role-review-notice" data-state="{state}" role="status" aria-live="polite">'
+            f'<strong>{titles[state]}</strong><span>{html.escape(str(message))}</span></div>')
 
 
 def split_result_status(generated, validation):
@@ -115,7 +148,8 @@ def split_result_status(generated, validation):
 def render_split_status(state='idle', detail='', started=None):
     """独立于 Gradio 原生遮罩的真实阶段提示，不显示虚构百分比。"""
     titles = {'idle': '等待生成剧本', 'starting': '正在准备剧本', 'running': 'DeepSeek 正在生成剧本',
-              'done': '剧本已准备好', 'failed': '剧本未生成成功'}
+              'done': '剧本已准备好', 'failed': '剧本未生成成功',
+              'stopping': '正在停止拆分', 'cancelled': '已停止拆分'}
     if state not in titles:
         state = 'idle'
     busy = state in ('starting', 'running')
@@ -201,23 +235,38 @@ ROLE_SPLIT_HEAD = '<script>' + r'''
 '''.replace('PENDING_TEMPLATE', json.dumps(render_split_status('starting', '请求已提交，正在等待开始分析…'), ensure_ascii=False)) + '</script>'
 
 
-def iter_split_events(run, values, heartbeat=1.0, on_finish=None):
+def iter_split_events(run, values, heartbeat=1.0, on_finish=None, control=None):
     """同步拆分在独立线程执行，向 Gradio 生成器持续传递阶段与结果。"""
     events = queue.Queue()
     worker_started = False
 
     def report(value, desc=''):
+        if control:
+            control.check()
+            if desc:
+                control.phase = str(desc)
         if desc:
             events.put({'state': 'running', 'message': str(desc)})
 
     def worker():
         try:
-            event = {'state': 'result', 'result': run(*values, progress=report)}
+            if control:
+                control.report = lambda value, desc='': events.put({'state': 'running', 'message': str(desc)})
+            with split_control_scope(control):
+                if control:
+                    control.check()
+                event = {'state': 'result', 'result': run(*values, progress=report)}
+        except SplitAborted as exc:
+            event = {'state': exc.state, 'message': str(exc)}
         except Exception as exc:
             event = {'state': 'failed', 'message': str(exc)}
         finally:
+            if control and 'event' in locals():
+                control.result = event.get('result')
             if on_finish:
                 on_finish()
+            if control:
+                control.finished.set()
         events.put(event)
 
     try:
@@ -231,9 +280,11 @@ def iter_split_events(run, values, heartbeat=1.0, on_finish=None):
                 yield {'state': 'heartbeat'}
                 continue
             yield event
-            if event['state'] in ('result', 'failed'):
+            if event['state'] in ('result', 'failed', 'cancelled'):
                 break
     finally:
         # 请求关闭不能解除仍在运行的工作线程占用；线程结束才释放。
         if not worker_started and on_finish:
             on_finish()
+        if not worker_started and control:
+            control.finished.set()

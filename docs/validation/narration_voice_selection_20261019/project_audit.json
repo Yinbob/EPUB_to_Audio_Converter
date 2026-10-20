@@ -1,0 +1,50 @@
+{
+  "project": "audiobook_output/.role_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011.json",
+  "sha256": "258ef6e3d7aa038e6d1c688acbdffa3ee63171b92ea51e59915f8eff4ca882eb",
+  "note": "当前存档包含人工确认，不能还原初次模型推荐。未修改存档。",
+  "previous_selector_default": "narrator",
+  "fixed_selector_default": "char_89caf36ff957",
+  "chapters": [
+    {
+      "index": 2,
+      "title": "Dedicated_with_infinite_love_toColton_and_Connorwho_make_me",
+      "narration": []
+    },
+    {
+      "index": 6,
+      "title": "Flipped",
+      "narration": [
+        {
+          "role_id": "char_89caf36ff957",
+          "name": "Julianna",
+          "voice": "Chloe",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "title": "Buddy_Beware",
+      "narration": [
+        {
+          "role_id": "char_4bcf63d73f27",
+          "name": "Bryce",
+          "voice": "Dean",
+          "count": 6
+        },
+        {
+          "role_id": "char_2aabde8a6946",
+          "name": "Caleb Hughes",
+          "voice": "Dean",
+          "count": 8
+        },
+        {
+          "role_id": "narrator",
+          "name": "Narrator",
+          "voice": "Chloe",
+          "count": 2
+        }
+      ]
+    }
+  ]
+}

@@ -54,7 +54,7 @@ class RoleStudioTest(unittest.TestCase):
         with patch.object(web_ui, '_load_uploaded_role_script', return_value=(script, report)):
             details = web_ui.role_review_details('test.json', narrative.segment_id)
         self.assertIn('叙述（可由故事人物自述）', details)
-        self.assertIn('朗读声音：林黛玉', details)
+        self.assertIn('**当前朗读人物**：林黛玉', details)
 
     def test_summary_is_bounded_and_uses_names_instead_of_segment_id_chains(self):
         script, _ = _script()

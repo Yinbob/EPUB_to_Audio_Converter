@@ -168,7 +168,7 @@ def request_mimo_instruction_patch(
 ) -> tuple[str, str]:
     """让 LLM 从受限动作表选择一条提示补丁；不允许其改写要朗读的文本。"""
     from audiobook_generator.role_script.deepseek_splitter import _create_client, _extract_json_object
-    from audiobook_generator.utils.deepseek_config import get_deepseek_credentials
+    from audiobook_generator.utils.deepseek_config import get_deepseek_credentials, deepseek_completion_options
 
     saved_key, saved_url, saved_model = get_deepseek_credentials()
     api_key = api_key or saved_key
@@ -184,7 +184,7 @@ def request_mimo_instruction_patch(
         "issues": list(report.issues),
     }
     response = client.chat.completions.create(
-        model=model,
+        **deepseek_completion_options(model),
         messages=[
             {"role": "system", "content": "你是语音质量诊断器。只从给定动作枚举中选择，不得输出原文改写。"},
             {"role": "user", "content": (

@@ -37,6 +37,45 @@ def saved_role_voice_key(params):
     return None
 
 
+def review_voice_identity(script, role_id):
+    """按声音来源分组，忽略人物ID、语速等表演参数；不推断实际音频声纹。"""
+    params = script.roles[role_id].provider_params
+    mode = params.get('voice_mode') or 'preset'
+    if mode == 'clone':
+        reference = params.get('reference_audio_sha256') or params.get('reference_audio_path')
+        identity = ('clone', reference or role_id)
+        saved = saved_role_voice_key(params)
+        label = SAVED_ROLE_VOICES[saved]['label'] if saved else '参考音克隆'
+    elif mode == 'design':
+        description = ' '.join(str(params.get('voice_description') or '').split())
+        identity = ('design', description or role_id)
+        label = '描述音色' + (f' · {description[:36]}' if description else '（未填写描述）')
+    else:
+        voice = (params.get('voice_id') or params.get('voice')) if script.provider == 'minimax' else (params.get('voice') or params.get('voice_id'))
+        identity = ('preset', voice or role_id)
+        label = str(voice) if voice else '未指定声音'
+    key = hashlib.sha256(json.dumps((script.provider, identity), ensure_ascii=False).encode()).hexdigest()
+    return key, label
+
+
+def review_voice_choices(script, selected='__all__'):
+    from collections import Counter
+    counts = Counter(s.role_id for c in script.chapters for s in c.segments)
+    groups = {}
+    for role_id, role in script.roles.items():
+        key, label = review_voice_identity(script, role_id)
+        group = groups.setdefault(key, {'label': label, 'names': [], 'count': 0})
+        if counts[role_id]:
+            group['names'].append(role.display_name)
+        group['count'] += counts[role_id]
+    choices = [('全部音色', '__all__')]
+    for key, group in groups.items():
+        if group['count'] or key == selected:
+            names = ' / '.join(group['names'][:3]) + (' 等' if len(group['names']) > 3 else '')
+            choices.append((f"{group['label']} · {names or '暂无使用段落'} · {group['count']} 段", key))
+    return choices
+
+
 def make_voice_profile(role_id, mode, voice, description, reference, language, pace,
                        instructions, output_dir):
     if mode not in {'preset', 'design', 'clone'} or language not in {'en', 'zh'}:

@@ -19,6 +19,50 @@ class NarrationReviewTest(unittest.TestCase):
             segments=(replace(chapter.segments[0], text_kind='narration'),
                       replace(chapter.segments[1], text_kind='dialogue'))),))
 
+    def test_character_narration_is_default_voice_selection_but_manual_choice_is_kept(self):
+        chapter = self.script.chapters[0]
+        female = replace(self.script, chapters=(replace(chapter, segments=(
+            replace(chapter.segments[0], role_id='char_1'), chapter.segments[1])),))
+        self.assertEqual(web_ui._role_choice_update(female)['value'], 'char_1')
+        self.assertEqual(web_ui._role_choice_update(female, 'narrator')['value'], 'narrator')
+        self.assertIn('独立于人物自述', web_ui._role_choice_update(female)['choices'][0][0])
+        report = web_ui.ValidationReport(schema_version=2)
+        with patch.object(web_ui, '_load_uploaded_role_script', return_value=(female, report)):
+            self.assertEqual(web_ui.select_chapter_narration_voice('test.json', 1)['value'], 'char_1')
+            self.assertNotIn('value', web_ui.select_chapter_narration_voice('test.json', 99))
+            self.assertIn('林黛玉（茉莉）', web_ui.load_narration_controls('test.json')[3])
+        # 只有一个旁白或多视角时不能猜一个女性人物替换归属。
+        self.assertEqual(web_ui._role_choice_update(self.script)['value'], 'narrator')
+
+    def test_voice_selection_follows_alternating_chapters_without_changing_script(self):
+        first = self.script.chapters[0]
+        second = replace(first, chapter_index=2, segments=(replace(first.segments[0], role_id='char_1'), first.segments[1]))
+        script = replace(self.script, chapters=(first, second))
+        report = web_ui.ValidationReport(schema_version=2)
+        with patch.object(web_ui, '_load_uploaded_role_script', return_value=(script, report)):
+            self.assertEqual(web_ui.select_chapter_narration_voice('test.json', 1)['value'], 'narrator')
+            self.assertEqual(web_ui.select_chapter_narration_voice('test.json', 2)['value'], 'char_1')
+        self.assertEqual(script.chapters[0].segments[0].role_id, 'narrator')
+
+    def test_requested_chapter_wins_over_first_saved_and_missing_never_falls_back(self):
+        base = self.script.chapters[0]
+        script = replace(self.script, chapters=(replace(base, chapter_index=5, title='First'),
+                                               replace(base, chapter_index=11, title='Get a Grip, Man')))
+        report = web_ui.ValidationReport(schema_version=2)
+        with patch.object(web_ui, '_load_uploaded_role_script', return_value=(script, report)):
+            chosen = web_ui.load_narration_controls('test.json', 11)
+            self.assertEqual(chosen[0]['value'], 11)
+            self.assertTrue(chosen[2]['interactive'])
+            missing = web_ui.load_narration_controls('test.json', 12)
+            self.assertEqual(missing[0]['value'], 12)
+            self.assertIn('尚未生成剧本', missing[0]['choices'][-1][0])
+            self.assertEqual(missing[1]['choices'], [])
+            self.assertFalse(missing[1]['interactive'])
+            self.assertFalse(missing[2]['interactive'])
+            self.assertIn('第 12 章', missing[3])
+            self.assertEqual(web_ui.filter_role_review_with_voice('test.json', chapter_index=12)[2]['choices'], [])
+            self.assertEqual(web_ui.refresh_review_people('test.json', 12)[1]['choices'], [])
+
     def test_save_preserves_current_voice_edits_and_requires_reconfirmation(self):
         with tempfile.TemporaryDirectory() as folder, patch.object(web_ui, 'get_output_dir', return_value=folder):
             path = save_project(self.script, project_path(folder, self.script.book_sha256))

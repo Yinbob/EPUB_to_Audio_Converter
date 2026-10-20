@@ -86,12 +86,16 @@ WORKFLOW_HEAD_HTML = '''<script>
 
 WORKFLOW_CSS = '''
 :root { --ease-out: cubic-bezier(0.23, 1, 0.32, 1); }
-html .gradio-container { max-width: 1180px !important; }
+/* 页面宽度沿用 63aa489，首页标题单独调整，不影响其他页面。 */
+.hero.home-hero { padding: clamp(24px, 4vw, 40px) 8px 32px; }
+.hero.home-hero h1 {
+  font-size: clamp(2rem, 5.5vw, 3rem) !important; font-weight: 700 !important;
+  line-height: 1.2; margin-bottom: 16px !important;
+}
+.hero.home-hero p { font-size: clamp(1.1rem, 1.6vw, 1.2rem); line-height: 1.75; max-width: 640px; }
 .workflow-result[hidden] { display: none !important; }
 .workflow-result { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px; border-radius: 12px; background-color: var(--apple-blue-soft); color: var(--apple-text); font-size: .9rem; }
 .workflow-result button { flex-shrink: 0; padding: 10px 16px; }
-.hero { padding: 18px 8px 12px; }
-.hero p { max-width: 65ch; }
 .workflow-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .workflow-steps a { display: grid; grid-template-columns: 28px 1fr; column-gap: 10px; padding: 12px; border-radius: 12px; color: var(--apple-text-2); text-decoration: none; background-color: var(--ata-glass-soft); }
 .workflow-steps a span { grid-row: span 2; align-self: center; display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--apple-border); border-radius: 50%; font-size: .8rem; }
@@ -100,7 +104,20 @@ html .gradio-container { max-width: 1180px !important; }
 .workflow-steps a[aria-current=step] { background-color: var(--apple-blue-soft); color: var(--apple-blue); }
 .workflow-next { margin: 4px 0 12px; color: var(--apple-text-2); font-size: .86rem; line-height: 1.6; }
 #book_setup, #voice_setup, #role_studio, #generation_setup { scroll-margin-top: 24px; }
-.book-file-upload button.center.boundedheight.flex { min-height: 180px !important; }
+/* 桌面上传区左右各拓宽 8px，仍留在卡片内；窄屏沿用原宽。 */
+/* Group 的外层 styler 也默认裁切，须与表单一起放行，避免截断左右虚线。 */
+#book_setup > .styler:has(.book-file-upload),
+#book_setup .form:has(> .book-file-upload) {
+  overflow: visible !important;
+  background-color: transparent !important;
+}
+#book_setup .book-file-upload:not(:has(.file-preview)) { overflow: visible !important; }
+@media (min-width: 720px) {
+  #book_setup .book-file-upload {
+    width: calc(100% + 16px) !important; max-width: none !important;
+    margin-inline: -8px !important;
+  }
+}
 .optional-label { margin-left: 8px; color: var(--apple-text-3); font-size: .8rem; font-weight: 400; }
 #role_studio .advanced-section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 #role_studio .advanced-section-copy h3 { margin: 0; font-size: 1.1rem; }
@@ -131,7 +148,8 @@ html .gradio-container { max-width: 1180px !important; }
 @media (max-width: 559px) {
   .app-card .toggle-grid .form, #advanced_modal .toggle-grid .form { grid-template-columns: minmax(0, 1fr); }
 }
-#generation_setup .row-cta { gap: 12px !important; }
+#generation_setup > .styler { gap: 16px !important; }
+#generation_setup .row-cta { gap: 20px !important; }
 #role_confirmation_probe_host { position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip-path: inset(50%); }
 .generation-summary { font-size: .95rem; line-height: 1.7; color: var(--apple-text-2); }
 #result_library_btn { margin-top: 8px; }
@@ -155,12 +173,38 @@ html .gradio-container { max-width: 1180px !important; }
 .library-heading { margin: 0; font-size: 1.05rem; }
 .library-selection h3 { font-size: 1.05rem; overflow-wrap: anywhere; margin: 0 0 8px; }
 .library-selection p { color: var(--apple-text-2); font-size: .86rem; margin: 0; }
-#library_file_list .wrap { display: flex !important; flex-direction: column !important; gap: 6px !important; }
-#library_file_list label { width: 100% !important; min-height: 46px; margin: 0 !important; padding: 12px !important; border-radius: 10px !important; display: flex !important; align-items: center; gap: 10px; overflow-wrap: anywhere; }
-#library_file_list label:has(input:checked) { background-image: none !important; background-color: var(--apple-blue-soft) !important; color: var(--apple-text) !important; border-color: var(--apple-blue) !important; box-shadow: none !important; }
+#library_file_list { border: 0 !important; background-color: transparent !important; padding: 0 !important; }
+#library_file_list .wrap { display: flex !important; flex-direction: column !important; gap: 8px !important; }
+#library_file_list label {
+  box-sizing: border-box; width: 100% !important; min-height: 48px; margin: 0 !important;
+  padding: 13px 16px !important; border: 1px solid var(--apple-border-soft) !important;
+  border-radius: 14px !important; display: flex !important; align-items: center; gap: 12px;
+  background-image: none !important; background-color: var(--ata-glass-soft) !important;
+  color: var(--apple-text) !important; font-weight: 500 !important; box-shadow: none !important;
+  overflow-wrap: anywhere; cursor: pointer;
+  transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out) !important;
+}
+/* 悬停只提示未选项可点击；勾选才是持续选中状态，焦点不改变它。 */
+@media (hover: hover) and (pointer: fine) {
+  #library_file_list label:not(:has(input:checked)):hover { background-color: var(--ata-hover) !important; border-color: var(--apple-border) !important; }
+}
+#library_file_list label:has(input:checked),
+#library_file_list label:has(input:checked):hover,
+#library_file_list label:has(input:checked):active,
+#library_file_list label:has(input:checked):focus-within {
+  background-image: none !important; background-color: var(--apple-blue-soft) !important;
+  color: var(--apple-text) !important; border-color: var(--apple-blue) !important; box-shadow: none !important;
+}
 #library_file_list label:has(input:checked) span { color: var(--apple-text) !important; }
+#library_file_list label:has(input:focus-visible) { outline: 2px solid var(--apple-blue); outline-offset: -4px; }
 #library_file_list label span { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
-#library_file_list input { flex: 0 0 auto; }
+#library_file_list input { flex: 0 0 auto; accent-color: var(--apple-blue); }
+/* 点击焦点不借用文本框光圈，键盘焦点由上方整行内描边提示。 */
+#library_file_list input[type="checkbox"],
+#library_file_list input[type="checkbox"]:focus {
+  box-shadow: none !important; outline: none !important;
+}
+#library_file_list input[type="checkbox"]:checked { background-color: var(--apple-blue) !important; border-color: var(--apple-blue) !important; }
 #library_file_list { max-height: 520px; overflow-y: auto !important; }
 #library_direct_download { min-height: 80px; }
 #library_direct_download .file { min-width: 0; }

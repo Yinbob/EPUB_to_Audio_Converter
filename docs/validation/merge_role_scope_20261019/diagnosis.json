@@ -1,0 +1,115 @@
+{
+  "project": "/Users/yinzh/PycharmProjects/EPUB_to_Audio_Converter-1/audiobook_output/.role_projects/e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011.json",
+  "project_sha256": "8ff6ea20d1b0c0ba852ffd4ad3b4ec09c2acfd1d23d61033516d63050bb2f498",
+  "project_modified": false,
+  "chapters": [
+    {
+      "chapter": 2,
+      "merge_candidates": [],
+      "caleb_segments": 0,
+      "caleb_in_default_candidates": false
+    },
+    {
+      "chapter": 5,
+      "merge_candidates": [
+        [
+          "Mother · 本章 6 段",
+          "char_84ad48311413"
+        ],
+        [
+          "Bryce · 本章 25 段",
+          "char_4bcf63d73f27"
+        ],
+        [
+          "Father · 本章 8 段",
+          "char_f820fafad2a3"
+        ],
+        [
+          "Juli Baker · 本章 13 段",
+          "char_74ad157777b8"
+        ]
+      ],
+      "caleb_segments": 0,
+      "caleb_in_default_candidates": false
+    },
+    {
+      "chapter": 6,
+      "merge_candidates": [
+        [
+          "Mother · 本章 4 段",
+          "char_84ad48311413"
+        ],
+        [
+          "Lynetta · 本章 1 段",
+          "char_1d33e2f66a9f"
+        ],
+        [
+          "Juli Baker · 本章 14 段",
+          "char_74ad157777b8"
+        ]
+      ],
+      "caleb_segments": 0,
+      "caleb_in_default_candidates": false
+    },
+    {
+      "chapter": 7,
+      "merge_candidates": [
+        [
+          "Mother · 本章 1 段",
+          "char_84ad48311413"
+        ],
+        [
+          "Bryce · 本章 10 段",
+          "char_4bcf63d73f27"
+        ],
+        [
+          "Granddad · 本章 4 段",
+          "char_06f13333e818"
+        ],
+        [
+          "Juli Baker · 本章 2 段",
+          "char_74ad157777b8"
+        ]
+      ],
+      "caleb_segments": 0,
+      "caleb_in_default_candidates": false
+    },
+    {
+      "chapter": 11,
+      "merge_candidates": [
+        [
+          "Mother · 本章 5 段",
+          "char_84ad48311413"
+        ],
+        [
+          "Lynetta · 本章 1 段",
+          "char_1d33e2f66a9f"
+        ],
+        [
+          "Bryce · 本章 113 段",
+          "char_4bcf63d73f27"
+        ],
+        [
+          "Father · 本章 21 段",
+          "char_f820fafad2a3"
+        ],
+        [
+          "Juli Baker · 本章 12 段",
+          "char_74ad157777b8"
+        ],
+        [
+          "Grandfather · 本章 43 段",
+          "char_4c18c3c47573"
+        ]
+      ],
+      "caleb_segments": 0,
+      "caleb_in_default_candidates": false
+    }
+  ],
+  "source_occurrences": [
+    {
+      "file": "FLIPPED_split_018.html",
+      "excerpt": " one of the few fates worse than basket boy. Caleb Hughes was up next, and he fetched the Boosters all of eleven"
+    }
+  ]
+}
