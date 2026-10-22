@@ -34,3 +34,18 @@ private_examples/
 tests
 logs/
 venv/
+# 本地环境、凭证及前端开发依赖不进入镜像
+venv_audio_quality/
+venv_audio_quality_runtime/
+venv_chatterbox/
+.audio_quality_models/
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+mimo_config.json
+minimax_config.json
+qwen_config.json
+deepseek_config.json
+.webui_settings.json
+.studio-runtime.lock

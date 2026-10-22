@@ -1,0 +1,19 @@
+{
+  "provider": "openai",
+  "status": "succeeded",
+  "error": "",
+  "audio_files": [
+    {
+      "name": "0001_迁移验收.mp3",
+      "bytes": 28434
+    }
+  ],
+  "progress": {
+    "mode": "finished",
+    "status": "任务已完成",
+    "pct": 100,
+    "detail": "章节 1/1",
+    "book": "迁移验收",
+    "active": false
+  }
+}

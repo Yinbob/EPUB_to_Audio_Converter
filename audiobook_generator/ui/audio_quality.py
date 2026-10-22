@@ -120,8 +120,7 @@ def local_quality_status():
     apply_local_quality_defaults(config)
     available = []
     if getattr(config, 'audio_core_asr_model', None):
-        available.append('内容转写模型')
+        available.append('内容转写')
     if getattr(config, 'audio_core_speaker_model', None):
-        available.append('声纹模型')
-    return ('本地已发现：' + '、'.join(available) + '。' if available else '尚未发现本地质检模型。') + \
-        '检查会区分疑似异常和未完成项目；模型发现不代表所有指标均已校准。'
+        available.append('声纹')
+    return '本地模型：' + '、'.join(available) if available else '本地检查模型：尚未发现'

@@ -68,3 +68,11 @@ logs/
 
 # 人工上传的 TTS 音色目录
 .tts_voice_catalog.json
+
+# Vue 工作台
+frontend/node_modules/
+frontend/test-results/
+frontend/playwright-report/
+.studio-runtime.lock
+.webui_settings.json
+minimax_config.json

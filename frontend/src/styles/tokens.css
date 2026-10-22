@@ -1,0 +1,226 @@
+:root {
+  /* 底色与表面 */
+  --apple-bg: #f5f5f7;
+  --apple-surface: #ffffff;
+  --apple-surface-2: #fbfbfd;
+  /* 文字三档：主 / 次 / 弱，两套主题都保证在各自背景上有足够对比度 */
+  --apple-text: #1d1d1f;
+  --apple-text-2: #52525a;
+  --apple-text-3: #6a6a72;
+  /* 描边 */
+  --apple-border: #d2d2d7;
+  --apple-border-soft: #e8e8ed;
+  /* 强调色 */
+  --apple-blue: #0071e3;
+  --apple-blue-hover: #0077ed;
+  --apple-blue-soft: #e8f1fd;
+  --apple-indigo: #5e5ce6;
+  --ata-generate-gradient: linear-gradient(
+    110deg,
+    #006d80 0%,
+    #175ec5 34%,
+    #6842b5 68%,
+    #a52f79 100%
+  );
+  --ata-stop-gradient: linear-gradient(110deg, #aa2948, #9b3437);
+  /* 主操作的液态玻璃：色彩只出现在折射边缘。 */
+  --ata-action-glass: rgba(252, 253, 255, 0.12);
+  --ata-action-glass-hover: rgba(252, 253, 255, 0.22);
+  --ata-action-sheen: linear-gradient(
+    175deg,
+    rgba(255, 255, 255, 0.24),
+    rgba(255, 255, 255, 0) 48%,
+    rgba(255, 255, 255, 0.06)
+  );
+  --ata-action-spectrum: linear-gradient(
+    115deg,
+    #199ebc 0%,
+    #6a86ed 22%,
+    #9d67da 46%,
+    #d87da1 68%,
+    #c9a867 84%,
+    #3ba89c 100%
+  );
+  --ata-action-neon-cyan: #099fcf;
+  --ata-action-neon-violet: #9870f5;
+  --ata-action-neon-rose: #e77ab3;
+  --ata-action-reflection: rgba(255, 255, 255, 0.92);
+  --apple-green: #1f7a35;
+  --apple-red: #d70015;
+  --apple-amber: #b25000;
+  /* 毛玻璃与半透明面 */
+  --ata-glass: rgba(255, 255, 255, 0.58); /* 卡片 */
+  --ata-glass-header: rgba(251, 251, 253, 0.62); /* 顶栏 */
+  --ata-glass-strong: rgba(255, 255, 255, 0.62); /* 进度条 */
+  --ata-glass-soft: rgba(255, 255, 255, 0.45); /* 控件 / 输入框 */
+  --ata-glass-soft-2: rgba(255, 255, 255, 0.55); /* 弹窗内输入框 */
+  --ata-glass-modal: rgba(255, 255, 255, 0.82); /* 弹窗玻璃 */
+  --ata-sheen: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.22),
+    rgba(255, 255, 255, 0) 42%
+  );
+  --ata-glass-edge: rgba(255, 255, 255, 0.7); /* 玻璃上沿高光 */
+  --ata-glass-ring: rgba(255, 255, 255, 0.35); /* 玻璃内描边 */
+  --ata-track: rgba(0, 0, 0, 0.06); /* 进度轨 / 开关底 */
+  --ata-hover: rgba(0, 0, 0, 0.04);
+  --ata-hover-strong: rgba(0, 0, 0, 0.07);
+  --ata-ripple: rgba(0, 0, 0, 0.14);
+  --ata-empty: rgba(255, 255, 255, 0.35);
+  --ata-terminal: rgba(255, 255, 255, 0.42);
+  --ata-book-chip: var(--apple-surface-2);
+  /* 滚动条：轨道透明，避免原生滚动条的方块轨道盖住圆角卡片的两侧 */
+  --ata-scroll-thumb: rgba(0, 0, 0, 0.22);
+  --ata-scroll-thumb-hover: rgba(0, 0, 0, 0.34);
+  /* 语义提示块 */
+  --ata-ready-bg: linear-gradient(135deg, #f0f9ff, #f0eefe);
+  --ata-ready-border: #cfe3fc;
+  --ata-ready-title: #0369a1;
+  --ata-ready-text: #0c4a6e;
+  --ata-danger-bg: #fff0ef;
+  --ata-danger-border: #ffd1ce;
+  --ata-warn-bg: #fff8e1;
+  --ata-scrim: rgba(0, 0, 0, 0.08);
+  /* 大标题的渐变（.hero h1 用 background-clip: text 涂在文字上）。
+     ⚠️ 必须是"纯 var() 引用"，渐变本身不能写在 background 简写里、也不要在里面再套 var()：
+     Gradio 处理 CSS 时会把 `background: linear-gradient(... var(...) ...)` 拆成空值长写属性
+     （实测 background-image 变空），而标题还有 -webkit-text-fill-color: transparent，
+     结果就是标题整段透明消失。颜色对齐 --apple-text / --apple-blue / --apple-indigo。 */
+  --ata-title-grad: linear-gradient(
+    120deg,
+    #1d1d1f 0%,
+    #0071e3 55%,
+    #5e5ce6 100%
+  );
+  /* 阴影 */
+  --apple-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
+  --apple-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.14);
+  --apple-shadow-blue: 0 8px 20px rgba(0, 113, 227, 0.28);
+  --ata-shadow-hover:
+    0 1px 2px rgba(0, 0, 0, 0.04), 0 16px 40px rgba(0, 0, 0, 0.07);
+  --radius: 20px;
+  --radius-sm: 14px;
+  /* 对齐 Gradio 自带变量：默认 slate-400（#94a3b8）在浅底上只有 2.48:1，
+     滑块 min/max、info、占位符都吃这几个变量，必须换成本项目的文字令牌。 */
+  --body-text-color: var(--apple-text);
+  --body-text-color-subdued: var(--apple-text-3);
+  --block-info-text-color: var(--apple-text-3);
+  --block-label-text-color: var(--apple-text-2);
+  --block-title-text-color: var(--apple-text-2);
+  --input-placeholder-color: var(--apple-text-3);
+  --checkbox-label-text-color: var(--apple-text);
+  --link-text-color: var(--apple-text-2);
+  --color-accent: var(--apple-blue);
+  --color-accent-soft: var(--apple-blue-soft);
+}
+
+/* 暗色：与 Gradio 的 <body class="dark"> 同步（html.dark 用于首屏不闪白） */
+:root .dark,
+:root.dark {
+  --apple-bg: #0e0e12;
+  --apple-surface: #1c1c22;
+  --apple-surface-2: #232329;
+  --apple-text: #f5f5f7;
+  --apple-text-2: #c3c3c9;
+  --apple-text-3: #a5a5ad;
+  --apple-border: #3a3a42;
+  --apple-border-soft: #2c2c33;
+  --apple-blue: #409cff;
+  --apple-blue-hover: #63b0ff;
+  --apple-blue-soft: rgba(64, 156, 255, 0.18);
+  --apple-indigo: #9a97ff;
+  --ata-generate-gradient: linear-gradient(
+    110deg,
+    #126e8c 0%,
+    #285fc4 34%,
+    #7450b5 68%,
+    #a03c7e 100%
+  );
+  --ata-stop-gradient: linear-gradient(110deg, #a93055, #a13b40);
+  --ata-action-glass: rgba(40, 43, 55, 0.18);
+  --ata-action-glass-hover: rgba(49, 53, 67, 0.28);
+  --ata-action-sheen: linear-gradient(
+    175deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0) 48%,
+    rgba(255, 255, 255, 0.03)
+  );
+  --ata-action-spectrum: linear-gradient(
+    115deg,
+    #47d6e8 0%,
+    #80a0ff 22%,
+    #b893fa 46%,
+    #ed9cc6 68%,
+    #e1c18a 84%,
+    #7cd9c4 100%
+  );
+  --ata-action-neon-cyan: #58dcff;
+  --ata-action-neon-violet: #b695ff;
+  --ata-action-neon-rose: #ff9ed6;
+  --ata-action-reflection: rgba(255, 255, 255, 0.33);
+  --apple-green: #4cd964;
+  --apple-red: #ff8a82;
+  --apple-amber: #ffb340;
+  --ata-glass: rgba(30, 30, 37, 0.62);
+  --ata-glass-header: rgba(18, 18, 23, 0.68);
+  --ata-glass-strong: rgba(32, 32, 39, 0.66);
+  --ata-glass-soft: rgba(255, 255, 255, 0.07);
+  --ata-glass-soft-2: rgba(255, 255, 255, 0.1);
+  --ata-glass-modal: rgba(24, 24, 30, 0.86);
+  --ata-sheen: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0) 42%
+  );
+  --ata-glass-edge: rgba(255, 255, 255, 0.12);
+  --ata-glass-ring: rgba(255, 255, 255, 0.06);
+  --ata-track: rgba(255, 255, 255, 0.16);
+  --ata-hover: rgba(255, 255, 255, 0.08);
+  --ata-hover-strong: rgba(255, 255, 255, 0.13);
+  --ata-ripple: rgba(255, 255, 255, 0.22);
+  --ata-empty: rgba(255, 255, 255, 0.05);
+  --ata-terminal: rgba(10, 10, 14, 0.55);
+  --ata-book-chip: rgba(255, 255, 255, 0.07);
+  --ata-scroll-thumb: rgba(255, 255, 255, 0.22);
+  --ata-scroll-thumb-hover: rgba(255, 255, 255, 0.34);
+  --ata-ready-bg: linear-gradient(
+    135deg,
+    rgba(64, 156, 255, 0.16),
+    rgba(154, 151, 255, 0.14)
+  );
+  --ata-ready-border: rgba(100, 170, 255, 0.35);
+  --ata-ready-title: #9ecbff;
+  --ata-ready-text: #d6e7ff;
+  --ata-danger-bg: rgba(255, 105, 97, 0.16);
+  --ata-danger-border: rgba(255, 105, 97, 0.42);
+  --ata-warn-bg: rgba(255, 179, 64, 0.16);
+  --ata-scrim: rgba(0, 0, 0, 0.55);
+  /* 暗色下标题渐变要跟着变浅（同 --apple-text / --apple-blue / --apple-indigo） */
+  --ata-title-grad: linear-gradient(
+    120deg,
+    #f5f5f7 0%,
+    #409cff 55%,
+    #9a97ff 100%
+  );
+  --apple-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.45);
+  --apple-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
+  --apple-shadow-blue: 0 8px 20px rgba(0, 80, 180, 0.45);
+  --ata-shadow-hover:
+    0 1px 2px rgba(0, 0, 0, 0.5), 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Gradio 的暗色变量写在 `:root .dark{}`（(0,2,0)）；这里用 :root:root 提高一级特异性，
+   保证"文字/强调色必须用我们的令牌"这条在任何注入顺序下都成立。 */
+:root:root .dark,
+:root:root.dark {
+  --body-text-color: var(--apple-text);
+  --body-text-color-subdued: var(--apple-text-3);
+  --block-info-text-color: var(--apple-text-3);
+  --block-label-text-color: var(--apple-text-2);
+  --block-title-text-color: var(--apple-text-2);
+  --input-placeholder-color: var(--apple-text-3);
+  --checkbox-label-text-color: var(--apple-text);
+  --link-text-color: var(--apple-text-2);
+  --color-accent: var(--apple-blue);
+  --color-accent-soft: var(--apple-blue-soft);
+}

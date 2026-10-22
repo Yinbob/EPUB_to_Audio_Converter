@@ -1,0 +1,20 @@
+{
+  "provider": "openai",
+  "status": "succeeded",
+  "error": "",
+  "audio_files": [],
+  "progress": {
+    "mode": "failed",
+    "status": "任务已完成",
+    "pct": 100,
+    "detail": "",
+    "book": "",
+    "active": false
+  },
+  "kind": "split",
+  "project": {
+    "id": "080b3dc2ccf996295a7bce539094b14b",
+    "revision": 1,
+    "confirmed": false
+  }
+}

@@ -6,6 +6,39 @@ import threading
 import time
 from audiobook_generator.role_script.split_control import SplitAborted, split_control_scope
 
+SPLIT_ACTIVITY_CSS = """
+#role_split_status .role-split-activity { position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(224px, .65fr); align-items: center; gap: 16px 20px; padding: 22px; border: 1px solid var(--apple-border); border-radius: 18px; background-color: var(--ata-glass-soft); }
+#role_split_status .role-split-copy { min-width: 0; }
+#role_split_status [data-state="starting"], #role_split_status [data-state="running"] { border-color: var(--apple-blue); background-color: var(--apple-blue-soft); box-shadow: var(--apple-shadow-blue); }
+#role_split_status .role-split-heading { color: var(--apple-text); font-size: 1.08rem; font-weight: 650; line-height: 1.5; }
+#role_split_status .role-split-wave { display: flex; align-items: center; justify-content: center; gap: 3px; height: 64px; color: var(--apple-blue); }
+#role_split_status .role-split-wave i { display: block; width: 3px; height: var(--bar-height); flex: 0 0 3px; border-radius: 4px; background-color: currentColor; transform: scaleY(.35); opacity: .45; }
+#role_split_status [data-state="starting"] .role-split-wave i, #role_split_status [data-state="running"] .role-split-wave i { animation: role-split-wave 1400ms cubic-bezier(0.77, 0, 0.175, 1) infinite; animation-delay: calc(var(--bar-index) * -80ms); }
+#role_split_status .role-split-detail { margin-top: 10px; color: var(--apple-text-2); white-space: pre-line; overflow-wrap: anywhere; line-height: 1.65; }
+#role_split_status .role-split-elapsed { display: block; margin-top: 10px; color: var(--apple-text); font-size: .86rem; font-variant-numeric: tabular-nums; }
+#role_split_status .role-split-stages { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 20px; padding-left: 24px; border-left: 1px solid var(--apple-border-soft); color: var(--apple-text-2); font-size: .8rem; line-height: 1.6; }
+#role_split_status .role-split-stages [aria-current="step"] { color: var(--apple-blue); font-weight: 650; }
+#role_split_status .role-split-track { grid-column: 1 / -1; position: relative; height: 3px; overflow: hidden; border-radius: 4px; background-color: var(--apple-border-soft); }
+#role_split_status .role-split-track span { display: block; width: 30%; height: 100%; border-radius: inherit; background-color: var(--apple-blue); transform: translateX(-110%); }
+#role_split_status [data-state="starting"] .role-split-track span, #role_split_status [data-state="running"] .role-split-track span { animation: role-split-flow 2200ms linear infinite; }
+#role_split_status [data-state="failed"] .role-split-heading { color: var(--apple-red); }
+#role_split_status [data-state="done"] .role-split-heading { color: var(--apple-green); }
+#role_split_status [data-state="failed"] .role-split-wave { color: var(--apple-red); }
+#role_split_status [data-state="done"] .role-split-wave { color: var(--apple-green); }
+@keyframes role-split-wave { 0%, 100% { transform: scaleY(.35); opacity: .45; } 50% { transform: scaleY(1); opacity: 1; } }
+@keyframes role-split-flow { to { transform: translateX(440%); } }
+@media (max-width: 1000px) {
+  #role_split_status .role-split-activity { grid-template-columns: 64px minmax(0, 1fr); }
+  #role_split_status .role-split-stages { grid-column: 1 / -1; padding: 14px 0 0; border-left: 0; border-top: 1px solid var(--apple-border-soft); }
+}
+@media (max-width: 480px) {
+  #role_split_status .role-split-activity { grid-template-columns: 48px minmax(0, 1fr); gap: 14px; padding: 18px; }
+  #role_split_status .role-split-wave { gap: 2px; }
+  #role_split_status .role-split-wave i { width: 2px; flex-basis: 2px; }
+}
+"""
+
+
 ROLE_STUDIO_CSS = """
 #role_studio { --role-field-radius: 18px; }
 #role_studio .role-section-title h4 { margin: 0 0 6px; font-size: 1.08rem; font-weight: 650; color: var(--apple-text); }
@@ -51,28 +84,10 @@ ROLE_STUDIO_CSS = """
 #role_studio .role-action-row { gap: 10px; align-items: stretch; }
 #role_studio .role-action-row button { min-height: 44px; white-space: normal; }
 #role_studio #role_split_btn, #role_studio #role_split_stop_btn { min-height: 48px; margin-top: 8px; }
-#role_studio #role_split_status { min-height: 148px; margin-top: 16px !important; padding: 0; border-radius: 18px; background-color: transparent; }
+#role_studio #role_split_note { margin-top: 16px !important; }
+#role_studio #role_split_status { min-height: 0; margin-top: 16px !important; padding: 0; border-radius: 18px; background-color: transparent; }
 #role_studio #role_split_status p { margin: 0; line-height: 1.65; color: var(--apple-text-2); }
 #role_studio #role_split_status .generating { border-radius: 18px; }
-#role_split_status .role-split-activity { position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: 16px 20px; padding: 22px; border: 1px solid var(--apple-border); border-radius: 18px; background-color: var(--ata-glass-soft); }
-#role_split_status [data-state="starting"], #role_split_status [data-state="running"] { border-color: var(--apple-blue); background-color: var(--apple-blue-soft); box-shadow: var(--apple-shadow-blue); }
-#role_split_status .role-split-heading { color: var(--apple-text); font-size: 1.08rem; font-weight: 650; line-height: 1.5; }
-#role_split_status .role-split-wave { display: flex; align-items: center; justify-content: center; gap: 3px; height: 64px; color: var(--apple-blue); }
-#role_split_status .role-split-wave i { display: block; width: 3px; height: var(--bar-height); flex: 0 0 3px; border-radius: 4px; background-color: currentColor; transform: scaleY(.35); opacity: .45; }
-#role_split_status [data-state="starting"] .role-split-wave i, #role_split_status [data-state="running"] .role-split-wave i { animation: role-split-wave 1400ms cubic-bezier(0.77, 0, 0.175, 1) infinite; animation-delay: calc(var(--bar-index) * -80ms); }
-#role_split_status .role-split-detail { margin-top: 10px; color: var(--apple-text-2); white-space: pre-line; overflow-wrap: anywhere; line-height: 1.65; }
-#role_split_status .role-split-elapsed { display: block; margin-top: 10px; color: var(--apple-text); font-size: .86rem; font-variant-numeric: tabular-nums; }
-#role_split_status .role-split-stages { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--apple-text-2); font-size: .8rem; line-height: 1.6; }
-#role_split_status .role-split-stages [aria-current="step"] { color: var(--apple-blue); font-weight: 650; }
-#role_split_status .role-split-track { grid-column: 1 / -1; position: relative; height: 3px; overflow: hidden; border-radius: 4px; background-color: var(--apple-border-soft); }
-#role_split_status .role-split-track span { display: block; width: 30%; height: 100%; border-radius: inherit; background-color: var(--apple-blue); transform: translateX(-110%); }
-#role_split_status [data-state="starting"] .role-split-track span, #role_split_status [data-state="running"] .role-split-track span { animation: role-split-flow 2200ms linear infinite; }
-#role_split_status [data-state="failed"] .role-split-heading { color: var(--apple-red); }
-#role_split_status [data-state="done"] .role-split-heading { color: var(--apple-green); }
-#role_split_status [data-state="failed"] .role-split-wave { color: var(--apple-red); }
-#role_split_status [data-state="done"] .role-split-wave { color: var(--apple-green); }
-@keyframes role-split-wave { 0%, 100% { transform: scaleY(.35); opacity: .45; } 50% { transform: scaleY(1); opacity: 1; } }
-@keyframes role-split-flow { to { transform: translateX(440%); } }
 @keyframes role-split-spin { to { transform: rotate(360deg); } }
 #role_studio #role_preview_btn { min-height: 48px; margin-top: 8px; }
 #role_studio #role_preview_audio { margin-top: 24px !important; margin-bottom: 12px; }
@@ -117,12 +132,9 @@ ROLE_STUDIO_CSS = """
   #role_studio .tab-nav button { font-size: .86rem; padding: 10px 8px; }
 }
 @media (max-width: 480px) {
-  #role_split_status .role-split-activity { grid-template-columns: 48px minmax(0, 1fr); gap: 14px; padding: 18px; }
-  #role_split_status .role-split-wave { gap: 2px; }
-  #role_split_status .role-split-wave i { width: 2px; flex-basis: 2px; }
   #role_studio #role_preview_audio { margin-top: 20px !important; }
 }
-"""
+""" + SPLIT_ACTIVITY_CSS
 
 
 def review_notice(message, state='idle'):

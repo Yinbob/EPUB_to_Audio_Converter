@@ -1,0 +1,67 @@
+/* ════════════════════════════════════════════════════════════════
+   氛围背景层（#ata-bg）——静态渐变 + canvas 光晕
+   层级：body 兜底渐变 → #ata-bg（z-index:0）→ .gradio-container（z-index:1）内容
+   ════════════════════════════════════════════════════════════════ */
+#ata-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  transition: opacity 0.35s ease;
+}
+/* 静态环境光渐变（原 CUSTOM_CSS 里那份，挪到独立层上，生成态可以整体加强） */
+#ata-bg-base {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      58% 38% at 10% 0%,
+      rgba(0, 113, 227, 0.07),
+      transparent 72%
+    ),
+    radial-gradient(
+      48% 34% at 92% 4%,
+      rgba(94, 92, 230, 0.07),
+      transparent 72%
+    ),
+    radial-gradient(
+      46% 32% at 50% 100%,
+      rgba(52, 199, 89, 0.05),
+      transparent 72%
+    );
+}
+/* 生成态：再叠一层同款渐变，等效把整体强度抬到约 1.6 倍（0.07 → 0.13） */
+#ata-bg-base::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  background:
+    radial-gradient(
+      58% 38% at 10% 0%,
+      rgba(0, 113, 227, 0.06),
+      transparent 72%
+    ),
+    radial-gradient(
+      48% 34% at 92% 4%,
+      rgba(94, 92, 230, 0.06),
+      transparent 72%
+    ),
+    radial-gradient(
+      46% 32% at 50% 100%,
+      rgba(52, 199, 89, 0.04),
+      transparent 72%
+    );
+}
+#ata-bg.generating #ata-bg-base::after {
+  opacity: 1;
+}
+#ata-bg-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}

@@ -1,0 +1,20 @@
+ M .impeccable/surfaces/book-workflow.md
+ M audiobook_generator/audio_core/casting.py
+ M audiobook_generator/audio_core/hybrid_casting.py
+ M audiobook_generator/role_script/split_control.py
+ M audiobook_generator/ui/audio_quality.py
+ M audiobook_generator/ui/role_studio.py
+ M audiobook_generator/ui/web_ui.py
+ M "docs/presentation_20261018/output/\345\244\232\350\247\222\350\211\262\346\234\211\345\243\260\344\271\246_\345\212\237\350\203\275\347\225\214\351\235\242\344\270\216\346\212\200\346\234\257\350\256\262\350\247\243_20261018.pptx"
+ M tests/audiobook_generator/ui/role_script_ui_test.py
+?? audiobook_generator/ui/audio_quality_ui.py
+?? audiobook_generator/ui/book_casting.py
+?? audiobook_generator/ui/book_casting_ui.py
+?? docs/migration/
+?? docs/validation/audio_quality_ui_20261020/
+?? docs/validation/book_casting_20261020/
+?? docs/validation/role_split_spacing_20261020/
+?? docs/validation/split_status_layout_20261020/
+?? "docs/\345\205\250\344\271\246\350\207\252\345\212\250\345\210\206\351\205\215\350\247\222\350\211\262\345\243\260\351\237\263.md"
+?? tests/audiobook_generator/ui/book_casting_test.py
+?? tests/audiobook_generator/ui/book_casting_wiring_test.py

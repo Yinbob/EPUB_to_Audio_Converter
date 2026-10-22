@@ -2,7 +2,7 @@
 
 echo "Starting entrypoint script..."
 
-if [ $# -eq 0 ] || { [ "$1" = "--host" ] || [ "$1" = "--port" ]; }; then
+if [ $# -eq 0 ] || { [ "$1" = "--host" ] || [ "$1" = "--port" ] || [ "$1" = "--ui" ]; }; then
     # If no arguments or optional arguments --host and/or --port are provided, execute main_ui.py
     echo "No arguments or optional arguments provided. Executing main_ui.py"
     exec python3 /app_src/main_ui.py --host 0.0.0.0 --port 7862 "$@"

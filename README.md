@@ -23,6 +23,8 @@ python3 main.py <input_file> <output_folder> [options]
 
 启动环境：直接运行 `python3 main_ui.py` 时，优先使用项目内已存在的 `venv_audio_quality/`，没有时回退 `venv_chatterbox/`，均不存在时使用当前 Python。已激活的虚拟环境／Conda 环境优先保留。需要指定本地引擎环境时，使用 `./venv_chatterbox/bin/python3 main_ui.py`；已配置的 MiMo 质检环境也可显式使用 `./venv_audio_quality/bin/python3 main_ui.py`。不会自动安装依赖或下载模型。模块导入和 spawn 后台进程不会切换环境。
 
+Vue 工作台已提供独立入口，保留原 Apple 风格、双主题与光效：`./run_ui.sh --ui vue`。当前默认仍为 Gradio，回退使用 `./run_ui.sh --ui gradio`。构建、部署、数据兼容及尚待目标环境验收的项目见 [Vue 迁移说明](docs/migration/README.md)。
+
 多角色分段 TTS（MiMo / MiniMax）的完整说明、JSON 规范和 CLI/WebUI 操作见 [多角色分段 TTS MVP](docs/multi_role_tts_mvp.md)。
 
 ### 自动更新 TTS 英文音色（可选）

@@ -3,5 +3,6 @@
   "preview": false,
   "remove_endnotes": false,
   "remove_reference_numbers": false,
-  "show_voice_instructions": false
+  "show_voice_instructions": false,
+  "admin_password_hash": "pbkdf2$92a2be3e3d5681147a6a3a66e339ae8b$54617d62f4347a0a31d0d69ca78a86f1ced993e4109822febba649d097962bd5"
 }

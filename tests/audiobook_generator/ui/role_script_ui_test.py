@@ -677,16 +677,29 @@ class TestRoleScriptUiWiring(unittest.TestCase):
             "DeepSeek API Key",
             "服务地址",
             "DeepSeek 模型",
-            "MiMo 生成时检查内容、拼接与角色一致性",
-            "按次数与时限自动修复问题片段",
-            "可选：本地模型与资源设置 JSON",
-            "可选：已审查角色选角 JSON",
+            "检查生成的音频",
+            "自动修复问题片段",
+            "模型与资源设置（JSON）",
+            "已核验的角色选角（JSON）",
         ]
         for component_id, label in zip(inputs[-23:-4], expected_labels):
             if label is None:
                 continue
             actual = str(components[component_id].get("props", {}).get("label") or "")
             self.assertTrue(actual.startswith(label), (actual, label))
+
+    def test_quality_panel_preserves_report_and_generation_connections(self):
+        components = {c["props"].get("elem_id"): c for c in self._components() if c["props"].get("elem_id")}
+        self.assertTrue(components["audio_core_enabled"]["props"]["value"])
+        self.assertFalse(components["audio_core_repair"]["props"]["value"])
+        refresh = self._dependency("refresh_quality_reports")
+        show = self._dependency("show_quality_report")
+        report_id = components["quality_report_file"]["id"]
+        self.assertEqual(refresh["targets"], [(components["quality_refresh"]["id"], "click")])
+        self.assertEqual(refresh["outputs"], [report_id])
+        self.assertEqual(show["inputs"], [report_id])
+        self.assertIn(components["quality_rows"]["id"], show["outputs"])
+        self.assertIn(report_id, self._dependency("refresh_quality_after_progress")["outputs"])
 
     def test_role_events_are_wired(self):
         auto_split = self._dependency("auto_split_role_script")

@@ -53,7 +53,7 @@ def voice_distance(a, b):
 
 def optimize_casting(roles, edges, bank, *, locked=None, initial=None, fit_penalties=None,
                      strategy="interaction", seed=42, narrator_exclusive=False, language=None,
-                     unique_voices=False):
+                     unique_voices=False, spread_tiebreak=False):
     if language is not None:
         from .language import normalize_language
         if normalize_language(language) not in bank.get("languages", []):
@@ -118,6 +118,13 @@ def optimize_casting(roles, edges, bank, *, locked=None, initial=None, fit_penal
         value += .05 * sum(role in initial and initial[role] != voice for role, voice in assignment.items())
         return value
 
+    def order(assignment):
+        chosen = sorted(set(assignment.values()))
+        distances = [voice_distance(voices[a], voices[b]) for i, a in enumerate(chosen)
+                     for b in chosen[i + 1:]] if spread_tiebreak else []
+        return (objective(assignment), -min(distances, default=0), -sum(distances),
+                tuple(sorted(assignment.items())))
+
     degree = {role: sum(w for edge, w in edges.items() if role in edge) for role in roles}
     # 计算硬约束后的规模，超限即停止计数，避免大整数和指数级枚举。
     movable_count = len(set(roles) - set(locked) - ({'narrator'} if exclusive else set()))
@@ -144,12 +151,12 @@ def optimize_casting(roles, edges, bank, *, locked=None, initial=None, fit_penal
             ordered = sorted(movable)
             choices = permutations(candidates, len(ordered)) if unique_voices else product(candidates, repeat=len(ordered))
             assignments = ({**fixed, **dict(zip(ordered, values))} for values in choices)
-            return min(assignments, key=lambda a: (objective(a), tuple(sorted(a.items()))))
+            return min(assignments, key=order)
         for role in sorted(movable, key=lambda r: (-degree[r], r)):
             # 角色声音不足时可以复用，但不能占用已保留的旁白音色。
             available = sorted(set(candidates) - set(assignment.values())) or candidates
             assignment[role] = rng.choice(available) if strategy == 'random' else min(
-                available, key=lambda voice: (objective({**assignment, role: voice}), voice))
+                available, key=lambda voice: order({**assignment, role: voice}))
         for _ in range(0 if strategy == 'random' else 20):
             best, best_score = assignment, objective(assignment)
             for role in sorted(movable):
@@ -158,12 +165,12 @@ def optimize_casting(roles, edges, bank, *, locked=None, initial=None, fit_penal
                         continue
                     candidate = {**assignment, role: voice}
                     score = objective(candidate)
-                    if score < best_score - 1e-10:
+                    if order(candidate) < order(best):
                         best, best_score = candidate, score
                 for other in sorted(movable - {role}):
                     candidate = {**assignment, role: assignment[other], other: assignment[role]}
                     score = objective(candidate)
-                    if score < best_score - 1e-10:
+                    if order(candidate) < order(best):
                         best, best_score = candidate, score
             if best == assignment:
                 break
@@ -171,7 +178,7 @@ def optimize_casting(roles, edges, bank, *, locked=None, initial=None, fit_penal
         return assignment
 
     assignments = [search(voice) for voice in narrator_choices]
-    assignment = min(assignments, key=lambda a: (objective(a), tuple(sorted(a.items()))))
+    assignment = min(assignments, key=order)
     shared = {voice: [r for r in roles if assignment[r] == voice] for voice in sorted(set(assignment.values()))}
     return {"schema_version": "mimo-casting-v1", "provider": "openai", "roles": assignment,
             "locked_voices": locked, "objective": objective(assignment),

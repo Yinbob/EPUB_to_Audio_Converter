@@ -33,6 +33,8 @@ from datetime import datetime
 
 import gradio as gr
 from gradio_log import Log
+from audiobook_generator.ui.book_casting_ui import BOOK_CASTING_CSS
+from audiobook_generator.ui.audio_quality_ui import QUALITY_CSS, build_audio_quality
 
 from audiobook_generator.config.general_config import GeneralConfig
 from audiobook_generator.tts_providers.edge_tts_provider import (
@@ -200,7 +202,8 @@ def _get_admin_password_hash() -> str:
 
 def _verify_admin_password(password: str) -> bool:
     """验证管理员密码"""
-    return _hash_password(password) == _get_admin_password_hash()
+    from audiobook_generator.services.settings import verify_hash
+    return verify_hash(_get_admin_password_hash(), password)
 
 
 def _change_admin_password(old_password: str, new_password: str) -> tuple[bool, str]:
@@ -322,6 +325,8 @@ def _test_deepseek_api(api_key: str, base_url: str, model: str) -> str:
 
 # ── 运行态 ────────────────────────────────────────────────────────
 running_process: Optional[Process] = None
+_studio_manager = None
+_studio_task_id = None
 # 是否由用户点了「停止转换」而结束（用于把状态显示成"已停止"而不是"异常中断"）
 manual_stopped = False
 webui_log_file = None
@@ -678,7 +683,7 @@ def _role_project_operation(fn):
     return guarded
 
 
-def _begin_role_split(input_file):
+def _begin_role_split(input_file, invalidate_confirmation=True):
     """按书籍指纹占用项目；在首帧反馈前作废旧确认，不读取或更改旧剧本。"""
     files = input_file if isinstance(input_file, (list, tuple)) else [input_file]
     if len(files) != 1:
@@ -695,8 +700,9 @@ def _begin_role_split(input_file):
         _ROLE_SPLITTING_PROJECTS.add(key)
         from audiobook_generator.role_script.split_control import SplitControl
         _ROLE_SPLIT_CONTROLS[key] = SplitControl()
-        _ROLE_RECONFIRM_PROJECTS.add(key)
-        _ROLE_CONFIRMED_SCRIPTS.pop(key, None)
+        if invalidate_confirmation:
+            _ROLE_RECONFIRM_PROJECTS.add(key)
+            _ROLE_CONFIRMED_SCRIPTS.pop(key, None)
     return key
 
 
@@ -2574,7 +2580,11 @@ def _batch_worker(config_list, log_file_path):
 
 
 def launch_batch(configs):
-    global running_process, manual_stopped
+    global running_process, manual_stopped, _studio_task_id
+    if _studio_manager is not None:
+        manual_stopped = False
+        _studio_task_id, running_process = _studio_manager.start_configs(configs, webui_log_file)
+        return
     if running_process and running_process.is_alive():
         print("Audiobook generator already running")
         return
@@ -2596,6 +2606,9 @@ def get_progress_info():
     shimmer 等 CSS 动画每 2 秒重新播放一次，看起来"一闪一闪"。
     """
     global webui_log_file
+    if _studio_manager is not None and _studio_task_id is not None:
+        task = _studio_manager.get(_studio_task_id)
+        return json.dumps(task['progress'], ensure_ascii=False), gr.Timer(active=task['status'] in ('starting', 'running', 'stopping'))
     run_alive = running_process is not None and running_process.is_alive()
 
     state = None
@@ -2633,6 +2646,14 @@ def _terminate_running_batch(timeout=3.0):
     所以看起来"停止按钮没反应"——尤其是 chatterbox/GPU 这类单章很慢的引擎。
     """
     global running_process, manual_stopped
+    if _studio_manager is not None and _studio_task_id is not None:
+        task = _studio_manager.get(_studio_task_id)
+        was_active = task['status'] in ('starting', 'running', 'stopping')
+        if was_active:
+            _studio_manager.stop(_studio_task_id)
+            running_process = None
+            manual_stopped = True
+        return was_active
     proc = running_process
     if proc is None:
         return False
@@ -4342,7 +4363,7 @@ body.modal-open::before {
 @media (min-width: 1440px) {
   .gradio-container { max-width: 1320px !important; }
 }
-""" + AMBIENT_CSS + THEME_CSS + WORKFLOW_CSS + CHAPTER_CSS + ROLE_STUDIO_CSS
+""" + AMBIENT_CSS + THEME_CSS + WORKFLOW_CSS + CHAPTER_CSS + ROLE_STUDIO_CSS + BOOK_CASTING_CSS + QUALITY_CSS
 
 # ── 主装配 ────────────────────────────────────────────────────────
 def host_ui(config):
@@ -4588,7 +4609,7 @@ def host_ui(config):
                                 with gr.Row(elem_classes='role-action-row'):
                                     role_regenerate_btn = gr.Button("生成 / 重新拆分剧本", elem_classes="btn-primary", elem_id="role_split_btn", scale=3)
                                     role_split_stop_btn = gr.Button('停止拆分', interactive=False, elem_classes='btn-danger', elem_id='role_split_stop_btn', scale=1)
-                                gr.Markdown('单次请求最多 120 秒；可随时停止。停止会保留上次保存的剧本。', elem_classes='role-caption')
+                                gr.Markdown('单次请求最多 120 秒；可随时停止。停止会保留上次保存的剧本。', elem_classes='role-caption', elem_id='role_split_note')
                             with gr.Tab("DeepSeek 连接"):
                                 gr.Markdown("首次使用时配置，已保存的连接会自动读取。")
                                 deepseek_api_key = gr.Textbox(label="DeepSeek API Key", placeholder="请输入 API Key", type="password", elem_classes="role-field")
@@ -4647,6 +4668,8 @@ def host_ui(config):
                                                 role_merge_feedback = gr.HTML(review_notice('尚未执行人物合并。'), elem_id="role_merge_feedback")
                                     role_to_voices = gr.Button("下一步：配置角色声音 →", elem_classes="btn-ghost role-next-step", elem_id="role_to_voices")
                                 with gr.Tab("2 · 角色声音", id="role_voices"):
+                                    from .book_casting_ui import build_book_casting
+                                    book_casting_ui = build_book_casting(get_output_dir())
                                     gr.HTML('<div class="role-section-title"><h4>为每个人物选好声音</h4><p>选人物 → 调整并应用 → 试听。主要人物可将满意的试听固定为参考音。</p></div>')
                                     with gr.Row(elem_classes="role-voice-columns"):
                                         with gr.Column(scale=6, min_width=260):
@@ -4716,24 +4739,9 @@ def host_ui(config):
                                     gr.Markdown("旧版结果写入 role_quality_reports。需要本地 SenseVoice；失败片段可能将诊断发送至 DeepSeek，并增加一次 MiMo 合成。日常建议使用下方统一音频检查。", elem_classes="role-caption")
 
 
-                with gr.Group(elem_classes="app-card", elem_id="quality_setup"):
-                    gr.HTML('<p class="card-title">音频检查与修复</p>')
-                    audio_core_enabled = gr.Checkbox(label="MiMo 生成时检查内容、拼接与角色一致性", value=True, elem_classes="toggle")
-                    audio_core_repair = gr.Checkbox(label="按次数与时限自动修复问题片段", value=False, elem_classes="toggle")
-                    from audiobook_generator.ui.audio_quality import local_quality_status
-                    gr.Markdown(local_quality_status())
-                    gr.Markdown("默认保留原音频并生成检查报告。开启自动修复会增加合成请求；未校准的声音差异不会直接认定为缺陷。")
-                    with gr.Accordion("高级质量配置（可选）", open=False):
-                        audio_core_settings_file = gr.File(label="可选：本地模型与资源设置 JSON", file_types=[".json"])
-                        audio_core_casting_file = gr.File(label="可选：已审查角色选角 JSON", file_types=[".json"])
-                    with gr.Accordion("生成后查看检查结果", open=False):
-                        quality_refresh = gr.Button("读取输出目录中的质量报告", size="sm")
-                        quality_report_file = gr.Dropdown(label="质量报告", choices=[], interactive=True)
-                        quality_summary = gr.Markdown("尚未读取报告")
-                        quality_rows = gr.Dataframe(headers=["位置", "维度", "问题", "判断", "时间（秒）"], interactive=False)
-                        quality_download = gr.File(label="下载完整报告", interactive=False)
-                        quality_scope = gr.Dropdown(label="选择片段或拼接处试听", choices=[], interactive=True)
-                        quality_audio = gr.Audio(label="问题上下文试听", interactive=False)
+                (audio_core_enabled, audio_core_repair, audio_core_settings_file, audio_core_casting_file,
+                 quality_refresh, quality_report_file, quality_summary, quality_rows, quality_download,
+                 quality_scope, quality_audio) = build_audio_quality()
 
 
                 # —— 高级设置弹窗（纯客户端控制；默认 display:none，JS 切换 .show） ——
@@ -5219,6 +5227,8 @@ def host_ui(config):
             ],
             show_progress="hidden",
         )
+        from .book_casting_ui import wire_book_casting
+        wire_book_casting(book_casting_ui, locals())
         role_preview_role.change(
             fn=load_role_voice_settings, inputs=[role_script_file, role_table, role_preview_role],
             outputs=[role_voice_mode, role_voice_builtin, role_voice_description, role_voice_reference,
@@ -5623,9 +5633,20 @@ def host_ui(config):
         )
 
     temp_dir = os.path.join(get_output_dir(), ".temp_downloads")
-    ui.launch(
-        server_name=config.host,
-        server_port=config.port,
-        prevent_thread_lock=False,
-        allowed_paths=[get_output_dir(), temp_dir],
-    )
+    global _studio_manager, _studio_task_id
+    from audiobook_generator.services.files import FileStore
+    from audiobook_generator.services.projects import Projects
+    from audiobook_generator.services.tasks import TaskManager
+    files = FileStore(get_output_dir())
+    _studio_manager = TaskManager(get_output_dir(), files, Projects(get_output_dir(), files))
+    try:
+        ui.launch(
+            server_name=config.host,
+            server_port=config.port,
+            prevent_thread_lock=False,
+            allowed_paths=[get_output_dir(), temp_dir],
+        )
+    finally:
+        _studio_manager.close()
+        _studio_manager = None
+        _studio_task_id = None

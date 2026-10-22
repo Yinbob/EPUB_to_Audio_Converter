@@ -30,6 +30,8 @@ class SplitControl:
         if self.cancelled.is_set():
             raise SplitAborted()
         if time.monotonic() >= self.deadline:
+            if getattr(self, 'resumable', False):
+                raise SplitAborted('全书任务达到 30 分钟上限，已保留完成章节和成功批次；再次点击可继续补齐。', 'failed')
             raise SplitAborted('拆分达到 30 分钟任务上限，已停止；请缩小章节范围后重试。', 'failed')
 
     def create(self, api_key, base_url, **kwargs):

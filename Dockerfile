@@ -1,3 +1,11 @@
+# Vue 只在构建时需要 Node。
+FROM node:22-bookworm-slim AS frontend
+WORKDIR /frontend
+COPY frontend/package*.json ./
+RUN npm ci --no-audit --no-fund
+COPY frontend/ ./
+RUN npm run build
+
 # Use an official Python runtime as a parent image
 FROM python:3.11-slim-trixie
 
@@ -26,6 +34,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Add the rest of the application code
 COPY . .
+COPY --from=frontend /frontend/dist /app_src/frontend/dist
 
 # Set the working directory to /app
 WORKDIR /app
