@@ -211,7 +211,7 @@ class BookCasting:
             if index not in verified['complete']:
                 raise ValueError(f'第 {index} 章未覆盖原文，未计为已完成')
             # 累积结果逐章原子保存；失败只损失尚未完成的这一章。
-            script = replace(result, registry_complete=verified['full_book'])
+            script = replace(result, registry_complete=verified['full_book'] and not result.registry_warnings)
             atomic_json(self.analysis_path, {'source_binding': self.binding, 'analysis_binding': self.analysis_binding,
                                              'script': role_script_to_dict(script)})
         return self.progress()

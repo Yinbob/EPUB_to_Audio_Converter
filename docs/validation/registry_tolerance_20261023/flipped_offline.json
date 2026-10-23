@@ -1,0 +1,13 @@
+{
+  "book_sha256": "e89f8bdf8d54aeae297aa3d34798142c94382187243e621051a35d6c7db20011",
+  "chapter_index_in_book": 2,
+  "source_characters": 111,
+  "valid_people": [
+    "Colton",
+    "Connor"
+  ],
+  "simulated_invalid_candidate": "Colton Smith",
+  "attempts": 2,
+  "warning_count": 1,
+  "external_requests": 0
+}

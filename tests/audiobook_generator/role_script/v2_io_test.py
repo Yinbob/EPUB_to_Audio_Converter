@@ -8,7 +8,7 @@ from audiobook_generator.role_script.deepseek_splitter import role_script_to_dic
 from audiobook_generator.role_script.loader import load_role_script
 from audiobook_generator.role_script.models import (
     AliasRecord, CharacterEntity, ChapterScript, EvidenceSpan, RoleDefinition,
-    RoleScriptV2, SegmentScript, SourceSpan, SpeakerDecision,
+    RoleScriptV2, SegmentScript, SourceSpan, SpeakerDecision, RegistryWarning,
 )
 from audiobook_generator.role_script.validator import validate_role_script
 
@@ -73,6 +73,36 @@ class RoleScriptV2IOTest(unittest.TestCase):
         self.assertTrue(report.ok)
         result = validate_role_script(loaded, chapters=[("第一章", source)])
         self.assertIn("unknown_entity", [item.code for item in result.report.errors])
+
+    def test_registry_warnings_roundtrip_and_validate_source_location(self):
+        script, source = _script()
+        self.assertNotIn('registry_warnings', role_script_to_dict(script))
+        warning = RegistryWarning(1, 0, 1, 2, '少量人物条目无法定位，已保留有效人物。')
+        updated = replace(script, registry_complete=False, registry_warnings=(warning,))
+        loaded, report = self._load(role_script_to_dict(updated))
+        self.assertTrue(report.ok, report.to_dict())
+        self.assertEqual(loaded.registry_warnings, (warning,))
+        self.assertTrue(validate_role_script(loaded, chapters=[('第一章', source)]).ok)
+        for changed in (replace(warning, chapter_index=2), replace(warning, chunk_start=len(source))):
+            invalid = replace(updated, registry_warnings=(changed,))
+            result = validate_role_script(invalid, chapters=[('第一章', source)])
+            self.assertIn('invalid_registry_warning', [item.code for item in result.report.errors])
+
+    def test_invalid_registry_warning_metadata_is_rejected(self):
+        script, _ = _script()
+        warning = vars(RegistryWarning(1, 0, 1, 2, '需复核'))
+        for fields in ({'chapter_index': True}, {'chunk_start': -1}, {'rejected_items': 2},
+                       {'total_items': 0}, {'message': ''}, {'extra': True}):
+            with self.subTest(fields=fields):
+                payload = role_script_to_dict(script)
+                payload['registry_warnings'] = [{**warning, **fields}]
+                loaded, report = self._load(payload)
+                self.assertIsNone(loaded)
+                self.assertFalse(report.ok)
+        payload = role_script_to_dict(script)
+        payload.update(registry_complete=True, registry_warnings=[warning])
+        _, report = self._load(payload)
+        self.assertIn('invalid_registry_complete', [item.code for item in report.errors])
 
     def test_confidence_kind_validation_agrees_with_reload(self):
         script, source = _script()

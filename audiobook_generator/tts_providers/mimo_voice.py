@@ -11,7 +11,8 @@ CLONE_DEFAULT_EN = ('Speak in clear, neutral American English at a steady, moder
 def resolve_voice(config, params=None, *, tone=None):
     params = dict(params or {})
     model_default = getattr(config, 'model_name', None) or MODELS['preset']
-    if model_default not in MODELS.values():
+    custom = bool(getattr(config, 'allow_custom_tts', False))
+    if model_default not in MODELS.values() and not custom:
         raise ValueError('只支持MiMo内置声音、VoiceDesign或VoiceClone模型')
     mode = params.get('voice_mode', 'preset' if 'voice' in params else
                       'design' if model_default == MODELS['design'] else
@@ -58,7 +59,7 @@ def resolve_voice(config, params=None, *, tone=None):
             raise ValueError('内置声音不支持声音设计描述')
         from .openai_tts_provider import get_openai_supported_voices
         voice = params.get('voice') or getattr(config, 'voice_name', None) or 'mimo_default'
-        if voice not in get_openai_supported_voices():
+        if voice not in get_openai_supported_voices() and not custom:
             raise ValueError(f'不支持的 MiMo 内置声音：{voice}')
         stream = bool(getattr(config, 'stream', False))
         extension = 'wav' if stream else getattr(config, 'output_format', None) or 'wav'
@@ -71,7 +72,7 @@ def resolve_voice(config, params=None, *, tone=None):
         'Unless an explicit pace is requested above, use a steady, moderate audiobook pace. '
         'Keep the voice identity consistent. Read only the supplied text without omissions, additions or repeats.'
         if english else '除非上文明确要求快慢，否则使用稳定、适中的有声书语速。保持声音身份一致，读全句首和句尾，只朗读所给正文，不增加、删减或重复文字。']))
-    return {'version': REQUEST_VERSION, 'mode': mode, 'model': MODELS[mode], 'voice': voice,
+    return {'version': REQUEST_VERSION, 'mode': mode, 'model': model_default if mode == 'preset' else MODELS[mode], 'voice': voice,
             'instructions': effective, 'stream': stream, 'format': extension,
             'voice_profile_id': params.get('voice_profile_id'), 'voice_version': params.get('voice_version'),
             'language': language, 'optimize_text_preview': False if mode == 'design' else None}

@@ -6,7 +6,8 @@ from pathlib import Path
 
 from .common import ServiceError, atomic_json, read_json
 
-ALLOWED = {'.epub', '.doc', '.docx', '.json', '.txt', '.csv', '.wav', '.mp3', '.flac', '.m4a', '.ogg', '.zip', '.opus'}
+ALLOWED = {'.epub', '.doc', '.docx', '.json', '.txt', '.csv', '.tsv', '.md', '.html', '.htm', '.pdf',
+           '.wav', '.mp3', '.flac', '.m4a', '.aac', '.ogg', '.zip', '.opus'}
 
 
 class FileStore:

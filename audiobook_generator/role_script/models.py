@@ -93,11 +93,21 @@ class CharacterEntity:
 
 
 @dataclass(frozen=True)
+class RegistryWarning:
+    chapter_index: int
+    chunk_start: int
+    rejected_items: int
+    total_items: int
+    message: str
+
+
+@dataclass(frozen=True)
 class RoleScriptV2(RoleScriptV1):
     entities: Dict[str, CharacterEntity] = field(default_factory=dict)
     parser_fingerprint: str = ""
     chapter_hashes: Dict[int, str] = field(default_factory=dict)
     registry_complete: bool = False
+    registry_warnings: Tuple[RegistryWarning, ...] = ()
 
 
 @dataclass(frozen=True)

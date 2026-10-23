@@ -36,6 +36,7 @@ class GeneralConfig:
         # Multi-role script mode. CLI stores a path; WebUI stores a parsed,
         # pickle-safe RoleScriptV1/V2 instance.
         self.role_script = getattr(args, 'role_script', None)
+        self.voice_profile = getattr(args, 'voice_profile', None)
         self.allow_role_text_override = getattr(args, 'allow_role_text_override', False)
         self.allow_role_title_mismatch = getattr(args, 'allow_role_title_mismatch', False)
         self.allow_role_fallback = getattr(args, 'allow_role_fallback', False)

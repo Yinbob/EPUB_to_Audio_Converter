@@ -10,17 +10,26 @@ const reports = ref<any[]>([]),
   selected = ref(""),
   report = ref<any>(null),
   preview = ref("");
+let loadVersion = 0;
 async function refresh() {
   try {
     reports.value = await api("/quality/reports");
+    if (!reports.value.some((item) => item.id === selected.value)) {
+      selected.value = reports.value[0]?.id || "";
+    }
+    await load();
   } catch (e) {
     store.fail(e);
   }
 }
 async function load() {
+  const version = ++loadVersion;
+  report.value = null;
+  preview.value = "";
+  if (!selected.value) return;
   try {
-    report.value = await api("/quality/reports/" + selected.value);
-    preview.value = "";
+    const value = await api("/quality/reports/" + selected.value);
+    if (version === loadVersion) report.value = value;
   } catch (e) {
     store.fail(e);
   }
@@ -34,9 +43,9 @@ async function attach(e: Event, key: string) {
   }
 }
 watch(
-  () => store.lastTask?.status,
-  (status) => {
-    if (status === "succeeded") refresh();
+  () => [store.lastTask?.id, store.lastTask?.status],
+  ([, status]) => {
+    if (["succeeded", "failed", "stopped"].includes(status || "")) refresh();
   },
 );
 onMounted(refresh);
@@ -45,7 +54,10 @@ onMounted(refresh);
   <GlassCard
     title="音频检查与修复"
     description="核对内容、拼接和角色声音，查看报告并试听问题片段。"
-    ><div class="fields-grid">
+    ><p class="muted section-space">
+      {{ store.bootstrap?.quality_models?.message || "本地检查模型：尚未发现" }}
+    </p>
+    <div class="fields-grid">
       <Field
         label="检查生成的音频"
         type="checkbox"
@@ -98,7 +110,10 @@ onMounted(refresh);
       </div>
       <template v-if="report"
         ><p class="muted section-space">
-          生成状态：{{
+          第 {{ report.summary.chapter_index }} 章 · 质量判断：{{
+            report.summary.quality_status
+          }}
+          · 生成状态：{{
             report.summary.generation_status || report.summary.schema_version
           }}
         </p>

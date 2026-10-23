@@ -7,7 +7,7 @@ from typing import Any, Optional
 from .errors import ValidationReport
 from .models import (
     AliasRecord, CharacterEntity, ChapterScript, EvidenceSpan, RoleScriptV1,
-    RoleScriptV2, SegmentScript, SourceSpan, SpeakerDecision,
+    RoleScriptV2, SegmentScript, SourceSpan, SpeakerDecision, RegistryWarning,
 )
 
 
@@ -48,7 +48,7 @@ def parse_role_script_v2(raw: Any, report: ValidationReport) -> Optional[RoleScr
     if not _fields(
         raw,
         {"schema_version", "provider", "book_sha256", "default_pause_after_ms", "roles", "chapters",
-         "entities", "parser_fingerprint", "chapter_hashes", "registry_complete"},
+         "entities", "parser_fingerprint", "chapter_hashes", "registry_complete", "registry_warnings"},
         {"schema_version", "provider", "book_sha256", "default_pause_after_ms", "roles", "chapters", "entities"},
         "$", report,
     ):
@@ -196,11 +196,30 @@ def parse_role_script_v2(raw: Any, report: ValidationReport) -> Optional[RoleScr
         report.error("invalid_parser_fingerprint", "$.parser_fingerprint", "解析配置指纹必须是字符串")
     if type(raw.get("registry_complete", False)) is not bool:
         report.error("invalid_registry_complete", "$.registry_complete", "registry_complete 必须是布尔值")
+    warnings_raw = raw.get('registry_warnings', [])
+    warnings = []
+    if not isinstance(warnings_raw, list):
+        report.error('invalid_registry_warnings', '$.registry_warnings', '人物索引提示必须是数组')
+    else:
+        fields = {'chapter_index', 'chunk_start', 'rejected_items', 'total_items', 'message'}
+        for index, warning in enumerate(warnings_raw):
+            path = f'$.registry_warnings[{index}]'
+            if not _fields(warning, fields, fields, path, report):
+                continue
+            numbers = [warning.get(key) for key in ('chapter_index', 'chunk_start', 'rejected_items', 'total_items')]
+            if (any(type(n) is not int for n in numbers) or numbers[0] < 1 or numbers[1] < 0
+                    or not 0 <= numbers[2] < numbers[3]
+                    or not isinstance(warning.get('message'), str) or not warning['message'].strip()):
+                report.error('invalid_registry_warning', path, '人物索引提示的章节、数量或说明无效')
+            else:
+                warnings.append(RegistryWarning(**{key: warning[key] for key in fields}))
+    if warnings and raw.get('registry_complete'):
+        report.error('invalid_registry_complete', '$.registry_complete', '含待复核提示的人物索引不能标记为完整')
     if report.errors:
         return None
     return RoleScriptV2(2, base.provider, base.book_sha256, base.default_pause_after_ms,
                         base.roles, tuple(chapters), entities, raw.get("parser_fingerprint", ""),
-                        normalized_hashes, raw.get("registry_complete", False))
+                        normalized_hashes, raw.get("registry_complete", False), tuple(warnings))
 
 
 def role_script_v2_to_dict(script: RoleScriptV2) -> dict[str, Any]:
@@ -213,6 +232,8 @@ def role_script_v2_to_dict(script: RoleScriptV2) -> dict[str, Any]:
     data["parser_fingerprint"] = script.parser_fingerprint
     data["chapter_hashes"] = {str(key): value for key, value in script.chapter_hashes.items()}
     data["registry_complete"] = script.registry_complete
+    if script.registry_warnings:
+        data['registry_warnings'] = [vars(warning) for warning in script.registry_warnings]
     data["entities"] = {
         entity_id: {
             "canonical_name": entity.canonical_name,

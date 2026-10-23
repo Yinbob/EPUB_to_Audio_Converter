@@ -13,8 +13,8 @@ class MiMo(StrictModel):
     voice_name: str = 'mimo_default'
     output_format: Literal['mp3', 'aac', 'flac', 'opus', 'wav'] = 'mp3'
     speed: float = Field(1, ge=.25, le=4)
-    instructions: str = ''
-    stream: bool = True
+    instructions: str = 'Voice Affect: Calm, composed, and reassuring. Competent and in control, instilling trust.'
+    stream: bool = False
 
 
 class MiniMax(StrictModel):
@@ -32,7 +32,7 @@ class Edge(StrictModel):
     voice_rate: int = Field(0, ge=-100, le=100)
     voice_volume: int = Field(0, ge=-100, le=100)
     voice_pitch: int = Field(0, ge=-100, le=100)
-    break_duration: int = Field(500, ge=0, le=10000)
+    break_duration: int = Field(1250, ge=0, le=10000)
     proxy: str = ''
 
 
@@ -58,7 +58,7 @@ class VoxCPM(StrictModel):
     provider: Literal['voxcpm']
     model_name: str = 'openbmb/VoxCPM2'
     output_format: Literal['mp3', 'wav', 'aac', 'flac'] = 'mp3'
-    device: Literal['auto', 'cpu', 'cuda', 'mps'] = 'auto'
+    device: str = Field('auto', pattern=r'^(auto|cpu|cuda(?::[0-9]+)?|mps)$')
     mode: Literal['design', 'clone', 'hifi'] = 'design'
     voice: str = 'preset:沉稳男声'
     voice_dir: str = 'voices'
@@ -66,8 +66,8 @@ class VoxCPM(StrictModel):
     regenerate_voice: bool = False
     reference_audio: str | None = None
     reference_text: str = ''
-    auto_transcribe: bool = True
-    denoise: bool = False
+    auto_transcribe: bool = False
+    denoise: bool = True
     normalize: bool = True
     cfg_value: float = Field(2, ge=.5, le=8)
     inference_timesteps: int = Field(10, ge=1, le=50)
@@ -94,12 +94,12 @@ class BookRequest(StrictModel):
 
 
 class Generation(StrictModel):
-    file_ids: list[str] = Field(min_length=1)
+    file_ids: list[str] = Field(default_factory=list)
     engine: Engine = Field(default_factory=MiMo)
     parser: ParserOptions = Field(default_factory=ParserOptions)
     output_dir: str = ''
     worker_count: int = Field(1, ge=1, le=16)
-    log_level: Literal['DEBUG', 'INFO', 'WARNING', 'ERROR'] = 'INFO'
+    log_level: Literal['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'] = 'INFO'
     output_text: bool = False
     preview: bool = False
     chapter_start: int = Field(1, ge=1)
@@ -107,6 +107,8 @@ class Generation(StrictModel):
     catalog_fingerprint: str | None = None
     project_id: str | None = None
     project_revision: int | None = None
+    voice_profile_id: str | None = None
+    voice_profile_version: str | None = None
     allow_role_text_override: bool = False
     allow_role_title_mismatch: bool = False
     allow_role_fallback: bool = False
@@ -120,7 +122,8 @@ class Generation(StrictModel):
 
 class TaskRequest(StrictModel):
     request_id: str = Field(min_length=8, max_length=128)
-    kind: Literal['generate', 'split', 'preview', 'casting_analyze', 'casting_draft', 'calibrate'] = 'generate'
+    kind: Literal['generate', 'split', 'preview', 'voice_clone', 'casting_analyze', 'casting_draft', 'calibrate',
+                  'research_analyze', 'research_reanalyze', 'research_regenerate'] = 'generate'
     generation: Generation
     project_id: str | None = None
     revision: int | None = None
@@ -129,11 +132,15 @@ class TaskRequest(StrictModel):
     full_book: bool = False
     bank_id: str | None = None
     language: Literal['zh', 'en'] = 'zh'
+    reference_id: str | None = None
+    clone_voice_id: str | None = None
+    segment_ids: list[str] = Field(default_factory=list)
+    baseline_task_id: str | None = None
 
 
 class ProjectEdit(StrictModel):
     revision: int
-    operation: Literal['replace', 'narrator', 'segment', 'merge', 'lock', 'voice', 'confirm', 'casting_apply']
+    operation: Literal['replace', 'narrator', 'segment', 'merge', 'lock', 'voice', 'portable_voice', 'confirm', 'casting_apply', 'freeze_preview']
     data: dict = Field(default_factory=dict)
 
 
@@ -159,7 +166,10 @@ class TaskSnapshot(StrictModel):
     finished_at: float | None = None
     project_id: str | None = None
     revision: int | None = None
+    role_id: str | None = None
     result: dict = Field(default_factory=dict)
     error: str = ''
     output_dirs: list[str] = Field(default_factory=list)
     progress: dict = Field(default_factory=dict)
+    render_snapshot: dict | None = None
+    baseline_task_id: str | None = None

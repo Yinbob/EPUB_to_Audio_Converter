@@ -50,6 +50,18 @@ class TestOpenAiTtsProvider(unittest.TestCase):
 
     @patch('audiobook_generator.tts_providers.openai_tts_provider.get_mimo_credentials',
            return_value=('fake_key', 'https://example.invalid/v1'))
+    def test_custom_model_and_voice_reach_mimo_route(self, _credentials):
+        config = get_openai_config()
+        config.model_name = 'my-mimo-model'
+        config.voice_name = 'my-account-voice'
+        config.allow_custom_tts = True
+        provider = get_tts_provider(config)
+        route = provider.resolve_voice()
+        self.assertEqual(route['model'], 'my-mimo-model')
+        self.assertEqual(route['voice'], 'my-account-voice')
+
+    @patch('audiobook_generator.tts_providers.openai_tts_provider.get_mimo_credentials',
+           return_value=('fake_key', 'https://example.invalid/v1'))
     def test_segment_uses_profile_voice_instructions_and_tone(self, _credentials):
         provider = get_tts_provider(get_openai_config())
         profile = VoiceProfile(

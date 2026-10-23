@@ -93,6 +93,23 @@
     #5e5ce6 100%
   );
   /* 阴影 */
+  /* 控件分三层：按钮浮起、输入面浅凹、滑块拇指悬在轨道上。 */
+  --ata-control-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 2px 3px rgba(25, 30, 45, 0.09),
+    0 5px 12px rgba(25, 30, 45, 0.07);
+  --ata-control-hover-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 3px 5px rgba(25, 30, 45, 0.1),
+    0 7px 16px rgba(25, 30, 45, 0.1);
+  --ata-control-pressed-shadow:
+    inset 0 1px 3px rgba(25, 30, 45, 0.14), 0 1px 2px rgba(25, 30, 45, 0.05);
+  --ata-field-shadow:
+    inset 0 1px 3px rgba(25, 30, 45, 0.06), 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 2px 5px rgba(25, 30, 45, 0.04);
+  --ata-track-shadow:
+    inset 0 1px 3px rgba(25, 30, 45, 0.15), 0 1px 0 rgba(255, 255, 255, 0.7);
+  --ata-thumb-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 4px rgba(25, 30, 45, 0.22),
+    0 4px 8px rgba(25, 30, 45, 0.1);
   --apple-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
   --apple-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.14);
   --apple-shadow-blue: 0 8px 20px rgba(0, 113, 227, 0.28);
@@ -203,6 +220,22 @@
     #9a97ff 100%
   );
   --apple-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.45);
+  --ata-control-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 2px 3px rgba(0, 0, 0, 0.3),
+    0 5px 12px rgba(0, 0, 0, 0.22);
+  --ata-control-hover-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 3px 5px rgba(0, 0, 0, 0.35),
+    0 7px 16px rgba(0, 0, 0, 0.28);
+  --ata-control-pressed-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.15);
+  --ata-field-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.24), 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 2px 5px rgba(0, 0, 0, 0.16);
+  --ata-track-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.12);
+  --ata-thumb-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 2px 4px rgba(0, 0, 0, 0.45),
+    0 4px 8px rgba(0, 0, 0, 0.25);
   --apple-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
   --apple-shadow-blue: 0 8px 20px rgba(0, 80, 180, 0.45);
   --ata-shadow-hover:

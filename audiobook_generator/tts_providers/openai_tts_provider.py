@@ -61,7 +61,7 @@ class OpenAITTSProvider(BaseTTSProvider):
         config.model_name = config.model_name or "mimo-v2.5-tts"
 
         # 如果音色为空，或者传入了不属于 MiMo 的音色（例如系统默认带入的 alloy），强制纠正为 mimo_default
-        if not config.voice_name or config.voice_name not in get_openai_supported_voices():
+        if not config.voice_name or (not getattr(config, 'allow_custom_tts', False) and config.voice_name not in get_openai_supported_voices()):
             logger.warning(f"Voice '{config.voice_name}' is not supported by MiMo. Falling back to 'mimo_default'.")
             config.voice_name = "mimo_default"
 
@@ -281,14 +281,14 @@ class OpenAITTSProvider(BaseTTSProvider):
         return self.config.output_format
 
     def validate_config(self):
-        if self.config.model_name not in get_openai_supported_models():
+        if self.config.model_name not in get_openai_supported_models() and not getattr(self.config, 'allow_custom_tts', False):
             raise ValueError('不支持的 MiMo 模型')
         self.resolve_voice()
         if self.config.output_format not in get_openai_supported_output_formats():
             raise ValueError(f"OpenAI: Unsupported output format: {self.config.output_format}")
         if self.config.speed < 0.25 or self.config.speed > 4.0:
             raise ValueError(f"OpenAI: Unsupported speed: {self.config.speed}")
-        if self.config.voice_name not in get_openai_supported_voices():
+        if self.config.voice_name not in get_openai_supported_voices() and not getattr(self.config, 'allow_custom_tts', False):
             raise ValueError(
                 f"OpenAI: Unsupported voice: {self.config.voice_name}. Available: {get_openai_supported_voices()}")
 

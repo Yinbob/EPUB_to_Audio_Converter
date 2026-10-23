@@ -1,0 +1,6874 @@
+{
+  "same_name": {
+    "0354456dab412d457629f2b2d8ff3bafce62533e67e62d1b870863e0bac47487": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ea7399d2850e30e39ff7e9745df319091628fcba601e4afc4ac3ec4251a00223": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9957ecd865771779d6bcd545f14b6d00ffbc7d584b2a09028d17dbcee62c1174": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 24,
+                "end": 27
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "2b86501b0ef6507fca1fb73ccbd06b75753301a566820e43c3dfbb721b9d71b7": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 24,
+                "end": 27
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b7356322ebbec188fe300f826b58f196d7085e99af8d8df2090fa76a2eded02b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 48,
+                "end": 51
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "1553ea0338e6c9c9c54e9cc5c5d6a78f18008d817debef4ca20054e4ec1c9c59": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 48,
+                "end": 51
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3946b59261e48725df9c4e4ba59e44fdf36cd430062c338c7e6320ea68fc2571": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 72,
+                "end": 75
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "7b6a3c5e411aee7a1bb4aa9cce17376b50805aada72d00c7e464fe887de0d54d": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 72,
+                "end": 75
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "e42fc1caa00d59a4963a969e77c3c9ce8ce288a26b1f8c32818147a6cea11736": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 96,
+                "end": 99
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "aed249d6cce75b1a3d8f28e2c0f6e03adc75e0e30e5c3c3d2a201bd6912c9564": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 96,
+                "end": 99
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f3f97753dc87d2a8c77edb5f8d7a1cd798fb5109c1fcaeb0aca973613c306c48": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 120,
+                "end": 123
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "5f0b7513e34a32efdaae23426fd568581435d9a80402a2a6af6f5e55c585b953": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 120,
+                "end": 123
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "799c8661f9e849619561a5ea3523c5fbb18f443718ae7f151e4d7d49eb6bbedd": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 144,
+                "end": 147
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9551fd30bb7fa472180e505c25e2438172bae042023440f47455303efdef7376": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 144,
+                "end": 147
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9ff0b3664be8d0cac137278de60c9746e243356330d2e641aca69e2e105077c1": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 168,
+                "end": 171
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "d0f66e3eff6bcc5362673a301f0b245e6e76b743a903e5a811eb8c568ce126e0": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 168,
+                "end": 171
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "4f6e28c7ab04da009258a038b3fb5f402489666675cbccf69862a876d6e4077e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 192,
+                "end": 195
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "91fc0700c49e27a6b046d496e9e1b916fb237082ee7ae9634f28f52337318fe7": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 192,
+                "end": 195
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "fa29b5c80cc262b8c124c8d06e5be9cc5cb68251080087bf8b586b4efbd13fd6": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 216,
+                "end": 219
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "40c6f2f631641154e259d72ac09351def41261850b84722bf91eb99c5d430657": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 216,
+                "end": 219
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b11ab25002824ee1af928e875f4e010cd4c8d5f84baaf84b6d760b9ace8910d0": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 240,
+                "end": 243
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "aabbdd080f0dffe24416a52311dd219fee1a4f1255a0114617ec9393fdf1370f": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 240,
+                "end": 243
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "737baa5b2d1e5828acdc65e9e87389647024a0006dc7386a6e2e18bd031e0366": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 265,
+                "end": 268
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9c3647202199586792f364a8feb4839693f0672bb755c5b4a9c46367c5b3e857": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 265,
+                "end": 268
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "837992f7b91d2c1be50e82e56ea9b349a185dca123bb5f04060a3cef2339f1f9": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 290,
+                "end": 293
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ba2aabfeb1bc8f48a2fb79350c5535f960f344ca6ed801cc01489849943b0012": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 290,
+                "end": 293
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    }
+  },
+  "kinship": {
+    "de1903974099dcb5bda8335244505531c4aa5fe790e7ec661079ac52c53b142d": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "745ea2a1f8f403a8af9fa9e7f8e484026fcfd556708ce1cc4e74a352c5f400cf": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "7e2df9a50a855bcdddbb5843f251b2c07d9acecd7343c2b8e67eba03770a3834": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "aa4cee78fd6636c3b610ac8049d6af1e1ff256adc4be075f318ed3ef562fc339": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "2075bd930bb1580bb1c0706d90b6b8b31476cfea9180b6a08466d7d562d7c771": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "d9ebe207bf42cdcfc9626074808fe15ac3adea86a001b6c88536dd96b9d8368c": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "452959341809f34ebfe6c65b63ed71055299a891724427251af2033399e96c5c": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "2bc2cc9ecfff07bff7871703ecb7e978693cc53d67a23972fa2e7039bd9f4044": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9957ecd865771779d6bcd545f14b6d00ffbc7d584b2a09028d17dbcee62c1174": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 31,
+                "end": 34
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "cb4e9da79d4a28ffda7b0137713150f2074ef88769fff305fc120fd3be47e3b2": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 31,
+                "end": 34
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "c15a69777e45e0f060560a49a7b87c0f15d9df525a6409b5223f58fb1a940fcc": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 31,
+                "end": 34
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "82aeb32e73005a812d76b0b6a1fc547034636750df3566d6f38518a287bb911d": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 31,
+                "end": 34
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f92b4f4628f03c35fa649f7f9e596384ecaa93411e26192679d358faaacd91cd": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 31,
+                "end": 34
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "54df6d5f6be9abd0cbb36f100b79b6800c0b8b6e8775bdd6a2429f5c7480ef04": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 31,
+                "end": 34
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "6b93e4f11df226fb1bcb8b55daa8725ed7b198c812d261dd90b2bf421e9bb0fb": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 31,
+                "end": 34
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ffe90a586920be25f52cec3e70a23694051f6337a6792665bfed9e00e138e9ff": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 31,
+                "end": 34
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b7356322ebbec188fe300f826b58f196d7085e99af8d8df2090fa76a2eded02b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 55,
+                "end": 58
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "7fcdabd5422b318d742215d904eb7b645dc0688105f528cc3ac5503a8a93f0d8": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 55,
+                "end": 58
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "1dfab180b0c9758dd1a96f6d5fa546325c31ba8a3ee56a2d2a4052e31c8eb6db": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 55,
+                "end": 58
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "0e1e6a9f59bf469fe28552386a64cb4c6532347f2fdd83402451ed2769d7d26f": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 55,
+                "end": 58
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "597bda473249c0e91e05a5b97351d208502738a5eddaa4dbbb360ff7a4d02d7b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 55,
+                "end": 58
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "92190beda915382660fe7f5c4a6060bd7738a7f1fa8cd5f63b28ee297eef8eda": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 55,
+                "end": 58
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "fcb94528f02b1c18cd2618d721e2a3713ee2e673a9d745cb0ac481205bcf100c": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 55,
+                "end": 58
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "588b7f79716148b5c6c1229249d46a7f2e2698f45dfd0ac7c4e3ef7917fe2d8a": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 55,
+                "end": 58
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3946b59261e48725df9c4e4ba59e44fdf36cd430062c338c7e6320ea68fc2571": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 79,
+                "end": 82
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "4ccbb28fbab98b4621133794158a5d727cdf23cf29cddf2b09968bc1c691469b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 79,
+                "end": 82
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "80c5a60223c36c96237275c8f8bdcc2fc0c9d22e7ce0fdd270b0ea4abaf7d01a": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 79,
+                "end": 82
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "bb5375cd83e6e627e5b719d78805d8266892e17776d68332eeabd7a259245f36": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 79,
+                "end": 82
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "c92e17a5bf1636b13e0d2ca60f3b370eb80a7b60f4709561e57bb0f521efd33e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 79,
+                "end": 82
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "448e7e5da6e669615c162f854d1fe838c5c0153321e91179d20ec6c76767beca": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 79,
+                "end": 82
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "055933584537c5676e358db623b2f0feb67c65532d3e54728943b38f4e2405ab": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 79,
+                "end": 82
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "45a36f728a1ea47044e177c986d36ee37f8aabdf5decacbac873e04e1636110f": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 79,
+                "end": 82
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "e42fc1caa00d59a4963a969e77c3c9ce8ce288a26b1f8c32818147a6cea11736": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 103,
+                "end": 106
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "00a49c1eafe383fd7e8cfab28a4a82d31f7642b8ee3dcb4a2b0bf966c12f6c99": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 103,
+                "end": 106
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ee1a9839e8aa43ac1cd94c2a63f5571f62d298b08eb1fe58c87d2e01604fa6ce": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 103,
+                "end": 106
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3613f07c1ae3d0e0dc043fe908bb3b40b733d26031c41c74a8670646f93dfc10": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 103,
+                "end": 106
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "c8b5caec6e8e7145f0f8d0ed0d89a8773ca3754b855a31b498d651068524682b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 103,
+                "end": 106
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ebc13d269bf7709799cd02a1371db6106aaec3cbdabb853661f1979d908fb002": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 103,
+                "end": 106
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "04fb36cfdc5817a959553bdd4b1dc8108b25c71c1c1116afd6aed345c337183e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 103,
+                "end": 106
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "2565b2bce2419b4a354bdc456c94a2909933d234f46dda8fc4ffbbe85ad92d5b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 103,
+                "end": 106
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f3f97753dc87d2a8c77edb5f8d7a1cd798fb5109c1fcaeb0aca973613c306c48": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 127,
+                "end": 130
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b5d2380d3af52ce4644c858db9c9cece1e675729242725e32659c5dccc454995": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 127,
+                "end": 130
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "7bbe5230d07f3d60b7245ae5c47385ba042455814f9705919487bb0160376b64": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 127,
+                "end": 130
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "1cc1c9195db99bdc29680ef11759878c85faa842dcf3f0e9dcd6d5170aba9ca4": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 127,
+                "end": 130
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "31bdbce7f85e23995f8a116ff2a698394575abf9ebd94151a319ed3cd78330f6": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 127,
+                "end": 130
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "34808ccfb83858292fca73e6496b97f52d18940da3ac3eba01fa29f5990ad015": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 127,
+                "end": 130
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "fd2a0c99604d27ccf932f5ca2ce635c0668dddc3ecfd09c97eae9129c569a563": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 127,
+                "end": 130
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "bc22975b2fac0dfea9852c9df5a69cc765fdb4e54199741c4adcfda2f16cd912": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 127,
+                "end": 130
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "799c8661f9e849619561a5ea3523c5fbb18f443718ae7f151e4d7d49eb6bbedd": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 151,
+                "end": 154
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "414214a22c90803b71ce2fb420c85caa26bbb35a1fba6bc4c6deff0b713cb1f1": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 151,
+                "end": 154
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f2e1a984e4c1fa48880fecfa3e4b289f00329c5c246e8c6f8c8deb4d6fb81ceb": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 151,
+                "end": 154
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "c25a71049a856bf87d8aa4e2f3bc09287d81f8f2181ddd63a3d03f61243c006c": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 151,
+                "end": 154
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "4474d4ed6c6a5f619f7092b46a6c9c2d19926e76d855588225a39d0e18b2cda2": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 151,
+                "end": 154
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3ef80bf57b6c99e80c41fd81d7c20bee92fbdb7e22604dd39e22103323e55ad9": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 151,
+                "end": 154
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ca24b0580c9e840486b8d99a5fefc8808a6f837718316a2e73d643c0dee10631": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 151,
+                "end": 154
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "1a4afcadce08e0ed80c4a4a4fc17057416c7a246c4579e6c330e3928998c53f0": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 151,
+                "end": 154
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9ff0b3664be8d0cac137278de60c9746e243356330d2e641aca69e2e105077c1": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 175,
+                "end": 178
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "198f04fd8c761e52005b95bc8573ff6fda2fff7d74f6496612570d9334e07ecb": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 175,
+                "end": 178
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "8bb8db03946dd04d8b7ab59ff342ed3958502c33e5c02ecd1312fbd3b3a530ba": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 175,
+                "end": 178
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "7dc8cefa3794231d3e42e8770c4fbb6fa9f1fd7923cd36b345b67c180558191a": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 175,
+                "end": 178
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "7bb93f1927c029ac09d306244f29821951771f1737d8db13c8cda47e1e4c4989": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 175,
+                "end": 178
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "7af1d470c4e7c565b23c882516c3323fd666bec46057dd8da35e2ccb4fa2f906": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 175,
+                "end": 178
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "084f2b029b8f00b94af45de50452745e92266e2205c666302e57562e3006f0ce": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 175,
+                "end": 178
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3447d04f3a8c3d628c28f41012255268f9fcb8f8b5b14d8954400f46b67f9988": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 175,
+                "end": 178
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "4f6e28c7ab04da009258a038b3fb5f402489666675cbccf69862a876d6e4077e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 199,
+                "end": 202
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "435d5462c9be7dbe20df0b89c46d8964a721061c7dd403363b32f8edb7c246a0": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 199,
+                "end": 202
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "d87ce4b1d3047fd184efe1a6715540f40eec6f2c82525becbb66c61240e89530": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 199,
+                "end": 202
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "97762e5539f0374d3ba5b3fa7ac25cfb7529ebf346f02fa6cdded34d494141d0": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 199,
+                "end": 202
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "313bea8516bcbf7dcd3b4a3ec6e7278506037b60ecbfb7b031eff79c7c6c4d3b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 199,
+                "end": 202
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "29f2f95787f7c13f19dd6ad6f4788718bb5671816535d0d5988327e551ba83ee": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 199,
+                "end": 202
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "702acc4335e36b2f6c2b92a924a10bc50f40f073f6a2d456481d2f1bb3ac6334": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 199,
+                "end": 202
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ba4e1401b4a3cafbc272975674b32c822ee4beced848f1db707a5c687af956fb": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 199,
+                "end": 202
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "fa29b5c80cc262b8c124c8d06e5be9cc5cb68251080087bf8b586b4efbd13fd6": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 223,
+                "end": 226
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "2fd02c176b6edac88396c7d1672b6bb22f161822881486c88a3761ff63f198f8": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 223,
+                "end": 226
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "7b97cb225e6ce97d0579d5181c3910be59f50c9a8c0b386b30a8608e4e1b2489": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 223,
+                "end": 226
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "50477ee67be194e7d5cf422bb6f897ab9f0623d7e1d0a6fb0ea5b9629bd2acf4": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 223,
+                "end": 226
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "74bb37f21af00ee23963e4f84aa0cdfdaafdb362f73e15ecc3d8f4d7f12ead9b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 223,
+                "end": 226
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "8c048c39d1ab190a67edb00a6dc8f0a2f0ec753f91985c1587e7b82f1dbdc253": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 223,
+                "end": 226
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "aeba0eed2ba2cc808712276ab38cae8ca889beb275937becc19b3dbb2c3acc18": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 223,
+                "end": 226
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "a301107a3ea568e52c62d7eedbf35039dabf09079b433f9338e6af2e363053ed": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 223,
+                "end": 226
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b11ab25002824ee1af928e875f4e010cd4c8d5f84baaf84b6d760b9ace8910d0": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 247,
+                "end": 250
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "a020d09c6129c0db2deb66b1610717e0f9269bac10f1eccaf7f8dadaa74fa172": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 247,
+                "end": 250
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "fc82921bcf14d3f1adbfda5b3893e7c43eb26e59c6f81cbd716ce4c591902936": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 247,
+                "end": 250
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "4edb1a8799e7586c54f1184e4cd4930154378277ed80155dbf219e8a04a1bb1b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 247,
+                "end": 250
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "7fb7a1685dd40605769aed54c39a75e326090afa9d0d28a0d1930b6003f6c4c9": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 247,
+                "end": 250
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3c629a4af29ba3ad51ed1934d3840afe9fed51e193f8235d4401620ec2a7996a": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 247,
+                "end": 250
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "da5f52177a20bf17224b99b10335edc66ede04c64cb969504ce569c55f4b43b5": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 247,
+                "end": 250
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "7746be70ae8d622c2a3fcb7b2bf479b8071d6d663e39346e75df977cac202a32": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 247,
+                "end": 250
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "737baa5b2d1e5828acdc65e9e87389647024a0006dc7386a6e2e18bd031e0366": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 272,
+                "end": 275
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "792ecd1550efd7654c83f6ba44c17da8118f808ea662786692a917d605e16de9": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 272,
+                "end": 275
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "0c47d95a6e0d6d98058c703137ce26ed3ea3f004dd20d1281c6086fd1a96a0e7": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 272,
+                "end": 275
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "8259a88a4bfd4ffb9ac99b26fccb07c4eb3ce9ccee892d786d2f75d95001cfb8": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 272,
+                "end": 275
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "eb805fd33126bc0101323613f291ce7c85c4cc566255d94ff5fcadc010b0bef2": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 272,
+                "end": 275
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "621e1e21d502981727106d19ea7398ceec94201d978da4ec04c208a403f31647": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 272,
+                "end": 275
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b957cf49530cc17d2111ad255a5afd6e66489eb0665f44b5ccefcada08836f07": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 272,
+                "end": 275
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "a194c7c38fa21be062e236bdaeca41883eb1ff507c03033143de9dcdc6beddd5": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 272,
+                "end": 275
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "837992f7b91d2c1be50e82e56ea9b349a185dca123bb5f04060a3cef2339f1f9": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 297,
+                "end": 300
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "21562c68a798f1f435b93d1e7eeb349866a4188177a545afa59bf100e07a4349": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 297,
+                "end": 300
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "0cd1ef20cbd1433f8a7fa279f20d7e99650845a6a1cdb94dae6eb56e5a42a698": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 297,
+                "end": 300
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "a660c475a7667ce8ca6922a7738eed218b6226fc78b06e392ca5b911526503cd": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 297,
+                "end": 300
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "dc6bec93374a2cd74e273edaff0b4e129a2b075c54b85c92275f5afc620e3973": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 297,
+                "end": 300
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "0e78ed33313e186fe6416ba9ae8117d1a2b0409652cdb610a0e8b2410f1fe3a8": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 297,
+                "end": 300
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "227fca7058f11386e49abe614c28bb0c7d7f64d4133c8e23a61fb12cbf16dbaf": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 297,
+                "end": 300
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "d1f43cb0743466d53baa90c5545446d7f43fc83161c7645467cb1dccfc44823e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 297,
+                "end": 300
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    }
+  },
+  "wrong_merge": {
+    "837ee29bde7799c2efd2fec194259229bf4c4824c4e33c3b5946ea4803d584bf": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "6ace72dd3e774e7892b69d98dbb175192469b75e5fac2a65cf094d5a8ab92f9f": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "50d9d476d20b35b1d3a36ffce64e044ceb101754d92abdef1054bf5aa83b2224": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3bf658a9ea9b624cb26ec17f42e85a42c8559e2adfe0fc73e69999cb991fe944": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9957ecd865771779d6bcd545f14b6d00ffbc7d584b2a09028d17dbcee62c1174": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 21,
+                "end": 24
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "832aba1c8e1a1759fd61c7ba75fbfe71e66d7aa6902e86001d3e02a1d2edb66e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 21,
+                "end": 24
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "dd3a9258235fd256afc3ab983851d96a64774aaec7fa7d8faf14277792d227fe": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 21,
+                "end": 24
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b90bf639ce3d235ab74938c54b8e57200fd4cdddb8dad316a427c4c1beb70685": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 21,
+                "end": 24
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b7356322ebbec188fe300f826b58f196d7085e99af8d8df2090fa76a2eded02b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 45,
+                "end": 48
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f126c948b459df331aa14971480104c105abc5ffd2ec7c71850b1662151d73a6": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 45,
+                "end": 48
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3608bf6ae3ecdd7ef7cef57839dfa8acb05fffacd086cf6da5ed26f984deb61c": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 45,
+                "end": 48
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "d9dfb93136eaaa819b49245c9c6315f41b11135d2d0f94053f35d11e89c6c48e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 45,
+                "end": 48
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3946b59261e48725df9c4e4ba59e44fdf36cd430062c338c7e6320ea68fc2571": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 69,
+                "end": 72
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "14a35e8b6b61e0d50ecd5d24f779b02efad75685361844a1b591fe55228307c2": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 69,
+                "end": 72
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ca3626a859b3db9ba5323a13c8c56580c3cf83e6e0834845cdbdfe0ddf582677": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 69,
+                "end": 72
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "1bacdd83b322eca24d48049fd16c420738f0391fb0e98ca4766a5dc90575f021": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 69,
+                "end": 72
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "e42fc1caa00d59a4963a969e77c3c9ce8ce288a26b1f8c32818147a6cea11736": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 93,
+                "end": 96
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "44f0e82a12b66999d4f8d8fa5a0df93cad112db32ad24c64664d9d164d8d821b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 93,
+                "end": 96
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b0e587ae454a3969475423bd9be6bd739788e32138feb02f911570205b461a72": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 93,
+                "end": 96
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b0cfaf6f0685b2fd42d2f9f1b55e21c52ba646b935165f9c95889f96a35d4827": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 93,
+                "end": 96
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f3f97753dc87d2a8c77edb5f8d7a1cd798fb5109c1fcaeb0aca973613c306c48": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 117,
+                "end": 120
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "c17c298db6b193bf5a8382944876171331d51eb164ac403f356040ee7c306483": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 117,
+                "end": 120
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "28a1c02299db85108db1eebd4ae9465133929c3c20666ea8081a202835fbd202": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 117,
+                "end": 120
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "975b5fc5952f4b30246e4a5a5ee4915f8b7fbf65f265be14c6e70c2123bb64e2": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 117,
+                "end": 120
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "799c8661f9e849619561a5ea3523c5fbb18f443718ae7f151e4d7d49eb6bbedd": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 141,
+                "end": 144
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "25e010975961b0e6103d692abd9a97dddbccff75ecfbcf329dbad443667bb383": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 141,
+                "end": 144
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9554e6c74c74c1c9893b15c19bd0db61533acc8e6edc298eda1329552fa624be": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 141,
+                "end": 144
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "4738373b196348128f57ed1dfbb5abe9edf6b3708d3672d2757e5042b288467e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 141,
+                "end": 144
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9ff0b3664be8d0cac137278de60c9746e243356330d2e641aca69e2e105077c1": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 165,
+                "end": 168
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "c1c18a6699b6c026877736caa016ec19f17781098e84f0f7c5611537646ff9b9": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 165,
+                "end": 168
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "2fdbe056247de3d89e0b91d7c029183d49c0b83d9f81a454e8c46bbfbc1f4015": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 165,
+                "end": 168
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "1c814f02548cbdf66faa372f3949630ee1cea2f957534a0d50a4e2e4ab7e1197": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 165,
+                "end": 168
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "4f6e28c7ab04da009258a038b3fb5f402489666675cbccf69862a876d6e4077e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 189,
+                "end": 192
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "e73331961b9ec2518aa5653203d9f482370053adbe86c2deb822ade614d41d00": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 189,
+                "end": 192
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "d6407f15b79c2707cfa0c44646d2eab59da63d0848b72f684a40e03ca7c9934b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 189,
+                "end": 192
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ddbd0b45b43901986007c99b063193cb5f97bb10563b4d5e482b4751509fd094": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 189,
+                "end": 192
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "fa29b5c80cc262b8c124c8d06e5be9cc5cb68251080087bf8b586b4efbd13fd6": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 213,
+                "end": 216
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "75b3fb37e91be30d788610f0a68f5d4ed29c6542773512d7dc573bc4c92e2d34": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 213,
+                "end": 216
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "d21962eb0f2128ff403556b3704fe5498ce58aed44eda9ac6568e97885d2787c": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 213,
+                "end": 216
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "858425f327be5e2b4955c71eca2cd9c8ecc1c033427d0c752aa7c3eda83ad9c6": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 213,
+                "end": 216
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b11ab25002824ee1af928e875f4e010cd4c8d5f84baaf84b6d760b9ace8910d0": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 237,
+                "end": 240
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ec86455b4e024ce5c823e61830086867cdba6047314367afec5bc34fd2e7fe6f": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 237,
+                "end": 240
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "7223800dd08ca972a0ae6e3019c27e894d6366081334fc6abc7d8724cf3f8990": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 237,
+                "end": 240
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f74a680b44f55204ad38785d89ae8cda75641e420b2f5bed2ee30eeabfeed31f": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 237,
+                "end": 240
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "737baa5b2d1e5828acdc65e9e87389647024a0006dc7386a6e2e18bd031e0366": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 262,
+                "end": 265
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "842a77c2dd8a36b9cb2a3f027c3f4c2b4378bbad9e4ca8f4d3862b7f90eac446": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 262,
+                "end": 265
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "bcb3087211aca92173bae7add1e53536a9d6ae1851204181ba56c12b78c3daa8": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 262,
+                "end": 265
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "4c7bf655d9cf9452c542ae0cd541569a89597161405650cda892ce341fa9b409": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 262,
+                "end": 265
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "837992f7b91d2c1be50e82e56ea9b349a185dca123bb5f04060a3cef2339f1f9": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 287,
+                "end": 290
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "819e9ee2c3dea62e24c6cd60ba7afe901df478e28ee36187c48fff908d19b7e5": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 287,
+                "end": 290
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f80ac36d425b69184835e614bc46f2256665166c8fa2185413152ee6e1d92060": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 287,
+                "end": 290
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "850a7640de6c006aff9e0d3a54ac5f1a512d9946a88d9e5d7ce2ead8e838d8d0": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 287,
+                "end": 290
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    }
+  },
+  "narrator_shift": {
+    "bd831c41aa930f3a76f9554280e6335c03b56732998964610b4adf1e15e65275": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 4,
+                "end": 8
+              },
+              "quote": "林远自述",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "595be98c22b28ec8129db9d929c212df0a85ff6ac1d3051bf13249da3945716e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 4,
+                "end": 8
+              },
+              "quote": "林远自述",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9957ecd865771779d6bcd545f14b6d00ffbc7d584b2a09028d17dbcee62c1174": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 19,
+                "end": 22
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "18f3eecce53f2925217ea3f91637b2960fa52bb47153c29d30fc624f4c9ffea9": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 19,
+                "end": 22
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b7356322ebbec188fe300f826b58f196d7085e99af8d8df2090fa76a2eded02b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 43,
+                "end": 46
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "5ab38064d587ac25b5d35257cf5e3f7a887a334bdd9b880737396671473dc96c": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 43,
+                "end": 46
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3946b59261e48725df9c4e4ba59e44fdf36cd430062c338c7e6320ea68fc2571": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 67,
+                "end": 70
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "58eb3a8a494ac6361f59385862e99e928a4e5fb1c028f228763514318372cc34": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 67,
+                "end": 70
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "e42fc1caa00d59a4963a969e77c3c9ce8ce288a26b1f8c32818147a6cea11736": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 91,
+                "end": 94
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3a28981ed7a1511493f07c9c6e5172eb276aefb0013666b5e3e3bf3e03935098": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 91,
+                "end": 94
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f3f97753dc87d2a8c77edb5f8d7a1cd798fb5109c1fcaeb0aca973613c306c48": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 115,
+                "end": 118
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "2fbba207330a4c22a5ff66d2c34687a8db8c9c9cce7cbb1891ba39656733fcb3": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 115,
+                "end": 118
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "799c8661f9e849619561a5ea3523c5fbb18f443718ae7f151e4d7d49eb6bbedd": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 139,
+                "end": 142
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "a6fc849eb8802aaaedc4e4a55f009f81d6b9ff25707459a5d741b59872d9c9d9": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 139,
+                "end": 142
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9ff0b3664be8d0cac137278de60c9746e243356330d2e641aca69e2e105077c1": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 163,
+                "end": 166
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f53786bd8521ee973fac772f2eb8c158469a9a73c8649cb69706b9ccb2bc2737": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 163,
+                "end": 166
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "4f6e28c7ab04da009258a038b3fb5f402489666675cbccf69862a876d6e4077e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 187,
+                "end": 190
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "aa588ac737d9699d19838dcbe35c1f6047772e94d196fa4bd5cfae7af94dd318": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 187,
+                "end": 190
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "fa29b5c80cc262b8c124c8d06e5be9cc5cb68251080087bf8b586b4efbd13fd6": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 211,
+                "end": 214
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "8b798dc3322c1869e93fc3e293ca80e46cdea967557ab8bfea160ffe52befe00": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 211,
+                "end": 214
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b11ab25002824ee1af928e875f4e010cd4c8d5f84baaf84b6d760b9ace8910d0": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 235,
+                "end": 238
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f28a27c4d39d8137902315821a1a8db17833f5c71ea26f850afe7d4a54ccb5bc": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 235,
+                "end": 238
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "737baa5b2d1e5828acdc65e9e87389647024a0006dc7386a6e2e18bd031e0366": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 260,
+                "end": 263
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "8bdad530bfecea7d0d5a952555b8ac984d75164ec9a58bfc05c11f947bc9237c": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 260,
+                "end": 263
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "837992f7b91d2c1be50e82e56ea9b349a185dca123bb5f04060a3cef2339f1f9": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 285,
+                "end": 288
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "94ae766ddf981be876ab2e77f787197aeba049629076ac6f4a03d5fc5e4b282a": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 285,
+                "end": 288
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    }
+  },
+  "human_conflict": {
+    "8b6a66bb930c3373c72712bd0b347e2ce35a8910d5316939099d9719f2429fc8": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 0,
+                "end": 3
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "d52d0f01002c644efca7ed4a67eff182c1f7ee8bf0734234a60ace080e4af543": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 0,
+                "end": 3
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9957ecd865771779d6bcd545f14b6d00ffbc7d584b2a09028d17dbcee62c1174": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 24,
+                "end": 27
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "4f67d844e0dd1b332480aadf731ade4793087012d02bbcb9308756d3cd482de7": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 24,
+                "end": 27
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b7356322ebbec188fe300f826b58f196d7085e99af8d8df2090fa76a2eded02b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 48,
+                "end": 51
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ae0d1ffe703774938b420971389bc291576b28faa556ddeede266ff170a0c66c": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 48,
+                "end": 51
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3946b59261e48725df9c4e4ba59e44fdf36cd430062c338c7e6320ea68fc2571": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 72,
+                "end": 75
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "d3c390019619275cfe4a9e6dc8d08b75ea31c42c949100cf488a887d634fef2d": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 72,
+                "end": 75
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "e42fc1caa00d59a4963a969e77c3c9ce8ce288a26b1f8c32818147a6cea11736": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 96,
+                "end": 99
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f6e80ce1fa5413b77e4516cbf1ee27c5a3cffe54649349738a213d83381f9ece": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 96,
+                "end": 99
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f3f97753dc87d2a8c77edb5f8d7a1cd798fb5109c1fcaeb0aca973613c306c48": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 120,
+                "end": 123
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ce27c72925944ecc2563d6cded89f6e647d8f2b7ae9b30b7fd9d772855a93fce": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 120,
+                "end": 123
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "799c8661f9e849619561a5ea3523c5fbb18f443718ae7f151e4d7d49eb6bbedd": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 144,
+                "end": 147
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "66e574ebc7db90c7abca5879aba0e0b7203fadf016de2a515c31cca371339ce5": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 144,
+                "end": 147
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9ff0b3664be8d0cac137278de60c9746e243356330d2e641aca69e2e105077c1": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 168,
+                "end": 171
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "af3bc8f12dca2038a340b884bd592024697a13ec2df27f326f7f1fd86225efcf": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 168,
+                "end": 171
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "4f6e28c7ab04da009258a038b3fb5f402489666675cbccf69862a876d6e4077e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 192,
+                "end": 195
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "ddb6446f193f2b885f8ccda2476901393303670cf33a083ded7aabcacf32090a": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 192,
+                "end": 195
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "fa29b5c80cc262b8c124c8d06e5be9cc5cb68251080087bf8b586b4efbd13fd6": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 216,
+                "end": 219
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "cf986c9f6e6d7659b6405565eeb88387d2d15b612eaec15e8fbddb1fc6f9462d": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 216,
+                "end": 219
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b11ab25002824ee1af928e875f4e010cd4c8d5f84baaf84b6d760b9ace8910d0": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 240,
+                "end": 243
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "cc0440fceda6d820fd6fc1c94b7306f78d9c2a49c9300287dee18184ed51c688": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 240,
+                "end": 243
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "737baa5b2d1e5828acdc65e9e87389647024a0006dc7386a6e2e18bd031e0366": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 265,
+                "end": 268
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "a1aab3b375740d6b12347ab4908b7dc430e4b025dbf631d388d68535515cfc5f": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 265,
+                "end": 268
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "837992f7b91d2c1be50e82e56ea9b349a185dca123bb5f04060a3cef2339f1f9": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 290,
+                "end": 293
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b475a63b7989136e44aec9b21483ac2ffb67249a64ce308f3aaf69b60aba1d68": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 290,
+                "end": 293
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    }
+  },
+  "source_changed": {
+    "ce2db1121bfb504eae3948ef2bc6675791f8afc2128c9a987eb319bae1cda292": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "a746cc52756e4152feef7caa5778102a707065d3c34df90df688ca1459ef0a49": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s0",
+          "entity_id": "narrator",
+          "candidates": [
+            "narrator"
+          ],
+          "evidence": [],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9957ecd865771779d6bcd545f14b6d00ffbc7d584b2a09028d17dbcee62c1174": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 23,
+                "end": 26
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "dcff26e604755a3366384ab86e07225f60e0e1918397d17518bc3b42b2088a87": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s1",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 23,
+                "end": 26
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b7356322ebbec188fe300f826b58f196d7085e99af8d8df2090fa76a2eded02b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 47,
+                "end": 50
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f88dc8b8883c4ec49fd2cb76a316d72b4955563e24a2816cf01d7a6cbcf772dc": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s2",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 47,
+                "end": 50
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "3946b59261e48725df9c4e4ba59e44fdf36cd430062c338c7e6320ea68fc2571": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 71,
+                "end": 74
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b61495d22c80c207dff96c9ec9eff771b8b706a814d4ccd77aa062543f42ba9b": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s3",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 71,
+                "end": 74
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "e42fc1caa00d59a4963a969e77c3c9ce8ce288a26b1f8c32818147a6cea11736": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 95,
+                "end": 98
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "df0a926de77d7027f89267e1098056ae1c3ede064c4dc8efb56cf12dd5a1b20c": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s4",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 95,
+                "end": 98
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "f3f97753dc87d2a8c77edb5f8d7a1cd798fb5109c1fcaeb0aca973613c306c48": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 119,
+                "end": 122
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "e7185246fa5f767d1de6e7b6b963829b78fd35b0ca935a6f9575628bb48a89dd": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s5",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 119,
+                "end": 122
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "799c8661f9e849619561a5ea3523c5fbb18f443718ae7f151e4d7d49eb6bbedd": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 143,
+                "end": 146
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "e3ec6b960cc034907e67f8b4b6db747971779503c260cba9bc7f21ca9c592279": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s6",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 143,
+                "end": 146
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "9ff0b3664be8d0cac137278de60c9746e243356330d2e641aca69e2e105077c1": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 167,
+                "end": 170
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "a03e803a4a5b021fad4ab179a2553508b91ecbe249820a47ad7f0b7eceaad4e8": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s7",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 167,
+                "end": 170
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "4f6e28c7ab04da009258a038b3fb5f402489666675cbccf69862a876d6e4077e": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 191,
+                "end": 194
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "062eb8e5d594d1bac4804c460a2edbd293501a5da34fa457f797f371ca633982": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s8",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 191,
+                "end": 194
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "fa29b5c80cc262b8c124c8d06e5be9cc5cb68251080087bf8b586b4efbd13fd6": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 215,
+                "end": 218
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "e46f68620fecc86c1d8d4678acaf3c809fe96a3687d1704a70ac1ebd791c1f31": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s9",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 215,
+                "end": 218
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "b11ab25002824ee1af928e875f4e010cd4c8d5f84baaf84b6d760b9ace8910d0": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 239,
+                "end": 242
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "34ffd85f6ac516c27a7faf5c946efb0b54be72518360b4d131b6beff9fac6493": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s10",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 239,
+                "end": 242
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "737baa5b2d1e5828acdc65e9e87389647024a0006dc7386a6e2e18bd031e0366": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 264,
+                "end": 267
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "38f5bfa8fbe5140545f467caf506a1c6be3281338b50e87daca64212acf67a54": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s11",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 264,
+                "end": 267
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "837992f7b91d2c1be50e82e56ea9b349a185dca123bb5f04060a3cef2339f1f9": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 289,
+                "end": 292
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    },
+    "d370059b040fcc42f711014ae6a86b9492a686488d4c36154c46d5a29c92ee90": {
+      "decisions": [
+        {
+          "segment_id": "ch1_s12",
+          "entity_id": "person_a",
+          "candidates": [
+            "person_a"
+          ],
+          "evidence": [
+            {
+              "span": {
+                "chapter_index": 1,
+                "start": 289,
+                "end": 292
+              },
+              "quote": "林远说",
+              "kind": "explicit_speech_tag"
+            }
+          ],
+          "against": [],
+          "depends_on": []
+        }
+      ],
+      "mentions": [],
+      "claims": [],
+      "conflicts": []
+    }
+  }
+}

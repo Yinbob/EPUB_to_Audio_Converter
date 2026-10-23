@@ -1540,6 +1540,9 @@ def _role_script_summary(script: RoleScriptV1, heading: str = "自动拆分结�
             if segment.speaker and segment.speaker.status in {"needs_review", "unknown", "proposed"}
         )
         registry_scope = "全书人物索引已完成" if script.registry_complete else "仅已分析章节的人物索引；全书尚未分析完"
+        if script.registry_warnings:
+            registry_scope = f"人物索引含 {len(script.registry_warnings)} 处容错提示，需复核"
+            lines.extend(['', *[warning.message for warning in script.registry_warnings]])
         lines.extend(['', f'{registry_scope}；待核对 {pending} 段。可在下方查看原文归属。'])
     return "\n".join(lines)
 

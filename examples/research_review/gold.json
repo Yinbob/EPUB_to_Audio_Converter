@@ -1,0 +1,122 @@
+{
+  "same_name": {
+    "segments": {
+      "ch1_s0": "narrator",
+      "ch1_s1": "person_a",
+      "ch1_s2": "person_a",
+      "ch1_s3": "person_a",
+      "ch1_s4": "person_a",
+      "ch1_s5": "person_a",
+      "ch1_s6": "person_a",
+      "ch1_s7": "person_a",
+      "ch1_s8": "person_a",
+      "ch1_s9": "person_a",
+      "ch1_s10": "person_a",
+      "ch1_s11": "person_a",
+      "ch1_s12": "person_a"
+    },
+    "claims": {
+      "claim_same_name": "reject"
+    }
+  },
+  "kinship": {
+    "segments": {
+      "ch1_s0": "narrator",
+      "ch1_s1": "person_a",
+      "ch1_s2": "person_a",
+      "ch1_s3": "person_a",
+      "ch1_s4": "person_a",
+      "ch1_s5": "person_a",
+      "ch1_s6": "person_a",
+      "ch1_s7": "person_a",
+      "ch1_s8": "person_a",
+      "ch1_s9": "person_a",
+      "ch1_s10": "person_a",
+      "ch1_s11": "person_a",
+      "ch1_s12": "person_a"
+    },
+    "claims": {
+      "claim_kinship": "reject"
+    }
+  },
+  "wrong_merge": {
+    "segments": {
+      "ch1_s0": "narrator",
+      "ch1_s1": "person_a",
+      "ch1_s2": "person_a",
+      "ch1_s3": "person_a",
+      "ch1_s4": "person_a",
+      "ch1_s5": "person_a",
+      "ch1_s6": "person_a",
+      "ch1_s7": "person_a",
+      "ch1_s8": "person_a",
+      "ch1_s9": "person_a",
+      "ch1_s10": "person_a",
+      "ch1_s11": "person_a",
+      "ch1_s12": "person_a"
+    },
+    "claims": {
+      "claim_wrong_merge": "revoke"
+    }
+  },
+  "narrator_shift": {
+    "segments": {
+      "ch1_s0": "person_a",
+      "ch1_s1": "person_a",
+      "ch1_s2": "person_a",
+      "ch1_s3": "person_a",
+      "ch1_s4": "person_a",
+      "ch1_s5": "person_a",
+      "ch1_s6": "person_a",
+      "ch1_s7": "person_a",
+      "ch1_s8": "person_a",
+      "ch1_s9": "person_a",
+      "ch1_s10": "person_a",
+      "ch1_s11": "person_a",
+      "ch1_s12": "person_a"
+    },
+    "claims": {
+      "claim_narrator_shift": "reject"
+    }
+  },
+  "human_conflict": {
+    "segments": {
+      "ch1_s0": "narrator",
+      "ch1_s1": "person_a",
+      "ch1_s2": "person_a",
+      "ch1_s3": "person_a",
+      "ch1_s4": "person_a",
+      "ch1_s5": "person_a",
+      "ch1_s6": "person_a",
+      "ch1_s7": "person_a",
+      "ch1_s8": "person_a",
+      "ch1_s9": "person_a",
+      "ch1_s10": "person_a",
+      "ch1_s11": "person_a",
+      "ch1_s12": "person_a"
+    },
+    "claims": {
+      "claim_human_conflict": "revoke"
+    }
+  },
+  "source_changed": {
+    "segments": {
+      "ch1_s0": "narrator",
+      "ch1_s1": "person_a",
+      "ch1_s2": "person_a",
+      "ch1_s3": "person_a",
+      "ch1_s4": "person_a",
+      "ch1_s5": "person_a",
+      "ch1_s6": "person_a",
+      "ch1_s7": "person_a",
+      "ch1_s8": "person_a",
+      "ch1_s9": "person_a",
+      "ch1_s10": "person_a",
+      "ch1_s11": "person_a",
+      "ch1_s12": "person_a"
+    },
+    "claims": {
+      "claim_source_changed": "reject"
+    }
+  }
+}

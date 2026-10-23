@@ -1,0 +1,12 @@
+{
+  "version": "review_policy_v1",
+  "risk": {"conflict": 1.0, "unknown": 0.9, "unresolved": 0.75, "unsupported": 0.55, "explicit": 0.25},
+  "transitive_decay": 0.7,
+  "context_weight": 0.25,
+  "time_base": 20,
+  "time_per_character": 0.03,
+  "time_per_alternative": 8,
+  "time_min": 20,
+  "time_max": 180,
+  "audit_every": 10
+}

@@ -76,3 +76,4 @@ frontend/playwright-report/
 .studio-runtime.lock
 .webui_settings.json
 minimax_config.json
+.studio/research/

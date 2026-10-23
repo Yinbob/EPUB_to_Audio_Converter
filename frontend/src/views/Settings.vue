@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import GlassCard from "../components/GlassCard.vue";
 import Field from "../components/Field.vue";
+import VoiceProfiles from "../components/VoiceProfiles.vue";
 import { api, send, upload } from "../api";
 import { useStudio } from "../stores/studio";
 const store = useStudio(),
@@ -13,10 +14,12 @@ const store = useStudio(),
   newPassword = ref(""),
   confirmPassword = ref(""),
   voiceText = ref(""),
-  voiceProvider = ref("openai"),
-  voiceLanguage = ref("zh"),
+  voiceProvider = ref(""),
+  voiceLanguage = ref(""),
   catalog = ref<any[]>([]),
-  voiceFile = ref("");
+  voiceFile = ref(""),
+  voiceResult = ref<any>(null),
+  visibleKeys = ref<Record<string, boolean>>({});
 const labels: Record<string, string> = {
   openai: "MiMo",
   minimax: "MiniMax",
@@ -104,16 +107,19 @@ async function attach(e: Event) {
   }
 }
 async function importVoices() {
+  voiceResult.value = null;
+  store.error = "";
   try {
-    await send("/voices/import", {
+    const result = await send<any>("/voices/import", {
       file_id: voiceFile.value || null,
-      text: voiceText.value,
-      provider: voiceProvider.value,
+      text: voiceFile.value ? "" : voiceText.value,
+      provider: voiceProvider.value || null,
       language: voiceLanguage.value,
     });
+    voiceResult.value = result;
     await refresh();
     await store.refreshBootstrap();
-    store.notice = "音色目录已更新。";
+    store.notice = `已导入 ${result.count} 个音色。`;
   } catch (e) {
     store.fail(e);
   }
@@ -121,6 +127,7 @@ async function importVoices() {
 async function clearVoices() {
   try {
     await api("/voices", { method: "DELETE" });
+    voiceResult.value = null;
     await refresh();
     await store.refreshBootstrap();
   } catch (e) {
@@ -156,7 +163,7 @@ onMounted(() => refresh().catch(store.fail));
         ><div class="fields-grid">
           <Field
             label="API Key（留空保留）"
-            type="password"
+            :type="visibleKeys[key] ? 'text' : 'password'"
             v-model="form.api_key"
             :hint="configs[key].masked_key || '尚未配置'"
           /><Field
@@ -175,6 +182,8 @@ onMounted(() => refresh().catch(store.fail));
         </div>
         <div class="toolbar section-space">
           <button @click="reveal(String(key))">读取已保存密钥</button
+          ><button @click="visibleKeys[key] = !visibleKeys[key]">
+            {{ visibleKeys[key] ? "隐藏密钥" : "显示密钥" }}</button
           ><button @click="test(String(key))">测试连接</button
           ><button class="primary" @click="save(String(key))">保存配置</button>
         </div></GlassCard
@@ -194,7 +203,7 @@ onMounted(() => refresh().catch(store.fail));
           修改密码
         </button></GlassCard
       ></template
-    ><GlassCard
+    ><VoiceProfiles /><GlassCard
       title="人工音色目录"
       description="导入官网音色说明，让新增音色出现在声音选择与角色工作台。"
       ><div class="fields-grid">
@@ -202,6 +211,7 @@ onMounted(() => refresh().catch(store.fail));
           label="提供商"
           v-model="voiceProvider"
           :options="[
+            { value: '', label: '自动识别' },
             { value: 'openai', label: 'MiMo' },
             { value: 'minimax', label: 'MiniMax' },
           ]"
@@ -209,8 +219,10 @@ onMounted(() => refresh().catch(store.fail));
           label="默认语言"
           v-model="voiceLanguage"
           :options="[
+            { value: '', label: '自动识别' },
             { value: 'zh', label: '中文' },
             { value: 'en', label: '英语' },
+            { value: 'yue', label: '粤语' },
           ]"
         />
       </div>
@@ -221,8 +233,17 @@ onMounted(() => refresh().catch(store.fail));
         v-model="voiceText"
       /><label class="field section-space"
         ><span>或上传说明文件</span
-        ><input type="file" accept=".json,.txt,.csv,.docx" @change="attach"
-      /></label>
+        ><input
+          type="file"
+          accept=".json,.txt,.csv,.tsv,.md,.html,.htm,.docx,.pdf"
+          @change="attach"
+        /><small v-if="voiceFile"
+          >已上传说明文件，解析时优先使用文件。</small
+        ></label
+      >
+      <button v-if="voiceFile" class="quiet" @click="voiceFile = ''">
+        改用粘贴内容
+      </button>
       <div class="toolbar section-space">
         <button :disabled="store.busy" @click="importVoices">
           解析并保存音色</button
@@ -232,7 +253,29 @@ onMounted(() => refresh().catch(store.fail));
       </div>
       <p class="muted section-space">
         当前目录共 {{ catalog.length }} 个音色（含内置）。
-      </p></GlassCard
+      </p>
+      <div v-if="voiceResult" class="section-space" aria-live="polite">
+        <p>
+          本次导入 {{ voiceResult.count }} 个音色{{
+            voiceResult.source_name ? ` · ${voiceResult.source_name}` : ""
+          }}
+        </p>
+        <ul v-if="voiceResult.warnings?.length" class="warning">
+          <li v-for="warning in voiceResult.warnings" :key="warning">
+            {{ warning }}
+          </li>
+        </ul>
+        <ul v-if="voiceResult.entries?.length">
+          <li
+            v-for="entry in voiceResult.entries"
+            :key="`${entry.provider}:${entry.voice_id}`"
+          >
+            {{ entry.display_name || entry.voice_id }} · {{ entry.voice_id }} ·
+            {{ labels[entry.provider] || entry.provider }} ·
+            {{ entry.language || "未标注语言" }}
+          </li>
+        </ul>
+      </div></GlassCard
     >
   </div>
 </template>

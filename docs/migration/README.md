@@ -86,6 +86,10 @@ npm run types:api
 npm run build
 ```
 
+长书分块与恢复、逻辑声音卡和原文定位见 [使用说明](../long_books_voice_portability_traceability.md)。最新自动化及真实短样验证见 [本轮验收记录](acceptance_20261022.md)。
+
+研究审阅通过角色工作台的「段落归属」按项目启用，包含可撤销关系、依赖失效、优先队列、草稿差异和章节返工；普通项目及 V2 导入导出保持兼容。接口、数据格式与离线实验见 [研究审阅说明](../research_review.md)。
+
 `frontend/tools/export_visuals.py` 从原 theme/ambient 模块提取设计令牌和绘制算法。再次生成后应格式化并重新验收。光场缓冲不进入 Vue 响应式系统；Vue 直接传入任务状态，保留原浮点累加、一次量化、逐通道抖动、重心锚定、色相环、跑马灯、隐藏页暂停和 reduced-motion。可用 `?ata-seed=123&ata-state=generating` 固定布局和预览生成态，诊断数据仍在 `#ata-bg.dataset.field`。
 
 ## 后续正式切换门槛
@@ -94,4 +98,4 @@ npm run build
 2. 在 Linux/CUDA 验证本地引擎模型加载、试听释放、spawn 子进程及无孤儿停止。
 3. 完成真实全书角色分析、声音分配、取消交错、质量修复与报告试听的人工操作验收。
 4. 完成三档视口的新旧页面对照、光场 `data-field` 定量检查、Docker 实构建与回退演练。
-5. 满足上述条件并记录后，将 `main_ui.py` 中 `--ui` 的默认值由 `gradio` 改为 `vue`，保留显式回退至少一个稳定发布周期。
+5. 按已批准计划，全部验收通过后将共享业务迁入 services，移除 Gradio 入口、组件、适配、依赖及专属测试，保留 Vue 和 CLI；随后清理已确认范围的无用文件。当前尚未执行此删除阶段。

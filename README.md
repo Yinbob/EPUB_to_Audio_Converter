@@ -25,7 +25,11 @@ python3 main.py <input_file> <output_folder> [options]
 
 Vue 工作台已提供独立入口，保留原 Apple 风格、双主题与光效：`./run_ui.sh --ui vue`。当前默认仍为 Gradio，回退使用 `./run_ui.sh --ui gradio`。构建、部署、数据兼容及尚待目标环境验收的项目见 [Vue 迁移说明](docs/migration/README.md)。
 
+长书上下文分块与断点恢复、MiMo/MiniMax 可迁移声音卡、结构化输出与原文双向定位已接入，使用方法见 [长书、声音迁移与原文追溯](docs/long_books_voice_portability_traceability.md)。
+
 多角色分段 TTS（MiMo / MiniMax）的完整说明、JSON 规范和 CLI/WebUI 操作见 [多角色分段 TTS MVP](docs/multi_role_tts_mvp.md)。
+
+Vue 角色工作台可按项目启用可撤销人物关系、优先审阅、局部重分析草稿和章节音频返工。使用流程、研究快照格式与四组离线实验命令见 [研究审阅说明](docs/research_review.md)。
 
 ### 自动更新 TTS 英文音色（可选）
 

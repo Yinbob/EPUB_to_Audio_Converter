@@ -6,6 +6,41 @@ from pathlib import Path
 from .common import atomic_json
 
 
+class BatchConversionError(RuntimeError):
+    def __init__(self, message, result):
+        super().__init__(message)
+        self.result = result
+
+
+def preview_book(config, log):
+    """只解析选定章节；不构造 Provider，也不读取 API 密钥。"""
+    from audiobook_generator.book_parsers.base_book_parser import get_book_parser
+    from audiobook_generator.utils.filename_sanitizer import make_safe_filename
+    parser = get_book_parser(config)
+    chapters = [(title, text) for title, text in parser.get_chapters(
+        '   ' if config.tts in ('openai', 'chatterbox', 'voxcpm') else ' @BRK#') if text.strip()]
+    start = config.chapter_start
+    end = len(chapters) if config.chapter_end == -1 else config.chapter_end
+    if not 1 <= start <= end <= len(chapters):
+        raise ValueError(f'章节范围 {start}～{end} 超出目录（共 {len(chapters)} 章）。')
+    from .provenance import write_sources, finalize
+    if write_sources(parser, chapters, config):
+        finalize(config.output_folder, status='parsed')
+    log.info('Chapters count: %s', len(chapters))
+    log.info('Converting chapters from %s to %s.', start, end)
+    summaries = []
+    for index, (title, text) in enumerate(chapters[start - 1:end], start):
+        log.info('第 %s 章 %s · %s 字符', index, title, len(text))
+        summaries.append({'index': index, 'title': title, 'characters': len(text)})
+        if config.output_text:
+            output = Path(config.output_folder)
+            output.mkdir(parents=True, exist_ok=True)
+            name = make_safe_filename(title=title, idx=index, output_dir=str(output),
+                                      ext='.txt', collision_check=False)
+            (output / name).write_text(text, encoding='utf-8')
+    return summaries
+
+
 def run_task(payload, result_path, log_path, ready):
     os.setsid()
     ready.set()
@@ -20,13 +55,20 @@ def run_task(payload, result_path, log_path, ready):
     try:
         from audiobook_generator.role_script.split_control import SplitControl, split_control_scope
         control = SplitControl(report=lambda *a, **k: log.info('%s', k.get('desc', a)))
-        control.resumable = payload['kind'].startswith('casting_')
-        with split_control_scope(control):
+        control.resumable = payload['kind'] in ('split', 'casting_analyze', 'casting_draft', 'research_analyze', 'research_reanalyze')
+        from audiobook_generator.role_script.context_budget import checkpoint_scope
+        import hashlib
+        cfg = payload['configs'][0]
+        from .settings import credentials
+        endpoint = credentials('deepseek')
+        identity = hashlib.sha256((endpoint.get('base_url', '') + endpoint.get('model', '')).encode()).hexdigest()
+        checkpoint = Path(payload.get('root', cfg.output_folder)) / '.split_checkpoints' / identity
+        with split_control_scope(control), checkpoint_scope(checkpoint):
             result = execute(payload, log, result_path)
         atomic_json(result_path, {'ok': True, 'result': result or {}})
     except BaseException as exc:
         log.exception('任务失败')
-        atomic_json(result_path, {'ok': False, 'error': str(exc)})
+        atomic_json(result_path, {'ok': False, 'error': str(exc), 'result': getattr(exc, 'result', {})})
     finally:
         stream.flush()
 
@@ -35,30 +77,52 @@ def execute(payload, log, result_path):
     kind = payload['kind']
     configs = payload['configs']
     work = Path(result_path).parent
-    if kind == 'generate':
+    if kind in ('generate', 'research_regenerate'):
         from audiobook_generator.core.audiobook_generator import AudiobookGenerator
         from pydub import AudioSegment
         AudioSegment.converter = shutil.which("ffmpeg") or next((p for p in ("/opt/homebrew/bin/ffmpeg", "/usr/bin/ffmpeg", "/usr/local/bin/ffmpeg") if Path(p).is_file()), "ffmpeg")
-        total = len(configs)
+        total, books, failures = len(configs), [], []
         for index, cfg in enumerate(configs, 1):
-            log.info('📚 [%s/%s] 开始转换: %s', index, total, Path(cfg.input_file).stem)
-            if cfg.preview:
-                from audiobook_generator.book_parsers.base_book_parser import get_book_parser
-                chapters = [(title, text) for title, text in get_book_parser(cfg).get_chapters('   ' if cfg.tts in ('openai', 'chatterbox', 'voxcpm') else ' @BRK#') if text.strip()]
-                log.info('Chapters count: %s', len(chapters))
-                for n, (title, text) in enumerate(chapters, 1):
-                    log.info('第 %s 章 %s · %s 字符', n, title, len(text))
-                log.info('📋 [%s/%s] 预解析完成（未生成音频）: %s', index, total, Path(cfg.input_file).stem)
-                continue
-            cfg.log_file = work / 'EtA_task.log'
-            logging.getLogger().setLevel(cfg.log)
-            if AudiobookGenerator(cfg).run() is not True:
-                raise RuntimeError('转换未成功完成，请查看章节错误日志。')
-            log.info('✅ [%s/%s] 完成: %s', index, total, Path(cfg.input_file).stem)
+            name = getattr(cfg, 'source_name', None) or Path(cfg.input_file).name
+            log.info('📚 [%s/%s] 开始转换: %s', index, total, name)
+            entry = {'name': name, 'output_dir': cfg.output_folder}
+            try:
+                if cfg.preview:
+                    entry['chapters'] = preview_book(cfg, log)
+                    log.info('📋 [%s/%s] 预解析完成（未生成音频）: %s', index, total, name)
+                else:
+                    cfg.log_file = work / 'EtA_task.log'
+                    logging.getLogger().setLevel(cfg.log)
+                    if AudiobookGenerator(cfg).run() is not True:
+                        raise RuntimeError('转换未成功完成，请查看章节错误日志。')
+                    log.info('✅ [%s/%s] 完成: %s', index, total, name)
+                entry['status'] = 'succeeded'
+            except Exception as exc:
+                entry.update(status='failed', error=str(exc))
+                failures.append(name)
+                log.exception('❌ [%s/%s] 转换失败: %s；继续处理后续书籍。', index, total, name)
+            books.append(entry)
+        result = {'output_dirs': [cfg.output_folder for cfg in configs], 'books': books}
+        if failures:
+            message = f'批量处理结束：{total - len(failures)} 本成功，{len(failures)} 本失败（' + '、'.join(failures) + '）。请查看日志。'
+            log.error(message)
+            raise BatchConversionError(message, result)
         log.info('🎉 全部处理完毕！共 %s 本书', total)
-        return {'output_dirs': [cfg.output_folder for cfg in configs]}
+        return result
     cfg = configs[0]
     script = payload.get('script')
+    if kind in ('research_analyze', 'research_reanalyze'):
+        from audiobook_generator.role_script.research_analysis import analyze
+        from .settings import credentials
+        cred = credentials('deepseek')
+        return {'research_proposal': analyze(payload['research_state'], payload['chapters'],
+            api_key=cred['api_key'], base_url=cred['base_url'], model=cred['model'],
+            target_ids=payload.get('segment_ids'), progress=lambda message: log.info('%s', message))}
+    if kind == 'voice_clone':
+        from .minimax_clone import clone
+        from .settings import credentials
+        clone(payload['reference_path'], payload['clone_voice_id'],
+              api_key=credentials('minimax')['api_key'], root=payload['root'], log=log)
     if kind == 'split':
         from audiobook_generator.role_script.v2_generation import generate_v2_for_book
         from audiobook_generator.role_script.deepseek_splitter import role_script_to_dict
@@ -113,12 +177,20 @@ def execute(payload, log, result_path):
         calibrated, limited = calibrated_speeds(durations, baseline, speeds[baseline])
         roles = {key: replace(role, provider_params={**role.provider_params, 'speed': calibrated[key]})
                  for key, role in script.roles.items()}
-        return {'script': encode(replace(script, roles=roles))}
+        return {'script': encode(replace(script, roles=roles)),
+                'calibration': {'baseline': baseline, 'durations_ms': durations, 'speeds': calibrated, 'limited': limited}}
     if script and payload.get('role_id'):
         role = script.roles[payload['role_id']]
         profile = VoiceProfile(payload['role_id'], role.display_name, dict(role.provider_params))
         artifact = provider.synthesize_segment(text, profile, str(work / 'preview'), None)
         from audiobook_generator.role_script.audio_pipeline import render_role_preview
+        artifact = render_role_preview(artifact, profile, cfg.tts, str(work / 'preview_processed.wav'))
+        return {'audio_path': artifact.path}
+    if cfg.tts in ('openai', 'minimax'):
+        from audiobook_generator.role_script.audio_pipeline import render_role_preview
+        from audiobook_generator.role_script.planner import build_default_provider_params
+        profile = VoiceProfile('narrator', '旁白', build_default_provider_params(cfg.tts, cfg))
+        artifact = provider.synthesize_segment(text, profile, str(work / 'preview'), None)
         artifact = render_role_preview(artifact, profile, cfg.tts, str(work / 'preview_processed.wav'))
         return {'audio_path': artifact.path}
     if cfg.tts == 'voxcpm' and cfg.voxcpm_mode == 'design':

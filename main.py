@@ -173,6 +173,8 @@ def handle_args():
         default=None,
         help="Path to a RoleScriptV1/V2 JSON file. Enables multi-role segmented TTS for MiMo/MiniMax.",
     )
+    parser.add_argument('--voice_profile', default=None,
+                        help='已试听确认的可迁移声音卡 ZIP；按当前提供商、模型和服务地址匹配绑定。')
     parser.add_argument(
         "--allow_role_text_override",
         action="store_true",

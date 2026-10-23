@@ -1,0 +1,3453 @@
+{
+  "schema_version": "research-corpus-v1",
+  "synthetic": true,
+  "cases": [
+    {
+      "id": "same_name",
+      "state": {
+        "research_schema_version": 1,
+        "id": "c10465b188e0062f32386def5a187886",
+        "revision": 2,
+        "confirmed": "",
+        "script": {
+          "schema_version": 2,
+          "provider": "openai",
+          "book_sha256": "c10465b188e0062f32386def5a18788650957cd1aeb90e97a9c70416105fee4e",
+          "default_pause_after_ms": 250,
+          "roles": {
+            "narrator": {
+              "display_name": "旁白",
+              "provider_params": {
+                "voice": "冰糖",
+                "speed": 1
+              }
+            },
+            "person_a": {
+              "display_name": "林远",
+              "provider_params": {
+                "voice": "茉莉",
+                "speed": 1
+              }
+            },
+            "person_b": {
+              "display_name": "林岳",
+              "provider_params": {
+                "voice": "冰糖",
+                "speed": 1
+              }
+            }
+          },
+          "entities": {
+            "narrator": {
+              "canonical_name": "旁白",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_a": {
+              "canonical_name": "林远",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_b": {
+              "canonical_name": "林岳",
+              "aliases": [],
+              "voice_locked": false
+            }
+          },
+          "chapters": [
+            {
+              "chapter_index": 1,
+              "title": "same_name",
+              "segments": [
+                {
+                  "segment_id": "ch1_s0",
+                  "text": "林远与林岳都被称作林先生，今天他们同时来到书店。",
+                  "role_id": "narrator",
+                  "text_kind": "narration",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 0,
+                    "end": 24
+                  },
+                  "speaker": {
+                    "entity_id": "narrator",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s1",
+                  "text": "林远说：“这是我第1次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 24,
+                    "end": 48
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s2",
+                  "text": "林远说：“这是我第2次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 48,
+                    "end": 72
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s3",
+                  "text": "林远说：“这是我第3次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 72,
+                    "end": 96
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s4",
+                  "text": "林远说：“这是我第4次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 96,
+                    "end": 120
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s5",
+                  "text": "林远说：“这是我第5次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 120,
+                    "end": 144
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s6",
+                  "text": "林远说：“这是我第6次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 144,
+                    "end": 168
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s7",
+                  "text": "林远说：“这是我第7次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 168,
+                    "end": 192
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s8",
+                  "text": "林远说：“这是我第8次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 192,
+                    "end": 216
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s9",
+                  "text": "林远说：“这是我第9次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 216,
+                    "end": 240
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s10",
+                  "text": "林远说：“这是我第10次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 240,
+                    "end": 265
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s11",
+                  "text": "林远说：“这是我第11次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 265,
+                    "end": 290
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s12",
+                  "text": "林远说：“这是我第12次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 290,
+                    "end": 315
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "sources": {
+          "1": "林远与林岳都被称作林先生，今天他们同时来到书店。林远说：“这是我第1次来这里，我还记得那本书。”林远说：“这是我第2次来这里，我还记得那本书。”林远说：“这是我第3次来这里，我还记得那本书。”林远说：“这是我第4次来这里，我还记得那本书。”林远说：“这是我第5次来这里，我还记得那本书。”林远说：“这是我第6次来这里，我还记得那本书。”林远说：“这是我第7次来这里，我还记得那本书。”林远说：“这是我第8次来这里，我还记得那本书。”林远说：“这是我第9次来这里，我还记得那本书。”林远说：“这是我第10次来这里，我还记得那本书。”林远说：“这是我第11次来这里，我还记得那本书。”林远说：“这是我第12次来这里，我还记得那本书。”"
+        },
+        "history_incomplete": true,
+        "mentions": {},
+        "claims": {
+          "claim_same_name": {
+            "id": "claim_same_name",
+            "kind": "same_entity",
+            "subject": "person_a",
+            "entity_id": "person_b",
+            "scope": {
+              "kind": "book"
+            },
+            "status": "proposed",
+            "evidence": [],
+            "source": "model",
+            "created_revision": 2,
+            "revoked_revision": null
+          }
+        },
+        "decisions": {
+          "ch1_s0": {
+            "id": "ch1_s0",
+            "segment_id": "ch1_s0",
+            "entity_id": "narrator",
+            "candidates": [
+              "narrator"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s1": {
+            "id": "ch1_s1",
+            "segment_id": "ch1_s1",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s2": {
+            "id": "ch1_s2",
+            "segment_id": "ch1_s2",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s3": {
+            "id": "ch1_s3",
+            "segment_id": "ch1_s3",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s4": {
+            "id": "ch1_s4",
+            "segment_id": "ch1_s4",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s5": {
+            "id": "ch1_s5",
+            "segment_id": "ch1_s5",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s6": {
+            "id": "ch1_s6",
+            "segment_id": "ch1_s6",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s7": {
+            "id": "ch1_s7",
+            "segment_id": "ch1_s7",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s8": {
+            "id": "ch1_s8",
+            "segment_id": "ch1_s8",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s9": {
+            "id": "ch1_s9",
+            "segment_id": "ch1_s9",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s10": {
+            "id": "ch1_s10",
+            "segment_id": "ch1_s10",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s11": {
+            "id": "ch1_s11",
+            "segment_id": "ch1_s11",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s12": {
+            "id": "ch1_s12",
+            "segment_id": "ch1_s12",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          }
+        },
+        "dependencies": [
+          {
+            "decision_id": "ch1_s1",
+            "upstream_id": "claim_same_name",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s2",
+            "upstream_id": "claim_same_name",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s3",
+            "upstream_id": "claim_same_name",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s4",
+            "upstream_id": "claim_same_name",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s5",
+            "upstream_id": "claim_same_name",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s6",
+            "upstream_id": "claim_same_name",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s7",
+            "upstream_id": "claim_same_name",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s8",
+            "upstream_id": "claim_same_name",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s9",
+            "upstream_id": "claim_same_name",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s10",
+            "upstream_id": "claim_same_name",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s11",
+            "upstream_id": "claim_same_name",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s12",
+            "upstream_id": "claim_same_name",
+            "kind": "depends_on"
+          }
+        ],
+        "conflicts": [],
+        "proposals": {},
+        "events": [],
+        "sessions": {},
+        "operations": {},
+        "unconfigured_entities": [],
+        "context_checks": [],
+        "runs": {},
+        "policy_version": "review_policy_v1"
+      },
+      "chapters": [
+        [
+          "第一章",
+          "林远与林岳都被称作林先生，今天他们同时来到书店。林远说：“这是我第1次来这里，我还记得那本书。”林远说：“这是我第2次来这里，我还记得那本书。”林远说：“这是我第3次来这里，我还记得那本书。”林远说：“这是我第4次来这里，我还记得那本书。”林远说：“这是我第5次来这里，我还记得那本书。”林远说：“这是我第6次来这里，我还记得那本书。”林远说：“这是我第7次来这里，我还记得那本书。”林远说：“这是我第8次来这里，我还记得那本书。”林远说：“这是我第9次来这里，我还记得那本书。”林远说：“这是我第10次来这里，我还记得那本书。”林远说：“这是我第11次来这里，我还记得那本书。”林远说：“这是我第12次来这里，我还记得那本书。”"
+        ]
+      ]
+    },
+    {
+      "id": "kinship",
+      "state": {
+        "research_schema_version": 1,
+        "id": "1b81a757b9e4fac50452f2b5987c9e7d",
+        "revision": 2,
+        "confirmed": "",
+        "script": {
+          "schema_version": 2,
+          "provider": "openai",
+          "book_sha256": "1b81a757b9e4fac50452f2b5987c9e7d919b8523eb0097bfb71d2c763a04e190",
+          "default_pause_after_ms": 250,
+          "roles": {
+            "narrator": {
+              "display_name": "旁白",
+              "provider_params": {
+                "voice": "冰糖",
+                "speed": 1
+              }
+            },
+            "person_a": {
+              "display_name": "林远",
+              "provider_params": {
+                "voice": "茉莉",
+                "speed": 1
+              }
+            },
+            "person_b": {
+              "display_name": "林岳",
+              "provider_params": {
+                "voice": "冰糖",
+                "speed": 1
+              }
+            },
+            "person_c": {
+              "display_name": "林森",
+              "provider_params": {
+                "voice": "茉莉",
+                "speed": 1
+              }
+            }
+          },
+          "entities": {
+            "narrator": {
+              "canonical_name": "旁白",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_a": {
+              "canonical_name": "林远",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_b": {
+              "canonical_name": "林岳",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_c": {
+              "canonical_name": "林森",
+              "aliases": [],
+              "voice_locked": false
+            }
+          },
+          "chapters": [
+            {
+              "chapter_index": 1,
+              "title": "kinship",
+              "segments": [
+                {
+                  "segment_id": "ch1_s0",
+                  "text": "林远叫林岳“父亲”；林岳叫林森“父亲”。同一称谓指向不同的人。",
+                  "role_id": "narrator",
+                  "text_kind": "narration",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 0,
+                    "end": 31
+                  },
+                  "speaker": {
+                    "entity_id": "narrator",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s1",
+                  "text": "林远说：“这是我第1次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 31,
+                    "end": 55
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s2",
+                  "text": "林远说：“这是我第2次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 55,
+                    "end": 79
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s3",
+                  "text": "林远说：“这是我第3次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 79,
+                    "end": 103
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s4",
+                  "text": "林远说：“这是我第4次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 103,
+                    "end": 127
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s5",
+                  "text": "林远说：“这是我第5次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 127,
+                    "end": 151
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s6",
+                  "text": "林远说：“这是我第6次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 151,
+                    "end": 175
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s7",
+                  "text": "林远说：“这是我第7次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 175,
+                    "end": 199
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s8",
+                  "text": "林远说：“这是我第8次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 199,
+                    "end": 223
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s9",
+                  "text": "林远说：“这是我第9次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 223,
+                    "end": 247
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s10",
+                  "text": "林远说：“这是我第10次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 247,
+                    "end": 272
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s11",
+                  "text": "林远说：“这是我第11次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 272,
+                    "end": 297
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s12",
+                  "text": "林远说：“这是我第12次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 297,
+                    "end": 322
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "sources": {
+          "1": "林远叫林岳“父亲”；林岳叫林森“父亲”。同一称谓指向不同的人。林远说：“这是我第1次来这里，我还记得那本书。”林远说：“这是我第2次来这里，我还记得那本书。”林远说：“这是我第3次来这里，我还记得那本书。”林远说：“这是我第4次来这里，我还记得那本书。”林远说：“这是我第5次来这里，我还记得那本书。”林远说：“这是我第6次来这里，我还记得那本书。”林远说：“这是我第7次来这里，我还记得那本书。”林远说：“这是我第8次来这里，我还记得那本书。”林远说：“这是我第9次来这里，我还记得那本书。”林远说：“这是我第10次来这里，我还记得那本书。”林远说：“这是我第11次来这里，我还记得那本书。”林远说：“这是我第12次来这里，我还记得那本书。”"
+        },
+        "history_incomplete": true,
+        "mentions": {
+          "father_0": {
+            "id": "father_0",
+            "span": {
+              "chapter_index": 1,
+              "start": 6,
+              "end": 8
+            },
+            "text": "父亲",
+            "block_id": "ch1_s0"
+          },
+          "father_1": {
+            "id": "father_1",
+            "span": {
+              "chapter_index": 1,
+              "start": 16,
+              "end": 18
+            },
+            "text": "父亲",
+            "block_id": "ch1_s0"
+          }
+        },
+        "claims": {
+          "claim_kinship": {
+            "id": "claim_kinship",
+            "kind": "same_entity",
+            "subject": "person_a",
+            "entity_id": "person_b",
+            "scope": {
+              "kind": "book"
+            },
+            "status": "proposed",
+            "evidence": [],
+            "source": "model",
+            "created_revision": 2,
+            "revoked_revision": null
+          },
+          "truth_father_0": {
+            "id": "truth_father_0",
+            "kind": "mention_entity",
+            "subject": "father_0",
+            "entity_id": "person_b",
+            "scope": {
+              "chapter_index": 1,
+              "start": 6,
+              "end": 8
+            },
+            "status": "accepted",
+            "evidence": [
+              {
+                "span": {
+                  "chapter_index": 1,
+                  "start": 6,
+                  "end": 8
+                },
+                "quote": "父亲",
+                "kind": "address"
+              }
+            ],
+            "source": "human",
+            "created_revision": 2,
+            "revoked_revision": null
+          },
+          "truth_father_1": {
+            "id": "truth_father_1",
+            "kind": "mention_entity",
+            "subject": "father_1",
+            "entity_id": "person_c",
+            "scope": {
+              "chapter_index": 1,
+              "start": 16,
+              "end": 18
+            },
+            "status": "accepted",
+            "evidence": [
+              {
+                "span": {
+                  "chapter_index": 1,
+                  "start": 16,
+                  "end": 18
+                },
+                "quote": "父亲",
+                "kind": "address"
+              }
+            ],
+            "source": "human",
+            "created_revision": 2,
+            "revoked_revision": null
+          }
+        },
+        "decisions": {
+          "ch1_s0": {
+            "id": "ch1_s0",
+            "segment_id": "ch1_s0",
+            "entity_id": "narrator",
+            "candidates": [
+              "narrator"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s1": {
+            "id": "ch1_s1",
+            "segment_id": "ch1_s1",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s2": {
+            "id": "ch1_s2",
+            "segment_id": "ch1_s2",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s3": {
+            "id": "ch1_s3",
+            "segment_id": "ch1_s3",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s4": {
+            "id": "ch1_s4",
+            "segment_id": "ch1_s4",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s5": {
+            "id": "ch1_s5",
+            "segment_id": "ch1_s5",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s6": {
+            "id": "ch1_s6",
+            "segment_id": "ch1_s6",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s7": {
+            "id": "ch1_s7",
+            "segment_id": "ch1_s7",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s8": {
+            "id": "ch1_s8",
+            "segment_id": "ch1_s8",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s9": {
+            "id": "ch1_s9",
+            "segment_id": "ch1_s9",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s10": {
+            "id": "ch1_s10",
+            "segment_id": "ch1_s10",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s11": {
+            "id": "ch1_s11",
+            "segment_id": "ch1_s11",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s12": {
+            "id": "ch1_s12",
+            "segment_id": "ch1_s12",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          }
+        },
+        "dependencies": [
+          {
+            "decision_id": "ch1_s1",
+            "upstream_id": "claim_kinship",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s2",
+            "upstream_id": "claim_kinship",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s3",
+            "upstream_id": "claim_kinship",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s4",
+            "upstream_id": "claim_kinship",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s5",
+            "upstream_id": "claim_kinship",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s6",
+            "upstream_id": "claim_kinship",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s7",
+            "upstream_id": "claim_kinship",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s8",
+            "upstream_id": "claim_kinship",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s9",
+            "upstream_id": "claim_kinship",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s10",
+            "upstream_id": "claim_kinship",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s11",
+            "upstream_id": "claim_kinship",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s12",
+            "upstream_id": "claim_kinship",
+            "kind": "depends_on"
+          }
+        ],
+        "conflicts": [],
+        "proposals": {},
+        "events": [],
+        "sessions": {},
+        "operations": {},
+        "unconfigured_entities": [],
+        "context_checks": [],
+        "runs": {},
+        "policy_version": "review_policy_v1"
+      },
+      "chapters": [
+        [
+          "第一章",
+          "林远叫林岳“父亲”；林岳叫林森“父亲”。同一称谓指向不同的人。林远说：“这是我第1次来这里，我还记得那本书。”林远说：“这是我第2次来这里，我还记得那本书。”林远说：“这是我第3次来这里，我还记得那本书。”林远说：“这是我第4次来这里，我还记得那本书。”林远说：“这是我第5次来这里，我还记得那本书。”林远说：“这是我第6次来这里，我还记得那本书。”林远说：“这是我第7次来这里，我还记得那本书。”林远说：“这是我第8次来这里，我还记得那本书。”林远说：“这是我第9次来这里，我还记得那本书。”林远说：“这是我第10次来这里，我还记得那本书。”林远说：“这是我第11次来这里，我还记得那本书。”林远说：“这是我第12次来这里，我还记得那本书。”"
+        ]
+      ]
+    },
+    {
+      "id": "wrong_merge",
+      "state": {
+        "research_schema_version": 1,
+        "id": "ff873725ad8208fbe317c29004fed311",
+        "revision": 2,
+        "confirmed": "",
+        "script": {
+          "schema_version": 2,
+          "provider": "openai",
+          "book_sha256": "ff873725ad8208fbe317c29004fed311f3e657f19cea844cd1c8fbb111b2c381",
+          "default_pause_after_ms": 250,
+          "roles": {
+            "narrator": {
+              "display_name": "旁白",
+              "provider_params": {
+                "voice": "冰糖",
+                "speed": 1
+              }
+            },
+            "person_a": {
+              "display_name": "林远",
+              "provider_params": {
+                "voice": "茉莉",
+                "speed": 1
+              }
+            },
+            "person_b": {
+              "display_name": "林岳",
+              "provider_params": {
+                "voice": "冰糖",
+                "speed": 1
+              }
+            }
+          },
+          "entities": {
+            "narrator": {
+              "canonical_name": "旁白",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_a": {
+              "canonical_name": "林远",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_b": {
+              "canonical_name": "林岳",
+              "aliases": [],
+              "voice_locked": false
+            }
+          },
+          "chapters": [
+            {
+              "chapter_index": 1,
+              "title": "wrong_merge",
+              "segments": [
+                {
+                  "segment_id": "ch1_s0",
+                  "text": "林远和林岳是两个不同的人，各自拿着一本书。",
+                  "role_id": "narrator",
+                  "text_kind": "narration",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 0,
+                    "end": 21
+                  },
+                  "speaker": {
+                    "entity_id": "narrator",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s1",
+                  "text": "林远说：“这是我第1次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 21,
+                    "end": 45
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s2",
+                  "text": "林远说：“这是我第2次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 45,
+                    "end": 69
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s3",
+                  "text": "林远说：“这是我第3次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 69,
+                    "end": 93
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s4",
+                  "text": "林远说：“这是我第4次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 93,
+                    "end": 117
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s5",
+                  "text": "林远说：“这是我第5次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 117,
+                    "end": 141
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s6",
+                  "text": "林远说：“这是我第6次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 141,
+                    "end": 165
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s7",
+                  "text": "林远说：“这是我第7次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 165,
+                    "end": 189
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s8",
+                  "text": "林远说：“这是我第8次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 189,
+                    "end": 213
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s9",
+                  "text": "林远说：“这是我第9次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 213,
+                    "end": 237
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s10",
+                  "text": "林远说：“这是我第10次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 237,
+                    "end": 262
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s11",
+                  "text": "林远说：“这是我第11次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 262,
+                    "end": 287
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s12",
+                  "text": "林远说：“这是我第12次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 287,
+                    "end": 312
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "sources": {
+          "1": "林远和林岳是两个不同的人，各自拿着一本书。林远说：“这是我第1次来这里，我还记得那本书。”林远说：“这是我第2次来这里，我还记得那本书。”林远说：“这是我第3次来这里，我还记得那本书。”林远说：“这是我第4次来这里，我还记得那本书。”林远说：“这是我第5次来这里，我还记得那本书。”林远说：“这是我第6次来这里，我还记得那本书。”林远说：“这是我第7次来这里，我还记得那本书。”林远说：“这是我第8次来这里，我还记得那本书。”林远说：“这是我第9次来这里，我还记得那本书。”林远说：“这是我第10次来这里，我还记得那本书。”林远说：“这是我第11次来这里，我还记得那本书。”林远说：“这是我第12次来这里，我还记得那本书。”"
+        },
+        "history_incomplete": true,
+        "mentions": {},
+        "claims": {
+          "claim_wrong_merge": {
+            "id": "claim_wrong_merge",
+            "kind": "same_entity",
+            "subject": "person_a",
+            "entity_id": "person_b",
+            "scope": {
+              "kind": "book"
+            },
+            "status": "accepted",
+            "evidence": [],
+            "source": "model",
+            "created_revision": 2,
+            "revoked_revision": null
+          },
+          "truth_distinct": {
+            "id": "truth_distinct",
+            "kind": "distinct_entity",
+            "subject": "person_a",
+            "entity_id": "person_b",
+            "scope": {
+              "kind": "book"
+            },
+            "status": "accepted",
+            "evidence": [],
+            "source": "human",
+            "created_revision": 2,
+            "revoked_revision": null
+          }
+        },
+        "decisions": {
+          "ch1_s0": {
+            "id": "ch1_s0",
+            "segment_id": "ch1_s0",
+            "entity_id": "narrator",
+            "candidates": [
+              "narrator"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s1": {
+            "id": "ch1_s1",
+            "segment_id": "ch1_s1",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s2": {
+            "id": "ch1_s2",
+            "segment_id": "ch1_s2",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s3": {
+            "id": "ch1_s3",
+            "segment_id": "ch1_s3",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s4": {
+            "id": "ch1_s4",
+            "segment_id": "ch1_s4",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s5": {
+            "id": "ch1_s5",
+            "segment_id": "ch1_s5",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s6": {
+            "id": "ch1_s6",
+            "segment_id": "ch1_s6",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s7": {
+            "id": "ch1_s7",
+            "segment_id": "ch1_s7",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s8": {
+            "id": "ch1_s8",
+            "segment_id": "ch1_s8",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s9": {
+            "id": "ch1_s9",
+            "segment_id": "ch1_s9",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s10": {
+            "id": "ch1_s10",
+            "segment_id": "ch1_s10",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s11": {
+            "id": "ch1_s11",
+            "segment_id": "ch1_s11",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s12": {
+            "id": "ch1_s12",
+            "segment_id": "ch1_s12",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          }
+        },
+        "dependencies": [
+          {
+            "decision_id": "ch1_s1",
+            "upstream_id": "claim_wrong_merge",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s2",
+            "upstream_id": "claim_wrong_merge",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s3",
+            "upstream_id": "claim_wrong_merge",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s4",
+            "upstream_id": "claim_wrong_merge",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s5",
+            "upstream_id": "claim_wrong_merge",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s6",
+            "upstream_id": "claim_wrong_merge",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s7",
+            "upstream_id": "claim_wrong_merge",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s8",
+            "upstream_id": "claim_wrong_merge",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s9",
+            "upstream_id": "claim_wrong_merge",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s10",
+            "upstream_id": "claim_wrong_merge",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s11",
+            "upstream_id": "claim_wrong_merge",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s12",
+            "upstream_id": "claim_wrong_merge",
+            "kind": "depends_on"
+          }
+        ],
+        "conflicts": [
+          {
+            "id": "4f6fb049950b6952e67cf441",
+            "kind": "identity_conflict",
+            "refs": [
+              "claim_wrong_merge",
+              "truth_distinct"
+            ],
+            "evidence": [],
+            "status": "open"
+          }
+        ],
+        "proposals": {},
+        "events": [],
+        "sessions": {},
+        "operations": {},
+        "unconfigured_entities": [],
+        "context_checks": [],
+        "runs": {},
+        "policy_version": "review_policy_v1"
+      },
+      "chapters": [
+        [
+          "第一章",
+          "林远和林岳是两个不同的人，各自拿着一本书。林远说：“这是我第1次来这里，我还记得那本书。”林远说：“这是我第2次来这里，我还记得那本书。”林远说：“这是我第3次来这里，我还记得那本书。”林远说：“这是我第4次来这里，我还记得那本书。”林远说：“这是我第5次来这里，我还记得那本书。”林远说：“这是我第6次来这里，我还记得那本书。”林远说：“这是我第7次来这里，我还记得那本书。”林远说：“这是我第8次来这里，我还记得那本书。”林远说：“这是我第9次来这里，我还记得那本书。”林远说：“这是我第10次来这里，我还记得那本书。”林远说：“这是我第11次来这里，我还记得那本书。”林远说：“这是我第12次来这里，我还记得那本书。”"
+        ]
+      ]
+    },
+    {
+      "id": "narrator_shift",
+      "state": {
+        "research_schema_version": 1,
+        "id": "a6d02e9e0ea0a36d05f55f121b80eed0",
+        "revision": 2,
+        "confirmed": "",
+        "script": {
+          "schema_version": 2,
+          "provider": "openai",
+          "book_sha256": "a6d02e9e0ea0a36d05f55f121b80eed095815a2b13bf539cadd085945ac64ca4",
+          "default_pause_after_ms": 250,
+          "roles": {
+            "narrator": {
+              "display_name": "旁白",
+              "provider_params": {
+                "voice": "冰糖",
+                "speed": 1
+              }
+            },
+            "person_a": {
+              "display_name": "林远",
+              "provider_params": {
+                "voice": "茉莉",
+                "speed": 1
+              }
+            },
+            "person_b": {
+              "display_name": "林岳",
+              "provider_params": {
+                "voice": "冰糖",
+                "speed": 1
+              }
+            }
+          },
+          "entities": {
+            "narrator": {
+              "canonical_name": "旁白",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_a": {
+              "canonical_name": "林远",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_b": {
+              "canonical_name": "林岳",
+              "aliases": [],
+              "voice_locked": false
+            }
+          },
+          "chapters": [
+            {
+              "chapter_index": 1,
+              "title": "narrator_shift",
+              "segments": [
+                {
+                  "segment_id": "ch1_s0",
+                  "text": "这一章由林远自述，我终于找到了那本书。",
+                  "role_id": "person_b",
+                  "text_kind": "narration",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 0,
+                    "end": 19
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s1",
+                  "text": "林远说：“这是我第1次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 19,
+                    "end": 43
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s2",
+                  "text": "林远说：“这是我第2次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 43,
+                    "end": 67
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s3",
+                  "text": "林远说：“这是我第3次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 67,
+                    "end": 91
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s4",
+                  "text": "林远说：“这是我第4次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 91,
+                    "end": 115
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s5",
+                  "text": "林远说：“这是我第5次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 115,
+                    "end": 139
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s6",
+                  "text": "林远说：“这是我第6次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 139,
+                    "end": 163
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s7",
+                  "text": "林远说：“这是我第7次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 163,
+                    "end": 187
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s8",
+                  "text": "林远说：“这是我第8次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 187,
+                    "end": 211
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s9",
+                  "text": "林远说：“这是我第9次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 211,
+                    "end": 235
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s10",
+                  "text": "林远说：“这是我第10次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 235,
+                    "end": 260
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s11",
+                  "text": "林远说：“这是我第11次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 260,
+                    "end": 285
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s12",
+                  "text": "林远说：“这是我第12次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 285,
+                    "end": 310
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "sources": {
+          "1": "这一章由林远自述，我终于找到了那本书。林远说：“这是我第1次来这里，我还记得那本书。”林远说：“这是我第2次来这里，我还记得那本书。”林远说：“这是我第3次来这里，我还记得那本书。”林远说：“这是我第4次来这里，我还记得那本书。”林远说：“这是我第5次来这里，我还记得那本书。”林远说：“这是我第6次来这里，我还记得那本书。”林远说：“这是我第7次来这里，我还记得那本书。”林远说：“这是我第8次来这里，我还记得那本书。”林远说：“这是我第9次来这里，我还记得那本书。”林远说：“这是我第10次来这里，我还记得那本书。”林远说：“这是我第11次来这里，我还记得那本书。”林远说：“这是我第12次来这里，我还记得那本书。”"
+        },
+        "history_incomplete": true,
+        "mentions": {},
+        "claims": {
+          "claim_narrator_shift": {
+            "id": "claim_narrator_shift",
+            "kind": "narrator_entity",
+            "subject": "narrator",
+            "entity_id": "person_b",
+            "scope": {
+              "chapter_index": 1,
+              "start": 0,
+              "end": 19
+            },
+            "status": "proposed",
+            "evidence": [],
+            "source": "model",
+            "created_revision": 2,
+            "revoked_revision": null
+          }
+        },
+        "decisions": {
+          "ch1_s0": {
+            "id": "ch1_s0",
+            "segment_id": "ch1_s0",
+            "entity_id": "person_b",
+            "candidates": [
+              "narrator"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s1": {
+            "id": "ch1_s1",
+            "segment_id": "ch1_s1",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s2": {
+            "id": "ch1_s2",
+            "segment_id": "ch1_s2",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s3": {
+            "id": "ch1_s3",
+            "segment_id": "ch1_s3",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s4": {
+            "id": "ch1_s4",
+            "segment_id": "ch1_s4",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s5": {
+            "id": "ch1_s5",
+            "segment_id": "ch1_s5",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s6": {
+            "id": "ch1_s6",
+            "segment_id": "ch1_s6",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s7": {
+            "id": "ch1_s7",
+            "segment_id": "ch1_s7",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s8": {
+            "id": "ch1_s8",
+            "segment_id": "ch1_s8",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s9": {
+            "id": "ch1_s9",
+            "segment_id": "ch1_s9",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s10": {
+            "id": "ch1_s10",
+            "segment_id": "ch1_s10",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s11": {
+            "id": "ch1_s11",
+            "segment_id": "ch1_s11",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s12": {
+            "id": "ch1_s12",
+            "segment_id": "ch1_s12",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          }
+        },
+        "dependencies": [
+          {
+            "decision_id": "ch1_s0",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s1",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s2",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s3",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s4",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s5",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s6",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s7",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s8",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s9",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s10",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s11",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s12",
+            "upstream_id": "claim_narrator_shift",
+            "kind": "depends_on"
+          }
+        ],
+        "conflicts": [],
+        "proposals": {},
+        "events": [],
+        "sessions": {},
+        "operations": {},
+        "unconfigured_entities": [],
+        "context_checks": [],
+        "runs": {},
+        "policy_version": "review_policy_v1"
+      },
+      "chapters": [
+        [
+          "第一章",
+          "这一章由林远自述，我终于找到了那本书。林远说：“这是我第1次来这里，我还记得那本书。”林远说：“这是我第2次来这里，我还记得那本书。”林远说：“这是我第3次来这里，我还记得那本书。”林远说：“这是我第4次来这里，我还记得那本书。”林远说：“这是我第5次来这里，我还记得那本书。”林远说：“这是我第6次来这里，我还记得那本书。”林远说：“这是我第7次来这里，我还记得那本书。”林远说：“这是我第8次来这里，我还记得那本书。”林远说：“这是我第9次来这里，我还记得那本书。”林远说：“这是我第10次来这里，我还记得那本书。”林远说：“这是我第11次来这里，我还记得那本书。”林远说：“这是我第12次来这里，我还记得那本书。”"
+        ]
+      ]
+    },
+    {
+      "id": "human_conflict",
+      "state": {
+        "research_schema_version": 1,
+        "id": "31386c2cfee7af6e909a3e677684643e",
+        "revision": 2,
+        "confirmed": "",
+        "script": {
+          "schema_version": 2,
+          "provider": "openai",
+          "book_sha256": "31386c2cfee7af6e909a3e677684643efbb0388aca11503ab71dfc9605937233",
+          "default_pause_after_ms": 250,
+          "roles": {
+            "narrator": {
+              "display_name": "旁白",
+              "provider_params": {
+                "voice": "冰糖",
+                "speed": 1
+              }
+            },
+            "person_a": {
+              "display_name": "林远",
+              "provider_params": {
+                "voice": "茉莉",
+                "speed": 1
+              }
+            },
+            "person_b": {
+              "display_name": "林岳",
+              "provider_params": {
+                "voice": "冰糖",
+                "speed": 1
+              }
+            }
+          },
+          "entities": {
+            "narrator": {
+              "canonical_name": "旁白",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_a": {
+              "canonical_name": "林远",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_b": {
+              "canonical_name": "林岳",
+              "aliases": [],
+              "voice_locked": false
+            }
+          },
+          "chapters": [
+            {
+              "chapter_index": 1,
+              "title": "human_conflict",
+              "segments": [
+                {
+                  "segment_id": "ch1_s0",
+                  "text": "林远说过的话已经由编辑确认，不能随身份合并改写。",
+                  "role_id": "narrator",
+                  "text_kind": "narration",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 0,
+                    "end": 24
+                  },
+                  "speaker": {
+                    "entity_id": "narrator",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s1",
+                  "text": "林远说：“这是我第1次来这里，我还记得那本书。”",
+                  "role_id": "person_a",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 24,
+                    "end": 48
+                  },
+                  "speaker": {
+                    "entity_id": "person_a",
+                    "status": "confirmed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "human"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s2",
+                  "text": "林远说：“这是我第2次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 48,
+                    "end": 72
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s3",
+                  "text": "林远说：“这是我第3次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 72,
+                    "end": 96
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s4",
+                  "text": "林远说：“这是我第4次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 96,
+                    "end": 120
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s5",
+                  "text": "林远说：“这是我第5次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 120,
+                    "end": 144
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s6",
+                  "text": "林远说：“这是我第6次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 144,
+                    "end": 168
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s7",
+                  "text": "林远说：“这是我第7次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 168,
+                    "end": 192
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s8",
+                  "text": "林远说：“这是我第8次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 192,
+                    "end": 216
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s9",
+                  "text": "林远说：“这是我第9次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 216,
+                    "end": 240
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s10",
+                  "text": "林远说：“这是我第10次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 240,
+                    "end": 265
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s11",
+                  "text": "林远说：“这是我第11次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 265,
+                    "end": 290
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s12",
+                  "text": "林远说：“这是我第12次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 290,
+                    "end": 315
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "sources": {
+          "1": "林远说过的话已经由编辑确认，不能随身份合并改写。林远说：“这是我第1次来这里，我还记得那本书。”林远说：“这是我第2次来这里，我还记得那本书。”林远说：“这是我第3次来这里，我还记得那本书。”林远说：“这是我第4次来这里，我还记得那本书。”林远说：“这是我第5次来这里，我还记得那本书。”林远说：“这是我第6次来这里，我还记得那本书。”林远说：“这是我第7次来这里，我还记得那本书。”林远说：“这是我第8次来这里，我还记得那本书。”林远说：“这是我第9次来这里，我还记得那本书。”林远说：“这是我第10次来这里，我还记得那本书。”林远说：“这是我第11次来这里，我还记得那本书。”林远说：“这是我第12次来这里，我还记得那本书。”"
+        },
+        "history_incomplete": true,
+        "mentions": {},
+        "claims": {
+          "claim_human_conflict": {
+            "id": "claim_human_conflict",
+            "kind": "same_entity",
+            "subject": "person_a",
+            "entity_id": "person_b",
+            "scope": {
+              "kind": "book"
+            },
+            "status": "accepted",
+            "evidence": [],
+            "source": "model",
+            "created_revision": 2,
+            "revoked_revision": null
+          }
+        },
+        "decisions": {
+          "ch1_s0": {
+            "id": "ch1_s0",
+            "segment_id": "ch1_s0",
+            "entity_id": "narrator",
+            "candidates": [
+              "narrator"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s1": {
+            "id": "ch1_s1",
+            "segment_id": "ch1_s1",
+            "entity_id": "person_a",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "human",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s2": {
+            "id": "ch1_s2",
+            "segment_id": "ch1_s2",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s3": {
+            "id": "ch1_s3",
+            "segment_id": "ch1_s3",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s4": {
+            "id": "ch1_s4",
+            "segment_id": "ch1_s4",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s5": {
+            "id": "ch1_s5",
+            "segment_id": "ch1_s5",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s6": {
+            "id": "ch1_s6",
+            "segment_id": "ch1_s6",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s7": {
+            "id": "ch1_s7",
+            "segment_id": "ch1_s7",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s8": {
+            "id": "ch1_s8",
+            "segment_id": "ch1_s8",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s9": {
+            "id": "ch1_s9",
+            "segment_id": "ch1_s9",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s10": {
+            "id": "ch1_s10",
+            "segment_id": "ch1_s10",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s11": {
+            "id": "ch1_s11",
+            "segment_id": "ch1_s11",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s12": {
+            "id": "ch1_s12",
+            "segment_id": "ch1_s12",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          }
+        },
+        "dependencies": [
+          {
+            "decision_id": "ch1_s1",
+            "upstream_id": "claim_human_conflict",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s2",
+            "upstream_id": "claim_human_conflict",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s3",
+            "upstream_id": "claim_human_conflict",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s4",
+            "upstream_id": "claim_human_conflict",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s5",
+            "upstream_id": "claim_human_conflict",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s6",
+            "upstream_id": "claim_human_conflict",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s7",
+            "upstream_id": "claim_human_conflict",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s8",
+            "upstream_id": "claim_human_conflict",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s9",
+            "upstream_id": "claim_human_conflict",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s10",
+            "upstream_id": "claim_human_conflict",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s11",
+            "upstream_id": "claim_human_conflict",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s12",
+            "upstream_id": "claim_human_conflict",
+            "kind": "depends_on"
+          }
+        ],
+        "conflicts": [
+          {
+            "id": "a3cec41dd4504ccc01d70fef",
+            "kind": "human_projection",
+            "refs": [
+              "ch1_s1",
+              "claim_human_conflict"
+            ],
+            "evidence": [],
+            "status": "open"
+          }
+        ],
+        "proposals": {},
+        "events": [],
+        "sessions": {},
+        "operations": {},
+        "unconfigured_entities": [],
+        "context_checks": [],
+        "runs": {},
+        "policy_version": "review_policy_v1"
+      },
+      "chapters": [
+        [
+          "第一章",
+          "林远说过的话已经由编辑确认，不能随身份合并改写。林远说：“这是我第1次来这里，我还记得那本书。”林远说：“这是我第2次来这里，我还记得那本书。”林远说：“这是我第3次来这里，我还记得那本书。”林远说：“这是我第4次来这里，我还记得那本书。”林远说：“这是我第5次来这里，我还记得那本书。”林远说：“这是我第6次来这里，我还记得那本书。”林远说：“这是我第7次来这里，我还记得那本书。”林远说：“这是我第8次来这里，我还记得那本书。”林远说：“这是我第9次来这里，我还记得那本书。”林远说：“这是我第10次来这里，我还记得那本书。”林远说：“这是我第11次来这里，我还记得那本书。”林远说：“这是我第12次来这里，我还记得那本书。”"
+        ]
+      ]
+    },
+    {
+      "id": "source_changed",
+      "state": {
+        "research_schema_version": 1,
+        "id": "81a3b2c77db1bdfa6ffb94ed4014846f",
+        "revision": 2,
+        "confirmed": "",
+        "script": {
+          "schema_version": 2,
+          "provider": "openai",
+          "book_sha256": "81a3b2c77db1bdfa6ffb94ed4014846f4b8a24967850769bcbf91b806fc5c545",
+          "default_pause_after_ms": 250,
+          "roles": {
+            "narrator": {
+              "display_name": "旁白",
+              "provider_params": {
+                "voice": "冰糖",
+                "speed": 1
+              }
+            },
+            "person_a": {
+              "display_name": "林远",
+              "provider_params": {
+                "voice": "茉莉",
+                "speed": 1
+              }
+            },
+            "person_b": {
+              "display_name": "林岳",
+              "provider_params": {
+                "voice": "冰糖",
+                "speed": 1
+              }
+            }
+          },
+          "entities": {
+            "narrator": {
+              "canonical_name": "旁白",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_a": {
+              "canonical_name": "林远",
+              "aliases": [],
+              "voice_locked": false
+            },
+            "person_b": {
+              "canonical_name": "林岳",
+              "aliases": [],
+              "voice_locked": false
+            }
+          },
+          "chapters": [
+            {
+              "chapter_index": 1,
+              "title": "source_changed",
+              "segments": [
+                {
+                  "segment_id": "ch1_s0",
+                  "text": "这一版原文增加了人物说明，上一版的定位已失效。",
+                  "role_id": "narrator",
+                  "text_kind": "narration",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 0,
+                    "end": 23
+                  },
+                  "speaker": {
+                    "entity_id": "narrator",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s1",
+                  "text": "林远说：“这是我第1次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 23,
+                    "end": 47
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s2",
+                  "text": "林远说：“这是我第2次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 47,
+                    "end": 71
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s3",
+                  "text": "林远说：“这是我第3次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 71,
+                    "end": 95
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s4",
+                  "text": "林远说：“这是我第4次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 95,
+                    "end": 119
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s5",
+                  "text": "林远说：“这是我第5次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 119,
+                    "end": 143
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s6",
+                  "text": "林远说：“这是我第6次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 143,
+                    "end": 167
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s7",
+                  "text": "林远说：“这是我第7次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 167,
+                    "end": 191
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s8",
+                  "text": "林远说：“这是我第8次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 191,
+                    "end": 215
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s9",
+                  "text": "林远说：“这是我第9次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 215,
+                    "end": 239
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s10",
+                  "text": "林远说：“这是我第10次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 239,
+                    "end": 264
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s11",
+                  "text": "林远说：“这是我第11次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 264,
+                    "end": 289
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                },
+                {
+                  "segment_id": "ch1_s12",
+                  "text": "林远说：“这是我第12次来这里，我还记得那本书。”",
+                  "role_id": "person_b",
+                  "text_kind": "dialogue",
+                  "source_span": {
+                    "chapter_index": 1,
+                    "start": 289,
+                    "end": 314
+                  },
+                  "speaker": {
+                    "entity_id": "person_b",
+                    "status": "proposed",
+                    "confidence": null,
+                    "evidence": [],
+                    "confidence_kind": "uncalibrated"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "sources": {
+          "1": "这一版原文增加了人物说明，上一版的定位已失效。林远说：“这是我第1次来这里，我还记得那本书。”林远说：“这是我第2次来这里，我还记得那本书。”林远说：“这是我第3次来这里，我还记得那本书。”林远说：“这是我第4次来这里，我还记得那本书。”林远说：“这是我第5次来这里，我还记得那本书。”林远说：“这是我第6次来这里，我还记得那本书。”林远说：“这是我第7次来这里，我还记得那本书。”林远说：“这是我第8次来这里，我还记得那本书。”林远说：“这是我第9次来这里，我还记得那本书。”林远说：“这是我第10次来这里，我还记得那本书。”林远说：“这是我第11次来这里，我还记得那本书。”林远说：“这是我第12次来这里，我还记得那本书。”"
+        },
+        "history_incomplete": true,
+        "mentions": {},
+        "claims": {
+          "claim_source_changed": {
+            "id": "claim_source_changed",
+            "kind": "same_entity",
+            "subject": "person_a",
+            "entity_id": "person_b",
+            "scope": {
+              "kind": "book"
+            },
+            "status": "proposed",
+            "evidence": [],
+            "source": "model",
+            "created_revision": 2,
+            "revoked_revision": null
+          }
+        },
+        "decisions": {
+          "ch1_s0": {
+            "id": "ch1_s0",
+            "segment_id": "ch1_s0",
+            "entity_id": "narrator",
+            "candidates": [
+              "narrator"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s1": {
+            "id": "ch1_s1",
+            "segment_id": "ch1_s1",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s2": {
+            "id": "ch1_s2",
+            "segment_id": "ch1_s2",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s3": {
+            "id": "ch1_s3",
+            "segment_id": "ch1_s3",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s4": {
+            "id": "ch1_s4",
+            "segment_id": "ch1_s4",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s5": {
+            "id": "ch1_s5",
+            "segment_id": "ch1_s5",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s6": {
+            "id": "ch1_s6",
+            "segment_id": "ch1_s6",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s7": {
+            "id": "ch1_s7",
+            "segment_id": "ch1_s7",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s8": {
+            "id": "ch1_s8",
+            "segment_id": "ch1_s8",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s9": {
+            "id": "ch1_s9",
+            "segment_id": "ch1_s9",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s10": {
+            "id": "ch1_s10",
+            "segment_id": "ch1_s10",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s11": {
+            "id": "ch1_s11",
+            "segment_id": "ch1_s11",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          },
+          "ch1_s12": {
+            "id": "ch1_s12",
+            "segment_id": "ch1_s12",
+            "entity_id": "person_b",
+            "candidates": [
+              "person_b"
+            ],
+            "evidence": [],
+            "against": [],
+            "status": "proposed",
+            "analyzer_version": "legacy"
+          }
+        },
+        "dependencies": [
+          {
+            "decision_id": "ch1_s1",
+            "upstream_id": "claim_source_changed",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s2",
+            "upstream_id": "claim_source_changed",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s3",
+            "upstream_id": "claim_source_changed",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s4",
+            "upstream_id": "claim_source_changed",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s5",
+            "upstream_id": "claim_source_changed",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s6",
+            "upstream_id": "claim_source_changed",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s7",
+            "upstream_id": "claim_source_changed",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s8",
+            "upstream_id": "claim_source_changed",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s9",
+            "upstream_id": "claim_source_changed",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s10",
+            "upstream_id": "claim_source_changed",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s11",
+            "upstream_id": "claim_source_changed",
+            "kind": "depends_on"
+          },
+          {
+            "decision_id": "ch1_s12",
+            "upstream_id": "claim_source_changed",
+            "kind": "depends_on"
+          }
+        ],
+        "conflicts": [],
+        "proposals": {},
+        "events": [],
+        "sessions": {},
+        "operations": {},
+        "unconfigured_entities": [],
+        "context_checks": [],
+        "runs": {},
+        "policy_version": "review_policy_v1"
+      },
+      "chapters": [
+        [
+          "第一章",
+          "这一版原文增加了人物说明，上一版的定位已失效。林远说：“这是我第1次来这里，我还记得那本书。”林远说：“这是我第2次来这里，我还记得那本书。”林远说：“这是我第3次来这里，我还记得那本书。”林远说：“这是我第4次来这里，我还记得那本书。”林远说：“这是我第5次来这里，我还记得那本书。”林远说：“这是我第6次来这里，我还记得那本书。”林远说：“这是我第7次来这里，我还记得那本书。”林远说：“这是我第8次来这里，我还记得那本书。”林远说：“这是我第9次来这里，我还记得那本书。”林远说：“这是我第10次来这里，我还记得那本书。”林远说：“这是我第11次来这里，我还记得那本书。”林远说：“这是我第12次来这里，我还记得那本书。”新增的结尾。"
+        ]
+      ],
+      "expected_analysis_error": "原书正文"
+    }
+  ]
+}

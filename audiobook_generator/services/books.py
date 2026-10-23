@@ -29,6 +29,7 @@ def read_book(request, files):
     path = files.resolve(request.file_id)
     config = parser_config(request.parser, files)
     config.input_file = str(path)
+    config.source_name = files.register(path)['name']
     break_string = '   ' if request.provider in ('openai', 'chatterbox', 'voxcpm') else ' @BRK#'
     try:
         parser = get_book_parser(config)
@@ -49,7 +50,9 @@ def read_book(request, files):
                          for i, (title, text) in enumerate(chapters, 1)]}, chapters
 
 
-def configs_for(request, files, output_root, project=None):
+def configs_for(request, files, output_root, project=None, *, allow_empty=False):
+    if not request.file_ids and not allow_empty:
+        raise ServiceError('book_required', '请先上传书籍文件。')
     if request.chapter_end != -1 and request.chapter_end < request.chapter_start:
         raise ServiceError('chapter_range', '结束章节不能早于起始章节。')
     if request.audio_core_enabled and request.engine.provider != 'openai':
@@ -67,13 +70,20 @@ def configs_for(request, files, output_root, project=None):
             raise ServiceError('chapter_range', '章节范围超过目录，请重新选择。')
     output = Path(request.output_dir).expanduser().resolve() if request.output_dir else Path(output_root)
     configs = []
-    for file_id in request.file_ids:
-        path = files.resolve(file_id)
+    used_names = set()
+    for file_id in request.file_ids or [None]:
+        path = files.resolve(file_id) if file_id else None
         config = parser_config(request.parser, files)
-        config.input_file = str(path)
-        # 上传文件名是唯一标识，避免同名书籍批处理覆盖。
-        config.output_folder = str(output / path.stem) if len(request.file_ids) > 1 else str(output)
+        config.input_file = str(path) if path else None
+        config.source_name = files.register(path)['name'] if path else '声音试听'
+        name = ''.join(c if c.isalnum() or c in '._-' else '_' for c in Path(config.source_name).stem)
+        name = name.strip('.')[:100] or '书籍'
+        if name in used_names:
+            name += '_' + file_id[:8]
+        used_names.add(name)
+        config.output_folder = str(output / name) if len(request.file_ids) > 1 else str(output)
         config.tts = request.engine.provider
+        config.allow_custom_tts = config.tts == 'openai'
         config.worker_count = request.worker_count
         config.log = request.log_level
         config.no_prompt = True
@@ -97,15 +107,24 @@ def configs_for(request, files, output_root, project=None):
             setattr(config, key, getattr(request, key))
         config.role_script = project
         config.language = getattr(config, 'language', None) or 'zh-CN'
+        if request.voice_profile_id or request.voice_profile_version:
+            if project:
+                raise ServiceError('voice_profile_scope', '角色项目请逐个人物绑定声音卡；全局声音卡用于普通朗读。')
+            from .portable_voices import PortableVoices
+            config._portable_params, config.portable_voice_snapshot = PortableVoices(output_root).resolve(
+                request.voice_profile_id, request.voice_profile_version, config.tts, config.model_name)
+            if config.output_format not in ('mp3', 'wav', 'flac'):
+                raise ServiceError('voice_profile_format', '声音卡朗读请使用 MP3/WAV/FLAC 格式。')
         if project:
             from audiobook_generator.role_script.deepseek_splitter import detect_role_script_language
             config.language = 'en-US' if detect_role_script_language(project) == 'en' else 'zh-CN'
-        from audiobook_generator.ui.audio_quality import apply_local_quality_defaults
-        apply_local_quality_defaults(config)
-        if request.audio_core_settings_file:
-            from audiobook_generator.ui.audio_quality import apply_quality_settings
-            apply_quality_settings(config, files.resolve(request.audio_core_settings_file))
-        if request.audio_core_casting_file:
-            config.audio_core_casting = str(files.resolve(request.audio_core_casting_file))
+        config.role_quality_enabled = bool(project) and request.role_quality_enabled and not request.audio_core_enabled
+        if request.audio_core_enabled:
+            from audiobook_generator.ui.audio_quality import apply_local_quality_defaults, apply_quality_settings
+            apply_local_quality_defaults(config)
+            apply_quality_settings(config, files.resolve(request.audio_core_settings_file) if request.audio_core_settings_file else None)
+            if request.audio_core_casting_file:
+                config.audio_core_casting = str(files.resolve(request.audio_core_casting_file))
+            config.worker_count = 1
         configs.append(config)
     return configs

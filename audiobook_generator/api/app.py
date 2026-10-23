@@ -46,6 +46,8 @@ def create_app(root=None, *, acquire_lock=True, frontend=None):
 
     app = FastAPI(title='有声书工坊', version='1.0.0', lifespan=lifespan)
     prefix = '/api/v1'
+    from .research import register_research_routes
+    register_research_routes(app, prefix)
 
     @app.exception_handler(ServiceError)
     async def service_error(request, exc):
@@ -93,9 +95,15 @@ def create_app(root=None, *, acquire_lock=True, frontend=None):
     @app.get(prefix + '/bootstrap')
     def bootstrap():
         from audiobook_generator.services.capabilities import capabilities
+        from audiobook_generator.ui.audio_quality import apply_local_quality_defaults, local_quality_status
+        from types import SimpleNamespace
+        models = SimpleNamespace()
+        apply_local_quality_defaults(models)
         return {'providers': capabilities(), 'settings': {key: value for key, value in app.state.settings.read().items()
                     if key != 'admin_password_hash'}, 'current_task': app.state.tasks.current(),
-                'projects': app.state.projects.list(), 'output_root': str(root)}
+                'projects': app.state.projects.list(), 'output_root': str(root),
+                'quality_models': {'asr': bool(getattr(models, 'audio_core_asr_model', None)),
+                    'speaker': bool(getattr(models, 'audio_core_speaker_model', None)), 'message': local_quality_status()}}
 
     @app.post(prefix + '/uploads')
     def upload(file: UploadFile = File(...)):
@@ -131,8 +139,8 @@ def create_app(root=None, *, acquire_lock=True, frontend=None):
         return app.state.tasks.stop(key)
 
     @app.get(prefix + '/tasks/{key}/logs')
-    def logs(key: str, cursor: int | None = None):
-        return app.state.tasks.logs(key, cursor)
+    def logs(key: str, cursor: int | None = None, before: int | None = None):
+        return app.state.tasks.logs(key, cursor, before)
 
     @app.get(prefix + '/projects')
     def projects():
@@ -156,15 +164,27 @@ def create_app(root=None, *, acquire_lock=True, frontend=None):
         return app.state.projects.edit(key, body)
 
     @app.post(prefix + '/projects/{key}/casting')
-    def casting(key: str, body: BookRequest):
+    def casting(key: str, body: BookRequest, language: str = 'zh'):
         from audiobook_generator.ui.book_casting import discover_banks, draft_rows
+        if language not in ('zh', 'en'):
+            raise ServiceError('language_invalid', '请选择中文或英语。')
         with app.state.projects.lock:
             controller = app.state.projects.casting(key, body.model_dump())
-            usage, coverage = controller.usage('zh')
+            usage, coverage = controller.usage(language)
             draft = controller.read_draft()
             return {'coverage': coverage, 'usage': usage,
                     'banks': [{'label': label, **app.state.files.register(path)} for label, path in discover_banks(root)],
                     'draft': {'draft_id': draft['draft_id'], 'rows': draft_rows(draft)} if draft else None}
+
+    @app.post(prefix + '/casting/bank')
+    def casting_bank(body: dict):
+        from audiobook_generator.ui.book_casting import load_bank
+        language = body.get('language', 'zh')
+        path = app.state.files.resolve(body['file_id'])
+        bank = load_bank(path, language)
+        return {'bank_id': body['file_id'], 'language': language,
+                'voices': [{'value': name, 'label': name} for name in bank['voices']],
+                'summary': f'{len(bank["voices"])} 个已核验声音 · {language}'}
 
     @app.get(prefix + '/voices')
     def voices():
@@ -180,8 +200,11 @@ def create_app(root=None, *, acquire_lock=True, frontend=None):
             path = app.state.files.resolve(body['file_id']) if body.get('file_id') else None
             result = import_voice_catalog_document(str(path) if path else None, text=body.get('text', ''),
                       provider=body.get('provider'), default_language=body.get('language', 'zh'))
+            if result.errors or not result.entries:
+                raise ServiceError('voice_import_invalid', '；'.join(result.errors) or '未找到有效音色条目。')
             save_user_voice_entries(result.entries)
-            return {'count': len(result.entries)}
+            return {'count': len(result.entries), 'entries': [item.to_dict() for item in result.entries],
+                    'warnings': list(result.warnings), 'source_name': result.source_name}
 
     @app.delete(prefix + '/voices')
     def clear_voices():
@@ -190,6 +213,34 @@ def create_app(root=None, *, acquire_lock=True, frontend=None):
             app.state.tasks.require_idle()
             clear_user_voice_entries()
         return {'ok': True}
+
+    @app.get(prefix + '/voice-profiles')
+    def voice_profiles():
+        from audiobook_generator.services.portable_voices import PortableVoices
+        return PortableVoices(root).list()
+
+    @app.post(prefix + '/voice-profiles')
+    def save_voice_profile(body: dict):
+        from audiobook_generator.services.portable_voices import PortableVoices
+        with app.state.projects.lock:
+            app.state.tasks.require_idle()
+            return PortableVoices(root).from_preview(app.state.tasks, body['task_id'],
+                key=body['id'], label=body['label'], language=body['language'],
+                confirmed=body.get('confirmed'), previous_version=body.get('previous_version'))
+
+    @app.post(prefix + '/voice-profiles/import')
+    def import_voice_profile(body: dict):
+        from audiobook_generator.services.portable_voices import PortableVoices
+        with app.state.projects.lock:
+            app.state.tasks.require_idle()
+            return PortableVoices(root).import_file(app.state.files.resolve(body['file_id']))
+
+    @app.get(prefix + '/voice-profiles/{key}/{version}/export')
+    def export_voice_profile(key: str, version: str):
+        from audiobook_generator.services.portable_voices import PortableVoices
+        with app.state.projects.lock:
+            path = PortableVoices(root).export(key, version)
+        return FileResponse(path, filename=path.name, media_type='application/zip')
 
     def batches():
         result = {p.name: p.resolve() for p in root.iterdir() if p.is_dir() and not p.name.startswith('.') and p.resolve().parent == root}
@@ -218,6 +269,32 @@ def create_app(root=None, *, acquire_lock=True, frontend=None):
         directory = batch(folder)
         names = [p.name for p in directory.iterdir() if not p.name.startswith('.')]
         return [app.state.files.register(p) for p in selected_paths(directory.parent, directory.name, names)]
+
+    @app.get(prefix + '/library/source')
+    def source_trace(folder: str):
+        from audiobook_generator.services.common import read_json
+        from audiobook_generator.services.provenance import sha256
+        directory = batch(folder)
+        manifest = read_json(directory / 'manifest.json', {})
+        if not manifest:
+            return {'available': False}
+        original = (directory / manifest.get('source_file', '.source/missing')).resolve()
+        original_file = None
+        if (original.parent == (directory / '.source').resolve() and original.is_file()
+                and sha256(original) == manifest.get('book_sha256')):
+            original_file = app.state.files.register(original)
+        timeline = read_json(directory / 'timeline.json', {'chapters': []})
+        for chapter in timeline['chapters']:
+            audio = (directory / chapter['audio']).resolve()
+            if audio.parent != directory or not audio.is_file() or sha256(audio) != chapter['audio_sha256']:
+                chapter['audio_file'] = None
+                chapter['stale'] = True
+            else:
+                chapter['audio_file'] = app.state.files.register(audio)
+        return {'available': True, 'manifest': manifest, 'source_file': original_file,
+                'chapters': read_json(directory / 'chapters.json', {}).get('chapters', []),
+                'paragraphs': read_json(directory / 'source_map.json', {}).get('paragraphs', []),
+                'timeline': timeline}
 
     @app.post(prefix + '/library/archive')
     def archive(body: Selection):

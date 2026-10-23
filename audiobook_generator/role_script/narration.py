@@ -6,14 +6,20 @@ import re
 from audiobook_generator.utils.deepseek_config import deepseek_completion_options
 
 
-def name_in_source(name, source):
-    """姓名需逐字落在正文；英文短名不能命中另一单词的内部。"""
+def source_name_match(name, source, *, case_sensitive=False):
+    """返回带单词边界的原文匹配，供调用方恢复原文大小写。"""
     if not isinstance(name, str) or not name.strip():
-        return False
+        return None
     name = name.strip()
     left = r'(?<![A-Za-z0-9_])' if name[0].isascii() and name[0].isalnum() else ''
     right = r'(?![A-Za-z0-9_])' if name[-1].isascii() and name[-1].isalnum() else ''
-    return re.search(left + re.escape(name) + right, source, re.IGNORECASE) is not None
+    return re.search(left + re.escape(name) + right, source,
+                     0 if case_sensitive else re.IGNORECASE)
+
+
+def name_in_source(name, source, *, case_sensitive=False):
+    """英文短名不能命中另一单词的内部。"""
+    return source_name_match(name, source, case_sensitive=case_sensitive) is not None
 
 
 def grounded_entities(entities, chapters):
@@ -32,10 +38,31 @@ def local_character_hint(person, source):
 
 
 def request_narration_context(client, model, chapter_index, title, source, known_characters):
-    """每章一次身份分析；长章只取首尾，缺失的中段仍由分段模型判断。"""
+    """按上下文预算扫描整章；各块独立提供身份原文证据。"""
     from .deepseek_splitter import _extract_json_object
 
-    excerpt = source if len(source) <= 24000 else source[:12000] + '\n[中段未提供；不得推断中段视角]\n' + source[-12000:]
+    from .context_budget import completion, output_tokens, context_tokens, relevant_cards, ContextLimit, TruncatedCompletion, split_middle
+    excerpt = source
+    known_characters = relevant_cards(known_characters, source, limit=min(2048, context_tokens() // 8))
+    def validate_content(content):
+        value = _extract_json_object(content)
+        if value.get('perspective') not in ('character', 'third_person', 'mixed', 'unknown'):
+            raise ValueError('叙述视角分析未返回有效类型')
+        if not isinstance(value.get('narrators'), list):
+            raise ValueError('叙述视角分析未返回 narrators 数组')
+        # 不可信候选仍由下面的证据过滤处理，但不能成为成功断点。
+        for person in value['narrators']:
+            if not isinstance(person, dict) or not isinstance(person.get('evidence'), list):
+                return False
+            name, role_id = person.get('display_name'), person.get('role_id')
+            known = next((p for p in known_characters if p.get('role_id') == role_id), None)
+            if not name_in_source(name, source) and not (known and local_character_hint(known, source)):
+                return False
+            if not any(isinstance(evidence, dict) and isinstance(evidence.get('quote'), str)
+                       and evidence['quote'].strip() and source.count(evidence['quote']) == 1
+                       for evidence in person['evidence']):
+                return False
+        return True
     prompt = '''识别这章小说的叙述视角，只返回JSON，不改写原文。
 第一人称自述/回忆/内心叙述仍属于narration，声音身份可以是人物，不能一律分配默认旁白。
 区分“谁在叙述”和“正在描写谁”：第三人称聚焦、自由间接引语、引号内的I/我均不能单独证明叙述者身份。
@@ -48,14 +75,39 @@ def request_narration_context(client, model, chapter_index, title, source, known
 人名必须逐字出现在正文，或严格复用已知人物的名称及ID；不得补写正文未出现的全名、编造姓名。
 全书出现过的人名不能证明本章的I/我是谁：本章需出现其姓名或已确认别名，并给出与叙述者相连的身份线索。
 证据不足返回空narrators；不要返回分段正文。'''
-    response = client.chat.completions.create(
-        **deepseek_completion_options(model), temperature=0, max_tokens=2048,
+    if context_tokens() < 8192:
+        prompt = ('Identify narrative perspective using ONLY source evidence. Return JSON '
+                  '{"perspective":"character|third_person|mixed|unknown","narrators":'
+                  '[{"role_id":"id","display_name":"verbatim name","gender":"male|female|unknown",'
+                  '"evidence":[{"quote":"verbatim identity evidence","kind":"narrator_identity"}]}]}. '
+                  'Who narrates differs from who is described. Quoted I does not identify narrator. '
+                  'Never infer by title or chapter order. Match known identity only with local evidence. '
+                  'No evidence: empty narrators. Do not emit segment text.')
+    try:
+        content = completion(client,
+        validator=validate_content,
+        **deepseek_completion_options(model), temperature=0, max_tokens=output_tokens(2048),
         response_format={'type': 'json_object'},
         messages=[{'role': 'system', 'content': '你是有声书叙述视角分析器。只输出JSON。'},
                   {'role': 'user', 'content': prompt + '\n已知人物：' + json.dumps(known_characters, ensure_ascii=False)
-                   + f'\n章节：{chapter_index} {title}\n原文：\n{excerpt}'}],
+                   + f'\n章节：{chapter_index} {title[:256]}\n原文：\n{excerpt}'}],
     )
-    raw = _extract_json_object(response.choices[0].message.content)
+    except (ContextLimit, TruncatedCompletion):
+        if len(source) <= 64:
+            raise
+        parts = [request_narration_context(client, model, chapter_index, title, part, known_characters)
+                 for part in split_middle(source)]
+        people = {}
+        for part in parts:
+            for person in part.get('narrators', []):
+                key = person['role_id']
+                if key in people:
+                    people[key]['evidence'].extend(person['evidence'])
+                else:
+                    people[key] = person
+        perspectives = {p['perspective'] for p in parts}
+        return {'perspective': next(iter(perspectives)) if len(perspectives) == 1 else 'mixed', 'narrators': list(people.values())}
+    raw = _extract_json_object(content)
     perspective = raw.get('perspective')
     if perspective not in ('character', 'third_person', 'mixed', 'unknown'):
         raise ValueError('叙述视角分析未返回有效类型')

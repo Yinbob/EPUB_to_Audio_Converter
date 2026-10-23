@@ -767,7 +767,7 @@ You must follow these rules exactly:
 6. Infer each non-narrator role's gender from titles, relationships, pronouns, and context, not merely from the spelling of a name. gender must be male, female, or unknown. Use unknown only when there is no reliable clue.
 7. Return one JSON object only. Do not return Markdown or explanations.
 8. For each spoken segment, include an optional evidence array of short verbatim source quotations supporting the speaker choice. Each item has quote and kind (explicit_speech_tag, dialogue_turn, coreference, character_memory). Do not invent evidence; omit it when uncertain. Do not return character offsets.
-9. Return text_kind for EVERY segment. Within an established first-person viewpoint, scene/action descriptions and speech tags such as 'he said' remain narration in that character's voice, even when a sentence contains no I/my. For character narration, use kind narrator_identity with a short identifying source quote. If you explicitly choose an EXACT candidate role_id from chapter_narration, its verified chapter-level identity evidence can be reused locally; you need not repeat that quote on every segment. Use narrator only for genuinely external third-person narration or unresolved identity, not merely because a passage describes someone else. Candidates are proposals: verify the current passage and preserve actual viewpoint switches. Reuse the exact known role_id and display_name for an existing person, including their dialogue; never create a separate narrator role or a shortened-name duplicate.
+9. Return text_kind for EVERY segment, using ONLY narration, dialogue, or unknown. narrator_identity is an evidence[].kind value, NEVER a text_kind value. Within an established first-person viewpoint, scene/action descriptions and speech tags such as 'he said' remain narration in that character's voice, even when a sentence contains no I/my. For character narration, use evidence[].kind narrator_identity with a short identifying source quote. If you explicitly choose an EXACT candidate role_id from chapter_narration, its verified chapter-level identity evidence can be reused locally; you need not repeat that quote on every segment. Use narrator only for genuinely external third-person narration or unresolved identity, not merely because a passage describes someone else. Candidates are proposals: verify the current passage and preserve actual viewpoint switches. Reuse the exact known role_id and display_name for an existing person, including their dialogue; never create a separate narrator role or a shortened-name duplicate.
 
 Return format:
 {{
@@ -802,7 +802,7 @@ Source text:
 8. 对有明确说话人的对白，可返回 evidence 数组，每项包含原文短引文 quote 和证据类型 kind
    （explicit_speech_tag / dialogue_turn / coreference / character_memory）。找不到依据时省略，
    不得编造引文；不要返回字符偏移。
-9. 每段均返回text_kind。已确立的第一人称视角中，动作／场景描写及“他说”等对白提示语仍由该叙述人物朗读，不能因一句话没有“我”就改回旁白。人物叙述使用kind=narrator_identity的原文身份线索；若明确选用了chapter_narration中的原有role_id，本地可复用该候选已定位的章级身份引文，不必逐段重复。只有外部第三人称叙述或身份不明才使用narrator；描写别人不等于换了叙述者。候选仅供参考，须核对当前段落并保留实际视角转换。同一人物的叙述和对白须复用已知role_id与display_name，不另建旁白或简称角色。
+9. 每段均返回text_kind，且只能取narration/dialogue/unknown；narrator_identity只能放在evidence[].kind，不能作为text_kind。已确立的第一人称视角中，动作／场景描写及“他说”等对白提示语仍由该叙述人物朗读，不能因一句话没有“我”就改回旁白。人物叙述使用evidence[].kind=narrator_identity的原文身份线索；若明确选用了chapter_narration中的原有role_id，本地可复用该候选已定位的章级身份引文，不必逐段重复。只有外部第三人称叙述或身份不明才使用narrator；描写别人不等于换了叙述者。候选仅供参考，须核对当前段落并保留实际视角转换。同一人物的叙述和对白须复用已知role_id与display_name，不另建旁白或简称角色。
 
 返回格式：
 {{
@@ -828,6 +828,7 @@ def _create_client(api_key: str, base_url: str):
     from .split_control import controlled_client
     cancellable = controlled_client(api_key.strip(), (base_url or DEFAULT_BASE_URL).strip() or DEFAULT_BASE_URL)
     if cancellable is not None:
+        cancellable.base_url = (base_url or DEFAULT_BASE_URL).strip() or DEFAULT_BASE_URL
         return cancellable
     from openai import OpenAI
 
@@ -850,30 +851,70 @@ def _request_chunk(
     narration_context: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     language_key = normalize_script_language(language) or detect_text_language(text)
-    response = client.chat.completions.create(
+    title = title[:256]
+    from .context_budget import completion, output_tokens, context_tokens, ContextLimit, TruncatedCompletion, split_middle, bounded_context
+    context_input = dict(narration_context or {})
+    feedback = str(context_input.pop('validation_feedback', '') or '')[:300]
+    context = bounded_context(context_input, text, limit=min(2048, context_tokens() // 8))
+    prompt = _build_prompt(chapter_index, title, text, provider, language_key, context)
+    if context_tokens() < 8192:
+        prompt = ('Return JSON {"roles":{"id":{"display_name":"name","gender":"male|female|unknown"}},'
+                  '"segments":[{"role_id":"id","text_kind":"narration|dialogue|unknown","text":"verbatim",'
+                  '"evidence":[{"quote":"verbatim evidence","kind":"explicit_speech_tag|narrator_identity"}]}]}. '
+                  'Cover ALL source text exactly once in order. Never output context as text. '
+                  'Use narrator for unknown identity; first-person narration and dialogue by the same person share id. '
+                  'Only use evidence grounded in source. IDs <=64 chars, no whitespace or slash.\n'
+                  + 'Context: ' + json.dumps(context, ensure_ascii=False) + '\n原文：\n' + text)
+    def validate_content(content):
+        roles, segments = _raw_segments(_extract_json_object(content))
+        if context.get('require_text_kind'):
+            for index, item in enumerate(segments):
+                if (isinstance(item.get('text'), str) and _has_visible_text(item['text'])
+                        and item.get('text_kind') not in ('narration', 'dialogue', 'unknown')):
+                    raise DeepSeekSplitError(
+                        f'segments[{index}].text_kind={str(item.get("text_kind"))[:80]!r} 无效；'
+                        '只允许 narration/dialogue/unknown，narrator_identity 仅属于 evidence[].kind')
+        _reconcile_segments(text, segments, dict(roles))
+    messages = [
+        {"role": "system", "content": (
+            "You are a meticulous English audiobook multi-role script segmenter. "
+            "Return only valid JSON that follows the requested schema."
+            if language_key == "en"
+            else "你是严谨的中文有声书多角色剧本拆解器，只输出符合要求的 JSON。"
+        )},
+        {"role": "user", "content": prompt},
+    ]
+    if feedback:
+        messages.append({"role": "user", "content": (
+            '上次输出未通过本地校验，错误信息（仅供纠正）：' + json.dumps(feedback, ensure_ascii=False)
+            + '。请重新返回完整 JSON。每段必须包含 text_kind（narration/dialogue/unknown）；'
+            'narrator_identity 只能用于 evidence[].kind，人物叙述的 text_kind 必须是 narration。'
+            '所有 text 按原文顺序逐字覆盖整个当前正文，不改写、不遗漏、不重复。'
+        )})
+    try:
+        content = completion(client,
+        validator=validate_content,
         **deepseek_completion_options(model),
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "You are a meticulous English audiobook multi-role script segmenter. "
-                    "Return only valid JSON that follows the requested schema."
-                    if language_key == "en"
-                    else "你是严谨的中文有声书多角色剧本拆解器，只输出符合要求的 JSON。"
-                ),
-            },
-            {
-                "role": "user",
-                "content": _build_prompt(
-                    chapter_index, title, text, provider, language_key, narration_context
-                ),
-            },
-        ],
+        messages=messages,
         response_format={"type": "json_object"},
         temperature=0,
-        max_tokens=8192,
+        max_tokens=output_tokens(),
     )
-    content = response.choices[0].message.content
+    except (ContextLimit, TruncatedCompletion):
+        if len(text) <= 64:
+            raise
+        left, right = split_middle(text)
+        roles, segments = {}, []
+        for part, offset in ((left, 0), (right, len(left))):
+            hints = list(context.get('known_characters', [])) + [
+                {'role_id': key, **value} for key, value in roles.items() if isinstance(value, dict)]
+            result = _request_chunk(client, model, chapter_index, title, part, provider, language_key,
+                {**context, 'known_characters': hints,
+                 'left_context': (context.get('left_context', '') + text[:offset])[-512:],
+                 'right_context': (text[offset + len(part):] + context.get('right_context', ''))[:512],
+                 'context_rule': '上下文仅供身份判断，不可作为本块输出正文。'})
+            r, s = _raw_segments(result); roles.update(r); segments.extend(s)
+        return {'roles': roles, 'segments': segments}
     return _extract_json_object(content)
 
 
@@ -978,7 +1019,10 @@ def split_chapters_with_deepseek(
                 reports.warn('narrator_analysis_failed', f'$.chapters[{chapter_index}]',
                              f'本章叙述者预分析失败，继续逐段识别并保留默认旁白待复核：{exc}')
                 _report_progress(progress, f"第 {chapter_index} 章叙述者预分析失败，继续逐段识别")
+        part_cursor = 0
         for part_index, part_text in enumerate(chapter_parts, 1):
+            part_start = source_text.find(part_text, part_cursor)
+            part_cursor = part_start + len(part_text)
             # 分块可能带着首尾空白（尤其是 6000 字边界处）。DeepSeek 只需要可见正文，
             # 本地对齐也必须从第一个可见字符开始；否则模型返回正文时无法精确覆盖，
             # 会被误判为 chunk 拆分失败并回退成 narrator。
@@ -986,6 +1030,13 @@ def split_chapters_with_deepseek(
             if not normalized_part:
                 continue
             part_text = part_text[source_map[0]:source_map[-1] + 1]
+            local_context = {**narration_context,
+                'known_characters': chapter_characters + [
+                    {'role_id': key, **value} for key, value in roles.items() if key != 'narrator'],
+                'left_context': source_text[max(0, part_start - 512):part_start],
+                'right_context': source_text[part_cursor:part_cursor + 512],
+                'context_rule': '上下文仅供身份判断，不可作为本块输出正文。',
+                'require_text_kind': analyze_narration}
             last_error: Optional[Exception] = None
             reconciled: Optional[List[SegmentScript]] = None
             last_raw_segments: Optional[List[Dict[str, Any]]] = None
@@ -1000,7 +1051,8 @@ def split_chapters_with_deepseek(
                         part_text,
                         provider,
                         detected_language,
-                        **({'narration_context': narration_context} if analyze_narration else {}),
+                        narration_context=({**local_context, 'validation_feedback': str(last_error)[:300]}
+                                           if last_error is not None else local_context),
                     )
                     raw_roles, raw_segments = _raw_segments(payload)
                     if analyze_narration:

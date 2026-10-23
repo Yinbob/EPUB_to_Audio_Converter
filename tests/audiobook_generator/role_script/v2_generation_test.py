@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from audiobook_generator.role_script.models import (
-    ChapterScript, RoleDefinition, RoleScriptV1, SegmentScript,
+    ChapterScript, RoleDefinition, RoleScriptV1, SegmentScript, RegistryWarning,
 )
 from audiobook_generator.role_script.project_store import load_project, project_path, save_project
 from audiobook_generator.role_script.v2_generation import generate_v2_for_book
@@ -97,6 +97,73 @@ class V2GenerationTest(unittest.TestCase):
                         parser_fingerprint="parser-v1", index_full_book=full,
                     )
             client.assert_not_called()
+
+    def test_tolerated_index_marks_automatic_assignments_for_review_and_recovers(self):
+        chapters = [("一", "张三说：你好。")]
+
+        def registry(*args, **kwargs):
+            kwargs['warnings'].append(RegistryWarning(1, 0, 1, 2, '第 1 章有一个无法定位的人物'))
+            return [{"name": "张三", "aliases": [], "evidence_quote": "张三"}]
+
+        with patch("audiobook_generator.role_script.v2_generation.splitter._create_client", return_value=object()), \
+             patch("audiobook_generator.role_script.v2_generation._request_character_chunk", side_effect=registry) as index, \
+             patch("audiobook_generator.role_script.v2_generation.splitter.split_chapters_with_deepseek",
+                   side_effect=[self._generated(1, chapters)] * 2):
+            first = generate_v2_for_book(
+                chapters, 1, 1, "openai", "a" * 64, "key", "https://example.test", "deepseek-chat",
+                parser_fingerprint="parser-v1",
+            )
+            self.assertFalse(first.registry_complete)
+            self.assertEqual(len(first.registry_warnings), 1)
+            segment = first.chapters[0].segments[0]
+            self.assertEqual(segment.text, chapters[0][1])
+            self.assertEqual(segment.speaker.status, 'needs_review')
+            human = replace(first, chapters=(replace(first.chapters[0], segments=(
+                replace(segment, speaker=replace(segment.speaker, status='confirmed', confidence_kind='human')),
+            )),))
+            index.side_effect = None
+            index.return_value = [{"name": "张三", "aliases": [], "evidence_quote": "张三"}]
+            recovered = generate_v2_for_book(
+                chapters, 1, 1, "openai", "a" * 64, "key", "https://example.test", "deepseek-chat",
+                parser_fingerprint="parser-v1", previous=human,
+            )
+            self.assertEqual(index.call_count, 2)
+            self.assertTrue(recovered.registry_complete)
+            self.assertEqual(recovered.registry_warnings, ())
+            self.assertEqual(recovered.chapters[0].segments[0].speaker, human.chapters[0].segments[0].speaker)
+
+    def test_partial_retry_retains_other_chapter_warnings_and_human_confirmations(self):
+        chapters = [("一", "张三说：你好。"), ("二", "张三说：再见。")]
+        from audiobook_generator.role_script.v2_generation import upgrade_generated_script
+        from audiobook_generator.role_script.models import CharacterEntity
+        warning = RegistryWarning(1, 0, 1, 2, '第 1 章人物需复核')
+        first = upgrade_generated_script(
+            self._generated(1, chapters), chapters, {'char_1': CharacterEntity('张三')},
+            parser_fingerprint='parser-v1', model='test', registry_complete=False,
+            registry_warnings=(warning,),
+        )
+        segment = first.chapters[0].segments[0]
+        first = replace(first, chapters=(replace(first.chapters[0], segments=(
+            replace(segment, speaker=replace(segment.speaker, status='confirmed', confidence_kind='human')),
+        )),))
+        repeated = upgrade_generated_script(
+            self._generated(1, chapters), chapters, dict(first.entities), previous=first,
+            parser_fingerprint='parser-v1', model='test', registry_complete=False,
+            registry_warnings=(warning,),
+        )
+        self.assertEqual(repeated.chapters[0].segments[0].speaker.status, 'confirmed')
+        with patch("audiobook_generator.role_script.v2_generation.splitter._create_client", return_value=object()), \
+             patch("audiobook_generator.role_script.v2_generation._request_character_chunk",
+                   return_value=[{"name": "张三", "aliases": [], "evidence_quote": "张三"}]), \
+             patch("audiobook_generator.role_script.v2_generation.splitter.split_chapters_with_deepseek",
+                   return_value=self._generated(2, chapters)):
+            second = generate_v2_for_book(
+                chapters, 2, 2, "openai", "a" * 64, "key", "https://example.test", "deepseek-chat",
+                parser_fingerprint='parser-v1', previous=first, index_full_book=False,
+            )
+        self.assertEqual(second.registry_warnings, (warning,))
+        self.assertFalse(second.registry_complete)
+        self.assertEqual(second.chapters[0], first.chapters[0])
 
 
 if __name__ == "__main__":

@@ -337,6 +337,12 @@ def _validate_v2(script: RoleScriptV2, chapters, report: ValidationReport) -> No
     import hashlib
 
     chapter_texts = {index: text for index, (_title, text) in enumerate(chapters or (), 1)}
+    if script.registry_warnings and script.registry_complete:
+        report.error('invalid_registry_complete', '$.registry_complete', '含待复核提示的人物索引不能标记为完整')
+    for index, warning in enumerate(script.registry_warnings):
+        if chapter_texts and (warning.chapter_index not in chapter_texts
+                             or not 0 <= warning.chunk_start < len(chapter_texts[warning.chapter_index])):
+            report.error('invalid_registry_warning', f'$.registry_warnings[{index}]', '人物索引提示超出原文章节范围')
     for chapter_index, digest in script.chapter_hashes.items():
         if not isinstance(chapter_index, int) or not _SHA256_PATTERN.fullmatch(str(digest)):
             report.error("invalid_chapter_hash", "$.chapter_hashes", "章节指纹必须是 SHA-256")

@@ -4,6 +4,7 @@ from typing import List, Tuple
 
 from audiobook_generator.book_parsers.base_book_parser import BaseBookParser
 from audiobook_generator.config.general_config import GeneralConfig
+from .source_map import TrackedText
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,8 @@ class DocBookParser(BaseBookParser):
             else:
                 # Use filename as title
                 import os
-                self._book_title = os.path.splitext(os.path.basename(file_path))[0]
+                self._book_title = os.path.splitext(os.path.basename(
+                    getattr(self.config, 'source_name', None) or file_path))[0]
             
             # Extract author
             if doc.core_properties.author:
@@ -55,10 +57,18 @@ class DocBookParser(BaseBookParser):
             
             # Extract all text from paragraphs
             paragraphs = []
-            for para in doc.paragraphs:
+            self._source_records = []
+            offset = 0
+            for index, para in enumerate(doc.paragraphs):
                 text = para.text.strip()
                 if text:
+                    self._source_records.append({'raw_start': offset, 'raw_end': offset + len(text), 'text': text,
+                        'original_text': para.text,
+                        'locator': {'kind': 'docx', 'paragraph_index': index, 'precision': 'paragraph',
+                            'paragraph_char_start': len(para.text) - len(para.text.lstrip()),
+                            'paragraph_char_end': len(para.text.rstrip())}})
                     paragraphs.append(text)
+                    offset += len(text) + 2
             
             self._text_content = '\n\n'.join(paragraphs)
             logger.info(f"Loaded DOCX file: {len(paragraphs)} paragraphs, {len(self._text_content)} characters")
@@ -74,7 +84,8 @@ class DocBookParser(BaseBookParser):
         import os
         
         # Use filename as title
-        self._book_title = os.path.splitext(os.path.basename(file_path))[0]
+        self._book_title = os.path.splitext(os.path.basename(
+            getattr(self.config, 'source_name', None) or file_path))[0]
         self._book_author = "Unknown"
         
         # Try multiple methods to extract text from .doc files
@@ -129,6 +140,11 @@ class DocBookParser(BaseBookParser):
         
         # Clean up the text
         self._text_content = text.strip()
+        self._source_records = [
+            {'raw_start': m.start(), 'raw_end': m.end(), 'text': m.group(),
+             'locator': {'kind': 'doc', 'extracted_paragraph_index': i, 'precision': 'extracted_text',
+                         'note': '旧 DOC 经文本提取，不提供原文件页码或二进制段落坐标。'}}
+            for i, m in enumerate(re.finditer(r'[^\n]+', self._text_content)) if m.group().strip()]
         logger.info(f"Loaded DOC file: {len(self._text_content)} characters")
     
     def __str__(self) -> str:
@@ -159,31 +175,33 @@ class DocBookParser(BaseBookParser):
             return []
         
         # Apply search and replaces if configured
-        cleaned_text = self._text_content
+        tracked = TrackedText(self._text_content)
+        cleaned_text = tracked.text
         search_and_replaces = self.get_search_and_replaces()
         for search_and_replace in search_and_replaces:
-            cleaned_text = re.sub(
+            cleaned_text = tracked.sub(
                 search_and_replace['search'],
                 search_and_replace['replace'],
-                cleaned_text
-            )
+            ).text
         
         # Remove excessive whitespace while preserving paragraph structure
         # Replace multiple newlines with double newline
-        cleaned_text = re.sub(r'\n{3,}', '\n\n', cleaned_text)
+        cleaned_text = tracked.sub(r'\n{3,}', '\n\n').text
         
         # Remove endnotes if configured
         if self.config.remove_endnotes:
-            cleaned_text = re.sub(r'(?<=[a-zA-Z.,!?;"")])\d+', "", cleaned_text)
+            cleaned_text = tracked.sub(r'(?<=[a-zA-Z.,!?;"")])\d+', "").text
         
         # Remove reference numbers if configured
         if self.config.remove_reference_numbers:
-            cleaned_text = re.sub(r'\[\d+(\.\d+)?\]', '', cleaned_text)
+            cleaned_text = tracked.sub(r'\[\d+(\.\d+)?\]', '').text
         
         # Generate title
         title = self._book_title or "Full Document"
         title = self._sanitize_title(title, break_string)
         
+        self.source_chapters = [{'title': title, 'text': cleaned_text,
+            'paragraphs': tracked.paragraphs(getattr(self, '_source_records', []), 1)}]
         return [(title, cleaned_text)]
     
     def get_search_and_replaces(self):

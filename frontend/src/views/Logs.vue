@@ -9,6 +9,8 @@ const store = useStudio(),
   selected = ref(""),
   text = ref(""),
   cursor = ref<number | undefined>(),
+  startCursor = ref(0),
+  hasMore = ref(false),
   follow = ref(true);
 let timer: ReturnType<typeof setTimeout> | undefined,
   disposed = false;
@@ -31,7 +33,11 @@ async function logs() {
         (cursor.value === undefined ? "" : `?cursor=${cursor.value}`),
     );
     if (key !== selected.value) return;
-    text.value = (text.value + data.text).split("\n").slice(-2000).join("\n");
+    text.value = (text.value + data.text).split("\n").slice(-8000).join("\n");
+    if (cursor.value === undefined) {
+      startCursor.value = data.start_cursor || 0;
+      hasMore.value = !!data.has_more;
+    }
     cursor.value = data.cursor;
     const current = await api<Task>("/tasks/" + key);
     if (!disposed && follow.value && active(current))
@@ -39,6 +45,18 @@ async function logs() {
   } catch (e) {
     store.fail(e);
     if (!disposed && follow.value) timer = setTimeout(logs, 2000);
+  }
+}
+async function earlier() {
+  try {
+    const key = selected.value;
+    const data = await api(`/tasks/${key}/logs?before=${startCursor.value}`);
+    if (key !== selected.value) return;
+    text.value = (data.text + text.value).split("\n").slice(0, 8000).join("\n");
+    startCursor.value = data.start_cursor;
+    hasMore.value = !!data.has_more;
+  } catch (e) {
+    store.fail(e);
   }
 }
 watch(selected, () => {
@@ -63,7 +81,7 @@ onUnmounted(() => {
       <p>查看每一次生成、拆分与试听任务的执行记录。</p>
     </div>
     <GlassCard title="任务记录"
-      ><div class="fields-grid">
+      ><div class="logs-controls">
         <Field
           label="选择任务"
           v-model="selected"
@@ -73,11 +91,16 @@ onUnmounted(() => {
               label: `${new Date(t.created_at * 1000).toLocaleString()} · ${t.kind} · ${t.status}`,
             }))
           "
-        /><Field label="自动更新运行日志" type="checkbox" v-model="follow" />
+        />
+        <div class="field logs-update">
+          <span>更新方式</span>
+          <Field label="自动更新运行日志" type="checkbox" v-model="follow" />
+        </div>
       </div>
       <div class="toolbar section-space">
         <button @click="refresh">刷新任务列表</button
-        ><button :disabled="!selected" @click="logs">读取最新日志</button>
+        ><button :disabled="!selected" @click="logs">读取最新日志</button
+        ><button :disabled="!hasMore" @click="earlier">读取更早日志</button>
       </div>
       <pre v-if="selected" class="logs" tabindex="0" aria-label="任务日志">{{
         text || "等待任务输出…"

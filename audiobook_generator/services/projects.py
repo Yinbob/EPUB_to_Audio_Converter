@@ -37,17 +37,30 @@ class Projects:
         self.manager = None
         self.meta = self.root / '.studio' / 'projects.json'
         self.entries = read_json(self.meta, {})
+        from .research import ResearchService
+        self.research = ResearchService(self)
         # 已有 V2 项目原地登记，不改写用户文件。
         for path in (self.root / '.role_projects').glob('*.json'):
+            if len(path.stem) == 32 and all(c in '0123456789abcdef' for c in path.stem) and self.research.exists(path.stem):
+                continue
+            if any(meta.get('path') == str(path.resolve()) for meta in self.entries.values()):
+                continue
             key = signature(str(path.resolve()))[:32]
             self.entries.setdefault(key, {'path': str(path.resolve()), 'revision': 1, 'confirmed': '', 'generated': True})
+        for path in self.research.root.glob('*/state.json'):
+            state = self.research.read(path.parent.name)
+            self.entries.setdefault(state['id'], {'revision': state['revision'], 'confirmed': '', 'generated': True})
 
     def list(self):
         with self.lock:
-            return [{'id': key, **{k: v for k, v in meta.items() if k != 'path'}} for key, meta in self.entries.items()]
+            return [{'id': key, **{k: v for k, v in meta.items() if k != 'path'},
+                     **({'revision': self.research.read(key)['revision'], 'research_enabled': True}
+                        if self.research.exists(key) else {})} for key, meta in self.entries.items()]
 
     def get(self, key):
         with self.lock:
+            if self.research.exists(key):
+                return self.research.project_view(key)
             if key not in self.entries:
                 raise ServiceError('project_missing', '找不到角色项目，请重新载入。', 404)
             meta = self.entries[key]
@@ -68,6 +81,8 @@ class Projects:
         with self.lock:
             if key is None:
                 key = signature(data['book_sha256'] + data['provider'])[:32]
+            if self.research.exists(key):
+                return self.research.put_script(key, data, confirmed=confirmed)
             previous = self.entries.get(key, {})
             path = previous.get('path') or str(self.root / '.role_projects' / (key + '.json'))
             save_project(script, path)
@@ -78,6 +93,11 @@ class Projects:
 
     def invalidate(self, key):
         if key:
+            if self.research.exists(key):
+                state = self.research.read(key)
+                state['confirmed'] = ''
+                self.research.save(state)
+                return
             self.entries[key]['confirmed'] = ''
             atomic_json(self.meta, self.entries)
 
@@ -92,6 +112,8 @@ class Projects:
         if not value['confirmed']:
             raise ServiceError('confirmation_required', '剧本已变化，请复核并重新确认后生成。', 409)
         script = decode(value['script'])
+        if value.get('research_enabled'):
+            self.research.gate(self.research.read(key))
         if script.provider != provider:
             raise ServiceError('role_provider', '剧本提供商与当前引擎不一致。')
         return script
@@ -106,9 +128,16 @@ class Projects:
             value = self.check_revision(key, request.revision)
             script = decode(value['script'])
             data, operation = request.data, request.operation
+            if value.get('research_enabled') and operation in ('segment', 'merge', 'narrator'):
+                result = self.research.decide(key, request.revision,
+                    data.get('operation_id') or __import__('uuid').uuid4().hex, operation, data)
+                return result['project']
+            voice_binding = None
             if operation in ('narrator', 'segment', 'merge', 'lock', 'casting_apply') and script.schema_version != 2:
                 raise ServiceError('v2_required', '此操作需要 V2 剧本，请重新拆分后使用。')
             if operation == 'confirm':
+                if value.get('research_enabled'):
+                    return self.research.confirm(key)
                 self.entries[key]['confirmed'] = signature(value['script'])
                 atomic_json(self.meta, self.entries)
                 return self.get(key)
@@ -125,6 +154,35 @@ class Projects:
                 script = merge_entities(script, data['source_id'], data['target_id'])
             elif operation == 'lock':
                 script = lock_entity_voice(script, data['entity_id'], data.get('locked', True))
+            elif operation == 'freeze_preview':
+                from audiobook_generator.ui.role_voices import make_voice_profile
+                if script.provider != 'openai' or not self.manager:
+                    raise ServiceError('preview_reference', '只有 MiMo 人物试听可以固定为参考音。')
+                role_id = data.get('role_id')
+                if role_id not in script.roles:
+                    raise ServiceError('role_missing', '人物不存在。')
+                reference = self.manager.freeze_preview(key, request.revision, role_id, data.get('task_id'))
+                previous = script.roles[role_id].provider_params
+                from audiobook_generator.role_script.deepseek_splitter import detect_role_script_language
+                params = make_voice_profile(role_id, 'clone', None, None, str(reference),
+                    previous.get('voice_language') or detect_role_script_language(script),
+                    previous.get('speed', 1), previous.get('instructions', ''), self.root)
+                roles = dict(script.roles)
+                roles[role_id] = replace(roles[role_id], provider_params=params)
+                script = replace(script, roles=roles)
+            elif operation == 'portable_voice':
+                from .portable_voices import PortableVoices
+                role_id = data['role_id']
+                if role_id not in script.roles or script.schema_version != 2:
+                    raise ServiceError('role_missing', '请在 V2 项目中选择有效人物。')
+                params, snapshot = PortableVoices(self.root).resolve(data['voice_profile_id'],
+                    data['voice_profile_version'], script.provider, data['model_name'])
+                roles = dict(script.roles)
+                roles[role_id] = replace(roles[role_id], provider_params=params)
+                script = replace(script, roles=roles)
+                script = lock_entity_voice(script, role_id, True)
+                # 固定项目引用的版本；历史快照保留，不随声音卡最新版本变化。
+                voice_binding = (role_id, snapshot)
             elif operation == 'voice':
                 from audiobook_generator.ui.role_voices import make_voice_profile
                 role_id = data['role_id']
@@ -146,7 +204,18 @@ class Projects:
                 controller = self.casting(key, data['book'])
                 bank = load_bank(self.files.resolve(data['bank_id']), data.get('language', 'zh'))
                 script = controller.apply(bank, data['draft_id'], data.get('rows'))
-            return self.put(decode(encode(script)), key)
+            if value.get('research_enabled'):
+                result = self.research.put_script(key, encode(decode(encode(script))), operation=operation,
+                    configured_role=data.get('role_id') if operation in ('voice', 'portable_voice', 'freeze_preview') else None)
+            else:
+                result = self.put(decode(encode(script)), key)
+            if voice_binding:
+                role_id, snapshot = voice_binding
+                # 签名使用持久化后规范化参数，避免 1 与 1.0 导致版本约束失效。
+                atomic_json(self.root / '.studio' / 'project_voice_bindings' / key / (role_id + '.json'),
+                            {'snapshot': snapshot, 'params_signature': signature(
+                                result['script']['roles'][role_id]['provider_params'])})
+            return result
 
     def casting(self, key, book):
         from audiobook_generator.ui.book_casting import BookCasting

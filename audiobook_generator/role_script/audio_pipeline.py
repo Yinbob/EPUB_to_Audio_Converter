@@ -281,6 +281,7 @@ def assemble_chapter_audio(
         raise ValueError(f"角色音频管线只支持单声道或双声道，实际为 {channels}")
 
     normalized_paths = []
+    timeline, sample_cursor = [], 0
     for index, artifact in enumerate(artifacts):
         unit = plan.units[index]
         speed = None
@@ -288,11 +289,20 @@ def assemble_chapter_audio(
             speed = float(unit.profile.provider_params.get("speed", 1.0))
         target = os.path.join(normalized_dir, f"segment_{index + 1:04d}.wav")
         _decode_normalized(artifact, target, sample_rate, channels, speed, ffmpeg)
+        import wave
+        with wave.open(target, 'rb') as normalized:
+            frames = normalized.getnframes()
+        from dataclasses import asdict
+        timeline.append({'chunk_id': unit.unit_id, 'role_id': unit.role_id, 'start_sample': sample_cursor,
+            'end_sample': sample_cursor + frames, 'source_span': asdict(unit.source_span) if unit.source_span else None})
+        sample_cursor += frames
         normalized_paths.append(target)
         if index < len(artifacts) - 1 and unit.pause_after_ms > 0:
             silence = os.path.join(normalized_dir, f"pause_{index + 1:04d}.wav")
             _write_silence(silence, unit.pause_after_ms, sample_rate, channels, ffmpeg)
             normalized_paths.append(silence)
+            with wave.open(silence, 'rb') as pause:
+                sample_cursor += pause.getnframes()
 
     concat_list = os.path.abspath(os.path.join(work_dir, "concat.txt"))
     with open(concat_list, "w", encoding="utf-8") as file_obj:
@@ -319,6 +329,8 @@ def assemble_chapter_audio(
         except OSError:
             pass
         raise
+    from audiobook_generator.services.provenance import write_timeline
+    write_timeline(output_file, plan.chapter_index, timeline, sample_rate=sample_rate)
     return build_audio_artifact(
         output_file,
         cache_key=f"chapter:{plan.chapter_index}",

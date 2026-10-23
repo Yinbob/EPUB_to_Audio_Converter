@@ -24,7 +24,21 @@ class PlanningResult:
 
 def build_default_provider_params(provider: str, config: Any) -> Dict[str, Any]:
     """从普通模式配置构造 fallback 的全局默认角色参数。"""
+    if getattr(config, '_portable_params', None):
+        return dict(config._portable_params)
     if provider == "openai":
+        if getattr(config, 'model_name', None) == 'mimo-v2.5-tts-voicedesign':
+            import hashlib
+            import json
+            description = str(getattr(config, 'instructions', '') or '').strip()
+            if not description or len(description) > 1500:
+                raise ValueError('VoiceDesign 请在朗读要求中填写 1～1500 字声音描述')
+            params = {'voice_mode': 'design', 'voice_description': description,
+                'voice_language': 'en' if str(getattr(config, 'language', '')).lower().startswith('en') else 'zh',
+                'speed': float(getattr(config, 'speed', None) or 1.0), 'voice_profile_id': 'global_narrator'}
+            params['voice_version'] = hashlib.sha256(json.dumps(params, sort_keys=True,
+                ensure_ascii=False).encode()).hexdigest()
+            return params
         return {
             "voice": getattr(config, "voice_name", None) or "mimo_default",
             "instructions": getattr(config, "instructions", None),

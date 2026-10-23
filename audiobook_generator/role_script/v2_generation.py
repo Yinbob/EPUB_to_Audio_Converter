@@ -9,7 +9,7 @@ from typing import Any, Callable, Optional, Sequence
 from . import deepseek_splitter as splitter
 from .models import (
     AliasRecord, CharacterEntity, ChapterScript, EvidenceSpan, RoleScriptV1,
-    RoleScriptV2, SegmentScript, SourceSpan, SpeakerDecision,
+    RoleScriptV2, SegmentScript, SourceSpan, SpeakerDecision, RegistryWarning,
 )
 from .normalization import normalize_coverage_text
 from .project_store import chapter_hashes
@@ -55,37 +55,90 @@ def _known_name_matches(entities: dict[str, CharacterEntity], name: str) -> list
 
 
 def _request_character_chunk(client: Any, model: str, chapter_index: int, text: str,
-                             cards: dict[str, CharacterEntity]) -> list[dict[str, Any]]:
-    summary = [
-        {"entity_id": entity_id, "name": entity.canonical_name,
-         "aliases": [alias.text for alias in entity.aliases if alias.status == "confirmed"]}
-        for entity_id, entity in list(cards.items())[-30:] if entity_id != "narrator"
-    ]
+                             cards: dict[str, CharacterEntity], *,
+                             warnings: Optional[list[RegistryWarning]] = None,
+                             source_start: int = 0) -> list[dict[str, Any]]:
+    # 卡片仅提供本块出现的原文称呼，避免把全书姓名当成本块提取结果。
+    summary = []
+    for entity_id, entity in cards.items():
+        if entity_id == "narrator":
+            continue
+        names = [entity.canonical_name, *(
+            alias.text for alias in entity.aliases if alias.status == "confirmed"
+        )]
+        local_names = list(dict.fromkeys(
+            name for name in names if name_in_source(name, text, case_sensitive=True)
+        ))
+        if local_names:
+            summary.append({"entity_id": entity_id, "name": local_names[0], "aliases": local_names[1:]})
+    from .context_budget import relevant_cards, completion, output_tokens, context_tokens, ContextLimit, TruncatedCompletion, split_middle
+    summary = relevant_cards(summary, text, limit=min(2048, context_tokens() // 8))
     prompt = (
         "从这段小说原文提取出现过的角色及原文称呼。返回 JSON 对象 characters 数组，"
         "每项包含 name、aliases（原文中实际出现的称呼）、evidence_quote（包含名字的原文短引文），"
         "可选 existing_entity_id（仅明确与已知角色为同一人物时填写）。只使用原文中能找到的称呼，"
-        "不要猜测别名、性别或改写文字。已知人物卡片："
+        "name、aliases 和 evidence_quote 必须逐字复制当前原文，保留大小写；"
+        "不能用全名替换简称，不能翻译姓名，不能根据已知卡片或小说常识补全人物。"
+        "不能确定的角色请省略，没有可定位称呼时返回空数组。"
+        "不要猜测别名、性别或改写文字。当前原文可用的人物卡片（仅供身份参考）："
         + json.dumps(summary, ensure_ascii=False)
         + f"\n章节：{chapter_index}\n原文：\n{text}"
     )
-    response = client.chat.completions.create(
-        **deepseek_completion_options(model),
-        messages=[{"role": "system", "content": "你是小说人物索引器，只返回 JSON。"},
-                  {"role": "user", "content": prompt}],
-        response_format={"type": "json_object"}, temperature=0, max_tokens=4096,
-    )
-    payload = splitter._extract_json_object(response.choices[0].message.content)
-    items = payload.get("characters")
-    if not isinstance(items, list):
-        raise ValueError("全书人物索引未返回 characters 数组")
-    return [item for item in items if isinstance(item, dict)]
+    from .registry_validation import validate_characters, CharacterValidationError
+
+    def grounded_items(content):
+        result = validate_characters(splitter._extract_json_object(content).get('characters'), text)
+        if result.errors:
+            raise CharacterValidationError(result)
+        return result.items
+    messages = [{"role": "system", "content": "你是小说人物索引器，只返回 JSON。"},
+                {"role": "user", "content": prompt}]
+    for attempt in range(splitter.MAX_ATTEMPTS_PER_CHUNK):
+        try:
+            content = completion(
+                client, validator=grounded_items, **deepseek_completion_options(model),
+                messages=messages, response_format={"type": "json_object"},
+                temperature=0, max_tokens=output_tokens(4096),
+            )
+            break
+        except (ContextLimit, TruncatedCompletion):
+            if len(text) <= 64:
+                raise
+            left, right = split_middle(text)
+            return (_request_character_chunk(client, model, chapter_index, left, cards,
+                                             warnings=warnings, source_start=source_start)
+                    + _request_character_chunk(client, model, chapter_index, right, cards,
+                                               warnings=warnings, source_start=source_start + len(left)))
+        except ValueError as exc:
+            if attempt + 1 == splitter.MAX_ATTEMPTS_PER_CHUNK:
+                if isinstance(exc, CharacterValidationError) and exc.result.recoverable:
+                    last_result = exc.result
+                    message = (f'第 {chapter_index} 章人物索引容错继续：保留 {len(last_result.items)} 项有效人物，'
+                               f'排除 {last_result.rejected} 项人物及无效别名；需复核。'
+                               + '; '.join(last_result.errors[:3]))
+                    warning = RegistryWarning(chapter_index, source_start, last_result.rejected,
+                                              last_result.total, message)
+                    if warnings is not None:
+                        warnings.append(warning)
+                    splitter.logger.warning('%s', message)
+                    return last_result.items
+                raise ValueError(
+                    f'第 {chapter_index} 章人物索引经 {attempt + 1} 次尝试仍未通过原文校验：{exc}'
+                ) from exc
+            # 不携带整份错误输出，保持预算有界；失败结果仍不会写入成功缓存。
+            messages = [*messages[:2], {"role": "user", "content": (
+                f'上次结果未通过原文校验：{exc}。请重新提取完整 characters 数组。'
+                '所有姓名、别名和引文只允许逐字复制上面的当前原文；'
+                '若全名不在原文，请使用原文实际称呼；无法提供原文证据的条目请省略。'
+            )}]
+    return grounded_items(content)
 
 
 def build_book_registry(
     chapters: Sequence[tuple[str, str]], *, api_key: str, base_url: str,
     model: str, previous: Optional[RoleScriptV2] = None,
     progress: ProgressCallback = None, chapter_start: int = 1, chapter_end: Optional[int] = None,
+    warnings: Optional[list[RegistryWarning]] = None,
 ) -> dict[str, CharacterEntity]:
     """只扫描明确指定的章节；保留原书章号与证据区间。"""
     chapter_end = len(chapters) if chapter_end is None else chapter_end
@@ -97,6 +150,23 @@ def build_book_registry(
     client = splitter._create_client(api_key, base_url)
     entities = dict(previous.entities) if previous else {}
     entities.setdefault("narrator", CharacterEntity("旁白", voice_profile_id="voice_narrator", voice_locked=True))
+    from .context_budget import checkpoint_directory
+    from audiobook_generator.services.common import read_json, atomic_json
+    from dataclasses import asdict
+    import hashlib
+    root = checkpoint_directory()
+    identity = hashlib.sha256(json.dumps({'chapters': chapters, 'start': chapter_start, 'end': chapter_end,
+        'baseline': {k: asdict(v) for k, v in entities.items()}, 'version': 'registry-v3-tolerant',
+        'endpoint': base_url, 'model': model},
+        sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+    path = root / ('registry-' + identity + '.json') if root else None
+    saved = read_json(path, {}) if path else {}
+    processed = set(saved.get('processed', []))
+    for key, value in saved.get('entities', {}).items():
+        aliases = tuple(AliasRecord(a['text'], a['status'], SourceSpan(**a['source_span']) if a.get('source_span') else None,
+                                    a.get('confidence')) for a in value.get('aliases', []))
+        entities[key] = CharacterEntity(value['canonical_name'], aliases, value.get('voice_profile_id'),
+                                        value.get('voice_locked', False), value.get('gender'))
     prompt_cards = grounded_entities(entities, chapters)
     for chapter_index in range(chapter_start, chapter_end + 1):
         _title, text = chapters[chapter_index - 1]
@@ -104,15 +174,28 @@ def build_book_registry(
         for part in splitter._split_text_chunks(text):
             part_start = cursor
             cursor += len(part)
+            part_key = f'{chapter_index}:{part_start}:' + hashlib.sha256(part.encode()).hexdigest()
+            if part_key in processed:
+                continue
             if not splitter._has_visible_text(part):
                 continue
             if progress:
                 progress(f"正在建立人物表：第 {chapter_index} 章（范围 {chapter_start}～{chapter_end}）")
-            for raw in _request_character_chunk(client, model, chapter_index, part, prompt_cards):
+            part_warnings = []
+            items = _request_character_chunk(client, model, chapter_index, part, prompt_cards,
+                                             warnings=part_warnings, source_start=part_start)
+            if warnings is not None:
+                warnings.extend(part_warnings)
+            if progress:
+                for warning in part_warnings:
+                    progress(warning.message)
+            for raw in items:
                 name = raw.get("name")
-                if not isinstance(name, str) or not name.strip() or name not in part:
+                if not isinstance(name, str):
                     continue
                 name = name.strip()
+                if not name or name not in part:
+                    continue
                 matches = _known_name_matches(entities, name)
                 entity_id = (matches[0] if len(matches) == 1 else None)
                 # 模型的 existing_entity_id 只是候选，不能据此把两个人物自动合并。
@@ -138,6 +221,11 @@ def build_book_registry(
                     continue
                 entities[entity_id] = replace(entity, aliases=tuple(old_aliases.values()))
                 prompt_cards[entity_id] = entities[entity_id]
+            # 降级结果不作为完整断点，下次可重试该块；有效人物仍保存以复用声音。
+            if not part_warnings:
+                processed.add(part_key)
+            if path:
+                atomic_json(path, {'processed': sorted(processed), 'entities': {k: asdict(v) for k, v in entities.items()}})
     return entities
 
 
@@ -206,6 +294,7 @@ def upgrade_generated_script(
     generated: RoleScriptV1, chapters: Sequence[tuple[str, str]],
     entities: dict[str, CharacterEntity], *, parser_fingerprint: str,
     model: str, previous: Optional[RoleScriptV2] = None, registry_complete: bool = True,
+    registry_warnings: Sequence[RegistryWarning] = (),
 ) -> RoleScriptV2:
     """将已对齐的 V1 提议转为含稳定实体 ID、原文区间与证据的 V2。"""
     roles = dict(previous.roles) if previous else {}
@@ -233,6 +322,7 @@ def upgrade_generated_script(
             entities[entity_id] = replace(entity, voice_profile_id=f"voice_{entity_id}")
 
     output_chapters = []
+    review_chapters = {warning.chapter_index for warning in registry_warnings}
     previous_chapters = {chapter.chapter_index: chapter for chapter in previous.chapters} if previous else {}
     for chapter in generated.chapters:
         source = chapters[chapter.chapter_index - 1][1]
@@ -290,12 +380,20 @@ def upgrade_generated_script(
     if previous and previous.parser_fingerprint == parser_fingerprint and previous.chapter_hashes == chapter_hashes(chapters):
         for chapter in previous.chapters:
             selected.setdefault(chapter.chapter_index, chapter)
+    for index in review_chapters & selected.keys():
+        chapter = selected[index]
+        selected[index] = replace(chapter, segments=tuple(
+            replace(segment, speaker=replace(segment.speaker, status='needs_review'))
+            if segment.speaker and not (segment.speaker.status == 'confirmed'
+                                       and segment.speaker.confidence_kind == 'human') else segment
+            for segment in chapter.segments
+        ))
     result = RoleScriptV2(
         schema_version=2, provider=generated.provider, book_sha256=generated.book_sha256,
         default_pause_after_ms=generated.default_pause_after_ms, roles=roles,
         chapters=tuple(selected[index] for index in sorted(selected)), entities=entities,
         parser_fingerprint=parser_fingerprint, chapter_hashes=chapter_hashes(chapters),
-        registry_complete=registry_complete,
+        registry_complete=registry_complete, registry_warnings=tuple(registry_warnings),
     )
     result, _ = revalidate_cached_assignments(result, chapters)
     validation = validate_role_script(
@@ -321,10 +419,11 @@ def generate_v2_for_book(
             or not 1 <= chapter_start <= chapter_end <= len(chapters)):
         raise ValueError("章节范围无效")
     registry_complete = index_full_book or (chapter_start == 1 and chapter_end == len(chapters))
+    registry_warnings = []
     current_hashes = chapter_hashes(chapters)
     compatible = bool(previous and previous.parser_fingerprint == parser_fingerprint
                       and previous.chapter_hashes == current_hashes)
-    if compatible and previous.registry_complete:
+    if compatible and previous.registry_complete and not previous.registry_warnings:
         entities = dict(previous.entities)
         registry_complete = True
         if progress:
@@ -341,7 +440,13 @@ def generate_v2_for_book(
         entities = build_book_registry(chapters, api_key=api_key, base_url=base_url,
                                        model=model, previous=baseline, progress=progress,
                                        chapter_start=1 if index_full_book else chapter_start,
-                                       chapter_end=len(chapters) if index_full_book else chapter_end)
+                                       chapter_end=len(chapters) if index_full_book else chapter_end,
+                                       warnings=registry_warnings)
+        if compatible and not index_full_book:
+            registry_warnings.extend(w for w in previous.registry_warnings
+                                     if not chapter_start <= w.chapter_index <= chapter_end)
+        if registry_warnings:
+            registry_complete = False
     supported = grounded_entities(entities, chapters)
     rejected_names = len(entities) - len(supported)
     if rejected_names and progress:
@@ -351,7 +456,7 @@ def generate_v2_for_book(
         api_key, base_url, model, progress=progress, analyze_narration=True,
         known_characters=[{'role_id': entity_id, 'display_name': entity.canonical_name,
                            'aliases': [alias.text for alias in entity.aliases if alias.status == 'confirmed']}
-                          for entity_id, entity in list(supported.items())[-30:] if entity_id != 'narrator'],
+                          for entity_id, entity in supported.items() if entity_id != 'narrator'],
     )
     if previous and previous.provider != provider:
         previous = replace(previous, roles={}, entities={
@@ -363,4 +468,5 @@ def generate_v2_for_book(
     return upgrade_generated_script(
         generated, chapters, entities, parser_fingerprint=parser_fingerprint,
         model=model, previous=previous, registry_complete=registry_complete,
+        registry_warnings=registry_warnings,
     )

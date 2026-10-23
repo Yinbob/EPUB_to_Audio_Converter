@@ -8,6 +8,7 @@ from ebooklib import epub
 
 from audiobook_generator.book_parsers.base_book_parser import BaseBookParser
 from audiobook_generator.config.general_config import GeneralConfig
+from .source_map import TrackedText, epub_source
 
 logger = logging.getLogger(__name__)
 
@@ -41,40 +42,43 @@ class EpubBookParser(BaseBookParser):
 
     def get_chapters(self, break_string) -> List[Tuple[str, str]]:
         chapters = []
+        self.source_chapters = []
         search_and_replaces = self.get_search_and_replaces()
         for item in self.book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
             content = item.get_content()
             soup = BeautifulSoup(content, "lxml-xml")
-            raw = soup.get_text(strip=False)
+            raw, source_records = epub_source(soup, item.get_name())
+            tracked = TrackedText(raw).strip()
             logger.debug(f"Raw text: <{raw[:]}>")
 
             # Replace excessive whitespaces and newline characters based on the mode
             if self.config.newline_mode == "single":
-                cleaned_text = re.sub(r"[\n]+", break_string, raw.strip())
+                tracked.sub(r"[\n]+", break_string)
             elif self.config.newline_mode == "double":
-                cleaned_text = re.sub(r"[\n]{2,}", break_string, raw.strip())
+                tracked.sub(r"[\n]{2,}", break_string)
             elif self.config.newline_mode == "none":
-                cleaned_text = re.sub(r"[\n]+", " ", raw.strip())
+                tracked.sub(r"[\n]+", " ")
             else:
                 raise ValueError(f"Invalid newline mode: {self.config.newline_mode}")
 
+            cleaned_text = tracked.text
             logger.debug(f"Cleaned text step 1: <{cleaned_text[:]}>")
-            cleaned_text = re.sub(r"\s+", " ", cleaned_text)
+            cleaned_text = tracked.sub(r"\s+", " ").text
             logger.debug(f"Cleaned text step 2: <{cleaned_text[:100]}>")
 
             # Removes end-note numbers
             if self.config.remove_endnotes:
-                cleaned_text = re.sub(r'(?<=[a-zA-Z.,!?;”")])\d+', "", cleaned_text)
+                cleaned_text = tracked.sub(r'(?<=[a-zA-Z.,!?;”")])\d+', "").text
                 logger.debug(f"Cleaned text step 4: <{cleaned_text[:100]}>")
 
             # Removes references numbers like [1] or [2.3]
             if self.config.remove_reference_numbers:
-                cleaned_text = re.sub(r'\[\d+(\.\d+)?\]', '', cleaned_text)
+                cleaned_text = tracked.sub(r'\[\d+(\.\d+)?\]', '').text
                 logger.debug(f"Cleaned text step 4.1 (removed brackets): <{cleaned_text[:100]}>")
 
             # Does user defined search and replaces
             for search_and_replace in search_and_replaces:
-                cleaned_text = re.sub(search_and_replace['search'], search_and_replace['replace'], cleaned_text)
+                cleaned_text = tracked.sub(search_and_replace['search'], search_and_replace['replace']).text
             logger.debug(f"Cleaned text step 5: <{cleaned_text[:100]}>")
 
             # Get proper chapter title
@@ -105,6 +109,8 @@ class EpubBookParser(BaseBookParser):
             logger.debug(f"Sanitized title: <{title}>")
 
             chapters.append((title, cleaned_text))
+            self.source_chapters.append({'title': title, 'text': cleaned_text,
+                'paragraphs': tracked.paragraphs(source_records, len(chapters))})
             soup.decompose()
         return chapters
 

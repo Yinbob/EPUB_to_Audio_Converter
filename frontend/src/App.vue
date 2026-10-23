@@ -130,7 +130,7 @@ onUnmounted(() => {
       {{ store.notice }}
     </div>
     <section
-      v-show="store.progressVisible"
+      v-show="store.progressVisible && store.task?.kind !== 'split'"
       class="progress-card"
       aria-live="polite"
     >

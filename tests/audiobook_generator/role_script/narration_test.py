@@ -65,9 +65,30 @@ class NarrationTest(unittest.TestCase):
             result = splitter.split_chapters_with_deepseek([('One', source)], 1, 1, 'openai',
                 'a' * 64, 'dummy', 'https://example.invalid', 'test', analyze_narration=True)
         self.assertEqual(request.call_count, splitter.MAX_ATTEMPTS_PER_CHUNK)
+        self.assertNotIn('validation_feedback', request.call_args_list[0].kwargs['narration_context'])
+        self.assertIn('text_kind', request.call_args_list[1].kwargs['narration_context']['validation_feedback'])
         segment = result.chapters[0].segments[0]
         self.assertEqual((segment.role_id, segment.text_kind, segment.text), ('alex', 'narration', source))
         self.assertEqual(segment.evidence_candidates, (('I am Alex.', 'narrator_identity'),))
+
+    def test_missing_kind_feedback_reaches_model_and_corrected_response_is_used(self):
+        source = 'I am Alex. He walked away.'
+        incomplete = {'roles': {'alex': {'display_name': 'Alex'}},
+                      'segments': [{'role_id': 'alex', 'text': source}]}
+        complete = {'roles': {'alex': {'display_name': 'Alex'}},
+                    'segments': [{'role_id': 'alex', 'text_kind': 'narration', 'text': source}]}
+        client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=Mock(side_effect=[
+            response(narrator('alex', 'Alex', 'I am Alex.')), response(incomplete), response(complete)]))))
+        with patch.object(splitter, '_create_client', return_value=client):
+            result = splitter.split_chapters_with_deepseek([('One', source)], 1, 1, 'openai',
+                'a' * 64, 'dummy', 'https://example.invalid', 'test', analyze_narration=True)
+        calls = client.chat.completions.create.call_args_list
+        self.assertEqual(len(calls), 3)
+        self.assertEqual(len(calls[1].kwargs['messages']), 2)
+        self.assertEqual(len(calls[2].kwargs['messages']), 3)
+        self.assertIn('text_kind', calls[2].kwargs['messages'][-1]['content'])
+        segment = result.chapters[0].segments[0]
+        self.assertEqual((segment.role_id, segment.text_kind, segment.text), ('alex', 'narration', source))
 
     def test_repeated_missing_kind_preserves_source_as_unknown_without_extra_retry(self):
         source = 'I am Alex. He walked away.'
@@ -229,9 +250,14 @@ class NarrationTest(unittest.TestCase):
         client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=Mock(return_value=response(raw)))))
         result = request_narration_context(client, 'test', 1, 'One', source, [])
         self.assertEqual(result['narrators'], [])
-        prompt = client.chat.completions.create.call_args.kwargs['messages'][1]['content']
-        self.assertLess(len(prompt), 26000)
-        self.assertIn('中段未提供', prompt)
+        from audiobook_generator.role_script.context_budget import check_messages
+        calls = client.chat.completions.create.call_args_list
+        self.assertGreater(len(calls), 1)
+        parts = []
+        for call in calls:
+            check_messages(call.kwargs['messages'], call.kwargs['max_tokens'])
+            parts.append(call.kwargs['messages'][1]['content'].split('\n原文：\n', 1)[1])
+        self.assertEqual(''.join(parts), source)
 
     def test_invalid_kind_is_rejected_and_legacy_field_remains_optional(self):
         source = 'I waited.'

@@ -1,6 +1,10 @@
 import type { components } from "./generated/api";
-export type GenerationRequest = components["schemas"]["Generation"];
-export type TaskRequest = components["schemas"]["TaskRequest"];
+// API 有默认值的字段可省略；生成契约同时用于响应时会将默认字段标为 required。
+export type GenerationRequest = Partial<components["schemas"]["Generation"]>;
+export type TaskRequest = Omit<
+  components["schemas"]["TaskRequest"],
+  "generation"
+> & { generation: GenerationRequest };
 export class ApiError extends Error {
   constructor(
     public code: string,
@@ -55,6 +59,9 @@ export interface Task {
   kind: string;
   status: string;
   created_at: number;
+  project_id?: string | null;
+  revision?: number | null;
+  role_id?: string | null;
   error: string;
   result: any;
   progress: any;

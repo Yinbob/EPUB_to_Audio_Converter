@@ -26,7 +26,7 @@ const labels: Record<string, string> = {
   reference_text: "参考音频原文",
   auto_transcribe: "自动转写参考音频",
   denoise: "参考音频降噪",
-  normalize: "音频归一化",
+  normalize: "文本规范化",
   cfg_value: "CFG 引导强度",
   inference_timesteps: "推理步数",
   chunk_chars: "每块字符数",
@@ -40,14 +40,15 @@ const labels: Record<string, string> = {
 function choices(key: string, field: any) {
   if (key === "voice_name" || key === "voice")
     return props.engine.provider === "edge"
-      ? props.capability.voices.filter((v: string) =>
-          v.startsWith(props.engine.language + "-"),
+      ? props.capability.voices.filter((v: { value: string }) =>
+          v.value.startsWith(props.engine.language + "-"),
         )
       : props.capability.voices;
   if (key === "model_name")
     return props.capability.models.length ? props.capability.models : undefined;
   if (key === "output_format") return props.capability.formats;
   if (key === "language") return props.capability.languages;
+  if (key === "device") return props.capability.devices;
   return field.enum;
 }
 watch(
@@ -58,9 +59,9 @@ watch(
       !props.engine.voice_name.startsWith(props.engine.language + "-")
     )
       props.engine.voice_name =
-        props.capability.voices.find((v: string) =>
-          v.startsWith(props.engine.language + "-"),
-        ) || props.engine.voice_name;
+        props.capability.voices.find((v: { value: string }) =>
+          v.value.startsWith(props.engine.language + "-"),
+        )?.value || props.engine.voice_name;
   },
 );
 function kind(field: any, key: string) {
@@ -95,6 +96,12 @@ async function reference(e: Event) {
         v-model="engine[key]"
         :type="kind(field, key)"
         :options="choices(key, field)"
+        :allow-custom="capability.custom_fields?.includes(key)"
+        :hint="
+          key === 'device' && engine.provider === 'voxcpm'
+            ? '多卡可填写 cuda:0、cuda:1'
+            : undefined
+        "
         :min="field.minimum"
         :max="field.maximum"
         :step="field.type === 'integer' ? 1 : 0.05"

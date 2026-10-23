@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import GlassCard from "../components/GlassCard.vue";
 import Field from "../components/Field.vue";
 import SegmentedControl from "../components/SegmentedControl.vue";
+import SourceTrace from "../components/SourceTrace.vue";
 import { api, send, fileUrl, type FileRef } from "../api";
 import { useStudio } from "../stores/studio";
 const store = useStudio(),
@@ -183,6 +184,7 @@ onMounted(refresh);
               </p></template
             ></template
           >
+          <SourceTrace :folder="folder" />
           <details>
             <summary>清理文件</summary>
             <Field

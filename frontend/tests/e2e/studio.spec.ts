@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import fs from "node:fs";
-const out = "../docs/validation/vue_interactions_20261021/screenshots";
+const out = "test-results/validation/vue_interactions/screenshots";
 
 test("四页导航、双主题与响应式视觉", async ({ page }) => {
   const errors: string[] = [];
@@ -91,7 +91,7 @@ test("离线上传、启动、刷新恢复与停止", async ({ page }) => {
   const stop = page.getByRole("button", { name: "停止生成", exact: true });
   await expect(stop).toBeEnabled();
   await stop.scrollIntoViewIfNeeded();
-  const folder = "../docs/validation/vue_neon_bloom_20261022";
+  const folder = "test-results/validation/vue_neon_bloom";
   fs.mkdirSync(folder, { recursive: true });
   await page.screenshot({
     path: folder + "/stop-generation.png",
@@ -135,9 +135,13 @@ test("配音模式开关、双主题按钮与顶栏回到页首", async ({ page 
     buffer: Buffer.from("offline"),
   });
   const role = page.getByLabel("启用多角色配音", { exact: true });
-  const folder = "../docs/validation/vue_neon_bloom_20261022";
+  const folder = "test-results/validation/vue_neon_bloom";
   fs.mkdirSync(folder, { recursive: true });
   await role.check();
+  await expect(
+    page.getByRole("combobox", { name: "已有角色项目", exact: true }),
+  ).not.toBeVisible();
+  await page.getByText("导入剧本或载入已有项目", { exact: true }).click();
   await expect(
     page.getByRole("combobox", { name: "已有角色项目", exact: true }),
   ).toBeVisible();
@@ -249,14 +253,17 @@ test("配音模式开关、双主题按钮与顶栏回到页首", async ({ page 
 });
 
 test("角色项目载入、编辑后确认失效与重新确认", async ({ page }) => {
+  const projects = await (await page.request.get('/api/v1/projects')).json();
+  const ordinary = projects.find((p: any) => !p.research_enabled);
   await page.goto("/");
   await page.getByLabel("启用多角色配音", { exact: true }).check();
+  await page.getByText("导入剧本或载入已有项目", { exact: true }).click();
   const select = page.getByRole("combobox", {
     name: "已有角色项目",
     exact: true,
   });
-  await expect(select.locator("option")).toHaveCount(2);
-  await select.selectOption({ index: 1 });
+  await expect(select.locator("option")).toHaveCount(projects.length + 1);
+  await select.selectOption(ordinary.id);
   await page.getByRole("button", { name: "载入项目", exact: true }).click();
   await expect(page.getByText(/修订 1 · 待复核确认/)).toBeVisible();
   await page.getByRole("button", { name: "复核与确认", exact: true }).click();
@@ -427,13 +434,18 @@ test("高级设置弹窗、背景模糊、焦点返回与设置保留", async ({
       (el) => getComputedStyle(el, "::backdrop").backdropFilter,
     ),
   ).toContain("blur(12px)");
+  await expect(page.getByLabel("章节并行数", { exact: true })).toBeDisabled();
+  await expect(page.getByLabel("章节并行数", { exact: true })).toHaveValue("1");
+  await page.keyboard.press("Escape");
+  await page.getByLabel("检查生成的音频", { exact: true }).uncheck();
+  await trigger.click();
   await page.getByLabel("章节并行数", { exact: true }).fill("3");
   await page.keyboard.press("Escape");
   await expect(dialog).not.toBeVisible();
   await expect(trigger).toBeFocused();
   await trigger.click();
   await expect(page.getByLabel("章节并行数", { exact: true })).toHaveValue("3");
-  const folder = "../docs/validation/vue_advanced_modal_20261021";
+  const folder = "test-results/validation/vue_advanced_modal";
   fs.mkdirSync(folder, { recursive: true });
   await page.screenshot({
     path: folder + "/desktop-light.png",
@@ -457,13 +469,13 @@ test("高级设置弹窗、背景模糊、焦点返回与设置保留", async ({
   await expect(dialog).not.toBeVisible();
 });
 
-test("封面上传、批量占位、移除与旧版响应式宽度", async ({ page }) => {
+test("封面上传、批量占位、移除与响应式宽度", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1600, height: 1000 });
   await page.goto("/?ata-seed=42");
-  const folder = "../docs/validation/vue_book_covers_20261022";
+  const folder = "test-results/validation/vue_book_covers";
   fs.mkdirSync(folder, { recursive: true });
   await page.screenshot({ path: folder + "/empty-desktop.png" });
   await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -490,7 +502,7 @@ test("封面上传、批量占位、移除与旧版响应式宽度", async ({ pa
       await page.getByRole("button", { name: "切换深浅色主题" }).click();
     }
     for (const [device, width, height, shellWidth] of [
-      ["desktop", 1600, 1000, 1320],
+      ["desktop", 1600, 1000, 1600],
       ["laptop", 1280, 900, 1280],
       ["narrow", 1100, 900, 1100],
       ["mobile", 390, 844, 390],

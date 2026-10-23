@@ -34,7 +34,7 @@ class DeepSeekConfigTest(unittest.TestCase):
         client = MagicMock()
         create = client.chat.completions.create
         for run, content in (
-            (lambda: deepseek_splitter._request_chunk(client, '', 1, 'chapter', 'text', 'openai'), '{}'),
+            (lambda: deepseek_splitter._request_chunk(client, '', 1, 'chapter', 'text', 'openai'), '{"roles":{},"segments":[{"role_id":"narrator","text":"text"}]}'),
             (lambda: narration.request_narration_context(client, '', 1, 'chapter', 'text', []), '{"perspective":"unknown","narrators":[]}'),
             (lambda: v2_generation._request_character_chunk(client, '', 1, 'text', {}), '{"characters":[]}'),
         ):

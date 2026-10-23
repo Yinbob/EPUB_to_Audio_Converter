@@ -66,16 +66,19 @@ button,
   justify-content: center;
   gap: 8px;
   min-height: 44px;
+  box-shadow: var(--ata-control-shadow);
 }
 @media (hover: hover) and (pointer: fine) {
   button:not(:disabled):hover,
   .button:hover {
     background-color: var(--ata-hover-strong);
+    box-shadow: var(--ata-control-hover-shadow);
   }
 }
 button:not(:disabled):active,
 .button:active {
   transform: scale(0.97);
+  box-shadow: var(--ata-control-pressed-shadow);
 }
 button.primary,
 .button.primary {
@@ -92,6 +95,17 @@ button.danger {
 button.quiet {
   background: transparent;
   padding: 6px 10px;
+}
+button:disabled,
+button.quiet,
+button.brand {
+  box-shadow: none;
+}
+button.quiet:not(:disabled):hover,
+button.brand:not(:disabled):hover,
+button.quiet:not(:disabled):active,
+button.brand:not(:disabled):active {
+  box-shadow: none;
 }
 a {
   color: var(--apple-blue);
@@ -121,19 +135,9 @@ textarea {
   position: relative;
   z-index: 1;
   width: 100%;
+  max-width: none;
   margin: auto;
   padding: 16px clamp(14px, 4vw, 48px) 0;
-}
-/* 沿用 63aa489 多角色版本的大屏宽度。 */
-@media (min-width: 1200px) {
-  .studio-shell {
-    max-width: 1280px;
-  }
-}
-@media (min-width: 1440px) {
-  .studio-shell {
-    max-width: 1320px;
-  }
 }
 .app-header {
   cursor: pointer;
@@ -193,6 +197,7 @@ button.brand:not(:disabled):hover {
   border-radius: 16px;
   background-color: var(--ata-glass-soft);
   isolation: isolate;
+  box-shadow: var(--ata-track-shadow);
 }
 .segmented-control > a,
 .segmented-control > button {
@@ -212,6 +217,7 @@ button.brand:not(:disabled):hover {
   font-weight: 550;
   line-height: 1.4;
   transition: color 160ms ease;
+  box-shadow: none;
 }
 .segmented-control > .is-selected {
   color: var(--apple-text);
@@ -219,9 +225,11 @@ button.brand:not(:disabled):hover {
 .segmented-control > button:hover,
 .segmented-control > a:hover {
   background: transparent;
+  box-shadow: none;
 }
 .segmented-control > button:active {
   transform: none;
+  box-shadow: none;
 }
 .segment-indicator {
   position: absolute;
@@ -229,9 +237,7 @@ button.brand:not(:disabled):hover {
   left: 0;
   border-radius: 12px;
   background-color: var(--ata-glass-strong);
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.08),
-    0 8px 18px rgba(0, 0, 0, 0.025);
+  box-shadow: var(--ata-control-shadow);
   pointer-events: none;
 }
 .is-measured .segment-indicator {
@@ -387,6 +393,15 @@ textarea {
   border-radius: 12px;
   padding: 11px 12px;
   min-width: 0;
+  box-shadow: var(--ata-field-shadow);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+input:not([type="checkbox"]):not([type="range"]):focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--apple-blue);
 }
 input::placeholder,
 textarea::placeholder {
@@ -404,6 +419,20 @@ input[type="checkbox"] {
   width: 20px;
   height: 20px;
   accent-color: var(--apple-blue);
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  border-radius: 8px;
+  box-shadow: var(--ata-track-shadow);
+}
+input[type="range"]::-webkit-slider-thumb {
+  box-shadow: var(--ata-thumb-shadow);
+}
+input[type="range"]::-moz-range-track {
+  border-radius: 8px;
+  box-shadow: var(--ata-track-shadow);
+}
+input[type="range"]::-moz-range-thumb {
+  box-shadow: var(--ata-thumb-shadow);
 }
 input[type="range"] {
   accent-color: var(--apple-blue);
@@ -432,6 +461,7 @@ input[type="range"] {
   border: 0;
   border-radius: 20px;
   background-color: var(--ata-track);
+  box-shadow: var(--ata-track-shadow);
   cursor: pointer;
   transition: background-color 160ms ease;
 }
@@ -444,7 +474,7 @@ input[type="range"] {
   top: 2px;
   border-radius: 50%;
   background-color: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--ata-thumb-shadow);
   transition: transform 200ms var(--ease-out);
 }
 .switch-field input[type="checkbox"]:checked {
@@ -491,7 +521,7 @@ input[type="range"] {
   outline-offset: 4px;
 }
 .role-mode-switch:not(.is-disabled):active {
-  transform: scale(0.985);
+  background-color: var(--ata-hover-strong);
 }
 .role-mode-symbol {
   display: grid;
@@ -525,6 +555,7 @@ input[type="range"] {
   height: 36px;
   border-radius: 22px;
   background-color: var(--ata-track);
+  box-shadow: var(--ata-track-shadow);
 }
 .role-mode-track::before {
   content: "";
@@ -561,7 +592,7 @@ input[type="range"] {
   height: 28px;
   border-radius: 50%;
   background-color: var(--generate-ink, #fff);
-  box-shadow: 0 2px 4px color-mix(in srgb, var(--apple-text) 18%, transparent);
+  box-shadow: var(--ata-thumb-shadow);
   color: color-mix(in srgb, var(--apple-indigo) 60%, #000);
   transition: transform 250ms var(--ease-out);
 }
@@ -974,6 +1005,512 @@ button.book-remove {
 .section-space {
   margin-top: 24px;
 }
+/* 引擎参数和角色工作区向下变高时，保持用户当前的阅读位置。 */
+.generate-view {
+  overflow-anchor: none;
+}
+.workflow-guide {
+  padding: 8px;
+  margin-bottom: 24px;
+  border-radius: 16px;
+  background-color: var(--ata-glass-modal);
+  backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: var(--apple-shadow);
+}
+.workflow-links {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.workflow-links a {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 2px 10px;
+  min-height: 64px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--apple-text-2);
+  text-decoration: none;
+  text-align: left;
+  background-color: transparent;
+  box-shadow: none;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+.workflow-links a[aria-current="location"] {
+  background-color: var(--apple-blue-soft);
+  color: var(--apple-blue);
+  box-shadow: var(--ata-control-shadow);
+}
+.workflow-links a:active {
+  transform: none;
+}
+.workflow-links a:not([aria-current="location"]):active {
+  box-shadow: none;
+}
+.workflow-number {
+  grid-row: span 2;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+.workflow-label,
+.workflow-short {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.workflow-short {
+  display: none;
+}
+.workflow-links small {
+  font-size: 0.75rem;
+  color: var(--apple-text-2);
+}
+.workflow-section {
+  scroll-margin-top: var(--workflow-scroll-offset, 110px);
+}
+.workflow-section:focus-visible {
+  outline: 2px solid var(--apple-blue);
+  outline-offset: 4px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .workflow-links a:not([aria-current="location"]):hover {
+    background-color: var(--ata-hover);
+    color: var(--apple-text);
+    box-shadow: none;
+  }
+}
+@media (max-width: 1000px) {
+  .workflow-links a {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    text-align: center;
+  }
+  .workflow-number {
+    grid-row: auto;
+    width: 24px;
+    height: 24px;
+  }
+  .workflow-links small {
+    display: none;
+  }
+}
+@media (max-width: 720px) {
+  .workflow-guide {
+    padding: 6px;
+    margin-bottom: 20px;
+  }
+  .workflow-label {
+    display: none;
+  }
+  .workflow-short {
+    display: inline;
+    font-size: 0.8rem;
+  }
+}
+.expand-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 240ms var(--ease-out);
+}
+.expand-panel.is-open {
+  grid-template-rows: 1fr;
+}
+.expand-panel-content {
+  min-height: 0;
+  overflow: hidden;
+}
+.role-workflow {
+  min-width: 0;
+}
+.role-workflow-nav ol {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  gap: 8px;
+  padding: 0 0 20px;
+  margin: 0;
+  border-bottom: 1px solid var(--apple-border);
+}
+.role-workflow-nav button {
+  width: 100%;
+  justify-content: start;
+  text-align: left;
+  padding: 12px;
+  gap: 12px;
+  background-color: transparent;
+  box-shadow: none;
+}
+.role-workflow-nav strong,
+.role-workflow-nav small {
+  display: block;
+}
+.role-workflow-nav strong {
+  font-weight: 600;
+}
+.role-workflow-nav small {
+  color: var(--apple-text-2);
+  margin-top: 2px;
+  font-size: 0.78rem;
+}
+.role-step-number {
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--apple-text-2);
+}
+.role-workflow-nav [aria-current="step"] {
+  color: var(--apple-blue);
+  background-color: var(--apple-blue-soft);
+  box-shadow: var(--ata-control-shadow);
+}
+.role-workflow-nav [aria-current="step"]:not(:disabled):hover {
+  background-color: var(--apple-blue-soft);
+}
+.role-workflow-nav [aria-current="step"] .role-step-number {
+  color: inherit;
+}
+.role-stage,
+.role-stage-heading {
+  margin-top: 24px;
+}
+.role-stage-heading h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.role-stage-heading p {
+  margin: 6px 0 20px;
+}
+.role-voice-tools {
+  max-width: 480px;
+  margin-bottom: 24px;
+}
+.role-workflow .role-disclosure {
+  margin: 16px 0 0;
+}
+.role-disclosure summary small {
+  color: var(--apple-text-2);
+  font-weight: 400;
+  font-size: 0.8rem;
+  margin-left: 12px;
+}
+.role-next {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--apple-border);
+}
+.role-next p {
+  margin: 0;
+}
+.script-generate {
+  min-width: 226px;
+  min-height: 52px;
+  font-weight: 600;
+}
+.script-generate-icon {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+}
+.script-generate.is-preparing:disabled {
+  opacity: 1;
+  cursor: progress;
+}
+.script-generate.is-preparing .script-generate-icon {
+  animation: script-spin 800ms linear infinite;
+}
+@keyframes script-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.script-prepare {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  margin-bottom: 20px;
+}
+.script-prepare h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.script-prepare p {
+  margin: 6px 0 0;
+  max-width: 65ch;
+}
+.script-status {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 16px;
+  margin-top: 16px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background-color: var(--ata-glass-soft);
+}
+.script-status-copy strong {
+  font-weight: 600;
+}
+.script-status-copy p {
+  margin: 3px 0 0;
+  color: var(--apple-text-2);
+  font-size: 0.86rem;
+  overflow-wrap: anywhere;
+}
+.script-wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 117px;
+  height: 44px;
+  color: var(--apple-indigo);
+}
+.script-wave span {
+  flex: 1;
+  min-width: 0;
+  border-radius: 3px;
+  background-color: currentColor;
+  transform: scaleY(0.65);
+}
+.script-status.is-animating .script-wave span {
+  animation: script-wave 900ms var(--ease-in-out) infinite alternate;
+}
+.expand-panel:not(.is-open) .script-wave span {
+  animation-play-state: paused;
+}
+.script-status[data-state="succeeded"] .script-wave {
+  color: var(--apple-green);
+}
+.script-status[data-state="failed"] .script-wave {
+  color: var(--apple-red);
+}
+.script-stages {
+  grid-column: 1 / -1;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  padding: 0;
+  margin: 0;
+  color: var(--apple-text-2);
+  font-size: 0.8rem;
+}
+.script-stages li {
+  padding: 5px 8px;
+  text-align: center;
+  border-radius: 8px;
+}
+.script-stages li + li::before {
+  content: "›";
+  margin-right: 12px;
+  color: var(--apple-text-3);
+}
+.script-stages [aria-current="step"] {
+  color: var(--apple-blue);
+  background-color: var(--apple-blue-soft);
+}
+.script-progress {
+  grid-column: 1 / -1;
+}
+.script-progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--apple-text-2);
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.script-progress-track {
+  overflow: hidden;
+  height: 6px;
+  border-radius: 6px;
+  background-color: var(--apple-blue-soft);
+}
+.script-progress-fill {
+  display: block;
+  height: 100%;
+  background-color: var(--apple-blue);
+  border-radius: inherit;
+  transform-origin: left center;
+  transition: transform 200ms linear;
+}
+.script-progress-fill.is-indeterminate {
+  width: 36%;
+}
+.script-status.is-animating .script-progress-fill.is-indeterminate {
+  animation: script-progress 1400ms linear infinite;
+}
+.expand-panel:not(.is-open) .script-progress-fill,
+.expand-panel:not(.is-open) .script-generate-icon {
+  animation-play-state: paused;
+}
+@keyframes script-progress {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+@keyframes script-wave {
+  to {
+    transform: scaleY(1);
+  }
+}
+/* 宽屏把进度与阶段放到摘要右侧，减少状态卡中部的大块空白。 */
+@media (min-width: 1100px) {
+  .script-status {
+    grid-template-columns: 117px minmax(0, 1fr) minmax(320px, 0.85fr) auto;
+    grid-template-areas:
+      "wave copy progress action"
+      "wave copy stages action";
+    row-gap: 8px;
+  }
+  .script-wave {
+    grid-area: wave;
+  }
+  .script-status-copy {
+    grid-area: copy;
+  }
+  .script-status > button {
+    grid-area: action;
+  }
+  .script-progress {
+    grid-area: progress;
+  }
+  .script-stages {
+    grid-area: stages;
+    gap: 4px;
+  }
+  .script-stages li + li::before {
+    margin-right: 8px;
+  }
+}
+@media (max-width: 720px) {
+  .role-workflow-nav ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .role-workflow-nav button {
+    padding: 10px 8px;
+  }
+  .script-prepare .script-generate {
+    width: 100%;
+  }
+  .role-disclosure summary {
+    flex-wrap: wrap;
+  }
+  .role-disclosure summary small {
+    margin-left: 0;
+  }
+  .script-status {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 16px;
+  }
+  .script-status > button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+  .script-stages {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 8px;
+  }
+  .script-stages li {
+    padding: 4px 5px;
+  }
+  .script-stages li + li::before {
+    display: none;
+  }
+  .script-wave {
+    width: 87px;
+    gap: 2px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .expand-panel {
+    transition: none;
+  }
+  .script-status.is-animating .script-wave span {
+    animation: none;
+    transform: none;
+  }
+  .script-generate.is-preparing .script-generate-icon,
+  .script-status.is-animating .script-progress-fill.is-indeterminate {
+    animation: none;
+  }
+  .script-progress-fill {
+    transition: none;
+  }
+  .script-progress-fill.is-indeterminate {
+    width: 100%;
+    opacity: 0.6;
+  }
+}
+.chapter-overview {
+  padding: 16px 0 2px;
+}
+.chapter-overview-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.chapter-overview-top strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.chapter-overview-top span,
+.chapter-overview p {
+  color: var(--apple-text-2);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+.chapter-overview p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.chapter-track {
+  height: 6px;
+  margin: 14px 0 12px;
+  border-radius: 6px;
+  background-color: var(--ata-track);
+  overflow: hidden;
+}
+.chapter-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background-color: var(--apple-blue);
+  transform-origin: left center;
+  transition: transform 320ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .chapter-fill {
+    transition: none;
+  }
+}
 details {
   margin-top: 24px;
   border-top: 1px solid var(--apple-border-soft);
@@ -1070,6 +1607,23 @@ td button {
   font-size: 0.8rem;
   padding: 6px 12px;
   min-height: 36px;
+}
+.logs-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  align-items: end;
+  gap: 20px;
+}
+.logs-update .switch-field {
+  align-self: stretch;
+  min-height: 46px;
+  padding: 10px 14px;
+}
+@media (max-width: 720px) {
+  .logs-controls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
 }
 .logs {
   white-space: pre-wrap;

@@ -134,12 +134,22 @@ class AudiobookGenerator:
                                      source_span=SourceSpan(idx, 0, len(text)))
                 plan = ChapterSynthesisPlan(idx, title, (unit,), self.config.output_format or "wav", "openai")
                 self._run_audio_core(plan, tts_provider, output_file, audio_tags)
+            elif (getattr(self.config, '_source_metadata', False) and self.config.tts in ('openai', 'minimax')
+                    and audio_ext.lstrip('.') in ('mp3', 'wav', 'flac')):
+                self._run_traceable_plain(idx, title, text, tts_provider, output_file, audio_tags)
             else:
                 tts_provider.text_to_speech(text, output_file, audio_tags)
 
             # Provider 返回不代表已经写出音频，避免空结果被误报为成功。
             if not os.path.isfile(output_file) or os.path.getsize(output_file) == 0:
                 raise RuntimeError(f"第 {idx} 章未生成有效音频文件：{output_file}")
+            if (getattr(self.config, '_source_metadata', False) and not getattr(self.config, 'audio_core_enabled', False)
+                    and (self.config.tts not in ('openai', 'minimax') or audio_ext.lstrip('.') not in ('mp3', 'wav', 'flac'))):
+                from audiobook_generator.role_script.audio_pipeline import probe_audio
+                from audiobook_generator.services.provenance import write_timeline
+                info = probe_audio(output_file)
+                write_timeline(output_file, idx, [{'start_sample': 0, 'end_sample': info['duration_ms'],
+                    'source_start': 0, 'source_end': len(text)}], sample_rate=1000, precision='chapter')
 
             logger.info(f"✅ Converted chapter {idx}: {title}, output file: {output_file}")
 
@@ -165,14 +175,36 @@ class AudiobookGenerator:
             project_root = os.path.join(self.config.output_folder, ".audio_projects", book_hash)
         if getattr(self.config, "audio_core_casting", None):
             from audiobook_generator.audio_core.casting import apply_casting, locked_voices_from_script
-            script = self._load_role_script() if self.config.role_script is not None else None
+            script, _ = self._load_role_script() if self.config.role_script is not None else (None, None)
             plan = apply_casting(plan, self.config.audio_core_casting,
                                  locked=locked_voices_from_script(script) if script else {},
                                  language=self.config.language or "auto")
-        return run_chapter(plan, provider, output_file, tags, project_root,
+        result = run_chapter(plan, provider, output_file, tags, project_root,
                            options=CoreOptions.from_config(self.config),
                            run_id=getattr(self.config, "audio_core_run_id", None),
                            progress=logger.info)
+        from audiobook_generator.services.provenance import write_timeline
+        mapping = result.get('assembly', {})
+        if mapping.get('spans'):
+            write_timeline(output_file, plan.chapter_index, mapping['spans'], sample_rate=mapping['sample_rate'])
+        return result
+
+    def _run_traceable_plain(self, idx, title, text, provider, output_file, tags):
+        from audiobook_generator.role_script.models import ChapterSynthesisPlan, SourceSpan, SynthesisUnit, VoiceProfile
+        from audiobook_generator.role_script.planner import build_default_provider_params
+        from audiobook_generator.audio_core.reading import build_reading_plan
+        from audiobook_generator.role_script.audio_pipeline import assemble_chapter_audio
+        profile = VoiceProfile('narrator', '旁白', build_default_provider_params(self.config.tts, self.config))
+        original = SynthesisUnit(f'{idx}:narrator', idx, title, 1, 1, 'narrator', '旁白', text, profile,
+                                 source_span=SourceSpan(idx, 0, len(text)))
+        chunks = build_reading_plan((original,), chunk_chars=300)
+        units = tuple(replace(original, unit_id=c.chunk_id, segment_index=i, segment_count=len(chunks),
+            text=c.tts_text, source_span=SourceSpan(**c.source_span), pause_after_ms=c.pause_after_ms)
+            for i, c in enumerate(chunks, 1))
+        plan = ChapterSynthesisPlan(idx, title, units, Path(output_file).suffix.lstrip('.'), self.config.tts)
+        with tempfile.TemporaryDirectory(prefix=f'chapter-{idx}-', dir=self.config.output_folder) as work:
+            artifacts = [provider.synthesize_segment(u.text, u.profile, work, logger.info) for u in units]
+            assemble_chapter_audio(plan, artifacts, output_file, tags, work)
 
     def process_role_chapter(self, plan, book_author: str, book_title: str):
         """在 spawn worker 内合成一个角色章节。"""
@@ -415,8 +447,21 @@ class AudiobookGenerator:
         return planning.plans, planning.report
 
     def run(self):
+        final_status = 'failed'
+        self.config._source_metadata = False
         try:
             logger.info("Starting audiobook generation...")
+            if getattr(self.config, 'voice_profile', None):
+                if self.config.role_script or self.config.tts not in ('openai', 'minimax'):
+                    raise ValueError('CLI 全局声音卡仅支持普通 MiMo / MiniMax 朗读；角色声音请在角色项目中绑定')
+                from audiobook_generator.services.portable_voices import PortableVoices
+                voices = PortableVoices(self.config.output_folder)
+                card = voices.import_file(self.config.voice_profile)
+                model = self.config.model_name or ('mimo-v2.5-tts' if self.config.tts == 'openai' else 'speech-2.8-hd')
+                self.config._portable_params, self.config.portable_voice_snapshot = voices.resolve(
+                    card['id'], card['version'], self.config.tts, model)
+            if getattr(self.config, '_portable_params', None) and self.config.output_format not in ('mp3', 'wav', 'flac'):
+                raise ValueError('声音卡朗读仅支持 MP3/WAV/FLAC，请显式选择 --output_format')
             core_mode = bool(getattr(self.config, "audio_core_enabled", False))
             if core_mode:
                 if self.config.tts != "openai":
@@ -454,6 +499,8 @@ class AudiobookGenerator:
             chapters = book_parser.get_chapters(break_string)
             # Filter out empty or very short chapters
             chapters = [(title, text) for title, text in chapters if text.strip()]
+            from audiobook_generator.services.provenance import write_sources
+            self.config._source_metadata = write_sources(book_parser, chapters, self.config)
 
             logger.info(f"Chapters count: {len(chapters)}.")
 
@@ -507,6 +554,8 @@ class AudiobookGenerator:
                     chapter_start=self.config.chapter_start,
                     chapter_end=self.config.chapter_end,
                 )
+                from audiobook_generator.services.provenance import write_plans
+                write_plans(self.config.output_folder, role_plans)
                 for warning in planning_report.warnings:
                     logger.warning(
                         f"角色剧本警告 [{warning.code}] {warning.path}: {warning.message}"
@@ -528,6 +577,7 @@ class AudiobookGenerator:
                             f"  - 第 {plan.chapter_index} 章 {plan.title}: "
                             f"{plan.segment_count} 段"
                         )
+                    final_status = 'parsed'
                     return True
 
                 from audiobook_generator.role_script.audio_pipeline import require_ffmpeg_tools
@@ -587,6 +637,7 @@ class AudiobookGenerator:
                         chapter_title = chapters_to_process[idx - self.config.chapter_start][0]
                         failed_chapters.append((idx, chapter_title))
 
+            final_status = 'failed' if failed_chapters else ('parsed' if self.config.preview else 'succeeded')
             if failed_chapters:
                 logger.warning("The following chapters failed to convert:")
                 for idx, title in failed_chapters:
@@ -601,10 +652,17 @@ class AudiobookGenerator:
                 return True
 
         except KeyboardInterrupt:
+            final_status = 'interrupted'
             logger.info("Audiobook generation process interrupted by user (Ctrl+C).")
             return False
         except Exception as e:
             logger.exception(f"Error during audiobook generation: {e}")
             return False
         finally:
+            if self.config._source_metadata:
+                from audiobook_generator.services.provenance import finalize
+                try:
+                    finalize(self.config.output_folder, status=final_status)
+                except (OSError, ValueError, KeyError):
+                    logger.exception('无法刷新原文溯源报告')
             logger.debug("AudiobookGenerator.run() method finished.")

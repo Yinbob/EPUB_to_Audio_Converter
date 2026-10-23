@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ modelValue: boolean; disabled?: boolean }>();
+defineProps<{ modelValue: boolean; disabled?: boolean; controls?: string }>();
 const emit = defineEmits<{ "update:modelValue": [value: boolean] }>();
 </script>
 
@@ -11,6 +11,8 @@ const emit = defineEmits<{ "update:modelValue": [value: boolean] }>();
     <input
       type="checkbox"
       aria-label="启用多角色配音"
+      :aria-expanded="modelValue"
+      :aria-controls="controls"
       :checked="modelValue"
       :disabled="disabled"
       @change="

@@ -191,7 +191,7 @@ class DeepSeekSplitterTest(unittest.TestCase):
     @patch.object(deepseek_splitter, "_create_client", return_value=object())
     @patch.object(deepseek_splitter, "_request_chunk")
     def test_gender_survives_across_chunks(self, request, _client):
-        def fake_request(client, model, chapter_index, title, text, provider, language):
+        def fake_request(client, model, chapter_index, title, text, provider, language, narration_context=None):
             if "前半" in text:
                 roles = {
                     "narrator": {"display_name": "旁白", "gender": "unknown"},
@@ -586,7 +586,7 @@ class DeepSeekSplitterTest(unittest.TestCase):
 
         calls = {"count": 0}
 
-        def _fake_request(_client, _model, _chapter_index, _title, text, _provider, _language):
+        def _fake_request(_client, _model, _chapter_index, _title, text, _provider, _language, narration_context=None):
             # 第 1 块（两次尝试）返回完全对不上的文本：严格对齐 + 宽松抢救都会失败，
             # 只能整块回退 narrator。后续块原样返回，走精确对齐路径。
             calls["count"] += 1
